@@ -113,3 +113,50 @@ export function calculateStudentScoreVariance(studentScores: Array<{ idx: number
 
     return variance; // No toFixed
 }
+
+
+// src/utils/excelUtils.ts
+
+
+// src/utils/excelUtils.ts
+
+// src/utils/excelUtils.ts
+
+// src/utils/excelUtils.ts
+
+// src/utils/excelUtils.ts
+
+export function extractItemAnalysisData(data: Array<Array<string | number>>): Array<{ question: string; discIndex: number; incorrectPercentage: number; correctPercentage: number }> {
+    const itemAnalysisData: Array<{ question: string; discIndex: number; incorrectPercentage: number; correctPercentage: number }> = [];
+
+    const questionCol = 0;       // 1st column for question numbers (e.g., Q1, Q2)
+    const discIndexCol = 9;      // J column for Disc. Index
+    const incorrectPctCol = 11;  // L column for Pct. Incorrect
+
+    // Start iterating from the 6th row (index 5) onward to get each question
+    for (let row = 5; row < data.length; row++) {
+        const questionKey = data[row][questionCol];
+        const discIndex = data[row][discIndexCol];
+        const incorrectPercentage = data[row][incorrectPctCol];
+
+        // Check if questionKey is valid and matches the expected format (e.g., "Q1", "Q2")
+        if (typeof questionKey === 'string' && questionKey.startsWith("Q")) {
+            const incorrectPct = typeof incorrectPercentage === "number" ? incorrectPercentage * 100 : 0;
+            const correctPercentage = 100 - incorrectPct;
+
+            // Push data to array if question and metrics are valid
+            itemAnalysisData.push({
+                question: questionKey.trim(),
+                discIndex: typeof discIndex === "number" ? discIndex : 0,
+                incorrectPercentage: incorrectPct,
+                correctPercentage
+            });
+        }
+    }
+
+    return itemAnalysisData;
+}
+
+
+
+

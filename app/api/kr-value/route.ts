@@ -8,7 +8,8 @@ import {
     calculatePQValues, 
     calculateTotalPQValue, 
     extractStudentScores, 
-    calculateStudentScoreVariance 
+    calculateStudentScoreVariance, 
+    extractItemAnalysisData
 } from '@/server/utils/kr-utils';
 
 export async function POST(request: Request) {
@@ -21,14 +22,24 @@ export async function POST(request: Request) {
     const workbook = XLSX.read(buffer);
 
     // Check if "Result Grid" sheet exists
-    const sheetName = 'Results Grid';
-    if (!workbook.Sheets[sheetName]) {
-      return NextResponse.json({ message: `Sheet "${sheetName}" not found` }, { status: 404 });
+    const ResultsGridsheetName = 'Results Grid';
+    const itemAnalysisSheetName = 'Item Analysis';
+    if (!workbook.Sheets[ResultsGridsheetName]) {
+      return NextResponse.json({ message: `Sheet "${ResultsGridsheetName}" not found` }, { status: 404 });
     }
 
+    if (!workbook.Sheets[itemAnalysisSheetName]) {
+        return NextResponse.json({ message: `Sheet "${itemAnalysisSheetName}" not found` }, { status: 404 });
+    }
+
+   
+
     // Get the data from the "Result Grid" sheet
-    const sheet = workbook.Sheets[sheetName];
+    const sheet = workbook.Sheets[ResultsGridsheetName];
     const data: Array<Array<string | number>> = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+    const itemAnalysisSheet = workbook.Sheets[itemAnalysisSheetName];
+    const itemAnalysisData: Array<Array<string | number>> = XLSX.utils.sheet_to_json(itemAnalysisSheet, { header: 1 });
 
     // Process the data to extract answers
     if (data.length < 3) {
@@ -46,13 +57,16 @@ export async function POST(request: Request) {
     const totalPQValue = calculateTotalPQValue(pq_values);
     const studentScores = extractStudentScores(data);
     const variance = calculateStudentScoreVariance(studentScores);
-
+    console.log('itemAnalysisData:', itemAnalysisData);
+    const itemAnalysisResults = extractItemAnalysisData(itemAnalysisData);
     const KR_20 = (totalQuestions / (totalQuestions - 1)) * (1 - totalPQValue / variance);
 
     // Return the results, including the total number of questions
     return NextResponse.json(
       { 
+
         KR_20,
+        itemAnalysisResults,
         variance, 
         questionKeys, 
         totalQuestions, 
