@@ -4,7 +4,7 @@ import UserModel from '@/server/models/user.model';
 
 export async function POST(request: Request) {
   try {
-    const { email, password } = await request.json();
+    const { email, password } = await request.json(); 
 
     const user = await UserModel.findOne({ email });
     if (!user) {
@@ -20,9 +20,28 @@ export async function POST(request: Request) {
 
     const { password: _, ...userWithoutPassword } = user.toObject(); 
 
-    return NextResponse.json({ message: 'Login successful', user: userWithoutPassword, token }, { status: 200 });
+    // Prepare response and set cookies
+    const response = NextResponse.json({
+      message: 'Login successful',
+      user: userWithoutPassword,
+      token,
+    }, { status: 200 });
+
+
+    response.cookies.set('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 60 * 60, // 1 hour expiration
+      path: '/',
+    });
+
+    // Return response with cookies set
+    return response;
   } catch (error) {
-    console.error('Login error:', error); // Log the error for debugging
-    return NextResponse.json({ message: 'Error logging in', error: error instanceof Error ? error.message : 'Unknown error' }, { status: 500 });
+    console.error('Login error:', error);
+    return NextResponse.json({
+      message: 'Error logging in',
+      error: error instanceof Error ? error.message : 'Unknown error',
+    }, { status: 500 });
   }
 }
