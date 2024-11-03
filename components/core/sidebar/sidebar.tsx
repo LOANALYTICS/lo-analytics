@@ -1,22 +1,44 @@
 "use client";
 import { useState } from "react";
 import Image from "next/image";
-import { SidebarIcon, ChartBarStacked, SquareLibrary, BookOpenCheck, Plus, User } from "lucide-react";
+import { SidebarIcon, ChartBarStacked, SquareLibrary, BookOpenCheck, Plus, User, UsersRound, BookMarked, BookDashed, AsteriskSquare } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-const sidebarItems = [
+const sidebarItems: SidebarItem[] = [
   { name: "Item Analysis", href: "/dashboard/item-analysis", icon: ChartBarStacked },
+
   { name: "Question Bank", href: "/dashboard/question-bank", icon: SquareLibrary },
-  { name: "PLOs", href: "/dashboard/plos", icon: BookOpenCheck },
+  { name: "Blueprint", href: "/dashboard/blueprint", icon: BookOpenCheck,
+    others: [
+      { name: "Student Details", href: "/dashboard/blueprint/student-details", icon: UsersRound },
+      { name: "Learning Outcomes", href: "/dashboard/blueprint/learning-outcomes", icon: BookDashed },
+      { name: "Assessment Plan", href: "/dashboard/blueprint/assessment-plan", icon: AsteriskSquare },
+    ]
+   },
 ];
 
-const adminSidebarLinks = [
+const adminSidebarLinks: SidebarItem[] = [
   { name: "Create Course", href: "/dashboard/admin/create-course", icon: Plus },
   { name: "Manage", href: "/dashboard/admin/manage-coordinators", icon: User },
 ];
+interface SidebarItem {
+  name: string;
+  href: string;
+  icon: any;
+  others?: SidebarItem[]; // Optional for expandable items
+}
+
 
 const Sidebar = ({ userRole }: { userRole: string }) => {
+  const [expandedItems, setExpandedItems] = useState<{ [key: string]: boolean }>({});
+
+  const toggleExpand = (name:any) => {
+    setExpandedItems((prev) => ({
+      ...prev,
+      [name]: !prev[name],
+    }));
+  };
   const [isCollapsed, setIsCollapsed] = useState(false);
   const pathname = usePathname();
   console.log(pathname === `/dashboard/item-analysis`)
@@ -94,25 +116,78 @@ const Sidebar = ({ userRole }: { userRole: string }) => {
               )
             )
             }
-            {
+              {sidebarItems.map(({ name, href, icon: Icon, others }) => (
+        <li key={name}>
+          {!others ? (
+            // Simple link for items without "others"
+            <Link
+              href={href}
+              className={`flex items-center p-2 rounded-lg text-black transition-colors duration-200 ${pathname === href ? "bg-neutral-500 text-white" : "hover:bg-gray-200"}`}
+            >
+              <Icon className="text-xl min-w-[20px] w-[20px] ml-1" />
+              <span className={`ml-4 break-keep line-clamp-1 text-sm font-medium transition-opacity duration-300 ${isCollapsed ? "opacity-0 pointer-events-none" : "opacity-100"}`}>
+                {name}
+              </span>
+            </Link>
+          ) : (
+            // Expandable item for items with "others"
+            <>
+              <button
+                onClick={() => toggleExpand(name)}
+                className="flex items-center p-2 rounded-lg text-black transition-colors duration-200 hover:bg-gray-200 w-full"
+              >
+                <Icon className="text-xl min-w-[20px] w-[20px] ml-1" />
+                <span className={`ml-4 break-keep line-clamp-1 text-sm font-medium transition-opacity duration-300 ${isCollapsed ? "opacity-0 pointer-events-none" : "opacity-100"}`}>
+                  {name}
+                </span>
+                <span className="ml-auto text-xl">{expandedItems[name] ? '−' : '+'}</span>
+              </button>
+              <div
+                className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                  expandedItems[name] ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0 scale-95'
+                }`}
+              >
+                <ul className="ml-6 mt-2 space-y-1">
+                  {others.map(({ name: otherName, href: otherHref, icon: OtherIcon }) => (
+                    <li key={otherName}>
+                      <Link
+                        href={otherHref}
+                        className={`flex items-center p-2 rounded-lg text-black transition-colors duration-200 ${pathname === otherHref ? "bg-neutral-500 text-white" : "hover:bg-gray-200"}`}
+                      >
+                        <OtherIcon className="text-xl min-w-[20px] w-[20px] ml-1" />
+                        <span className={`ml-4 break-keep line-clamp-1 text-sm font-medium transition-opacity duration-300 ${isCollapsed ? "opacity-0 pointer-events-none" : "opacity-100"}`}>
+                          {otherName}
+                        </span>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </>
+          )}
+        </li>
+      ))}
+            
 
-              sidebarItems.map(({ name, href, icon: Icon }) => (
-                <li key={name}>
-                  <Link
-                    href={href}
-                    className={`flex items-center p-2 rounded-lg text-black transition-colors duration-200 ${pathname === `${href}` ? "bg-neutral-500 text-white" : "hover:bg-gray-200"
-                      }`}
-                  >
-                    <Icon className="text-xl min-w-[20px] w-[20px] ml-1" />
-                    <span
-                      className={`ml-4 break-keep line-clamp-1 text-sm font-medium transition-opacity duration-300 ${isCollapsed ? "opacity-0 pointer-events-none" : "opacity-100"
-                        }`}
-                    >
-                      {name}
-                    </span>
-                  </Link>
-                </li>
-              ))}
+
+
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
           </div>
         </ul>
       </aside>
