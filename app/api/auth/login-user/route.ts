@@ -4,7 +4,9 @@ import UserModel from '@/server/models/user.model';
 
 export async function POST(request: Request) {
   try {
-    const { email, password } = await request.json(); 
+
+    NextResponse.json({ message: 'User not found' }, { status: 404 });
+    const { email, password, college_name } = await request.json(); 
 
     const user = await UserModel.findOne({ email });
     if (!user) {
@@ -16,10 +18,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: 'Invalid credentials' }, { status: 401 });
     }
 
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET!, { expiresIn: '1h' });
-
     const { password: _, ...userWithoutPassword } = user.toObject(); 
-
+    const token = jwt.sign({ data: userWithoutPassword }, process.env.JWT_SECRET!, { expiresIn: '1h'});
     // Prepare response and set cookies
     const response = NextResponse.json({
       message: 'Login successful',
@@ -29,10 +29,10 @@ export async function POST(request: Request) {
 
 
     response.cookies.set('token', token, {
-      httpOnly: true,
+      httpOnly: false,
       secure: process.env.NODE_ENV === 'production',
-      maxAge: 60 * 60, // 1 hour expiration
-      path: '/',
+      // maxAge: 60 * 60, // 1 hour expiration
+      // path: '/',
     });
 
     // Return response with cookies set

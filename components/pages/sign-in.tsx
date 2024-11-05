@@ -27,12 +27,17 @@ SelectValue,
 import { Input } from "@/components/ui/input"
 import Link from 'next/link'
 import { Separator } from '../ui/separator'
+import axios from 'axios'
+import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 const formSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email" }),
   password: z.string().min(6, { message: "Password must be at least 6 characters" }),
   collage_name: z.string(),
 })
 export default function SignIn() {
+
+    const router = useRouter()
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -42,8 +47,20 @@ export default function SignIn() {
         },
       })
      
-      function onSubmit(values: z.infer<typeof formSchema>) {
-        console.log(values)
+      async function onSubmit(values: z.infer<typeof formSchema>) {
+
+        try {
+          const res = await axios.post("http://localhost:3000/api/auth/login-user", values)
+          if(res.status === 200){
+            console.log(res)
+            toast.success("Account created successfully")
+            localStorage.setItem('user', res.data)
+            router.push("/dashboard")
+          }
+          console.log(res)
+        } catch (error) {
+          console.error(error)
+        }
       }
     return (
         <section className='min-w-[400px] border shadow-sm rounded-lg py-4 px-6'>

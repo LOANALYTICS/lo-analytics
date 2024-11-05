@@ -4,21 +4,23 @@ import UserModel, { IUser } from '@/server/models/user.model';
 
 export async function POST(request: Request) {
   try {
-    const { name, email, password, role } = await request.json() as IUser;
-
+    const { name, email, password, college_name } = await request.json() as IUser;
+    if(password.length > 40) {
+      return NextResponse.json({ message: 'Password cant be more then 40 characters' }, { status: 400 });  
+    }
     const existingUser = await UserModel.findOne({ email });
     if (existingUser) {
       return NextResponse.json({ message: 'User already exists' }, { status: 409 });
     }
 
-    const user = new UserModel({ name, email, password, role });
+    const user = new UserModel({ name, email, password, role: 'course_coordinator', college_name });
     await user.save();
 
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET!, { expiresIn: '1h' });
+    const token = jwt.sign({ id: user }, process.env.JWT_SECRET!, { expiresIn: '1h' });
 
     const response = NextResponse.json({
       message: 'User registered successfully',
-      user: { id: user._id, name, email, role },
+      data: user,
       token,
     }, { status: 201 });
 
@@ -33,10 +35,10 @@ export async function POST(request: Request) {
     // }
 
     response.cookies.set('token', token, {
-      httpOnly: true,
+      httpOnly: false,
       secure: process.env.NODE_ENV === 'development',
-      maxAge: 60 * 60, // 1 hour expiration
-      path: '/',
+      // maxAge: 60 * 60, // 1 hour expiration
+      // path: '/',
     });
 
     return response;

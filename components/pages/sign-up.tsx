@@ -1,7 +1,7 @@
 "use client"
 import React from 'react'
 import { z } from "zod"
-
+import axios from 'axios'
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 
@@ -27,23 +27,40 @@ SelectValue,
 import { Input } from "@/components/ui/input"
 import { Separator } from '../ui/separator'
 import Link from 'next/link'
+import { toast } from 'sonner'
+import { useRouter } from 'next/navigation'
 const formSchema = z.object({
+  name: z.string().min(2, { message: "Name must be at least 2 characters" }),
   email: z.string().email({ message: "Please enter a valid email" }),
   password: z.string().min(6, { message: "Password must be at least 6 characters" }),
   collage_name: z.string(),
 })
 export default function SignUp() {
+  const router = useRouter()
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
+          name: "",
           email: "",
           password: "",
           collage_name:""
         },
       })
      
-      function onSubmit(values: z.infer<typeof formSchema>) {
+      async function onSubmit(values: z.infer<typeof formSchema>) {
         console.log(values)
+        try {
+          const res = await axios.post("http://localhost:3000/api/auth/register-user", values)
+          if(res.status === 201){
+            console.log(res)
+            toast.success("Account created successfully")
+            router.push("/dashboard")
+          }
+          console.log(res)
+        } catch (error) {
+          console.error(error)
+        }
+
       }
     return (
         <section className='min-w-[400px] border shadow-sm rounded-lg py-4 px-6'>
@@ -53,6 +70,18 @@ export default function SignUp() {
             </div>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
+          <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem >
+                  <FormLabel>User name</FormLabel>
+                  <FormControl>
+                    <Input required placeholder="Username" {...field} />
+                  </FormControl >
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name="email"
