@@ -25,7 +25,7 @@ const stumm = [
 export default function StudentDetailsPage() {
   return (
     <main>
-       <StudentTable  />
+       <StudentTable data={stumm} />
     </main>
   )
 }

@@ -13,11 +13,8 @@ export type Student = {
   studentName: string
 }
 
-export default function StudentTable() {
-  const [students, setStudents] = useState<Student[]>([
-    { id: '1', studentId: '001', studentName: 'John Doe' },
-    { id: '2', studentId: '002', studentName: 'Jane Smith' },
-  ])
+export default function StudentTable({data} : {data: any}) {
+  const [students, setStudents] = useState<Student[]>(data)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editingStudent, setEditingStudent] = useState<Student | null>(null)
 
@@ -60,29 +57,36 @@ export default function StudentTable() {
   }
 
   return (
-    <div className="container mx-auto p-4">
-      <Table>
+    <section className='p-2'>
+
+    <div className="container mx-auto border rounded-lg ">
+      <Table className='text-xs'>
         <TableHeader>
-          <TableRow>
-            <TableHead>Student ID</TableHead>
-            <TableHead>Student Name</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
+          <TableRow className='p-0'>
+            <TableHead className='w-16 py-2'>S.No</TableHead>
+            <TableHead className='w-[300px] max-w-[300px] min-[300px] py-2'>Student ID</TableHead>
+            <TableHead className='w-[300px] max-w-[300px] min-[300px] py-2'>Student Name</TableHead>
+            <TableHead className="text-right py-2">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
+
           {students.map((student, index) => (
+
             <TableRow key={student.id}>
-              <TableCell>
+              <TableCell className='w-16 py-2'>{index + 1}</TableCell>
+              <TableCell className='w-[300px] max-w-[300px] min-[300px] py-2'>
                 {editingId === student.id ? (
                   <Input 
                     value={editingStudent?.studentId} 
+                    className='w-fit'
                     onChange={(e) => handleInputChange(e, 'studentId')}
                     placeholder="Enter Student ID"
                     aria-label="Student ID"
                   />
                 ) : student.studentId}
               </TableCell>
-              <TableCell>
+              <TableCell className='w-[300px] max-w-[300px] min-[300px] py-2'>
                 {editingId === student.id ? (
                   <Input 
                     value={editingStudent?.studentName} 
@@ -92,7 +96,7 @@ export default function StudentTable() {
                   />
                 ) : student.studentName}
               </TableCell>
-              <TableCell className="text-right">
+              <TableCell className="text-right py-2">
                 {editingId === student.id ? (
                   <div className="flex justify-end space-x-2">
                     <Button variant="ghost" size="icon" onClick={saveChanges} aria-label="Save changes">
@@ -134,5 +138,7 @@ export default function StudentTable() {
         </TableBody>
       </Table>
     </div>
+    </section>
+
   )
 }
