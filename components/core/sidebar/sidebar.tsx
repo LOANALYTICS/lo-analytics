@@ -135,20 +135,29 @@ const Sidebar = ({ userRole }: { userRole: string }) => {
                   // Expandable item for items with "others"
                   <>
                     <button
-                      onClick={() => toggleExpand(name)}
+                      onClick={() => {
+                        toggleExpand(name)
+
+                        isCollapsed && expandedItems[name]
+                      }
+                      }
                       className="flex items-center p-2 rounded-lg text-black transition-colors duration-200 hover:bg-gray-200 w-full"
                     >
                       <Icon className="text-xl min-w-[20px] w-[20px] ml-1" />
                       <span className={`ml-4 break-keep line-clamp-1 text-sm font-medium transition-opacity duration-300 ${isCollapsed ? "opacity-0 pointer-events-none" : "opacity-100"}`}>
                         {name}
                       </span>
-                      <span className="ml-auto text-xl">{expandedItems[name] ? '−' : '+'}</span>
+                      {
+                        isCollapsed ? null : (
+                          <span className="ml-auto text-xl">{expandedItems[name] ? '−' : '+'}</span>
+                        )
+                      }
                     </button>
                     <div
                       className={`overflow-hidden transition-all duration-300 ease-in-out ${expandedItems[name] ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0 scale-95'
                         }`}
                     >
-                      <ul className="ml-6 mt-2 space-y-1">
+                      <ul className={` ${isCollapsed ? "": "ml-6"} mt-2 space-y-1`}>
                         {others.map(({ name: otherName, href: otherHref, icon: OtherIcon }) => (
                           <li key={otherName}>
                             <Link
