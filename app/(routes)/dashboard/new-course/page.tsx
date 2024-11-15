@@ -26,6 +26,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { ThumbsUp } from 'lucide-react'
+import { generatePDF } from '@/services/PdfGeneratorService'
 
 const formSchema = z.object({
   course_name: z.string(),
@@ -84,7 +85,9 @@ export default function NewCoursePage() {
           if (!response.ok) {
             throw new Error("Failed to upload file");
           }
-    
+          const htmlContent = await response.text();
+          console.log(htmlContent)
+          await generatePDF(htmlContent, 'item-analysis-report.pdf');
           const result = await response.json();
           console.log("File uploaded successfully:", result);
         } catch (error) {

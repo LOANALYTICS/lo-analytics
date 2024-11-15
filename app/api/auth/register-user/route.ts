@@ -4,7 +4,7 @@ import UserModel, { IUser } from '@/server/models/user.model';
 
 export async function POST(request: Request) {
   try {
-    const { name, email, password, college_name } = await request.json() as IUser;
+    const { name, email, password, collage_name } = await request.json() as IUser;
     if(password.length > 40) {
       return NextResponse.json({ message: 'Password cant be more then 40 characters' }, { status: 400 });  
     }
@@ -13,10 +13,11 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: 'User already exists' }, { status: 409 });
     }
 
-    const user = new UserModel({ name, email, password, role: 'course_coordinator', college_name });
+    const user = new UserModel({ name, email, password, role: 'course_coordinator', collage_name });
     await user.save();
 
-    const token = jwt.sign({ id: user }, process.env.JWT_SECRET!, { expiresIn: '1h' });
+    const { password: _, ...userWithoutPassword } = user.toObject(); 
+    const token = jwt.sign({ data: userWithoutPassword }, process.env.JWT_SECRET!, { expiresIn: '1h' });
 
     const response = NextResponse.json({
       message: 'User registered successfully',

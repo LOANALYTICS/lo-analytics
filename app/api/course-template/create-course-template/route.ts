@@ -1,12 +1,10 @@
 // app/api/createCourseTemplate/route.ts
 
 import { NextResponse } from 'next/server';
-import mongoose from 'mongoose';
-import CourseTemplateModel from '../../../../server/models/courseTemplate.model'; // Adjust path as needed
+import course from '@/server/models/course';
 
 export async function POST(request: Request) {
   try {
-    // Parse the incoming JSON body
     const {
       course_name,
       sem,
@@ -16,7 +14,6 @@ export async function POST(request: Request) {
       credit_hours,
       level,
       question_ref,
-      _id,
       college_name,
       coordinator,
       academic_year,
@@ -30,8 +27,7 @@ export async function POST(request: Request) {
       
     } = await request.json();
 
-    // Create a new document based on the CourseTemplate model
-    const newCourseTemplate = new CourseTemplateModel({
+    const newCourseTemplate = new course({
       course_name,
       sem,
       department,
@@ -40,7 +36,6 @@ export async function POST(request: Request) {
       credit_hours,
       level,
       question_ref,
-      _id,
       college_name,
       coordinator,
       academic_year,

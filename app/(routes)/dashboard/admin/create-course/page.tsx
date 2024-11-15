@@ -23,9 +23,10 @@ SelectValue,
 } from "@/components/ui/select"
 
 import { Input } from "@/components/ui/input"
+import axios from 'axios'
 const formSchema = z.object({
   course_name: z.string(),
-  course_code: z.string().min(6, { message: "Password must be at least 6 characters" }),
+  course_code: z.string().min(4, { message: "Password must be at least 4 characters" }),
   credit_hours: z.string(),
   department: z.string(),
   co_ordinator: z.string(),
@@ -42,8 +43,10 @@ export default function CreateCoursePage() {
         },
       })
      
-      function onSubmit(values: z.infer<typeof formSchema>) {
+      async function onSubmit(values: z.infer<typeof formSchema>) {
         console.log(values)
+        const response = await axios.post("/api/course-template/create-course-template", values)
+        console.log(response)
       }
     return (
         <section className='min-w-[400px] border shadow-sm rounded-lg py-4 px-6'>

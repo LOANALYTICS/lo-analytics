@@ -22,6 +22,7 @@ const sidebarItems: SidebarItem[] = [
 
 const adminSidebarLinks: SidebarItem[] = [
   { name: "Create Course", href: "/dashboard/admin/create-course", icon: Plus },
+  { name: "Manage Course", href: "/dashboard/admin/manage-courses", icon: Plus },
   { name: "Manage", href: "/dashboard/admin/manage-coordinators", icon: User },
 ];
 interface SidebarItem {
@@ -34,7 +35,7 @@ interface SidebarItem {
 
 const Sidebar = ({ userRole }: { userRole: string }) => {
   const [expandedItems, setExpandedItems] = useState<{ [key: string]: boolean }>({});
-
+  console.log(userRole)
   const toggleExpand = (name: any) => {
     setExpandedItems((prev) => ({
       ...prev,

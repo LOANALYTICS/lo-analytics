@@ -3,11 +3,13 @@ import bcrypt from 'bcrypt';
 import { UserRole } from './types.model';
 
 export interface IUser extends Document {
+  _id: string; 
   name: string;
   email: string;
   password: string;
-  college_name: string;
+  collage_name: string;
   role: UserRole;
+  permissions: string[];
   comparePassword(candidatePassword: string): Promise<boolean>;
 }
 
@@ -27,7 +29,7 @@ const userSchema: Schema<IUser> = new mongoose.Schema({
     type: String,
     required: true,
   },
-  college_name: {
+  collage_name: {
     type: String,
     required: true,
   },
@@ -36,6 +38,7 @@ const userSchema: Schema<IUser> = new mongoose.Schema({
     enum: Object.values(UserRole), 
     required: true,
   },
+  permissions: { type: [String] },
 }, { timestamps: true });
 
 userSchema.pre<IUser>('save', async function (next) {

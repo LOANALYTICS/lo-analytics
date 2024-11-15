@@ -200,6 +200,83 @@ export function extractItemAnalysisData(data: Array<Array<string | number>>): Ar
     return itemAnalysisData;
 }
 
+interface QuestionObject {
+    question: string;
+    discIndex: number;
+    incorrectPercentage: number;
+    correctPercentage: number;
+}
+
+interface GroupedQuestions {
+    classification: string;
+    questions: QuestionObject[];
+}
+
+export function groupByClassification(rows: QuestionObject[]): GroupedQuestions[] {
+    const classificationMap: Record<string, QuestionObject[]> = {
+        "Poor (Bad) Questions": [],
+        "Very Difficult Questions": [],
+        "Difficult Questions": [],
+        "Good Questions": [],
+        "Easy Questions": [],
+        "Very Easy Questions": [],
+    };
+
+    // Calculate total number of questions
+    const totalQuestions = rows.length;
+
+    // Classify questions based on the given conditions
+    rows.forEach(row => {
+        const { discIndex, correctPercentage } = row;
+        let classification = "";
+
+        if (discIndex < 0.199 && correctPercentage >= 0 && correctPercentage <= 100) {
+            classification = "Poor (Bad) Questions";
+        } else if (discIndex >= 0.2 && discIndex < 0.5) {
+            if (correctPercentage >= 0 && correctPercentage <= 20.99) {
+                classification = "Very Difficult Questions";
+            } else if (correctPercentage >= 21 && correctPercentage <= 30.99) {
+                classification = "Difficult Questions";
+            } else if (correctPercentage >= 31 && correctPercentage <= 70.99) {
+                classification = "Good Questions";
+            } else if (correctPercentage >= 71 && correctPercentage <= 80.99) {
+                classification = "Easy Questions";
+            } else if (correctPercentage >= 81 && correctPercentage <= 100) {
+                classification = "Very Easy Questions";
+            }
+        }
+
+        // Add row to the appropriate classification group
+        if (classification) {
+            classificationMap[classification].push({ ...row });
+        }
+    });
+
+    // Collect groups with their question count
+    const groups = Object.entries(classificationMap).map(([classification, questions]) => ({
+        classification,
+        questions,
+        perc: questions.length > 0 ? (questions.length / totalQuestions) * 100 : 0, // Calculate percentage or set to 0 if no questions
+    }));
+
+    // Calculate the sum of percentages
+    const totalPerc = groups.reduce((sum, group) => sum + group.perc, 0);
+
+    // Adjust percentages to ensure they sum to 100%
+    if (totalPerc !== 100) {
+        const correctionFactor = 100 / totalPerc;
+        groups.forEach(group => {
+            group.perc = parseFloat((group.perc * correctionFactor).toFixed(2)); // Adjust and round
+        });
+    }
+
+    return groups;
+}
+
+
+
+
+
 
 
 

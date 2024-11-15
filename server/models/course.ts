@@ -1,8 +1,9 @@
-// models/CourseTemplate.ts
+// models/Course.ts
 
-import mongoose, { Document, Schema, model, models } from 'mongoose';
+import  { Document, Schema, model, models } from 'mongoose';
 
-interface CourseTemplate extends Document {
+ export interface ICourse extends Document {
+  _id: string; 
   course_name: string;
   sem: number;
   department: string;
@@ -21,10 +22,11 @@ interface CourseTemplate extends Document {
   KR20?: string; 
   gender?: string;
   createdBy: string; 
+  permissions: string[];
 }
 
 // Define the schema
-const CourseTemplateSchema = new Schema<CourseTemplate>({
+const CourseSchema = new Schema<ICourse>({
   course_name: { type: String },
   sem: { type: Number },
   department: { type: String },
@@ -34,7 +36,7 @@ const CourseTemplateSchema = new Schema<CourseTemplate>({
   level: { type: Number },
   question_ref: { type: String },
   college_name: { type: String },
-  coordinator: [{ type: Schema.Types.ObjectId, ref: 'User' }], 
+  coordinator: [{ type: Schema.Types.ObjectId, ref: 'User' }],
   academic_year: { type: Date },
   no_of_question: { type: Number },
   no_of_student: { type: Number },
@@ -44,4 +46,5 @@ const CourseTemplateSchema = new Schema<CourseTemplate>({
   gender: { type: String },
 });
 
-export default models.CourseTemplate || model<CourseTemplate>('CourseTemplate', CourseTemplateSchema);
+// Use existing model if already compiled, otherwise create a new one
+export default models.Course || model<ICourse>('Course', CourseSchema);

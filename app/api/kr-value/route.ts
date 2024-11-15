@@ -10,8 +10,10 @@ import {
     extractStudentScores, 
     calculateStudentScoreVariance, 
     extractItemAnalysisData, 
-    calculateStudentGrades
+    calculateStudentGrades,
+    groupByClassification
 } from '@/server/utils/kr-utils';
+import { generateHTML } from '@/services/KR20GenerateHTML';
 
 // Configure API route settings
 export const config = {
@@ -19,6 +21,29 @@ export const config = {
     bodyParser: false, // Disable Next.js's default body parsing
   },
 };
+
+function calculateGradeDistribution(results: any[]) {
+  // Define all possible grades in order
+  const grades = ['A+', 'A', 'B+', 'B', 'C+', 'C', 'D+', 'D', 'F'];
+  
+  // Get total count of all students
+  const totalStudents = results.length;
+  
+  // Calculate distribution for each grade
+  const distribution = grades.map(grade => {
+    const studentsWithGrade = results.filter(student => student.grade === grade);
+    const count = studentsWithGrade.length;
+    const studentPercentage = (count / totalStudents) * 100;
+    
+    return {
+      grade,
+      count,
+      studentPercentage: Number(studentPercentage.toFixed(2))
+    };
+  });
+  
+  return distribution;
+}
 
 export async function POST(request: Request) {
   try {
@@ -74,23 +99,80 @@ export async function POST(request: Request) {
     const itemAnalysisResults = extractItemAnalysisData(itemAnalysisData);
     const KR_20 = (totalQuestions / (totalQuestions - 1)) * (1 - totalPQValue / variance);
     const gradedStudents = calculateStudentGrades(studentScores);
+    const groupedItemAnalysisResults = groupByClassification(itemAnalysisResults);
+    const gradeDistribution = calculateGradeDistribution(gradedStudents);
+
+    // Calculate passed students
+    const totalStudents = gradeDistribution.reduce((sum, grade) => sum + grade.count, 0);
+    const failedCount = gradeDistribution.find(g => g.grade === 'F')?.count || 0;
+    const passedStudents = {
+      number: totalStudents - failedCount,
+      percentage: ((totalStudents - failedCount) / totalStudents * 100).toFixed(2)
+    };
+
+    const course = {
+      name: "Mathematics 101",
+      level: "Undergraduate", 
+      semester: "Spring 2023",
+      coordinator: "Dr. Smith",
+      code: "MATH101",
+      creditHours: 3,
+      studentsNumber: 50,
+      studentsWithdrawn: 1,
+      studentsAbsent: 2,
+      studentsAttended: 47,
+      studentsPassed: passedStudents
+    }
+    const collegeInfo = {
+      logo: "https://upload.wikimedia.org/wikipedia/en/thumb/a/ae/Najran_University_Logo.svg/220px-Najran_University_Logo.svg.png",
+      college: {
+        english: "English College Name",
+        regional: "Regional College Name",
+        university: "University Name"
+      }
+    }
+    const KR20HTML = generateHTML({
+      groupedItemAnalysisResults:[...groupedItemAnalysisResults,  {
+        classification: "Reliability",
+        questions: [
+          { question: "KR20" }
+        ]
+      } ],
+      KR_20:KR_20,
+      segregatedGradedStudents:gradeDistribution,
+      course:course,
+      collegeInfo:collegeInfo
+    })
+// const data1 = [{
+//   // groupedItemAnalysisResults:groupedItemAnalysisResults,
+//   // KR_20:KR_20,
+//   // gradeDistribution:gradeDistribution,
+//   // course:course,
+//   // collegeInfo:collegeInfo
+//   gradedStudents:gradedStudents
+//     }]
+    // return new NextResponse(JSON.stringify(data1))
+    return new NextResponse(KR20HTML)
+
     // Return final JSON response
-    return NextResponse.json(
-      { 
-        gradedStudents,
-        KR_20,
-        itemAnalysisResults,
-        variance, 
-        questionKeys, 
-        totalQuestions, 
-        p_values, 
-        q_values, 
-        pq_values, 
-        totalPQValue, 
-        studentScores 
-      }, 
-      { status: 200 }
-    );
+    // return NextResponse.json(
+    //   { 
+    //     groupedItemAnalysisResults,
+    //     gradeDistribution,
+    //     gradedStudents,
+    //     KR_20,
+    //     itemAnalysisResults,
+    //     variance, 
+    //     questionKeys, 
+    //     totalQuestions, 
+    //     p_values, 
+    //     q_values, 
+    //     pq_values, 
+    //     totalPQValue, 
+    //     studentScores 
+    //   }, 
+    //   { status: 200 }
+    // );
 
   } catch (error) {
     console.error('Error processing Excel file:', error);
