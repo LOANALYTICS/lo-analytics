@@ -15,9 +15,17 @@ export type Student = {
 }
 
 export default function StudentTable({data} : {data: any}) {
-  const [students, setStudents] = useState<Student[]>(data)
-  const [editingId, setEditingId] = useState<string | null>(null)
-  const [editingStudent, setEditingStudent] = useState<Student | null>(null)
+  const initialState = data.length === 0 
+    ? [{ id: uuidv4(), studentId: '', studentName: '' }] 
+    : data;
+
+  const [students, setStudents] = useState<Student[]>(initialState)
+  const [editingId, setEditingId] = useState<string | null>(
+    data.length === 0 ? initialState[0].id : null
+  )
+  const [editingStudent, setEditingStudent] = useState<Student | null>(
+    data.length === 0 ? initialState[0] : null
+  )
 
   const addNewRow = () => {
     const id = uuidv4()
@@ -128,9 +136,11 @@ export default function StudentTable({data} : {data: any}) {
                     <Button variant="ghost" size="icon" onClick={saveChanges} aria-label="Save changes">
                       <Save className="h-4 w-4" />
                     </Button>
-                    <Button variant="ghost" size="icon" onClick={cancelEdit} aria-label="Cancel edit">
-                      <X className="h-4 w-4" />
-                    </Button>
+                    {!(students.length === 1 && !student.studentId && !student.studentName) && (
+                      <Button variant="ghost" size="icon" onClick={cancelEdit} aria-label="Cancel edit">
+                        <X className="h-4 w-4" />
+                      </Button>
+                    )}
                   </div>
                 ) : (
                   <DropdownMenu>
