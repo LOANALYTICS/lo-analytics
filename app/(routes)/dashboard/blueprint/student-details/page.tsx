@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import CourseCard from '@/components/shared/course-card'
 import StudentTable from '@/components/shared/student-table/StudentTable'
 import { getCurrentUser } from '@/server/utils/helper'

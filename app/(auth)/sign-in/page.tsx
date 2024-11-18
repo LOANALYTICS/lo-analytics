@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic'
 import SignIn from '@/components/pages/sign-in'
 import { getCollage } from '@/services/collage.action'
 import React from 'react'

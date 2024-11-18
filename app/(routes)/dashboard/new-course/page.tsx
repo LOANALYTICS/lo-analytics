@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import React from 'react'
 import { getCoordinatorCourseTemplates } from '@/services/courseTemplate.action'
 import { getCurrentUser } from '@/server/utils/helper'

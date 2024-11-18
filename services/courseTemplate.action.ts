@@ -1,5 +1,5 @@
 "use server";
-import Course, { ICourse } from "@/server/models/course";
+import { ICourse } from "@/server/models/course.model";
 import courseTemplateModel from "@/server/models/courseTemplate.model";
 
 export async function getCoursesTemplates(): Promise<any[]> {
