@@ -4,7 +4,6 @@ import Image from "next/image";
 import { SidebarIcon, ChartBarStacked, SquareLibrary, BookOpenCheck, Plus, User, UsersRound, BookMarked, BookDashed, AsteriskSquare, LogOut, Building } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Button } from "@/components/ui/button";
 
 const sidebarItems: SidebarItem[] = [
   { name: "Item Analysis", href: "/dashboard/item-analysis", icon: ChartBarStacked },
@@ -36,7 +35,6 @@ interface SidebarItem {
 
 const Sidebar = ({ userRole }: { userRole: string }) => {
   const [expandedItems, setExpandedItems] = useState<{ [key: string]: boolean }>({});
-  console.log(userRole)
   const toggleExpand = (name: any) => {
     setExpandedItems((prev) => ({
       ...prev,
@@ -45,8 +43,7 @@ const Sidebar = ({ userRole }: { userRole: string }) => {
   };
   const [isCollapsed, setIsCollapsed] = useState(false);
   const pathname = usePathname();
-  console.log(pathname === `/dashboard/item-analysis`)
-  console.log(pathname)
+
   const toggleSidebarCollapse = () => {
     setIsCollapsed((prev) => !prev);
   };

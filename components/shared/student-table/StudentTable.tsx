@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { MoreHorizontal, Pencil, Trash, Save, X, PlusCircle } from 'lucide-react'
 import { v4 as uuidv4 } from 'uuid'
+import { toast } from "sonner"
 
 export type Student = {
   id: string
@@ -36,18 +37,43 @@ export default function StudentTable({data} : {data: any}) {
   }
 
   const saveChanges = () => {
-    if (editingStudent) {
-      setStudents(students.map(student => 
-        student.id === editingStudent.id ? editingStudent : student
-      ))
-      setEditingId(null)
-      setEditingStudent(null)
+    if (!editingStudent) return;
+
+    const trimmedId = editingStudent.studentId.trim();
+    const trimmedName = editingStudent.studentName.trim();
+
+    if (!trimmedId || !trimmedName) {
+      toast.error("Student ID and Name cannot be empty");
+      return;
     }
+
+    const originalStudent = students.find(s => s.id === editingStudent.id);
+    if (originalStudent && !originalStudent.studentId && !originalStudent.studentName) {
+      if (!trimmedId || !trimmedName) {
+        toast.error("Both Student ID and Name are required for new entries");
+        return;
+      }
+    }
+
+    setStudents(students.map(student => 
+      student.id === editingStudent.id 
+        ? { ...editingStudent, studentId: trimmedId, studentName: trimmedName }
+        : student
+    ));
+    setEditingId(null);
+    setEditingStudent(null);
+    toast.success("Student saved successfully");
   }
 
   const cancelEdit = () => {
-    setEditingId(null)
-    setEditingStudent(null)
+    const studentBeingEdited = students.find(s => s.id === editingId);
+    
+    if (studentBeingEdited && !studentBeingEdited.studentId && !studentBeingEdited.studentName) {
+      setStudents(prevStudents => prevStudents.filter(student => student.id !== editingId));
+    }
+    
+    setEditingId(null);
+    setEditingStudent(null);
   }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>, field: keyof Student) => {
