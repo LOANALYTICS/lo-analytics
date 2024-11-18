@@ -1,10 +1,10 @@
 "use server";
-import Course, { ICourse } from "@/server/models/course";
+import courseModel, { ICourse } from '@/server/models/course.model';
 import { Types } from 'mongoose';
 
 export async function getCourses(): Promise<any[]> {
     // Fetch courses and populate the coordinators
-    const courses = await Course.find().populate('coordinator').lean() as ICourse[];
+    const courses = await courseModel.find().populate('coordinator').lean() as ICourse[];
 
     return courses.map((course) => {
         const serializedCourse: any = {
@@ -55,8 +55,16 @@ type CreateCourseInput = {
 }
 
 export async function createCourse(course: CreateCourseInput) {
-    const newCourse = await Course.create(course);
-    return newCourse.toObject();
+    const newCourse = await courseModel.create(course);
+    return {
+        _id: newCourse._id.toString(),
+        course_name: newCourse.course_name,
+        course_code: newCourse.course_code,
+        credit_hours: newCourse.credit_hours,
+        department: newCourse.department,
+        examType: newCourse.examType,
+        semister: newCourse.semister,
+    };
 }
 
 type Student = {
@@ -67,7 +75,7 @@ type Student = {
 
 export async function updateCourseStudents(courseId: string, students: Student[]) {
   try {
-    const updatedCourse = await Course.findByIdAndUpdate(
+    const updatedCourse = await courseModel.findByIdAndUpdate(
       courseId,
       { $set: { students: students } },
       { new: true }
@@ -91,7 +99,7 @@ export async function updateCourseStudents(courseId: string, students: Student[]
 export async function getCoursesByCreator(userId: string): Promise<any[]> {
     try {
         // Convert string ID to ObjectId and find courses
-        const courses = await Course.find({ 
+        const courses = await courseModel.find({ 
             createdBy: new Types.ObjectId(userId) 
         })
         .lean() as ICourse[];
@@ -129,7 +137,7 @@ export async function getCoursesByCreator(userId: string): Promise<any[]> {
 
 export async function getCourseById(courseId: string) {
     try {
-        const course = await Course.findById(courseId)
+        const course = await courseModel.findById(courseId)
             .populate('coordinator')
             .lean() as ICourse;
 

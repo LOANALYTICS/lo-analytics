@@ -132,26 +132,26 @@ export function generateHTML(data: any): string {
     <!-- Header with Logo and College Information -->
     <header>
       <img src="data:image/png;base64,${collegeInfo?.logo || ''}" alt="College Logo" class="logo" onerror="this.style.display='none'">
-      <p>${collegeInfo?.college?.english || ''} | ${collegeInfo?.college?.regional || ''} | ${collegeInfo?.college?.university || ''}</p>
+      <p>${collegeInfo?.english || ''} | ${collegeInfo?.regional || ''} | ${collegeInfo?.university || ''}</p>
     </header>
 
     <!-- Course Details Section -->
     <div class="info-box">
       <div class="course-grid">
         <div class="grid-item">
-          <p>Course Name: ${course?.name || ''}</p>
+          <p>Course Name: ${course?.course_name || ''}</p>
         </div>
         <div class="grid-item">
-          <p>Course Code: ${course?.code || ''}</p>
+          <p>Course Code: ${course?.course_code || ''}</p>
         </div>
         <div class="grid-item">
-          <p>Course Hour: ${course?.hour || ''}</p>
+          <p>Credit Hour: ${course?.credit_hours || ''}</p>
         </div>
         <div class="grid-item">
           <p>Level: ${course?.level || ''}</p>
         </div>
         <div class="grid-item">
-          <p>Semester: ${course?.semester || ''}</p>
+          <p>Semister: ${course?.semister || ''}</p>
         </div>
         <div class="grid-item">
           <p>Course Coordinator: ${course?.coordinator || ''}</p>
