@@ -2,7 +2,13 @@
 
 import  { Document, Schema, model, models } from 'mongoose';
 
- export interface ICourse extends Document {
+export interface IStudent {
+  id: string;
+  studentId: string;
+  studentName: string;
+}
+
+export interface ICourse extends Document {
   _id: string; 
   course_name: string;
   sem: number;
@@ -20,8 +26,9 @@ import  { Document, Schema, model, models } from 'mongoose';
   student_absent: number;
   KR20?: string; 
   gender?: string;
-  createdBy: string; 
+  createdBy?: typeof Schema.Types.ObjectId; 
   permissions: string[];
+  students: IStudent[];
 }
 
 // Define the schema
@@ -42,6 +49,12 @@ const CourseSchema = new Schema<ICourse>({
   student_absent: { type: Number },
   KR20: { type: String },
   gender: { type: String },
+  students: [{
+    id: { type: String, required: true },
+    studentId: { type: String, required: true },
+    studentName: { type: String, required: true }
+  }],
+  createdBy: { type: Schema.Types.ObjectId, ref: 'User' }
 });
 
 // Use existing model if already compiled, otherwise create a new one

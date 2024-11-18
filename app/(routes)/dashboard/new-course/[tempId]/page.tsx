@@ -130,7 +130,8 @@ export default function NewCoursePage() {
         try {
             const result = await createCourse({
                 ...data,
-                collage: user?.cid
+                collage: user?.cid,
+                createdBy: user?.id
             });
             
             if (result) {
