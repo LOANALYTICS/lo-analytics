@@ -1,16 +1,20 @@
 import { NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
-import UserModel from '@/server/models/user.model';
+import UserModel, { IUser } from '@/server/models/user.model';
 
 export async function POST(request: Request) {
   try {
-
     NextResponse.json({ message: 'User not found' }, { status: 404 });
-    const { email, password, college_name } = await request.json(); 
+    const { email, password, collage } = await request.json(); 
 
-    const user = await UserModel.findOne({ email });
+    const user = await UserModel.findOne({ email }).populate('collage');
+    console.log(user?.collage?._id + "", collage)
+    
     if (!user) {
       return NextResponse.json({ message: 'User not found' }, { status: 404 });
+    }
+    if((user.collage?._id + "") !== collage) {
+      return NextResponse.json({ message: 'Invalid collage' }, { status: 401 });
     }
 
     const isMatch = await user.comparePassword(password);
@@ -18,8 +22,17 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: 'Invalid credentials' }, { status: 401 });
     }
 
-    const { password: _, ...userWithoutPassword } = user.toObject(); 
-    const token = jwt.sign({ data: userWithoutPassword }, process.env.JWT_SECRET!, { expiresIn: '1h'});
+    const { password: _, ...userWithoutPassword } = user.toObject() as IUser & {
+      collage: { _id: string; logo: string; english: string; regional: string; university: string; }
+    }; 
+    const token = jwt.sign({ 
+      _id: userWithoutPassword._id.toString(),
+      name: userWithoutPassword.name,
+      email: userWithoutPassword.email,
+      role: userWithoutPassword.role,
+      cid: userWithoutPassword.collage._id.toString(),
+    }, process.env.JWT_SECRET!, { expiresIn: '1h' });
+
     // Prepare response and set cookies
     const response = NextResponse.json({
       message: 'Login successful',

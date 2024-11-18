@@ -131,7 +131,7 @@ export function generateHTML(data: any): string {
   <body>
     <!-- Header with Logo and College Information -->
     <header>
-      <img src="${collegeInfo?.logo || ''}" alt="College Logo" class="logo" onerror="this.style.display='none'">
+      <img src="data:image/png;base64,${collegeInfo?.logo || ''}" alt="College Logo" class="logo" onerror="this.style.display='none'">
       <p>${collegeInfo?.college?.english || ''} | ${collegeInfo?.college?.regional || ''} | ${collegeInfo?.college?.university || ''}</p>
     </header>
 

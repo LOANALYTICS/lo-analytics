@@ -1,0 +1,132 @@
+"use server";
+import Course, { ICourse } from "@/server/models/course";
+import courseTemplateModel from "@/server/models/courseTemplate.model";
+
+export async function getCoursesTemplates(): Promise<any[]> {
+    // Fetch courses and populate the coordinators
+    const courses = await courseTemplateModel.find().populate('coordinator').lean() as any[];
+
+    return courses.map((course) => {
+        const serializedCourse: any = {
+            _id: course._id.toString(), // Convert the main course ObjectId to string
+            course_name: course.course_name,
+            sem: course.sem,
+            department: course.department,
+            university_name: course.university_name,
+            course_code: course.course_code,
+            credit_hours: course.credit_hours,
+            level: course.level,
+            question_ref: course.question_ref,
+            // college_name: course.college,
+            // Handle coordinator (which is an array of objects) and convert _id to string
+            coordinator: course.coordinator
+                ? course.coordinator.map((coordinator: any) => ({
+                      _id: coordinator._id.toString(), // Convert each coordinator's ObjectId to string
+                      name: coordinator.name, // Assuming you want other fields like name
+                  }))
+                : [],
+            academic_year: course.academic_year,
+            students_withdrawn: course.students_withdrawn,
+            student_absent: course.student_absent,
+            gender: course.gender,
+            // createdBy: course.createdBy ? course.createdBy.toString() : undefined, // Convert createdBy ObjectId to string if present
+        };
+
+        return serializedCourse;
+    });
+}
+
+
+
+
+export async function createCourseTemplates(course: typeof courseTemplateModel) {
+    const newCourse = await courseTemplateModel.create(course);
+    return newCourse.toObject(); // Convert Mongoose document to plain object
+}
+
+export async function toggleCourseCoordinator(courseId: string, coordinatorId: string): Promise<ICourse | null> {
+    const course = await courseTemplateModel.findById(courseId).lean() as any | null;
+
+    if (!course) {
+        throw new Error('Course not found');
+    }
+
+    const isCoordinatorAdded = course.coordinator.includes(coordinatorId);
+
+    if (isCoordinatorAdded) {
+        await courseTemplateModel.findByIdAndUpdate(courseId, {
+            $pull: { coordinator: coordinatorId },
+        });
+    } else {
+        await courseTemplateModel.findByIdAndUpdate(courseId, {
+            $addToSet: { coordinator: coordinatorId },
+        });
+    }
+
+    const updatedCourse = await courseTemplateModel.findById(courseId).lean() as any | null;
+    return updatedCourse;
+}
+
+export async function assignCoordinatorsToCourse(courseId: string, coordinatorIds: string[]): Promise<any> {
+
+    const course = await courseTemplateModel.findById(courseId).lean< typeof courseTemplateModel>();
+    if (!course) {
+        throw new Error('Course not found');
+    }
+
+    await courseTemplateModel.findByIdAndUpdate(courseId, {
+        $set: { coordinator: coordinatorIds }, 
+    });
+
+    const updatedCourse = await courseTemplateModel.findById(courseId).populate('coordinator').lean<ICourse>();
+
+
+    return updatedCourse ? true : false; 
+}
+
+export async function getCoordinatorCourseTemplates(userId: string): Promise<any[]> {
+    const courses = await courseTemplateModel.find({
+        coordinator: userId
+    }).lean() as any[];
+
+    return courses.map((course) => ({
+        _id: course._id.toString(),
+        course_name: course.course_name,
+        sem: course.sem,
+        department: course.department,
+        university_name: course.university_name,
+        course_code: course.course_code,
+        credit_hours: course.credit_hours,
+        level: course.level,
+        question_ref: course.question_ref,
+        // coordinator: course.coordinator, // Keep as array of strings
+        academic_year: course.academic_year,
+        students_withdrawn: course.students_withdrawn,
+        student_absent: course.student_absent,
+        gender: course.gender,
+        // createdBy: course.createdBy ? course.createdBy.toString() : undefined,
+    }));
+}
+
+export async function getCourseTemplateById(id: string) {
+    const course = await courseTemplateModel.findById(id).lean() as any;
+    
+    if (!course) return null;
+
+    return {
+        _id: course._id.toString(),
+        course_name: course.course_name || "",
+        sem: course.sem || "",
+        department: course.department || "",
+        course_code: course.course_code || "",
+        credit_hours: course.credit_hours || "",
+        level: course.level || "",
+        examType: course.examType || "",
+        section: course.section || "",
+        academic_year: course.academic_year || "",
+        student_withdrawn: course.student_withdrawn || "",
+        student_absent: course.student_absent || "",
+        // coordinator: course.coordinator || []
+    };
+}
+

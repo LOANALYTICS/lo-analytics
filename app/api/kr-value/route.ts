@@ -13,7 +13,8 @@ import {
     calculateStudentGrades,
     groupByClassification
 } from '@/server/utils/kr-utils';
-import { generateHTML } from '@/services/KR20GenerateHTML';
+import { generateHTML } from '@/services/KR20GenerateHTML';odimport College from '@/server/models/college.model';
+el';
 
 // Configure API route settings
 export const config = {
@@ -100,35 +101,53 @@ export async function POST(request: Request) {
     const KR_20 = (totalQuestions / (totalQuestions - 1)) * (1 - totalPQValue / variance);
     const gradedStudents = calculateStudentGrades(studentScores);
     const groupedItemAnalysisResults = groupByClassification(itemAnalysisResults);
-    const gradeDistribution = calculateGradeDistribution(gradedStudents);
+    const gradeDistribution = calculateGradeDistribution(gradedStuden    // Get courseId and collegeId from request body
+    const { courseId, collegeId } = await request.json();
+ts);ou    if (!courseId || !collegeId) {
+      return NextResponse.json({ message: 'Course ID and College ID are required' }, { status: 400 });
+    }
 
+    // Find course from database
+    const courseData = await Course.findById(courseId)
+      .select('course_name level sem department course_code credit_hours no_of_student students_withdrawn student_absent coordinator')
+      .lean();
+
+    if (!courseData) {
+      return NextResponse.json({ message: 'Course not found' }, { status: 404 }); 
+    }
+
+    // Find college from database
+    const collegeData = await College.findById(collegeId).lean();
+
+    if (!collegeData) {
+      return NextResponse.json({ message: 'College not found' }, { status: 404 });
+    }
+
+    const course = {
+      name: courseData.course_name,
+      level: courseData.level,
+      semester: courseData.sem,
+      coordinator: courseData.coordinator,
+      code: courseData.course_code,
+      creditHours: courseData.credit_hours,
+      studentsNumber: courseData.no_of_student,
+      studentsWithdrawn: courseData.students_withdrawn,
+      studentsAbsent: courseData.student_absent,
+      studentsAttended: courseData.no_of_student - (courseData.students_withdrawn + courseData.student_absent),
+      studentsPassed: passedStudents
+    };
+rse.
     // Calculate passed students
     const totalStudents = gradeDistribution.reduce((sum, grade) => sum + grade.count, 0);
     const failedCount = gradeDistribution.find(g => g.grade === 'F')?.count || 0;
     const passedStudents = {
       number: totalStudents - failedCount,
       percentage: ((totalStudents - failedCount) / totalStudents * 100).toFixed(2)
-    };
-
-    const course = {
-      name: "Mathematics 101",
-      level: "Undergraduate", 
-      semester: "Spring 2023",
-      coordinator: "Dr. Smith",
-      code: "MATH101",
-      creditHours: 3,
-      studentsNumber: 50,
-      studentsWithdrawn: 1,
-      studentsAbsent: 2,
-      studentsAttended: 47,
-      studentsPassed: passedStudents
-    }
-    const collegeInfo = {
-      logo: "https://upload.wikimedia.org/wikipedia/en/thumb/a/ae/Najran_University_Logo.svg/220px-Najran_University_Logo.svg.png",
-      college: {
-        english: "English College Name",
-        regional: "Regional College Name",
-        university: "University Name"
+       }
+    const collegeInfo      logo: collegeData.logo,.png",
+      colleg        english: collegeData.english,
+        regional: collegeData.regional,
+        university: collegeData.university Name"
       }
     }
     const KR20HTML = generateHTML({

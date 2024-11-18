@@ -11,12 +11,11 @@ import  { Document, Schema, model, models } from 'mongoose';
   course_code: string;
   credit_hours: string;
   level: number;
+  examType: string;
   question_ref?: string;
-  college_name?: string;
+  college?: string;
   coordinator: string[]; 
-  academic_year: Date;
-  no_of_question: number;
-  no_of_student: number;
+  academic_year: String;
   students_withdrawn: number;
   student_absent: number;
   KR20?: string; 
@@ -34,12 +33,11 @@ const CourseSchema = new Schema<ICourse>({
   course_code: { type: String },
   credit_hours: { type: String },
   level: { type: Number },
+  examType: { type: String, required: true },
   question_ref: { type: String },
-  college_name: { type: String },
+  college: [{ type: Schema.Types.ObjectId, ref: 'Collage' }],
   coordinator: [{ type: Schema.Types.ObjectId, ref: 'User' }],
-  academic_year: { type: Date },
-  no_of_question: { type: Number },
-  no_of_student: { type: Number },
+  academic_year: { type: String },
   students_withdrawn: { type: Number },
   student_absent: { type: Number },
   KR20: { type: String },

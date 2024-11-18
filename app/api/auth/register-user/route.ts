@@ -4,7 +4,7 @@ import UserModel, { IUser } from '@/server/models/user.model';
 
 export async function POST(request: Request) {
   try {
-    const { name, email, password, collage_name } = await request.json() as IUser;
+    const { name, email, password, collage } = await request.json() as IUser;
     if(password.length > 40) {
       return NextResponse.json({ message: 'Password cant be more then 40 characters' }, { status: 400 });  
     }
@@ -13,11 +13,24 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: 'User already exists' }, { status: 409 });
     }
 
-    const user = new UserModel({ name, email, password, role: 'course_coordinator', collage_name });
+    const user = new UserModel({ name, email, password, role: 'course_coordinator', collage });
     await user.save();
+    await user.populate({
+      path: 'collage',
+      select: '_id logo english regional university'
+    });
 
-    const { password: _, ...userWithoutPassword } = user.toObject(); 
-    const token = jwt.sign({ data: userWithoutPassword }, process.env.JWT_SECRET!, { expiresIn: '1h' });
+    const { password: _, ...userWithoutPassword } = user.toObject() as IUser & {
+      collage: { _id: string; logo: string; english: string; regional: string; university: string; }
+    }; 
+    const token = jwt.sign({ 
+      _id: userWithoutPassword._id.toString(),
+      name: userWithoutPassword.name,
+      email: userWithoutPassword.email,
+      role: userWithoutPassword.role,
+      cid: userWithoutPassword.collage._id.toString(),
+    }, process.env.JWT_SECRET!, { expiresIn: '1h' });
+
 
     const response = NextResponse.json({
       message: 'User registered successfully',

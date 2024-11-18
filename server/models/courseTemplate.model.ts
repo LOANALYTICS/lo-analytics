@@ -3,6 +3,7 @@
 import mongoose, { Document, Schema, model, models } from 'mongoose';
 
 interface CourseTemplate extends Document {
+  _id: string; 
   course_name: string;
   sem: number;
   department: string;
@@ -10,17 +11,17 @@ interface CourseTemplate extends Document {
   course_code: string;
   credit_hours: string;
   level: number;
+  examType: string;
   question_ref?: string;
-  college_name?: string;
+  college?: string;
   coordinator: string[]; 
   academic_year: Date;
-  no_of_question: number;
-  no_of_student: number;
   students_withdrawn: number;
   student_absent: number;
   KR20?: string; 
   gender?: string;
   createdBy: string; 
+  permissions: string[];
 }
 
 // Define the schema
@@ -32,12 +33,11 @@ const CourseTemplateSchema = new Schema<CourseTemplate>({
   course_code: { type: String },
   credit_hours: { type: String },
   level: { type: Number },
+  examType: { type: String,},
   question_ref: { type: String },
-  college_name: { type: String },
-  coordinator: [{ type: Schema.Types.ObjectId, ref: 'User' }], 
+  college: [{ type: Schema.Types.ObjectId, ref: 'Collage' }],
+  coordinator: [{ type: Schema.Types.ObjectId, ref: 'User' }],
   academic_year: { type: Date },
-  no_of_question: { type: Number },
-  no_of_student: { type: Number },
   students_withdrawn: { type: Number },
   student_absent: { type: Number },
   KR20: { type: String },

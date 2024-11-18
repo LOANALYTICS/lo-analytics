@@ -7,7 +7,7 @@ export interface IUser extends Document {
   name: string;
   email: string;
   password: string;
-  collage_name: string;
+  collage: mongoose.Types.ObjectId;
   role: UserRole;
   permissions: string[];
   comparePassword(candidatePassword: string): Promise<boolean>;
@@ -29,10 +29,7 @@ const userSchema: Schema<IUser> = new mongoose.Schema({
     type: String,
     required: true,
   },
-  collage_name: {
-    type: String,
-    required: true,
-  },
+  collage: { type: Schema.Types.ObjectId, ref: 'Collage' },
   role: {
     type: String,
     enum: Object.values(UserRole), 

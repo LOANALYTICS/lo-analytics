@@ -33,9 +33,9 @@ import { toast } from 'sonner'
 const formSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email" }),
   password: z.string().min(6, { message: "Password must be at least 6 characters" }),
-  collage_name: z.string(),
+  collage: z.string(),
 })
-export default function SignIn() {
+export default function SignIn({collages}:{collages:any}) {
 
     const router = useRouter()
     const form = useForm<z.infer<typeof formSchema>>({
@@ -43,25 +43,30 @@ export default function SignIn() {
         defaultValues: {
           email: "",
           password: "",
-          collage_name:""
+          collage:""
         },
       })
      
       async function onSubmit(values: z.infer<typeof formSchema>) {
-
         try {
           const res = await axios.post("http://localhost:3000/api/auth/login-user", values)
+          console.log(res)
+
           if(res.status === 200){
             console.log(res)
-            toast.success("Account created successfully")
+            toast.success("Account login successfully")
             localStorage.setItem('user', res.data)
             router.push("/dashboard")
           }
-          console.log(res)
-        } catch (error) {
-          console.error(error)
+        } catch (error: any) {
+          console.log(error)
+          toast.error(error.message)
         }
       }
+      const collagesData = collages?.map((collage:any)=>({
+        value:collage._id,
+        label:collage.english
+      }))
     return (
         <section className='min-w-[400px] border shadow-sm rounded-lg py-4 px-6'>
             <div className=''>
@@ -96,7 +101,7 @@ export default function SignIn() {
             />
               <FormField
           control={form.control}
-          name="collage_name"
+          name="collage"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Collage</FormLabel>
@@ -107,9 +112,9 @@ export default function SignIn() {
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="collage_092">Collage 092</SelectItem>
-                  <SelectItem value="collage_82">Collage 82</SelectItem>
-                  <SelectItem value="collage_23">Collage 23</SelectItem>
+                  {collagesData && collagesData?.map((collage:any)=>(
+                    <SelectItem key={collage.value} value={collage.value}>{collage.label}</SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
            

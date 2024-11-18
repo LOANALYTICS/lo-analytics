@@ -3,9 +3,9 @@
 import React, { useState, useEffect } from "react"
 import { DynamicDropdownMenu } from '@/components/shared/MultiSelect'
 import { IUser } from '@/server/models/user.model'
-import { assignCoordinatorsToCourse, getCourses } from '@/services/courses.action'
 import { getUsersByRole } from '@/services/users.actions'
 import { toast } from "sonner"
+import { assignCoordinatorsToCourse, getCoursesTemplates } from "@/services/courseTemplate.action"
 
 export default function ManageCoordinators() {
   const [courses, setCourses] = useState<any[]>([])
@@ -13,10 +13,10 @@ export default function ManageCoordinators() {
   const [dropdownState, setDropdownState] = useState<Record<string, Record<string, boolean>>>({})
 
   const fetchData = async () => {
-    console.log("Fetching courses and coordinators...") // Log start of fetch
-    const courseData = await getCourses()
+    console.log("Fetching courses and coordinators...") 
+    const courseData = await getCoursesTemplates()
     const coordinatorData = await getUsersByRole("course_coordinator")
-    console.log("Coordinators fetched:", coordinatorData) // Log fetched coordinators
+    console.log("Coordinators fetched:", coordinatorData)
 
     setCourses(courseData)
     setCoordinators(coordinatorData)

@@ -33,9 +33,9 @@ const formSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters" }),
   email: z.string().email({ message: "Please enter a valid email" }),
   password: z.string().min(6, { message: "Password must be at least 6 characters" }),
-  collage_name: z.string(),
+  collage: z.string(),
 })
-export default function SignUp() {
+export default function SignUp({collages}:{collages:any}) {
   const router = useRouter()
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -43,7 +43,7 @@ export default function SignUp() {
           name: "",
           email: "",
           password: "",
-          collage_name:""
+          collage:""
         },
       })
      
@@ -62,6 +62,10 @@ export default function SignUp() {
         }
 
       }
+      const collagesData = collages?.map((collage:any)=>({
+        value:collage._id,
+        label:collage.english
+      }))
     return (
         <section className='min-w-[400px] border shadow-sm rounded-lg py-4 px-6'>
              <div className=''>
@@ -109,7 +113,7 @@ export default function SignUp() {
               <FormField
               
           control={form.control}
-          name="collage_name"
+          name="collage"
           render={({ field }) => (
             <FormItem >
               <FormLabel>Collage</FormLabel>
@@ -120,9 +124,10 @@ export default function SignUp() {
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="collage_092">Collage 092</SelectItem>
-                  <SelectItem value="collage_82">Collage 82</SelectItem>
-                  <SelectItem value="collage_23">Collage 23</SelectItem>
+                  { collagesData && collagesData?.map((collage:any)=>(
+                    <SelectItem key={collage.value} value={collage.value}>{collage.label}</SelectItem>
+                  ))}
+                
                 </SelectContent>
               </Select>
               <FormMessage />

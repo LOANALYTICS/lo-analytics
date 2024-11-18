@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import Image from "next/image";
-import { SidebarIcon, ChartBarStacked, SquareLibrary, BookOpenCheck, Plus, User, UsersRound, BookMarked, BookDashed, AsteriskSquare, LogOut } from "lucide-react";
+import { SidebarIcon, ChartBarStacked, SquareLibrary, BookOpenCheck, Plus, User, UsersRound, BookMarked, BookDashed, AsteriskSquare, LogOut, Building } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -21,8 +21,9 @@ const sidebarItems: SidebarItem[] = [
 ];
 
 const adminSidebarLinks: SidebarItem[] = [
+  { name: "Manage Collage", href: "/dashboard/admin/manage-collage", icon: Building },
   { name: "Create Course", href: "/dashboard/admin/create-course", icon: Plus },
-  { name: "Manage Course", href: "/dashboard/admin/manage-courses", icon: Plus },
+  { name: "Manage Course", href: "/dashboard/admin/manage-courses", icon: BookDashed },
   { name: "Manage", href: "/dashboard/admin/manage-coordinators", icon: User },
 ];
 interface SidebarItem {

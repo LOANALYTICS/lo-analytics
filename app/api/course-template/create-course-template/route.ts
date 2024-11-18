@@ -1,7 +1,7 @@
 // app/api/createCourseTemplate/route.ts
 
 import { NextResponse } from 'next/server';
-import course from '@/server/models/course';
+import courseTemplateModel from '@/server/models/courseTemplate.model';
 
 export async function POST(request: Request) {
   try {
@@ -27,7 +27,7 @@ export async function POST(request: Request) {
       
     } = await request.json();
 
-    const newCourseTemplate = new course({
+    const newCourseTemplate = new courseTemplateModel({
       course_name,
       sem,
       department,
