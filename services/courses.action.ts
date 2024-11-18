@@ -10,7 +10,7 @@ export async function getCourses(): Promise<any[]> {
         const serializedCourse: any = {
             _id: course._id.toString(), // Convert the main course ObjectId to string
             course_name: course.course_name,
-            sem: course.sem,
+            semister: course.semister,
             department: course.department,
             university_name: course.university_name,
             course_code: course.course_code,
@@ -108,7 +108,7 @@ export async function getCoursesByCreator(userId: string): Promise<any[]> {
         return courses.map((course) => ({
             _id: course._id.toString(),
             course_name: course.course_name,
-            sem: course.sem,
+            semister: course.semister,
             department: course.department,
             university_name: course.university_name,
             course_code: course.course_code,
@@ -149,7 +149,7 @@ export async function getCourseById(courseId: string) {
         return {
             _id: course._id.toString(),
             course_name: course.course_name,
-            sem: course.sem,
+            semister: course.semister,
             department: course.department,
             university_name: course.university_name,
             course_code: course.course_code,

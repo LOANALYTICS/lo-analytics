@@ -11,7 +11,7 @@ export interface IStudent {
 export interface ICourse extends Document {
   _id: string; 
   course_name: string;
-  sem: number;
+  semister: number;
   department: string;
   university_name: string;
   course_code: string;
@@ -34,7 +34,7 @@ export interface ICourse extends Document {
 // Define the schema
 const CourseSchema = new Schema<ICourse>({
   course_name: { type: String },
-  sem: { type: Number },
+  semister: { type: Number },
   department: { type: String },
   university_name: { type: String },
   course_code: { type: String },

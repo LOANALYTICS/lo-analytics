@@ -212,6 +212,7 @@ export default function NewCoursePage() {
             await generatePDF(htmlContent, "analysis-report.pdf");
             console.log("PDF generated successfully");
           }
+          router.push(`/dashboard/item-analysis`)
         } catch (error) {
           console.error("Error uploading file:", error);
           toast.error("Failed to upload file");

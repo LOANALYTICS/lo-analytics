@@ -103,7 +103,7 @@ export async function POST(request: Request) {
 
     // Fetch course and college data
     const courseData: any = await courseModel.findById(courseId)
-      .select('course_name level sem department course_code credit_hours no_of_student students_withdrawn student_absent coordinator')
+      .select('course_name level semister department course_code credit_hours no_of_student students_withdrawn student_absent coordinator')
       .lean();
 
     const collegeData : any = await collageModel.findById(collegeId).lean();
@@ -125,7 +125,7 @@ export async function POST(request: Request) {
     const course = {
       course_name: courseData.course_name,
       level: courseData.level,
-      semister: courseData.sem,
+      semister: courseData.semister,
       coordinator: courseData.coordinator,
       course_code: courseData.course_code,
       credit_hours: courseData.credit_hours,
@@ -142,7 +142,7 @@ export async function POST(request: Request) {
       regional: collegeData.regional,
       university: collegeData.university
     };
-    console.log(courseData,collegeInfo, "krs")
+    console.log(course, "krs")
 
     const KR20HTML = generateHTML({
       groupedItemAnalysisResults: [
