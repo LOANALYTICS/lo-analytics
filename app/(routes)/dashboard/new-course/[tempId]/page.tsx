@@ -132,21 +132,32 @@ export default function NewCoursePage() {
 
         setIsSubmitting(true);
         try {
-            const result = await createCourse({
+            const response = await createCourse({
                 ...data,
                 collage: user?.cid,
                 createdBy: user?.id
             });
             
-            if (result) {
-                console.log(result)
-                toast.success("Course created successfully");
-                setCreatedCourseId(result._id);
-                setOpen(true);
+            if (!response || !response.success) {
+                // Handle specific duplicate course error
+                if (response.error.includes('already exists')) {
+                    toast.warning(response.error, {
+                        duration: 4000,
+                        description: "Please try with different semester, section, or exam type"
+                    });
+                    return;
+                }
+                
+                toast.error(response.error);
+                return;
             }
+
+            toast.success("Course created successfully");
+            setCreatedCourseId(response.data._id);
+            setOpen(true);
         } catch (error) {
             console.error(error);
-            toast.error("Failed to create course");
+            toast.error("Something went wrong while creating the course");
         } finally {
             setIsSubmitting(false);
         }
@@ -302,15 +313,25 @@ export default function NewCoursePage() {
                                 </FormItem>
                             )}
                         />
+                    
                         <FormField
                             control={form.control}
                             name="section"
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Section</FormLabel>
-                                    <FormControl>
-                                        <Input placeholder="Section" {...field} />
-                                    </FormControl>
+                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                        <FormControl>
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Select Section" />
+                                            </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                            <SelectItem value="male">Male</SelectItem>
+                                            <SelectItem value="female">Female</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    <FormMessage />
                                 </FormItem>
                             )}
                         />

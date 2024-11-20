@@ -1,6 +1,7 @@
 "use server";
 import courseModel, { ICourse } from '@/server/models/course.model';
 import { Types } from 'mongoose';
+import { NextResponse } from 'next/server';
 
 export async function getCourses(): Promise<any[]> {
     // Fetch courses and populate the coordinators
@@ -28,7 +29,7 @@ export async function getCourses(): Promise<any[]> {
             academic_year: course.academic_year,
             students_withdrawn: course.students_withdrawn,
             student_absent: course.student_absent,
-            gender: course.gender,
+            section: course.section,
             createdBy: course.createdBy ? course.createdBy.toString() : undefined, // Convert createdBy ObjectId to string if present
             students: course.students || [],
         };
@@ -54,17 +55,55 @@ type CreateCourseInput = {
   createdBy: string;
 }
 
-export async function createCourse(course: CreateCourseInput) {
-    const newCourse = await courseModel.create(course);
-    return {
-        _id: newCourse._id.toString(),
-        course_name: newCourse.course_name,
-        course_code: newCourse.course_code,
-        credit_hours: newCourse.credit_hours,
-        department: newCourse.department,
-        examType: newCourse.examType,
-        semister: newCourse.semister,
-    };
+export async function createCourse(data: CreateCourseInput) {
+    try {
+        // Check for exact duplicate (same academic year, semester, examType, AND section)
+        const exactDuplicate = await courseModel.findOne({
+            academic_year: data.academic_year,
+            semister: data.semister,
+            examType: data.examType,
+            section: data.section
+        });
+
+        if (exactDuplicate) {
+            return {
+                success: false,
+                error: `A course already exists for ${data.academic_year} semester ${data.semister} with exam type ${data.examType} and section ${data.section}`
+            };
+        }
+
+        // If all validations pass, create the course
+        const course = await courseModel.create({
+            course_name: data.course_name,
+            course_code: data.course_code,
+            credit_hours: data.credit_hours,
+            department: data.department,
+            examType: data.examType,
+            semister: data.semister,
+            level: data.level,
+            section: data.section,
+            collage: data.collage,
+            academic_year: data.academic_year,
+            students_withdrawn: data.student_withdrawn,
+            student_absent: data.student_absent,
+            createdBy: data.createdBy
+        });
+
+        const plainCourse = course.toObject();
+        return {
+            success: true,
+            data: {
+                ...plainCourse,
+                _id: plainCourse._id.toString(),
+                createdBy: plainCourse.createdBy?.toString()
+            }
+        };
+    } catch (error: any) {
+        return {
+            success: false,
+            error: error.message
+        };
+    }
 }
 
 type Student = {
@@ -96,7 +135,7 @@ export async function updateCourseStudents(courseId: string, students: Student[]
   }
 }
 
-export async function getCoursesByCreator(userId: string): Promise<any[]> {
+export async function getCoursesByCreator(userId: string): Promise<any> {
     try {
         // Convert string ID to ObjectId and find courses
         const courses = await courseModel.find({ 
@@ -105,30 +144,41 @@ export async function getCoursesByCreator(userId: string): Promise<any[]> {
         .lean() as ICourse[];
         console.log(courses,"hello")
         // Serialize the courses similar to getCourses
-        return courses.map((course) => ({
-            _id: course._id.toString(),
-            course_name: course.course_name,
-            semister: course.semister,
-            department: course.department,
-            university_name: course.university_name,
-            course_code: course.course_code,
-            credit_hours: course.credit_hours,
-            level: course.level,
-            question_ref: course.question_ref,
-            coordinator: course.coordinator
-                ? course.coordinator.map((coordinator: any) => ({
-                      _id: coordinator._id.toString(),
-                      name: coordinator.name,
-                  }))
-                : [],
-            academic_year: course.academic_year,
-            students_withdrawn: course.students_withdrawn,
-            student_absent: course.student_absent,
-            gender: course.gender,
-            createdBy: course.createdBy ? course.createdBy.toString() : undefined,
-            students: course.students || [],
-            examType: course.examType
-        }));
+        // return courses.map((course) => ({
+        //     _id: course._id.toString(),
+        //     course_name: course.course_name,
+        //     semister: course.semister,
+        //     department: course.department,
+        //     university_name: course.university_name,
+        //     course_code: course.course_code,
+        //     credit_hours: course.credit_hours,
+        //     level: course.level,
+        //     question_ref: course.question_ref,
+        //     coordinator: course.coordinator
+        //         ? course.coordinator.map((coordinator: any) => ({
+        //               _id: coordinator._id.toString(),
+        //               name: coordinator.name,
+        //           }))
+        //         : [],
+        //     academic_year: course.academic_year,
+        //     students_withdrawn: course.students_withdrawn,
+        //     student_absent: course.student_absent,
+        //     section: course.section,
+        //     createdBy: course.createdBy ? course.createdBy.toString() : undefined,
+        //     students: course.students || [],
+        //     examType: course.examType
+        // }));
+        return {
+            success: true,
+            message: 'Courses fetched successfully',
+            data: courses.map((course) => ({
+                ...course,
+                _id: course._id.toString(),
+                createdBy: course.createdBy ? course.createdBy.toString() : undefined
+
+            }))
+        }
+            
     } catch (error) {
         console.error('Error fetching courses by creator:', error);
         throw new Error('Failed to fetch courses');
@@ -165,7 +215,7 @@ export async function getCourseById(courseId: string) {
             academic_year: course.academic_year,
             students_withdrawn: course.students_withdrawn,
             student_absent: course.student_absent,
-            gender: course.gender,
+            section: course.section,
             createdBy: course.createdBy ? course.createdBy.toString() : undefined,
             students: course.students.map((student) => {
                 return {
@@ -181,6 +231,7 @@ export async function getCourseById(courseId: string) {
         throw new Error('Failed to fetch course');
     }
 }
+
 
 
 

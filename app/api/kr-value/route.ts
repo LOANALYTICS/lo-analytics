@@ -16,6 +16,7 @@ import {
 import { generateHTML } from '@/services/KR20GenerateHTML';
 import courseModel from '@/server/models/course.model';
 import collageModel from '@/server/models/collage.model';
+import KRValueModel from '@/server/models/kr-value.model';
 
 
 // Configure API route settings
@@ -144,6 +145,34 @@ export async function POST(request: Request) {
     };
     console.log(course, "krs")
 
+    // Create KR value document
+    const krValueDoc = await KRValueModel.create({
+      courseId: courseData._id,
+      KR_20: KR_20,
+      groupedItemAnalysisResults: [
+        ...groupedItemAnalysisResults,
+        {
+          classification: "Reliability",
+          questions: [{ question: "KR20" }]
+        }
+      ],
+      gradeDistribution: gradeDistribution
+    });
+
+    // Update course with KR value reference
+    await courseModel.findByIdAndUpdate(
+      courseData._id,
+      {
+        $push: { krValues: krValueDoc._id }
+      },
+      { new: true }
+    ).exec();
+
+    // Add error handling
+    console.log('KR Value Document:', krValueDoc);
+    console.log('Course ID:', courseData._id);
+
+    // Generate and return HTML response
     const KR20HTML = generateHTML({
       groupedItemAnalysisResults: [
         ...groupedItemAnalysisResults,
