@@ -172,10 +172,32 @@ export async function getCoursesByCreator(userId: string): Promise<any> {
             success: true,
             message: 'Courses fetched successfully',
             data: courses.map((course) => ({
-                ...course,
                 _id: course._id.toString(),
-                createdBy: course.createdBy ? course.createdBy.toString() : undefined
-
+                course_name: course.course_name,
+                semister: course.semister,
+                department: course.department,
+                university_name: course.university_name,
+                course_code: course.course_code,
+                credit_hours: course.credit_hours,
+                level: course.level,
+                question_ref: course.question_ref,
+                coordinator: course.coordinator
+                    ? course.coordinator.map((coordinator: any) => ({
+                          _id: coordinator._id.toString(),
+                          name: coordinator.name,
+                      }))
+                    : [],   
+                academic_year: course.academic_year,
+                students_withdrawn: course.students_withdrawn,
+                student_absent: course.student_absent,
+                section: course.section,
+                examType: course.examType,
+                createdBy: course.createdBy ? course.createdBy.toString() : undefined,
+                students: course.students.map((student) => ({
+                    id: student.id.toString(),
+                    studentId: student.studentId.toString(),
+                    studentName: student.studentName
+                })) || []
             }))
         }
             

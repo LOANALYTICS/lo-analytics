@@ -1,6 +1,6 @@
 // models/Collage.ts
 
-import { Document, Schema, model, models } from 'mongoose';
+import { Document, Schema } from 'mongoose';
 
 export interface ICollage extends Document {
     _id: string;
@@ -10,13 +10,9 @@ export interface ICollage extends Document {
     university: string;
 }
 
-// Define the schema
-const CollageSchema = new Schema<ICollage>({
+export const collageSchema = new Schema<ICollage>({
     logo: { type: String },
     english: { type: String },
     regional: { type: String },
     university: { type: String }
-});
-
-// Use existing model if already compiled, otherwise create a new one
-export default models.Collage || model<ICollage>('Collage', CollageSchema);
+}, { timestamps: true });

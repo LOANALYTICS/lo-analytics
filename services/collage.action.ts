@@ -1,11 +1,12 @@
 "use server"
 
-import collageModel from "@/server/models/collage.model"
+import { Collage } from "@/lib/models"
+
 
 
 
 export async function getCollage() {
-    const collage = await collageModel.find()
+    const collage = await Collage.find()
     return collage.map((collage:any)=>({
         _id: collage._id.toString(),
         logo:collage.logo,
@@ -16,6 +17,6 @@ export async function getCollage() {
 }
 
 export async function createCollage(collage: any) {
-    const newCollage = await collageModel.create(collage)
+    const newCollage = await Collage.create(collage)
     return newCollage ? true : false
 }

@@ -1,5 +1,6 @@
 "use server";
-import User from "@/server/models/user.model";
+
+import { User } from "@/lib/models";
 
 // Get users by role
 export async function getUsersByRole(role: string): Promise<any[]> {

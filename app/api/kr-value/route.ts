@@ -15,9 +15,9 @@ import {
 } from '@/server/utils/kr-utils';
 import { generateHTML } from '@/services/KR20GenerateHTML';
 import courseModel from '@/server/models/course.model';
-import collageModel from '@/server/models/collage.model';
 import KRValueModel from '@/server/models/kr-value.model';
 import { connectToMongoDB } from '@/lib/db';
+import { Collage } from '@/lib/models';
 
 
 // Configure API route settings
@@ -109,7 +109,7 @@ export async function POST(request: Request) {
       .select('course_name level semister department course_code credit_hours no_of_student students_withdrawn student_absent coordinator')
       .lean();
 
-    const collegeData : any = await collageModel.findById(collegeId).lean();
+    const collegeData : any = await Collage.findById(collegeId).lean();
 
     if (!courseData || !collegeData) {
       return NextResponse.json({ 

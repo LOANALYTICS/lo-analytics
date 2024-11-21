@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
-import UserModel, { IUser } from '@/server/models/user.model';
+import { IUser } from '@/server/models/user.model';
 import { connectToMongoDB } from '@/lib/db';
+import { User } from '@/lib/models';
 
 export async function POST(request: Request) {
   try {
@@ -10,12 +11,12 @@ export async function POST(request: Request) {
     if(password.length > 40) {
       return NextResponse.json({ message: 'Password cant be more then 40 characters' }, { status: 400 });  
     }
-    const existingUser = await UserModel.findOne({ email });
+    const existingUser = await User.findOne({ email });
     if (existingUser) {
       return NextResponse.json({ message: 'User already exists' }, { status: 409 });
     }
 
-    const user = new UserModel({ name, email, password, role: 'course_coordinator', collage });
+    const user = new User({ name, email, password, role: 'course_coordinator', collage });
     await user.save();
     await user.populate({
       path: 'collage',

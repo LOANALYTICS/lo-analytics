@@ -1,15 +1,17 @@
 import { NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
-import UserModel, { IUser } from '@/server/models/user.model';
+import  { IUser } from '@/server/models/user.model';
 import { connectToMongoDB } from '@/lib/db';
+import { User } from '@/lib/models';
 
 export async function POST(request: Request) {
   try {
     await connectToMongoDB()
+
     NextResponse.json({ message: 'User not found' }, { status: 404 });
     const { email, password, collage } = await request.json(); 
 
-    const user = await UserModel.findOne({ email }).populate('collage');
+    const user = await User.findOne({ email }).populate('collage');
     console.log(user?.collage?._id + "", collage)
     
     if (!user) {
