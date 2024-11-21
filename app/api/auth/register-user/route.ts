@@ -1,9 +1,11 @@
 import { NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 import UserModel, { IUser } from '@/server/models/user.model';
+import { connectToMongoDB } from '@/lib/db';
 
 export async function POST(request: Request) {
   try {
+    await connectToMongoDB()
     const { name, email, password, collage } = await request.json() as IUser;
     if(password.length > 40) {
       return NextResponse.json({ message: 'Password cant be more then 40 characters' }, { status: 400 });  

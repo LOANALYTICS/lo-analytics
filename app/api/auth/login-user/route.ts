@@ -1,9 +1,11 @@
 import { NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 import UserModel, { IUser } from '@/server/models/user.model';
+import { connectToMongoDB } from '@/lib/db';
 
 export async function POST(request: Request) {
   try {
+    await connectToMongoDB()
     NextResponse.json({ message: 'User not found' }, { status: 404 });
     const { email, password, collage } = await request.json(); 
 

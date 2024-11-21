@@ -17,6 +17,7 @@ import { generateHTML } from '@/services/KR20GenerateHTML';
 import courseModel from '@/server/models/course.model';
 import collageModel from '@/server/models/collage.model';
 import KRValueModel from '@/server/models/kr-value.model';
+import { connectToMongoDB } from '@/lib/db';
 
 
 // Configure API route settings
@@ -51,6 +52,7 @@ function calculateGradeDistribution(results: any[]): GradeDistribution[] {
 
 export async function POST(request: Request) {
   try {
+    await connectToMongoDB()
     const formData = await request.formData();
     const file = formData.get('file') as Blob;
     const courseId = formData.get('courseId') as string;

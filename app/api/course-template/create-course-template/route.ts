@@ -2,9 +2,11 @@
 
 import { NextResponse } from 'next/server';
 import courseTemplateModel from '@/server/models/courseTemplate.model';
+import { connectToMongoDB } from '@/lib/db';
 
 export async function POST(request: Request) {
   try {
+    await connectToMongoDB()
     const {
       course_name,
       sem,
