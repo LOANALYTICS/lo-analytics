@@ -203,7 +203,7 @@ export default function NewCoursePage() {
         formData.append("collageId", user?.cid);
     
         try {
-          const response = await fetch("http://localhost:3000/api/kr-value", {
+          const response = await fetch("/api/kr-value", {
             method: "POST",
             body: formData,
           });
