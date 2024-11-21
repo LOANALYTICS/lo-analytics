@@ -49,7 +49,7 @@ export default function SignIn({collages}:{collages:any}) {
      
       async function onSubmit(values: z.infer<typeof formSchema>) {
         try {
-          const res = await axios.post("http://localhost:3000/api/auth/login-user", values)
+          const res = await axios.post("/api/auth/login-user", values)
           console.log(res)
 
           if(res.status === 200){
