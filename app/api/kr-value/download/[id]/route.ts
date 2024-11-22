@@ -1,12 +1,19 @@
 import { connectToMongoDB } from "@/lib/db";
 import { KRValue, Course } from "@/lib/models";
 import { generateHTML } from "@/services/KR20GenerateHTML";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse } from 'next/server';
+
+type Props = {
+  params: {
+    id: string;
+  };
+};
 
 export async function GET(
-  req: NextRequest,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  { params }: any
 ) {
+    console.log(params,"params", request);
   try {
     await connectToMongoDB();
 
