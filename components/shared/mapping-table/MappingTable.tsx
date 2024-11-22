@@ -140,7 +140,7 @@ export default function MappingTable({ initialData, defaultColumnCounts, onUpdat
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="absolute -top-1 -right-1 h-4 w-4 p-0 opacity-0 hover:opacity-100"
+                      className="absolute top-px right-px h-4 w-4 p-0 opacity-0 hover:opacity-100"
                       onClick={() => removeColumn(type as 'k' | 's' | 'v', i)}
                     >
                       <X className="h-2 w-2" />
