@@ -1,43 +1,33 @@
 'use client'
-import MappingTable, { CLO, PLOMapping } from '@/components/shared/mapping-table/MappingTable'
+import MappingTable, { CLO } from '@/components/shared/mapping-table/MappingTable'
 
 export default function AssessmentPlanPage() {
-  const initialData: CLO[] = [
-    {
-      id: '1',
-      description: 'CLO 1',
-      ploMapping: {
-        k: [
-          { k1: false },
-          { k2: false },
-          { k3: false },
-          { k4: false }
-        ],
-        s: [
-          { s1: false },
-          { s2: false },
-          { s3: false },
-          { s4: false }
-        ],
-        v: [
-          { v1: false },
-          { v2: false },
-          { v3: false },
-          { v4: false }
-        ]
-      }
+  const defaultColumnCounts = {
+    k: 4,
+    s: 4,
+    v: 4
+  };
+
+  const initialData: CLO[] = [{
+    id: '1',
+    description: 'CLO 1',
+    ploMapping: {
+      k: Array(defaultColumnCounts.k).fill(0).map((_, i) => ({ [`k${i + 1}`]: false })),
+      s: Array(defaultColumnCounts.s).fill(0).map((_, i) => ({ [`s${i + 1}`]: false })),
+      v: Array(defaultColumnCounts.v).fill(0).map((_, i) => ({ [`v${i + 1}`]: false }))
     }
-  ];
+  }];
 
   const handleUpdate = (newData: CLO[]) => {
-    // Handle updates if needed
     console.log('Updated data:', newData);
   };
 
   return (
-    <div className="">
+    <div className="p-4">
+      <h1 className="text-2xl font-bold mb-4">Assessment Plan</h1>
       <MappingTable 
-        initialData={initialData} 
+        initialData={initialData}
+        defaultColumnCounts={defaultColumnCounts}
         onUpdate={handleUpdate}
       />
     </div>
