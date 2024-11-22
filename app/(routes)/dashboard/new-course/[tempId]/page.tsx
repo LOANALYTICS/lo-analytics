@@ -39,8 +39,8 @@ const formSchema = z.object({
   credit_hours: z.string(),
   department: z.string(),
   examType: z.string().min(1, { message: "Please select an exam type" }),
-  semister: z.string().min(1, { message: "Semester is required" }),
-  level: z.string().min(1, { message: "Level is required" }),
+  semister: z.coerce.number().min(1, { message: "Semester is required" }),
+  level: z.number().min(1, { message: "Level is required" }),
   section: z.string().min(1, { message: "Section is required" }),
   academic_year: z.string().min(1, { message: "Academic year is required" }),
   student_withdrawn: z.string().min(1, { message: "Student withdrawn is required" }),
@@ -70,8 +70,8 @@ export default function NewCoursePage() {
             credit_hours: "",
             department: "",
             examType: "",
-            semister: "",
-            level: "",
+            semister: 0,
+            level: 0,
             section: "",
             academic_year: "",
             student_withdrawn: "",
@@ -294,10 +294,19 @@ export default function NewCoursePage() {
                             name="semister"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Semister</FormLabel>
-                                    <FormControl>
-                                        <Input placeholder="Semister" {...field} />
-                                    </FormControl>
+                                    <FormLabel>Semester</FormLabel>
+                                    <Select onValueChange={field.onChange} defaultValue={field.value?.toString()}>
+                                        <FormControl>
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Select Semester" />
+                                            </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                            <SelectItem value="1">First Semester</SelectItem>
+                                            <SelectItem value="2">Second Semester</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    <FormMessage />
                                 </FormItem>
                             )}
                         />
@@ -305,11 +314,34 @@ export default function NewCoursePage() {
                             control={form.control}
                             name="level"
                             render={({ field }) => (
-                                <FormItem >
+                                <FormItem>
                                     <FormLabel>Level</FormLabel>
-                                    <FormControl>
-                                        <Input type='number' placeholder="Level" {...field} />
-                                    </FormControl >
+                                    <Select 
+                                        onValueChange={(value) => field.onChange(Number(value))} 
+                                        defaultValue={field.value?.toString()}
+                                    >
+                                        <FormControl>
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Select Level" />
+                                            </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                            {[...Array(20)].map((_, index) => {
+                                                const level = index + 1;
+                                                const semester = form.watch("semister");
+                                                if ((semester === 1 && level % 2 === 1) || 
+                                                    (semester === 2 && level % 2 === 0)) {
+                                                    return (
+                                                        <SelectItem key={level} value={level.toString()}>
+                                                            Level {level}
+                                                        </SelectItem>
+                                                    );
+                                                }
+                                                return null;
+                                            })}
+                                        </SelectContent>
+                                    </Select>
+                                    <FormMessage />
                                 </FormItem>
                             )}
                         />

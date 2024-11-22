@@ -2,10 +2,7 @@
 import { cookies } from 'next/headers';
 import { jwtDecode } from "jwt-decode";
 interface CustomJwtPayloadRole {
-    data: {
         role: string;
-    }
-   
   }
 
   interface UserJwtPayload {
@@ -20,7 +17,7 @@ export async function getRole(cookieName: string): Promise<any> {
     const cookie = cookieStore.get(cookieName); // No TypeScript error
 
     const decoded = jwtDecode<CustomJwtPayloadRole>(cookie?.value || '');
-    return decoded?.data?.role || null;
+    return decoded?.role || null;
 }
 
 export async function getCurrentUser() {

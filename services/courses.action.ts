@@ -46,8 +46,8 @@ type CreateCourseInput = {
   credit_hours: string;
   department: string;
   examType: string;
-  semister: string;
-  level: string;
+  semister: number;
+  level: number;
   section: string;
   collage: string;
   academic_year: string;
