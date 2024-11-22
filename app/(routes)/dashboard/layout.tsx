@@ -19,7 +19,7 @@ const BaseLayout = async ({ children }: { children: React.ReactNode }) => {
     <div className="flex p-2 h-screen gap-2">
       <Sidebar userRole={role} />
       <div className="flex-1 flex flex-col gap-2">
-        <section className="h-16 w-full border flex justify-end px-4 rounded-xl">
+        <section className="h-16 min-h-16 w-full border flex justify-end px-4 rounded-xl">
           <div className="flex gap-3 items-center">
             {
               topbarLinks.map((link) => (
