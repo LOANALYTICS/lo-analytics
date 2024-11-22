@@ -116,12 +116,12 @@ export default function MappingTable({ initialData, defaultColumnCounts, onUpdat
             </TableRow>
             <TableRow>
               {['Knowledge', 'Skills', 'Values'].map((title, idx) => (
-                <TableHead key={title} colSpan={columnCounts[['k', 's', 'v'][idx] as keyof ColumnCounts]} className="text-center border relative">
+                <TableHead key={title}  colSpan={columnCounts[['k', 's', 'v'][idx] as keyof ColumnCounts]} className="text-center border relative group">
                   {title}
                   <Button 
                     variant="ghost" 
                     size="sm" 
-                    className="absolute right-1 top-1/2 -translate-y-1/2 h-6 w-6 p-0"
+                    className="absolute hidden group-hover:block right-1 top-1/2 -translate-y-1/2 h-6 w-6 p-0"
                     onClick={() => addColumn(['k', 's', 'v'][idx] as 'k' | 's' | 'v')}
                   >
                     <Plus className="h-3 w-3" />
