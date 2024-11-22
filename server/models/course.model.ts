@@ -1,6 +1,6 @@
 // models/Course.ts
 
-import  mongoose, { Document, Schema, model, models } from 'mongoose';
+import { Document, Schema } from 'mongoose';
 
 export interface IStudent {
   id: string;
@@ -28,11 +28,10 @@ export interface ICourse extends Document {
   createdBy?: typeof Schema.Types.ObjectId; 
   permissions: string[];
   students: IStudent[];
-  krValues: mongoose.Types.ObjectId[];
+  krValues: Schema.Types.ObjectId[];
 }
 
-// Define the schema
-const CourseSchema = new Schema<ICourse>({
+export const courseSchema = new Schema<ICourse>({
   course_name: { type: String },
   semister: { type: Number },
   department: { type: String },
@@ -55,10 +54,7 @@ const CourseSchema = new Schema<ICourse>({
   }],
   createdBy: { type: Schema.Types.ObjectId, ref: 'User' },
   krValues: [{
-    type: mongoose.Schema.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: 'KRValue'
   }]
-});
-
-// Use existing model if already compiled, otherwise create a new one
-export default models.Course || model<ICourse>('Course', CourseSchema);
+}, { timestamps: true });

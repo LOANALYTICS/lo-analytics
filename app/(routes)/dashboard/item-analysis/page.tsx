@@ -21,8 +21,9 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>
 
 export default function ItemAnalysisPage() {
-  const [open, setOpen] = useState(false);
+  const [filterOpen, setFilterOpen] = useState(false);
   const [courses, setCourses] = useState<any>({ data: [] }); 
+  const [user, setUser] = useState<any>(null);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -32,14 +33,16 @@ export default function ItemAnalysisPage() {
     },
   })
 
-  const onSubmit = (data: FormValues) => {
+  const onSubmit = async (data: FormValues) => {
     console.log(data);
-    setOpen(false);
+    setFilterOpen(false);
   }
+
   useEffect(() => {
     const getData = async () => {
-      const user = await getCurrentUser()
-      const res = await getCoursesByCreator(user?.id!)
+      const currentUser = await getCurrentUser()
+      setUser(currentUser);
+      const res = await getCoursesByCreator(currentUser?.id!)
       setCourses(res)
     }
     getData()
@@ -48,11 +51,11 @@ export default function ItemAnalysisPage() {
   return (
     <main className="px-2">
       <div className="flex justify-between items-center">
-        <h1 className="font-semibold text-lg"> Courses - ( {courses.data.length} )</h1>
+        <h1 className="font-semibold text-lg">Courses - ({courses.data.length})</h1>
         <Button 
           variant='outline' 
           className='flex items-center gap-2 p-0 w-20 h-9'
-          onClick={() => setOpen(true)}
+          onClick={() => setFilterOpen(true)}
         >
           <DockIcon className='w-4 h-4' />
         </Button>
@@ -60,16 +63,20 @@ export default function ItemAnalysisPage() {
 
       <section className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-2 mt-4">
         {courses.data.map((template: any) => (
-          <CourseCard key={template._id} template={template} />
+          <CourseCard 
+            key={template._id} 
+            template={template} 
+            user={user}
+          />
         ))}
       </section>
 
-      <Dialog open={open} onOpenChange={setOpen}>
+      {/* Filter Dialog */}
+      <Dialog open={filterOpen} onOpenChange={setFilterOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Filter Courses</DialogTitle>
+            <DialogTitle>Semester Analysis</DialogTitle>
           </DialogHeader>
-
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <FormField
@@ -120,7 +127,7 @@ export default function ItemAnalysisPage() {
               />
 
               <DialogFooter>
-                <Button type="submit">Save</Button>
+                <Button type="submit">Generate</Button>
               </DialogFooter>
             </form>
           </Form>

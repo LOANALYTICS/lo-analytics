@@ -1,8 +1,33 @@
-import mongoose from 'mongoose';
+import { Document, Schema } from 'mongoose';
 
-const krValueSchema = new mongoose.Schema({
+interface IQuestion {
+  question: string;
+  // Add other question fields if needed
+}
+
+interface IGroupedItemAnalysis {
+  classification: string;
+  questions: IQuestion[];
+}
+
+interface IGradeDistribution {
+  grade: string;
+  count: number;
+  studentPercentage: number;
+}
+
+export interface IKRValue extends Document {
+  _id: string;
+  courseId: Schema.Types.ObjectId;
+  KR_20: number;
+  groupedItemAnalysisResults: IGroupedItemAnalysis[];
+  gradeDistribution: IGradeDistribution[];
+  createdAt: Date;
+}
+
+export const krValueSchema = new Schema<IKRValue>({
   courseId: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: 'Course',
     required: true
   },
@@ -26,7 +51,4 @@ const krValueSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   }
-});
-
-const KRValueModel = mongoose.models.KRValue || mongoose.model('KRValue', krValueSchema);
-export default KRValueModel; 
+}, { timestamps: true }); 

@@ -1,11 +1,12 @@
 "use server";
-import courseModel, { ICourse } from '@/server/models/course.model';
+import { Course } from '@/lib/models';
+import  { ICourse } from '@/server/models/course.model';
 import { Types } from 'mongoose';
 import { NextResponse } from 'next/server';
 
 export async function getCourses(): Promise<any[]> {
     // Fetch courses and populate the coordinators
-    const courses = await courseModel.find().populate('coordinator').lean() as ICourse[];
+    const courses = await Course.find().populate('coordinator').lean() as ICourse[];
 
     return courses.map((course) => {
         const serializedCourse: any = {
@@ -58,7 +59,7 @@ type CreateCourseInput = {
 export async function createCourse(data: CreateCourseInput) {
     try {
         // Check for exact duplicate (same academic year, semester, examType, AND section)
-        const exactDuplicate = await courseModel.findOne({
+        const exactDuplicate = await Course.findOne({
             academic_year: data.academic_year,
             semister: data.semister,
             examType: data.examType,
@@ -73,7 +74,7 @@ export async function createCourse(data: CreateCourseInput) {
         }
 
         // If all validations pass, create the course
-        const course = await courseModel.create({
+        const course = await Course.create({
             course_name: data.course_name,
             course_code: data.course_code,
             credit_hours: data.credit_hours,
@@ -114,7 +115,7 @@ type Student = {
 
 export async function updateCourseStudents(courseId: string, students: Student[]) {
   try {
-    const updatedCourse = await courseModel.findByIdAndUpdate(
+    const updatedCourse = await Course.findByIdAndUpdate(
       courseId,
       { $set: { students: students } },
       { new: true }
@@ -138,7 +139,7 @@ export async function updateCourseStudents(courseId: string, students: Student[]
 export async function getCoursesByCreator(userId: string): Promise<any> {
     try {
         // Convert string ID to ObjectId and find courses
-        const courses = await courseModel.find({ 
+        const courses = await Course.find({ 
             createdBy: new Types.ObjectId(userId) 
         })
         .lean() as ICourse[];
@@ -209,7 +210,7 @@ export async function getCoursesByCreator(userId: string): Promise<any> {
 
 export async function getCourseById(courseId: string) {
     try {
-        const course = await courseModel.findById(courseId)
+        const course = await Course.findById(courseId)
             .populate('coordinator')
             .lean() as ICourse;
 
@@ -251,6 +252,38 @@ export async function getCourseById(courseId: string) {
     } catch (error) {
         console.error('Error fetching course:', error);
         throw new Error('Failed to fetch course');
+    }
+}
+
+export async function getCoursesBySemester(
+    semester: number, 
+    currentCourseId: string, 
+    courseName: string
+): Promise<any> {
+    try {
+        const courses = await Course.find({ 
+            semister: semester,
+            course_name: courseName, // Add course name filter
+            _id: { $ne: currentCourseId } // Exclude the current course
+        }).lean() as ICourse[];
+
+        return {
+            success: true,
+            message: 'Courses fetched successfully',
+            data: courses.map((course) => ({
+                _id: course._id.toString(),
+                course_name: course.course_name,
+                semister: course.semister,
+                section: course.section,
+                examType: course.examType,
+                academic_year: course.academic_year,
+                department: course.department,
+                course_code: course.course_code
+            }))
+        };
+    } catch (error) {
+        console.error('Error fetching courses by semester:', error);
+        throw new Error('Failed to fetch courses');
     }
 }
 

@@ -14,10 +14,8 @@ import {
     groupByClassification
 } from '@/server/utils/kr-utils';
 import { generateHTML } from '@/services/KR20GenerateHTML';
-import courseModel from '@/server/models/course.model';
-import KRValueModel from '@/server/models/kr-value.model';
 import { connectToMongoDB } from '@/lib/db';
-import { Collage } from '@/lib/models';
+import { Collage, Course, KRValue } from '@/lib/models';
 
 
 // Configure API route settings
@@ -105,7 +103,7 @@ export async function POST(request: Request) {
     const gradeDistribution = calculateGradeDistribution(gradedStudents);
 
     // Fetch course and college data
-    const courseData: any = await courseModel.findById(courseId)
+    const courseData: any = await Course.findById(courseId)
       .select('course_name level semister department course_code credit_hours no_of_student students_withdrawn student_absent coordinator')
       .lean();
 
@@ -148,7 +146,7 @@ export async function POST(request: Request) {
     console.log(course, "krs")
 
     // Create KR value document
-    const krValueDoc = await KRValueModel.create({
+    const krValueDoc = await KRValue.create({
       courseId: courseData._id,
       KR_20: KR_20,
       groupedItemAnalysisResults: [
@@ -162,7 +160,7 @@ export async function POST(request: Request) {
     });
 
     // Update course with KR value reference
-    await courseModel.findByIdAndUpdate(
+    await Course.findByIdAndUpdate(
       courseData._id,
       {
         $push: { krValues: krValueDoc._id }
@@ -188,7 +186,10 @@ export async function POST(request: Request) {
       course,
       collegeInfo
     });
-
+//  return  Response.json({
+//   message: "KR Value Generated Successfully",
+//   data: itemAnalysisResults
+//  })
     return new NextResponse(KR20HTML);
 
   } catch (error) {

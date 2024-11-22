@@ -232,7 +232,7 @@ export function groupByClassification(rows: QuestionObject[]): GroupedQuestions[
 
         if (discIndex < 0.199 && correctPercentage >= 0 && correctPercentage <= 100) {
             classification = "Poor (Bad) Questions";
-        } else if (discIndex >= 0.2 && discIndex < 0.5) {
+        } else{
             if (correctPercentage >= 0 && correctPercentage <= 20.99) {
                 classification = "Very Difficult Questions";
             } else if (correctPercentage >= 21 && correctPercentage <= 30.99) {
