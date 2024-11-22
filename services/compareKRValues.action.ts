@@ -3,7 +3,6 @@ import { type KRValue, Course } from '@/lib/models';
 
 export async function compareKRValues(courseId1: string, courseId2: string) {
     try {
-        // Fetch KR values and course details for both courses
         const [course1Data, course2Data] = await Promise.all([
             Course.findById(courseId1)
                 .populate<{ krValues: typeof KRValue[] }>('krValues')

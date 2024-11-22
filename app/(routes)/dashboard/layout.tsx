@@ -37,7 +37,7 @@ const BaseLayout = async ({ children }: { children: React.ReactNode }) => {
             <LogoutButton />
           </div>
         </section>
-        <section className="bg-white flex-1 border rounded-xl p-2">
+        <section className="  flex-1 overflow-y-auto bg-white border rounded-xl p-2 ">
           {children}
         </section>
       </div>

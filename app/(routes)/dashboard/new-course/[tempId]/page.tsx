@@ -212,6 +212,7 @@ export default function NewCoursePage() {
             throw new Error("Failed to upload file");
           }
     
+          console.log(response, "response")
           // Check content type to handle both HTML and JSON responses
           const contentType = response.headers.get("content-type");
           if (contentType?.includes("application/json")) {

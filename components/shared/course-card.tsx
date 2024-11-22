@@ -60,7 +60,9 @@ export default function CourseCard({ href, template, user }: {
 
     try {
         const response = await compareKRValues(template._id, selectedCourseId);
+        
         if (response.success) {
+          console.log(response, "response")
             const htmlContent = generateComparisonHTML(response.data);
             await generatePDF(htmlContent, `kr-comparison-${template.course_name}.pdf`);
             toast.success('Comparison PDF generated successfully');

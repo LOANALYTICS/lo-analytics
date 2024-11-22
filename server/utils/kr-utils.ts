@@ -207,12 +207,12 @@ interface QuestionObject {
     correctPercentage: number;
 }
 
-interface GroupedQuestions {
+
+export function groupByClassification(rows: QuestionObject[]): Array<{
     classification: string;
     questions: QuestionObject[];
-}
-
-export function groupByClassification(rows: QuestionObject[]): GroupedQuestions[] {
+    perc: number;
+}> {
     const classificationMap: Record<string, QuestionObject[]> = {
         "Poor (Bad) Questions": [],
         "Very Difficult Questions": [],
@@ -252,25 +252,12 @@ export function groupByClassification(rows: QuestionObject[]): GroupedQuestions[
         }
     });
 
-    // Collect groups with their question count
-    const groups = Object.entries(classificationMap).map(([classification, questions]) => ({
+    // Transform to final format with classification and perc
+    return Object.entries(classificationMap).map(([classification, questions]) => ({
         classification,
         questions,
-        perc: questions.length > 0 ? (questions.length / totalQuestions) * 100 : 0, // Calculate percentage or set to 0 if no questions
+        perc: questions.length > 0 ? Number(((questions.length / totalQuestions) * 100).toFixed(2)) : 0
     }));
-
-    // Calculate the sum of percentages
-    const totalPerc = groups.reduce((sum, group) => sum + group.perc, 0);
-
-    // Adjust percentages to ensure they sum to 100%
-    if (totalPerc !== 100) {
-        const correctionFactor = 100 / totalPerc;
-        groups.forEach(group => {
-            group.perc = parseFloat((group.perc * correctionFactor).toFixed(2)); // Adjust and round
-        });
-    }
-
-    return groups;
 }
 
 

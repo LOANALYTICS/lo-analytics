@@ -8,6 +8,7 @@ interface IQuestion {
 interface IGroupedItemAnalysis {
   classification: string;
   questions: IQuestion[];
+  perc: number;
 }
 
 interface IGradeDistribution {
@@ -39,8 +40,8 @@ export const krValueSchema = new Schema<IKRValue>({
     classification: String,
     questions: [{
       question: String,
-      // Add other question fields if needed
-    }]
+    }],
+    perc: Number
   }],
   gradeDistribution: [{
     grade: String,

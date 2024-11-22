@@ -3,20 +3,11 @@ import html2canvas from 'html2canvas';
 
 export async function generatePDF(htmlContent: string, filename: string = 'download.pdf'): Promise<void> {
   try {
-    // Create hidden iframe
-    const iframe = document.createElement('iframe');
-    iframe.style.cssText = 'position: fixed; left: -9999px; top: -9999px; visibility: hidden;';
-    document.body.appendChild(iframe);
-
-    // Get iframe document
-    const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document;
-    if (!iframeDoc) throw new Error('Could not access iframe document');
-
-    // Add content to iframe
-    const element = iframeDoc.createElement('div');
+    // Create a temporary div to hold the HTML content
+    const element = document.createElement('div');
     element.innerHTML = htmlContent;
     element.style.padding = '20px';
-    iframeDoc.body.appendChild(element);
+    document.body.appendChild(element);
 
     // Convert HTML to canvas
     const canvas = await html2canvas(element, {
@@ -51,7 +42,7 @@ export async function generatePDF(htmlContent: string, filename: string = 'downl
     pdf.save(filename);
 
     // Clean up
-    document.body.removeChild(iframe);
+    document.body.removeChild(element);
   } catch (error) {
     console.error('Error generating PDF:', error);
     throw error;
