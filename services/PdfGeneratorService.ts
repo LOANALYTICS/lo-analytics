@@ -23,20 +23,33 @@ export async function generatePDF(htmlContent: string, filename: string = 'downl
       format: 'a4'
     });
 
-    // Calculate dimensions to fit the content
-    const imgWidth = 190; // Reduced from 210 to allow for margins
-    const pageHeight = 297;
+    // Calculate dimensions
+    const imgWidth = 190;
+    const pageHeight = 287; // Reduced from 297 to account for margins
     const imgHeight = (canvas.height * imgWidth) / canvas.width;
+    let heightLeft = imgHeight;
+    let position = 10; // Starting position
 
-    // Add image to PDF with margins
-    pdf.addImage(
-      canvas.toDataURL('image/jpeg', 0.98),
-      'JPEG',
-      10, // Left margin in mm
-      10, // Top margin in mm
-      imgWidth,
-      imgHeight
-    );
+    // Add image to PDF, creating new pages as needed
+    let page = 1;
+    while (heightLeft >= 0) {
+      pdf.addImage(
+        canvas.toDataURL('image/jpeg', 0.98),
+        'JPEG',
+        10,
+        position,
+        imgWidth,
+        imgHeight
+      );
+      
+      heightLeft -= pageHeight;
+      
+      if (heightLeft > 0) {
+        pdf.addPage();
+        position = 10 - (imgHeight - pageHeight * page);
+        page++;
+      }
+    }
 
     // Download PDF
     pdf.save(filename);
