@@ -164,12 +164,12 @@ export default function CourseCard({ href, template, user }: {
           href={href}
           className='flex relative justify-between items-center border border-gray-300 shadow-sm p-3 rounded-md text-[13px]'
         >
-          
             <div className='flex flex-col gap-1'>
               <h2>Course Name : <span className='capitalize'>{template.course_name}</span></h2>
               <p>Course Code : <span className='capitalize'>{template.course_code}</span></p>
               <p>Section : <span className='capitalize'>{template.section}</span></p>
               <p>Type : <span className='capitalize'>{template.examType}</span></p>
+              <p>Sem : <span className='capitalize'>{href ?  template.sem : template.semister}</span></p>
             </div>
         </Link>
       ) : (
@@ -180,12 +180,14 @@ export default function CourseCard({ href, template, user }: {
               <p>Course Code : <span className='capitalize'>{template.course_code}</span></p>
               <p>Section : <span className='capitalize'>{template.section}</span></p>
               <p>Type : <span className='capitalize'>{template.examType}</span></p>
+              <p>Sem : <span className='capitalize'>{href ?  template.sem : template.semister}</span></p>
+              <p>Academic Year : <span className='capitalize'>{template.academic_year}</span></p>
             </div>
             <div className='absolute right-3 bottom-3 space-x-2'>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant='outline' size='sm' className='p-0 text-[11px] w-[74px] h-7'>
-                    KR Report
+                      <p className={template.krValues ? "text-green-500" : "text-red-500"}>KR Report </p>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>

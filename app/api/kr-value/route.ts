@@ -163,7 +163,7 @@ export async function POST(request: Request) {
     await Course.findByIdAndUpdate(
       courseData._id,
       {
-        $push: { krValues: krValueDoc._id }
+        krValues: krValueDoc._id
       },
       { new: true }
     ).exec();

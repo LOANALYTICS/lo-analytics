@@ -19,7 +19,7 @@ export interface ICourse extends Document {
   level: number;
   examType: string;
   question_ref?: string;
-  college?: string;
+  collage: Schema.Types.ObjectId;
   coordinator: string[]; 
   academic_year: String;
   students_withdrawn: number;
@@ -28,7 +28,7 @@ export interface ICourse extends Document {
   createdBy?: typeof Schema.Types.ObjectId; 
   permissions: string[];
   students: IStudent[];
-  krValues: Schema.Types.ObjectId[];
+  krValues: Schema.Types.ObjectId;
 }
 
 export const courseSchema = new Schema<ICourse>({
@@ -41,7 +41,7 @@ export const courseSchema = new Schema<ICourse>({
   level: { type: Number },
   examType: { type: String, required: true },
   question_ref: { type: String },
-  college: [{ type: Schema.Types.ObjectId, ref: 'Collage' }],
+  collage: { type: Schema.Types.ObjectId, ref: 'Collage' },
   coordinator: [{ type: Schema.Types.ObjectId, ref: 'User' }],
   academic_year: { type: String },
   students_withdrawn: { type: Number },
@@ -53,8 +53,9 @@ export const courseSchema = new Schema<ICourse>({
     studentName: { type: String, required: true }
   }],
   createdBy: { type: Schema.Types.ObjectId, ref: 'User' },
-  krValues: [{
+  krValues: {
     type: Schema.Types.ObjectId,
-    ref: 'KRValue'
-  }]
+    ref: 'KRValue',
+    default: null
+  }
 }, { timestamps: true });

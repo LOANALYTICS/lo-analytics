@@ -1,26 +1,31 @@
 "use server"
-import { type KRValue, Course } from '@/lib/models';
+import { KRValue, Course } from '@/lib/models';
+import { ICourse } from '@/server/models/course.model';
 
 export async function compareKRValues(courseId1: string, courseId2: string) {
     try {
         const [course1Data, course2Data] = await Promise.all([
             Course.findById(courseId1)
-                .populate<{ krValues: typeof KRValue[] }>('krValues')
                 .select('course_name section academic_year examType krValues')
-                .lean<{ krValues: typeof KRValue[]; course_name: string; section: string; academic_year: string; examType: string }>(),
+                .lean<ICourse>(),
             Course.findById(courseId2)
-                .populate<{ krValues: typeof KRValue[] }>('krValues')
                 .select('course_name section academic_year examType krValues')
-                .lean<{ krValues: typeof KRValue[]; course_name: string; section: string; academic_year: string; examType: string }>()
+                .lean<ICourse>()
         ]);
 
-        if (!course1Data?.krValues?.length || !course2Data?.krValues?.length) {
+        if (!course1Data?.krValues || !course2Data?.krValues) {
             throw new Error('KR values not found for one or both courses');
         }
 
-        // Get the latest KR value for each course
-        const kr1 = JSON.parse(JSON.stringify(course1Data.krValues[course1Data.krValues.length - 1]));
-        const kr2 = JSON.parse(JSON.stringify(course2Data.krValues[course2Data.krValues.length - 1]));
+        // Fetch the KR values separately
+        const [kr1, kr2] = await Promise.all([
+            KRValue.findById(course1Data.krValues).lean(),
+            KRValue.findById(course2Data.krValues).lean()
+        ]);
+
+        if (!kr1 || !kr2) {
+            throw new Error('KR values not found for one or both courses');
+        }
 
         return {
             success: true,
@@ -32,7 +37,7 @@ export async function compareKRValues(courseId1: string, courseId2: string) {
                         academic_year: course1Data.academic_year,
                         examType: course1Data.examType
                     },
-                    kr: kr1
+                    kr: JSON.parse(JSON.stringify(kr1))
                 },
                 course2: {
                     details: {
@@ -41,7 +46,7 @@ export async function compareKRValues(courseId1: string, courseId2: string) {
                         academic_year: course2Data.academic_year,
                         examType: course2Data.examType
                     },
-                    kr: kr2
+                    kr: JSON.parse(JSON.stringify(kr2))
                 }
             }
         };

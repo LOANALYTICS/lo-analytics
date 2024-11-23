@@ -17,12 +17,11 @@ export async function GET(
   try {
     await connectToMongoDB();
 
-    const krValue = await KRValue.findOne({ courseId: params.id });
-    const courseData = await Course.findById(params.id);
+    const courseData = await Course.findById(params.id).populate('krValues');
     
-    if (!krValue || !courseData) {
+    if (!courseData || !courseData.krValues) {
       return NextResponse.json(
-        { error: "KR Value or Course not found" },
+        { error: "Course or KR Value not found" },
         { status: 404 }
       );
     }
@@ -34,19 +33,19 @@ export async function GET(
         coordinator: courseData.coordinator,
         course_code: courseData.course_code,
         credit_hours: courseData.credit_hours,
-        studentsNumber: courseData.no_of_student,
+        studentsNumber: courseData.students?.length || 0,
         studentsWithdrawn: courseData.students_withdrawn,
         studentsAbsent: courseData.student_absent,
-        studentsAttended: courseData.no_of_student - (courseData.students_withdrawn + courseData.student_absent),
+        studentsAttended: (courseData.students?.length || 0) - (courseData.students_withdrawn + courseData.student_absent),
         studentsPassed: courseData.passedStudents
     };
 
     const KR20HTML = generateHTML({
-        groupedItemAnalysisResults: krValue.groupedItemAnalysisResults,
-        KR_20: krValue.KR_20,
-        segregatedGradedStudents: krValue.gradeDistribution,
+        groupedItemAnalysisResults: courseData.krValues.groupedItemAnalysisResults,
+        KR_20: courseData.krValues.KR_20,
+        segregatedGradedStudents: courseData.krValues.gradeDistribution,
         course: course,
-        collegeInfo: krValue.collegeInfo
+        collegeInfo: courseData.krValues.collegeInfo
     });
 
     // Return HTML content with proper headers

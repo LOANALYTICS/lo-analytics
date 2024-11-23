@@ -87,9 +87,13 @@ export function generateHTML(data: any): string {
       }
       .table th, .table td { 
         border: 1px solid #333; 
-        padding: 8px; 
+        padding: 8px 8px 8px 8px; 
         text-align: center;
         white-space: nowrap;
+        height: 100%;
+        vertical-align: middle !important;
+        text-align: center !important;
+        padding: 8px !important;
       }
       .section-title { font-weight: bold; font-size: 18px; margin-top: 20px; }
       .info-box { padding: 10px; border: 1px solid #000; margin: 10px 0; }
@@ -99,8 +103,14 @@ export function generateHTML(data: any): string {
         padding: 0 !important;
       }
       .cell-row {
-        padding: 4px;
+        padding: 4px 4px 4px 4px;
         border-bottom: 1px solid #333;
+        min-height: 24px;
+        line-height: 1.2;
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+        min-height: 24px !important;
       }
       .cell-row:last-child {
         border-bottom: none;
@@ -111,7 +121,7 @@ export function generateHTML(data: any): string {
         max-width: 300px;
         word-wrap: break-word;
         text-align: left;
-        padding: 8px;
+        padding: 8px 8px 20px 8px !important;
         vertical-align: top;
         line-height: 1.4;
         overflow-wrap: break-word;
@@ -171,17 +181,17 @@ export function generateHTML(data: any): string {
       </tr>
       ${(groupedItemAnalysisResults || [])?.map((item: any, index: number) => `
         <tr>
-          <td>${index + 1}</td>
-          <td>${item?.classification || ''}</td>
+          <td><p style="margin-bottom: 10px;">${index + 1}</p></td>
+          <td><p style="margin-bottom: 10px;">${item?.classification || ''}</p></td>
           ${item?.classification === 'Reliability' 
-            ? `<td colspan="3">KR20 = ${(KR_20 || 0).toFixed(2)}</td>`
+            ? `<td colspan="3" style="vertical-align: middle; text-align: center;"><p style="margin-bottom: 10px;">KR20 = ${(KR_20 || 0).toFixed(2)}</p></td>`
             : `
-              <td class="question-no-cell">${formatQuestions(item?.questions || [])}</td>
-              <td>${(item?.questions || []).length}</td>
-              <td>${Number((item?.perc || 0).toFixed(1))}%</td>
+              <td class="question-no-cell"><p style="margin-bottom: 10px;">${formatQuestions(item?.questions || [])}</p></td>
+              <td style="vertical-align: middle; text-align: center;"><p style="margin-bottom: 10px;">${(item?.questions || []).length}</p></td>
+              <td style="vertical-align: middle; text-align: center;"><p style="margin-bottom: 10px;">${Number((item?.perc || 0).toFixed(1))}%</p></td>
             `
           }
-          <td>${getCommentByClassification(item?.classification || '')}</td>
+          <td><p style="margin-bottom: 10px;">${getCommentByClassification(item?.classification || '')}</p></td>
         </tr>
       `).join("")}
     </table>
@@ -207,20 +217,24 @@ export function generateHTML(data: any): string {
         <th>F</th>
       </tr>
       <tr>
-        <td>${course?.code || ''}</td>
-        <td>${course?.creditHours || ''}</td>
-        <td>${course?.studentsNumber || ''}</td>
-        <td>${course?.studentsWithdrawn || ''}</td>
-        <td>${course?.studentsAbsent || ''}</td>
-        <td>${course?.studentsAttended || ''}</td>
-        <td class="split-cell">
-          <div class="cell-row">${course?.studentsPassed?.number || ''}</div>
-          <div class="cell-row">${course?.studentsPassed?.percentage || ''}%</div>
+        <td><p style="margin-bottom: 10px;">${course?.code || ''}</p></td>
+        <td><p style="margin-bottom: 10px;">${course?.creditHours || ''}</p></td>
+        <td><p style="margin-bottom: 10px;">${course?.studentsNumber || ''}</p></td>
+        <td style="vertical-align: middle; text-align: center;"><p style="margin-bottom: 10px;">${course?.studentsWithdrawn || ''}</p></td>
+        <td style="vertical-align: middle; text-align: center;"><p style="margin-bottom: 10px;">${course?.studentsAbsent || ''}</p></td>
+        <td style="vertical-align: middle; text-align: center;"><p style="margin-bottom: 10px;">${course?.studentsAttended || ''}</p></td>
+        <td class="split-cell" style="padding: 0;">
+          <div class="cell-row">
+            <p style="margin-bottom: 10px;">${course?.studentsPassed?.number || ''}</p>
+          </div>
+          <div class="cell-row">
+            <p style="margin-bottom: 10px;">${course?.studentsPassed?.percentage || ''}%</p>
+          </div>
         </td>
         ${(segregatedGradedStudents || []).map((grade: any) => `
           <td class="split-cell">
-            <div class="cell-row">${grade?.count || '0'}</div>
-            <div class="cell-row">${grade?.studentPercentage || ''}%</div>
+            <div class="cell-row"><p style="margin-bottom: 10px;">${grade?.count || '0'}</p></div>
+            <div class="cell-row"><p style="margin-bottom: 10px;">${grade?.studentPercentage || ''}%</p></div>
           </td>
         `).join("")}
       </tr>

@@ -1,4 +1,4 @@
-import { Document, Schema } from 'mongoose';
+import { Document, Schema, model, models } from 'mongoose';
 
 interface IQuestion {
   question: string;
@@ -52,4 +52,7 @@ export const krValueSchema = new Schema<IKRValue>({
     type: Date,
     default: Date.now
   }
-}, { timestamps: true }); 
+}, { timestamps: true });
+
+// Check if the model exists before creating a new one
+export const KRValue = models.KRValue || model('KRValue', krValueSchema); 

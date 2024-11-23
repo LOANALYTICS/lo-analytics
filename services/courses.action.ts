@@ -60,6 +60,7 @@ export async function createCourse(data: CreateCourseInput) {
     try {
         // Check for exact duplicate (same academic year, semester, examType, AND section)
         const exactDuplicate = await Course.findOne({
+            course_name: data.course_name,
             academic_year: data.academic_year,
             semister: data.semister,
             examType: data.examType,
@@ -96,7 +97,8 @@ export async function createCourse(data: CreateCourseInput) {
             data: {
                 ...plainCourse,
                 _id: plainCourse._id.toString(),
-                createdBy: plainCourse.createdBy?.toString()
+                createdBy: plainCourse.createdBy?.toString(),
+                collage: plainCourse.collage?.toString()
             }
         };
     } catch (error: any) {
@@ -193,6 +195,7 @@ export async function getCoursesByCreator(userId: string): Promise<any> {
                 student_absent: course.student_absent,
                 section: course.section,
                 examType: course.examType,
+                krValues: course.krValues !== null ? true : false,
                 createdBy: course.createdBy ? course.createdBy.toString() : undefined,
                 students: course.students.map((student) => ({
                     id: student.id.toString(),
@@ -284,6 +287,42 @@ export async function getCoursesBySemester(
     } catch (error) {
         console.error('Error fetching courses by semester:', error);
         throw new Error('Failed to fetch courses');
+    }
+}
+
+
+
+export async function migrateKrValuesField() {
+    try {
+        // First, update the schema to ensure krValues is treated as an ObjectId
+        await Course.collection.updateMany(
+            { krValues: { $type: "array" } },  // Only update documents where krValues is an array
+            [
+                {
+                    $set: {
+                        krValues: {
+                            $convert: {
+                                input: { $arrayElemAt: ["$krValues", 0] },
+                                to: "objectId",
+                                onError: null,
+                                onNull: null
+                            }
+                        }
+                    }
+                }
+            ]
+        );
+
+        return {
+            success: true,
+            message: 'Successfully migrated krValues field to ObjectId'
+        };
+    } catch (error) {
+        console.error('Error migrating krValues field:', error);
+        return {
+            success: false,
+            error: 'Failed to migrate krValues field'
+        };
     }
 }
 

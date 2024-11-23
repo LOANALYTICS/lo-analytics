@@ -11,6 +11,8 @@ import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { getCurrentUser } from '@/server/utils/helper';
 import { getCoursesByCreator } from '@/services/courses.action';
+import MigrateButton from '@/components/core/New';
+import { generatePDF } from '@/services/PdfGeneratorService';
 
 // Form schema
 const formSchema = z.object({
@@ -56,8 +58,36 @@ export default function ItemAnalysisPage() {
   }
 
   const onCompareSubmit = async (data: { left: FormValues, right: FormValues }) => {
-    console.log(data);
-    setCompareOpen(false);
+    try {
+      const params = new URLSearchParams({
+        collegeId: user?.cid,
+        semister: data?.left?.semester.toString(),
+        yearA: data?.left?.academic_year,
+        yearB: data?.right?.academic_year,
+        sectionA: data?.left?.section?.toLowerCase(),
+        sectionB: data?.right?.section?.toLowerCase()
+      });
+
+      const response = await fetch(`/api/course-compare?${params}`);
+      console.log(response, 'responsess');
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch comparison data');
+      }
+
+      // Since the response is HTML, we'll create a new window/tab to display it
+      const htmlContent = await response.text();
+      try {
+        await generatePDF(htmlContent, 'item-analysis.pdf');
+      } catch (error) {
+        console.error('Failed to generate PDF:', error);
+      }
+      
+      setCompareOpen(false);
+    } catch (error) {
+      console.error('Comparison error:', error);
+      // You might want to add toast notification here for error handling
+    }
   }
 
   useEffect(() => {
