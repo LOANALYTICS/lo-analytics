@@ -29,17 +29,46 @@ export async function GET(request: Request) {
       sectionB
     });
 
-    return new NextResponse(
-      `${styles}${tables.join('\n')}`, 
-      {
-        headers: {
-          'Content-Type': 'text/html',
-        },
-      }
-    );
+    const htmlContent = `
+      <!DOCTYPE html>
+      <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Course Comparison</title>
+          ${styles}
+          <style>
+            body {
+              margin: 0;
+              padding: 0;
+            }
+            .tables-container {
+              padding: 0;
+              margin: 0;
+            }
+            table {
+              margin-bottom: 15px !important;
+            }
+            table:last-child {
+              margin-bottom: 0 !important;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="tables-container">
+            ${tables.join('\n')}
+          </div>
+        </body>
+      </html>
+    `;
 
-  } catch (error) {
-    console.error('Course comparison error:', error);
+    return new NextResponse(htmlContent, {
+      headers: {
+        'Content-Type': 'text/html',
+      },
+    });
+
+  } catch (error) {    console.error('Course comparison error:', error);
     return NextResponse.json({
       message: 'Error comparing courses',
       error: error instanceof Error ? error.message : 'Unknown error'

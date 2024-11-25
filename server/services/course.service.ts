@@ -67,62 +67,64 @@ function generateComparisonHTML(title: string, courses: any[], yearA: string, ye
   const averages = calculateLevelTotals(courses);
   
   return `
-    <table class="min-w-full border-collapse border border-gray-300">
+    <table  class="min-w-full border-collapse border border-gray-300">
       <thead>
         <tr>
-          <th colspan="2" class="border border-gray-300 bg-yellow-200 p-2">
-            ${isLevel ? `LEVEL ${title}` : `DEPARTMENT: ${title}`}
+          <th colspan="2" class="border border-gray-300 bg-yellow-200 p-1">
+            <p style="text-align: left; margin: 0; margin-bottom: 10px;">${isLevel ? `LEVEL ${title}` : `DEPARTMENT: ${title}`}</p>
           </th>
-          <th colspan="3" class="border border-gray-300 p-2">1st Semester, ${yearA} (${sectionA})</th>
-          <th colspan="3" class="border border-gray-300 p-2">1st Semester, ${yearB} (${sectionB})</th>
+          <th colspan="3" class="border border-gray-300 p-1">
+            <p style="text-align: center; margin: 0; margin-bottom: 10px;">1st Semester, ${yearA} (${sectionA})</p>
+          </th>
+          <th colspan="3" class="border border-gray-300 p-1">
+            <p style="text-align: center; margin: 0; margin-bottom: 10px;">1st Semester, ${yearB} (${sectionB})</p>
+          </th>
         </tr>
         <tr>
-          <th class="border border-gray-300 p-2">N</th>
-          <th class="border border-gray-300 p-2">Course Title & Course code</th>
-          <th class="border border-gray-300 p-2">Total Accepted Questions</th>
-          <th class="border border-gray-300 p-2">Total Rejected Questions</th>
-          <th class="border border-gray-300 p-2">KR20</th>
-          <th class="border border-gray-300 p-2">Total Accepted Questions</th>
-          <th class="border border-gray-300 p-2">Total Rejected Questions</th>
-          <th class="border border-gray-300 p-2">KR20</th>
+          <th class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">N</p></th>
+          <th class="border border-gray-300 p-1"><p style="text-align: left; margin: 0; margin-bottom: 10px;">Course Title & Course code</p></th>
+          <th class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">Total Accepted Questions</p></th>
+          <th class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">Total Rejected Questions</p></th>
+          <th class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">KR20</p></th>
+          <th class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">Total Accepted Questions</p></th>
+          <th class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">Total Rejected Questions</p></th>
+          <th class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">KR20</p></th>
         </tr>
       </thead>
       <tbody>
         ${courses.map((course, index) => `
           <tr>
-            <td rowspan="2" class="border border-gray-300 p-2">${index + 1}</td>
-            <td class="border border-gray-300 p-2">${course.courseTitle} (${course.courseCode})</td>
-            <td class="border border-gray-300 p-2">${course.yearA.accepted}</td>
-            <td class="border border-gray-300 p-2">${course.yearA.rejected}</td>
-            <td rowspan="2" class="border border-gray-300 p-2">${course.yearA.kr20 || '-'}</td>
-            <td class="border border-gray-300 p-2">${course.yearB.accepted}</td>
-            <td class="border border-gray-300 p-2">${course.yearB.rejected}</td>
-            <td rowspan="2" class="border border-gray-300 p-2">${course.yearB.kr20 || '-'}</td>
+            <td rowspan="2" class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${index + 1}</p></td>
+            <td rowspan="2" class="border border-gray-300 p-1"><p style="text-align: left; margin: 0; margin-bottom: 10px;">${course.courseTitle} (${course.courseCode})</p></td>
+            <td class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${course.yearA.accepted}</p></td>
+            <td class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${course.yearA.rejected}</p></td>
+            <td rowspan="2" class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${course.yearA.kr20 || '-'}</p></td>
+            <td class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${course.yearB.accepted}</p></td>
+            <td class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${course.yearB.rejected}</p></td>
+            <td rowspan="2" class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${course.yearB.kr20 || '-'}</p></td>
           </tr>
           <tr>
-            <td class="border border-gray-300 p-2">%</td>
-            <td class="border border-gray-300 p-2">${((course.yearA.accepted / (course.yearA.accepted + course.yearA.rejected)) * 100).toFixed(2)}%</td>
-            <td class="border border-gray-300 p-2">${((course.yearA.rejected / (course.yearA.accepted + course.yearA.rejected)) * 100).toFixed(2)}%</td>
-            <td class="border border-gray-300 p-2">${((course.yearB.accepted / (course.yearB.accepted + course.yearB.rejected)) * 100).toFixed(2)}%</td>
-            <td class="border border-gray-300 p-2">${((course.yearB.rejected / (course.yearB.accepted + course.yearB.rejected)) * 100).toFixed(2)}%</td>
+            <td class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${((course.yearA.accepted / (course.yearA.accepted + course.yearA.rejected)) * 100).toFixed(2)}%</p></td>
+            <td class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${((course.yearA.rejected / (course.yearA.accepted + course.yearA.rejected)) * 100).toFixed(2)}%</p></td>
+            <td class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${((course.yearB.accepted / (course.yearB.accepted + course.yearB.rejected)) * 100).toFixed(2)}%</p></td>
+            <td class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${((course.yearB.rejected / (course.yearB.accepted + course.yearB.rejected)) * 100).toFixed(2)}%</p></td>
           </tr>
         `).join('')}
         <tr>
-          <td rowspan="2" class="border border-gray-300 p-2 font-bold">Total</td>
-          <td class="border border-gray-300 p-2 font-bold">Average</td>
-          <td class="border border-gray-300 p-2 font-bold">${averages.yearA.accepted}</td>
-          <td class="border border-gray-300 p-2 font-bold">${averages.yearA.rejected}</td>
-          <td rowspan="2" class="border border-gray-300 p-2 font-bold">${averages.yearA.kr20.toFixed(2)}</td>
-          <td class="border border-gray-300 p-2 font-bold">${averages.yearB.accepted}</td>
-          <td class="border border-gray-300 p-2 font-bold">${averages.yearB.rejected}</td>
-          <td rowspan="2" class="border border-gray-300 p-2 font-bold">${averages.yearB.kr20.toFixed(2)}</td>
+          <td rowspan="2" class="border border-gray-300 p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px;">Total</p></td>
+          <td rowspan="2" class="border border-gray-300 p-1 font-bold"><p style="text-align: left; margin: 0; margin-bottom: 10px;">Average</p></td>
+          <td class="border border-gray-300 p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${averages.yearA.accepted}</p></td>
+          <td class="border border-gray-300 p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${averages.yearA.rejected}</p></td>
+          <td rowspan="2" class="border border-gray-300 p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${averages.yearA.kr20.toFixed(2)}</p></td>
+          <td class="border border-gray-300 p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${averages.yearB.accepted}</p></td>
+          <td class="border border-gray-300 p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${averages.yearB.rejected}</p></td>
+          <td rowspan="2" class="border border-gray-300 p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${averages.yearB.kr20.toFixed(2)}</p></td>
         </tr>
         <tr>
-          <td class="border border-gray-300 p-2">%</td>
-          <td class="border border-gray-300 p-2">${((averages.yearA.accepted / (averages.yearA.accepted + averages.yearA.rejected)) * 100).toFixed(2)}%</td>
-          <td class="border border-gray-300 p-2">${((averages.yearA.rejected / (averages.yearA.accepted + averages.yearA.rejected)) * 100).toFixed(2)}%</td>
-          <td class="border border-gray-300 p-2">${((averages.yearB.accepted / (averages.yearB.accepted + averages.yearB.rejected)) * 100).toFixed(2)}%</td>
-          <td class="border border-gray-300 p-2">${((averages.yearB.rejected / (averages.yearB.accepted + averages.yearB.rejected)) * 100).toFixed(2)}%</td>
+          <td class="border border-gray-300 p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${((averages.yearA.accepted / (averages.yearA.accepted + averages.yearA.rejected)) * 100).toFixed(2)}%</p></td>
+          <td class="border border-gray-300 p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${((averages.yearA.rejected / (averages.yearA.accepted + averages.yearA.rejected)) * 100).toFixed(2)}%</p></td>
+          <td class="border border-gray-300 p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${((averages.yearB.accepted / (averages.yearB.accepted + averages.yearB.rejected)) * 100).toFixed(2)}%</p></td>
+          <td class="border border-gray-300 p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${((averages.yearB.rejected / (averages.yearB.accepted + averages.yearB.rejected)) * 100).toFixed(2)}%</p></td>
         </tr>
       </tbody>
     </table>
@@ -261,26 +263,12 @@ export async function compareCourses({
     return generateComparisonHTML(dept, courses, yearA, yearB, sectionA, sectionB, false);
   });
 
-  // Wrap all tables in a container
-  const generateHTML = (tables: any[]) => `
-    <div class="tables-container">
-      ${tables.map(table => `
-        <div class="table-wrapper">
-          ${table.title ? `<div class="table-title">${table.title}</div>` : ''}
-          <table>
-            ${table.content}
-          </table>
-        </div>
-      `).join('')}
-    </div>
-  `;
 
   return {
     tables: [...levelTables, ...departmentTables],
     styles: `
       <style>
         .tables-container > div {
-          margin-top: 80px !important;
           margin-bottom: 80px !important;
         }
 
@@ -296,7 +284,6 @@ export async function compareCourses({
           border-collapse: collapse !important;
           table-layout: fixed !important;
           font-size: 7pt !important;
-          margin-bottom: 20px !important;
         }
         
         th, td {
@@ -348,7 +335,7 @@ export async function compareCourses({
           }
           
           .table-wrapper {
-            margin: 40px 0 !important;
+            margin: 15px 0 !important;
             page-break-inside: avoid !important;
             break-inside: avoid !important;
           }

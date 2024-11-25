@@ -1,4 +1,5 @@
 "use client"
+
 import CourseCard from '@/components/shared/course-card';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
@@ -12,7 +13,6 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { getCurrentUser } from '@/server/utils/helper';
 import { getCoursesByCreator } from '@/services/courses.action';
 import MigrateButton from '@/components/core/New';
-import html2pdf from 'html2pdf.js';
 
 // Form schema
 const formSchema = z.object({
@@ -26,44 +26,88 @@ type FormValues = z.infer<typeof formSchema>
 // Add this function at the top of the component or in a separate utility file
 const generatePDF = async (html: string, fileName: string) => {
   try {
+    // Dynamically import html2pdf only on client side
+    const html2pdf = (await import('html2pdf.js')).default;
+    
     const container = document.createElement('div');
-    container.innerHTML = html;
+    container.className = 'tables-container';
+    
+    // Wrap each table in a container with specific styles
+    const wrappedHtml = html.replace(
+      /<table/g, 
+      '<div class="table-wrapper" style="display: block; margin: 0; padding: 0;"><table style="display: block; margin: 0; padding: 0;"'
+    ).replace(
+      /<\/table>/g, 
+      '</table></div>'
+    );
+    
+    container.innerHTML = wrappedHtml;
+    
+    const style = document.createElement('style');
+    style.textContent = `
+     
+      .table-wrapper {
+        page-break-inside: avoid !important;
+        page-break-before: auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+
+      @page {
+        margin: 0;
+        padding: 0;
+      }
+    `;
+    
+    container.appendChild(style);
     document.body.appendChild(container);
 
     const opt = {
-      margin: [0.3, 0.3, 0.5, 0.3],
+      margin: [0.25, 0.5, 0.25, 0.5],  // Set all margins to 0
       filename: `${fileName}.pdf`,
       image: { type: 'jpeg', quality: 0.98 },
       html2canvas: { 
         scale: 2,
         useCORS: true,
-        letterRendering: true
+        letterRendering: true,
+        scrollY: 0,
+        y: 0,
+        removeContainer: true,
+        windowHeight: document.documentElement.offsetHeight
       },
       jsPDF: { 
         unit: 'in', 
         format: 'a4', 
-        orientation: 'portrait'
-      },
-      pagebreak: { 
-        mode: ['avoid-all', 'css', 'legacy'],
-        avoid: ['tr', '.table-wrapper']
+        orientation: 'portrait',
+        compress: true
       }
     };
 
+    // Add margins after PDF creation for page numbers
     await html2pdf()
       .set(opt)
       .from(container)
       .toPdf()
       .get('pdf')
       .then((pdf: any) => {
+        // Set margins for page numbers
+        pdf.setProperties({
+          margins: {
+            top: 0,
+            bottom: 20,
+            left: 20,
+            right: 20
+          }
+        });
+        
         const totalPages = pdf.internal.getNumberOfPages();
         for (let i = 1; i <= totalPages; i++) {
           pdf.setPage(i);
           pdf.setFontSize(7);
           pdf.text(
             `Page ${i} of ${totalPages}`,
-            pdf.internal.pageSize.getWidth() - 0.5,
-            pdf.internal.pageSize.getHeight() - 0.2,
+            pdf.internal.pageSize.getWidth() - 0.75,
+            pdf.internal.pageSize.getHeight() - 0.3,
             { align: 'right' }
           );
         }
