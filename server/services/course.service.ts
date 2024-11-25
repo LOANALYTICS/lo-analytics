@@ -268,10 +268,7 @@ export async function compareCourses({
     tables: [...levelTables, ...departmentTables],
     styles: `
       <style>
-        .tables-container > div {
-          margin-bottom: 80px !important;
-        }
-
+      
         .table-wrapper {
           page-break-inside: avoid !important;
           display: block !important;
@@ -286,9 +283,8 @@ export async function compareCourses({
           font-size: 7pt !important;
         }
         
-        th, td {
-          border: 1px solid #ccc !important;
-          padding: 4px !important;
+        table:last-child {
+          margin-bottom: 0 !important;
         }
 
         /* N column */

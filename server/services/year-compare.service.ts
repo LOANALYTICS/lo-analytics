@@ -232,10 +232,6 @@ export async function compareYears({
     tables: [...levelTables, ...departmentTables],
     styles: `
       <style>
-        .tables-container > div {
-          margin-bottom: 80px !important;
-        }
-
         .table-wrapper {
           page-break-inside: avoid !important;
           display: block !important;
@@ -248,7 +244,6 @@ export async function compareYears({
           border-collapse: collapse !important;
           table-layout: fixed !important;
           font-size: 7pt !important;
-          margin-bottom: 15px !important;
         }
         
         table:last-child {

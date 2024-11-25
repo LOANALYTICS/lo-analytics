@@ -45,7 +45,8 @@ export async function GET(request: Request) {
               margin: 0;
             }
             table {
-              margin-bottom: 15px !important;
+              margin-top: 5px !important;
+              margin-bottom: 40px !important;
             }
             table:last-child {
               margin-bottom: 0 !important;

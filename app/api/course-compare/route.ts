@@ -47,10 +47,21 @@ export async function GET(request: Request) {
               margin: 0;
             }
             table {
-              margin-bottom: 15px !important;
+              margin-top: 5px !important;
+              margin-bottom: 40px !important;
             }
             table:last-child {
               margin-bottom: 0 !important;
+            }
+              @media print {
+              .table-wrapper {
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+                margin: 15px 0 !important;
+              }
+              div {
+                break-inside: avoid !important;
+              }
             }
           </style>
         </head>
