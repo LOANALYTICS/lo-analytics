@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { DockIcon, SplitIcon } from 'lucide-react';
+import { DockIcon, SplitIcon, CalendarIcon } from 'lucide-react';
 import { useEffect, useState } from 'react'
 import { useForm } from "react-hook-form"
 import { z } from "zod"
@@ -26,88 +26,65 @@ type FormValues = z.infer<typeof formSchema>
 // Add this function at the top of the component or in a separate utility file
 const generatePDF = async (html: string, fileName: string) => {
   try {
-    // Dynamically import html2pdf only on client side
     const html2pdf = (await import('html2pdf.js')).default;
     
     const container = document.createElement('div');
-    container.className = 'tables-container';
-    
-    // Wrap each table in a container with specific styles
-    const wrappedHtml = html.replace(
-      /<table/g, 
-      '<div class="table-wrapper" style="display: block; margin: 0; padding: 0;"><table style="display: block; margin: 0; padding: 0;"'
-    ).replace(
-      /<\/table>/g, 
-      '</table></div>'
-    );
-    
-    container.innerHTML = wrappedHtml;
-    
-    const style = document.createElement('style');
-    style.textContent = `
-     
-      .table-wrapper {
-        page-break-inside: avoid !important;
-        page-break-before: auto !important;
-        margin: 0 !important;
-        padding: 0 !important;
-      }
-
-      @page {
-        margin: 0;
-        padding: 0;
-      }
-    `;
-    
-    container.appendChild(style);
+    container.innerHTML = html;
     document.body.appendChild(container);
 
     const opt = {
-      margin: [0.25, 0.5, 0.25, 0.5],  // Set all margins to 0
+      margin: [0.5, 0.5, 0.5, 0.5],
       filename: `${fileName}.pdf`,
       image: { type: 'jpeg', quality: 0.98 },
       html2canvas: { 
         scale: 2,
         useCORS: true,
         letterRendering: true,
-        scrollY: 0,
-        y: 0,
-        removeContainer: true,
-        windowHeight: document.documentElement.offsetHeight
       },
       jsPDF: { 
         unit: 'in', 
         format: 'a4', 
         orientation: 'portrait',
-        compress: true
+        compress: true,
+        marginTop: 0.5,
+        marginBottom: 0.5
+      },
+      pagebreak: { 
+        mode: 'avoid-all',
+        after: '.table-wrapper',
+        avoid: 'tr'
       }
     };
 
-    // Add margins after PDF creation for page numbers
+    // Special handling for year comparison
+    if (fileName === 'year-comparison') {
+      opt.pagebreak = { 
+        mode: ['css', 'avoid-all'],
+        before: '.table-wrapper'
+      } as any;
+      opt.html2canvas = {
+        ...opt.html2canvas,
+        windowHeight: container.scrollHeight
+      } as any;
+    }
+
     await html2pdf()
       .set(opt)
       .from(container)
       .toPdf()
       .get('pdf')
       .then((pdf: any) => {
-        // Set margins for page numbers
-        pdf.setProperties({
-          margins: {
-            top: 0,
-            bottom: 20,
-            left: 20,
-            right: 20
-          }
-        });
-        
         const totalPages = pdf.internal.getNumberOfPages();
+        
         for (let i = 1; i <= totalPages; i++) {
           pdf.setPage(i);
-          pdf.setFontSize(7);
+          pdf.setFontSize(8);
+          const pageHeight = pdf.internal.pageSize.height;
+          const pageWidth = pdf.internal.pageSize.width;
           pdf.text(
             `Page ${i} of ${totalPages}`,
-            pdf.internal.pageSize.getWidth() - 0.75,
-            pdf.internal.pageSize.getHeight() - 0.3,
+            pageWidth - 0.5,
+            pageHeight - 0.25,
             { align: 'right' }
           );
         }
@@ -124,6 +101,7 @@ const generatePDF = async (html: string, fileName: string) => {
 export default function ItemAnalysisPage() {
   const [filterOpen, setFilterOpen] = useState(false);
   const [compareOpen, setCompareOpen] = useState(false);
+  const [yearCompareOpen, setYearCompareOpen] = useState(false);
   const [courses, setCourses] = useState<any>({ data: [] }); 
   const [user, setUser] = useState<any>(null);
 
@@ -147,6 +125,20 @@ export default function ItemAnalysisPage() {
     defaultValues: {
       left: { academic_year: "", semester: 1, section: "" },
       right: { academic_year: "", semester: 1, section: "" }
+    }
+  });
+
+  const yearCompareForm = useForm<{
+    left: Omit<FormValues, 'section'>,
+    right: Omit<FormValues, 'section'>
+  }>({
+    resolver: zodResolver(z.object({
+      left: formSchema.omit({ section: true }),
+      right: formSchema.omit({ section: true })
+    })),
+    defaultValues: {
+      left: { academic_year: "", semester: 1 },
+      right: { academic_year: "", semester: 1 }
     }
   });
 
@@ -187,6 +179,33 @@ export default function ItemAnalysisPage() {
     }
   }
 
+  const onYearCompareSubmit = async (data: { 
+    left: Omit<FormValues, 'section'>, 
+    right: Omit<FormValues, 'section'> 
+  }) => {
+    try {
+      const params = new URLSearchParams({
+        collegeId: user?.cid,
+        semisterA: data?.left?.semester.toString(),
+        semisterB: data?.right?.semester.toString(),
+        yearA: data?.left?.academic_year,
+        yearB: data?.right?.academic_year,
+      });
+
+      const response = await fetch(`/api/year-compare?${params}`);
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch comparison data');
+      }
+
+      const htmlContent = await response.text();
+      await generatePDF(htmlContent, 'year-comparison');
+      setYearCompareOpen(false);
+    } catch (error) {
+      console.error('Year comparison error:', error);
+    }
+  }
+
   useEffect(() => {
     const getData = async () => {
       const currentUser = await getCurrentUser()
@@ -215,6 +234,13 @@ export default function ItemAnalysisPage() {
             onClick={() => setCompareOpen(true)}
           >
             <SplitIcon className='w-4 h-4' />
+          </Button>
+          <Button 
+            variant='outline' 
+            className='flex items-center gap-2 p-0 w-20 h-9'
+            onClick={() => setYearCompareOpen(true)}
+          >
+            <CalendarIcon className='w-4 h-4' />
           </Button>
         </div>
       </div>
@@ -444,6 +470,130 @@ export default function ItemAnalysisPage() {
                             {['Male', 'Female'].map((section) => (
                               <SelectItem key={section} value={section}>
                                 {section}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
+
+              <DialogFooter>
+                <Button type="submit">Compare</Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Year Compare Dialog */}
+      <Dialog open={yearCompareOpen} onOpenChange={setYearCompareOpen}>
+        <DialogContent className="max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>Compare Years</DialogTitle>
+          </DialogHeader>
+          <Form {...yearCompareForm}>
+            <form onSubmit={yearCompareForm.handleSubmit(onYearCompareSubmit)} className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                {/* Left Side */}
+                <div className="space-y-4 border-r pr-4">
+                  <h3 className="font-medium">Year A</h3>
+                  <FormField
+                    control={yearCompareForm.control}
+                    name="left.academic_year"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Academic Year</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select Year" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="2020-2021">2020-2021</SelectItem>
+                            <SelectItem value="2021-2022">2021-2022</SelectItem>
+                            <SelectItem value="2022-2023">2022-2023</SelectItem>
+                            <SelectItem value="2023-2024">2023-2024</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={yearCompareForm.control}
+                    name="left.semester"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Semester</FormLabel>
+                        <Select 
+                          onValueChange={(value) => field.onChange(Number(value))} 
+                          defaultValue={field.value?.toString()}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select Semester" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {[1, 2].map((sem) => (
+                              <SelectItem key={sem} value={sem.toString()}>
+                                Semester {sem}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                {/* Right Side */}
+                <div className="space-y-4">
+                  <h3 className="font-medium">Year B</h3>
+                  <FormField
+                    control={yearCompareForm.control}
+                    name="right.academic_year"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Academic Year</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select Year" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="2020-2021">2020-2021</SelectItem>
+                            <SelectItem value="2021-2022">2021-2022</SelectItem>
+                            <SelectItem value="2022-2023">2022-2023</SelectItem>
+                            <SelectItem value="2023-2024">2023-2024</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={yearCompareForm.control}
+                    name="right.semester"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Semester</FormLabel>
+                        <Select 
+                          onValueChange={(value) => field.onChange(Number(value))} 
+                          defaultValue={field.value?.toString()}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select Semester" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {[1, 2].map((sem) => (
+                              <SelectItem key={sem} value={sem.toString()}>
+                                Semester {sem}
                               </SelectItem>
                             ))}
                           </SelectContent>
