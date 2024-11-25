@@ -12,7 +12,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { getCurrentUser } from '@/server/utils/helper';
 import { getCoursesByCreator } from '@/services/courses.action';
 import MigrateButton from '@/components/core/New';
-import { generatePDF } from '@/services/PdfGeneratorService';
+import html2pdf from 'html2pdf.js';
 
 // Form schema
 const formSchema = z.object({
@@ -22,6 +22,60 @@ const formSchema = z.object({
 })
 
 type FormValues = z.infer<typeof formSchema>
+
+// Add this function at the top of the component or in a separate utility file
+const generatePDF = async (html: string, fileName: string) => {
+  try {
+    const container = document.createElement('div');
+    container.innerHTML = html;
+    document.body.appendChild(container);
+
+    const opt = {
+      margin: [0.3, 0.3, 0.5, 0.3],
+      filename: `${fileName}.pdf`,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { 
+        scale: 2,
+        useCORS: true,
+        letterRendering: true
+      },
+      jsPDF: { 
+        unit: 'in', 
+        format: 'a4', 
+        orientation: 'portrait'
+      },
+      pagebreak: { 
+        mode: ['avoid-all', 'css', 'legacy'],
+        avoid: ['tr', '.table-wrapper']
+      }
+    };
+
+    await html2pdf()
+      .set(opt)
+      .from(container)
+      .toPdf()
+      .get('pdf')
+      .then((pdf: any) => {
+        const totalPages = pdf.internal.getNumberOfPages();
+        for (let i = 1; i <= totalPages; i++) {
+          pdf.setPage(i);
+          pdf.setFontSize(7);
+          pdf.text(
+            `Page ${i} of ${totalPages}`,
+            pdf.internal.pageSize.getWidth() - 0.5,
+            pdf.internal.pageSize.getHeight() - 0.2,
+            { align: 'right' }
+          );
+        }
+      })
+      .save();
+
+    document.body.removeChild(container);
+  } catch (error) {
+    console.error('Error generating PDF:', error);
+    throw error;
+  }
+};
 
 export default function ItemAnalysisPage() {
   const [filterOpen, setFilterOpen] = useState(false);
@@ -75,10 +129,9 @@ export default function ItemAnalysisPage() {
         throw new Error('Failed to fetch comparison data');
       }
 
-      // Since the response is HTML, we'll create a new window/tab to display it
       const htmlContent = await response.text();
       try {
-        await generatePDF(htmlContent, 'item-analysis.pdf');
+        await generatePDF(htmlContent, 'item-analysis');
       } catch (error) {
         console.error('Failed to generate PDF:', error);
       }

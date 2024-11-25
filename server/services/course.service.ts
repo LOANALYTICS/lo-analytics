@@ -261,28 +261,97 @@ export async function compareCourses({
     return generateComparisonHTML(dept, courses, yearA, yearB, sectionA, sectionB, false);
   });
 
+  // Wrap all tables in a container
+  const generateHTML = (tables: any[]) => `
+    <div class="tables-container">
+      ${tables.map(table => `
+        <div class="table-wrapper">
+          ${table.title ? `<div class="table-title">${table.title}</div>` : ''}
+          <table>
+            ${table.content}
+          </table>
+        </div>
+      `).join('')}
+    </div>
+  `;
+
   return {
     tables: [...levelTables, ...departmentTables],
     styles: `
       <style>
+        .tables-container > div {
+          margin-top: 80px !important;
+          margin-bottom: 80px !important;
+        }
+
+        .table-wrapper {
+          page-break-inside: avoid !important;
+          display: block !important;
+          position: relative !important;
+          break-inside: avoid !important;
+        }
+        
         table {
-          width: 100%;
-          border-collapse: collapse;
-          margin-bottom: 2rem;
+          width: 100% !important;
+          border-collapse: collapse !important;
+          table-layout: fixed !important;
+          font-size: 7pt !important;
+          margin-bottom: 20px !important;
         }
+        
         th, td {
-          border: 1px solid #ccc;
-          padding: 8px;
-          text-align: left;
+          border: 1px solid #ccc !important;
+          padding: 4px !important;
         }
-        th {
-          background-color: #f8f9fa;
+
+        /* N column */
+        tr td:first-child {
+          width: 60px !important;
+          max-width: 60px !important;
         }
+
+        /* Course Title column */
+        tr td:nth-child(2) {
+          width: 240px !important;
+          max-width: 240px !important;
+          text-align: left !important;
+          white-space: normal !important;
+        }
+
+        /* Headers */
         th[colspan="2"] {
-          background-color: #ffd700;
+          background-color: #ffd700 !important;
+          text-align: left !important;
+          width: 300px !important;
         }
-        tr:nth-child(even) {
-          background-color: #f2f2f2;
+        
+        th[colspan="3"] {
+          background-color: #f8f9fa !important;
+        }
+
+        /* Data columns */
+        td:nth-child(n+3) {
+          width: 80px !important;
+          text-align: center !important;
+        }
+
+        /* Total rows */
+        tr:last-child td,
+        tr:nth-last-child(2) td {
+          font-weight: bold !important;
+          background-color: #f8f9fa !important;
+        }
+
+        @media print {
+          div {
+            break-inside: avoid !important;
+          }
+          
+          .table-wrapper {
+            margin: 40px 0 !important;
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+          }
         }
       </style>
     `
