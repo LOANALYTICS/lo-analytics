@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { DockIcon, SplitIcon, CalendarIcon } from 'lucide-react';
+import { DockIcon, SplitIcon, CalendarIcon, Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react'
 import { useForm } from "react-hook-form"
 import { z } from "zod"
@@ -13,6 +13,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { getCurrentUser } from '@/server/utils/helper';
 import { getCoursesByCreator } from '@/services/courses.action';
 import MigrateButton from '@/components/core/New';
+import { toast } from "sonner"
 
 // Form schema
 const formSchema = z.object({
@@ -99,6 +100,9 @@ export default function ItemAnalysisPage() {
   const [yearCompareOpen, setYearCompareOpen] = useState(false);
   const [courses, setCourses] = useState<any>({ data: [] }); 
   const [user, setUser] = useState<any>(null);
+  const [isAnalysisLoading, setIsAnalysisLoading] = useState(false);
+  const [isCompareLoading, setIsCompareLoading] = useState(false);
+  const [isYearCompareLoading, setIsYearCompareLoading] = useState(false);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -144,6 +148,7 @@ export default function ItemAnalysisPage() {
 
   const onCompareSubmit = async (data: { left: FormValues, right: FormValues }) => {
     try {
+      setIsCompareLoading(true);
       const params = new URLSearchParams({
         collegeId: user?.cid,
         semister: data?.left?.semester.toString(),
@@ -171,6 +176,8 @@ export default function ItemAnalysisPage() {
     } catch (error) {
       console.error('Comparison error:', error);
       // You might want to add toast notification here for error handling
+    } finally {
+      setIsCompareLoading(false);
     }
   }
 
@@ -179,6 +186,7 @@ export default function ItemAnalysisPage() {
     right: Omit<FormValues, 'section'> 
   }) => {
     try {
+      setIsYearCompareLoading(true);
       const params = new URLSearchParams({
         collegeId: user?.cid,
         semisterA: data?.left?.semester.toString(),
@@ -198,11 +206,14 @@ export default function ItemAnalysisPage() {
       setYearCompareOpen(false);
     } catch (error) {
       console.error('Year comparison error:', error);
+    } finally {
+      setIsYearCompareLoading(false);
     }
   }
 
   const onAnalysisSubmit = async (data: FormValues) => {
     try {
+      setIsAnalysisLoading(true);
       console.log("Analysis Submit Data:", data);
       const params = new URLSearchParams({
         collegeId: user?.cid,
@@ -217,9 +228,13 @@ export default function ItemAnalysisPage() {
 
       const htmlContent = await response.text();
       await generatePDF(htmlContent, 'semester-analysis');
+      toast.success("Report downloaded successfully");
       setFilterOpen(false);
     } catch (error) {
       console.error('Analysis error:', error);
+      toast.error("Failed to generate report");
+    } finally {
+      setIsAnalysisLoading(false);
     }
   }
 
@@ -330,13 +345,20 @@ export default function ItemAnalysisPage() {
               <DialogFooter>
                 <Button 
                   type="button"
+                  disabled={isAnalysisLoading}
                   onClick={async () => {
                     const values = form.getValues();
-                    console.log("Button clicked, values:", values);
                     await onAnalysisSubmit(values);
                   }}
                 >
-                  Generate
+                  {isAnalysisLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Generating...
+                    </>
+                  ) : (
+                    'Generate'
+                  )}
                 </Button>
               </DialogFooter>
             </form>
@@ -507,7 +529,23 @@ export default function ItemAnalysisPage() {
               </div>
 
               <DialogFooter>
-                <Button type="submit">Compare</Button>
+                <Button 
+                  type="button"
+                  disabled={isCompareLoading}
+                  onClick={async () => {
+                    const values = compareForm.getValues();
+                    await onCompareSubmit(values);
+                  }}
+                >
+                  {isCompareLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Comparing...
+                    </>
+                  ) : (
+                    'Compare'
+                  )}
+                </Button>
               </DialogFooter>
             </form>
           </Form>
@@ -631,7 +669,23 @@ export default function ItemAnalysisPage() {
               </div>
 
               <DialogFooter>
-                <Button type="submit">Compare</Button>
+                <Button 
+                  type="button"
+                  disabled={isYearCompareLoading}
+                  onClick={async () => {
+                    const values = yearCompareForm.getValues();
+                    await onYearCompareSubmit(values);
+                  }}
+                >
+                  {isYearCompareLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Comparing...
+                    </>
+                  ) : (
+                    'Compare'
+                  )}
+                </Button>
               </DialogFooter>
             </form>
           </Form>

@@ -1,4 +1,4 @@
- 'use client'
+'use client'
 import React, { useState } from 'react'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Input } from "@/components/ui/input"
@@ -102,10 +102,10 @@ export default function MappingTable({ initialData, defaultColumnCounts, onUpdat
             <TableRow>
               <TableHead rowSpan={3} className="border w-[50px]">
                 <Checkbox 
-                  checked={selectedCLOs.length === clos.length}
-                  onCheckedChange={() => setSelectedCLOs(prev => 
-                    prev.length === clos.length ? [] : clos.map(clo => clo.id)
-                  )}
+                  checked={clos.length > 0 && selectedCLOs.length === clos.length}
+                  onCheckedChange={(checked) => {
+                    setSelectedCLOs(checked ? clos.map(clo => clo.id) : []);
+                  }}
                 />
               </TableHead>
               <TableHead rowSpan={3} className="border w-[50px]">S.No</TableHead>
@@ -193,25 +193,64 @@ export default function MappingTable({ initialData, defaultColumnCounts, onUpdat
         </Table>
       </div>
 
-      <Button
-        onClick={() => setClos(prev => {
-          const newClo = {
-            id: (prev.length + 1).toString(),
-            description: `CLO ${prev.length + 1}`,
-            ploMapping: {
-              k: Array(columnCounts.k).fill(0).map((_, i) => ({ [`k${i + 1}`]: false })),
-              s: Array(columnCounts.s).fill(0).map((_, i) => ({ [`s${i + 1}`]: false })),
-              v: Array(columnCounts.v).fill(0).map((_, i) => ({ [`v${i + 1}`]: false }))
+      <div className="mt-4 flex gap-2">
+        {selectedCLOs.length > 0 && (
+          <Button
+            variant="destructive"
+            onClick={() => {
+              setClos(prev => {
+                const newClos = prev.filter(clo => !selectedCLOs.includes(clo.id));
+                
+                if (newClos.length === 0) {
+                  const newClo = {
+                    id: Date.now().toString(),
+                    description: 'CLO 1',
+                    ploMapping: {
+                      k: Array(columnCounts.k).fill(0).map((_, i) => ({ [`k${i + 1}`]: false })),
+                      s: Array(columnCounts.s).fill(0).map((_, i) => ({ [`s${i + 1}`]: false })),
+                      v: Array(columnCounts.v).fill(0).map((_, i) => ({ [`v${i + 1}`]: false }))
+                    }
+                  };
+                  newClos.push(newClo);
+                } else {
+                  newClos.forEach((clo, index) => {
+                    clo.description = clo.description.replace(/CLO \d+/, `CLO ${index + 1}`);
+                  });
+                }
+                
+                onUpdate(newClos);
+                return newClos;
+              });
+              setSelectedCLOs([]);
+            }}
+            className="flex items-center gap-2"
+          >
+            <Trash className="h-4 w-4" />
+            Delete Selected ({selectedCLOs.length})
+          </Button>
+        )}
+        <Button
+          onClick={() => setClos(prev => {
+            const newClo = {
+              id: Date.now().toString(),
+              description: `CLO ${prev.length + 1}`,
+              ploMapping: {
+                k: Array(columnCounts.k).fill(0).map((_, i) => ({ [`k${i + 1}`]: false })),
+                s: Array(columnCounts.s).fill(0).map((_, i) => ({ [`s${i + 1}`]: false })),
+                v: Array(columnCounts.v).fill(0).map((_, i) => ({ [`v${i + 1}`]: false }))
+              }
+            };
+            const newClos = [...prev, newClo];
+            onUpdate(newClos);
+            if (selectedCLOs.length === prev.length) {
+              setSelectedCLOs([]);
             }
-          };
-          const newClos = [...prev, newClo];
-          onUpdate(newClos);
-          return newClos;
-        })}
-        className="mt-4"
-      >
-        Add CLO
-      </Button>
+            return newClos;
+          })}
+        >
+          Add CLO
+        </Button>
+      </div>
     </div>
   );
 }

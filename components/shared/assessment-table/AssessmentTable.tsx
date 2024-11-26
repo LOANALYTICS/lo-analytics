@@ -5,7 +5,20 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Trash, Upload, Plus } from 'lucide-react'
+import { Trash, Upload, Plus, X } from 'lucide-react'
+
+// Default empty assessment structure should match the dummy data structure
+const DEFAULT_ASSESSMENT = {
+  id: '1',
+  type: '',
+  clos: {
+    clo1: [],
+    clo2: [],
+    clo3: [],
+    // This will be overridden by actual data structure if initialData exists
+  },
+  weight: 0
+};
 
 interface Assessment {
   id: string;
@@ -23,10 +36,39 @@ interface AssessmentTableProps {
   onSave: (data: Assessment[]) => void;
 }
 
+// Get CLO keys dynamically from the first assessment or default assessment
+const getCLOKeys = (assessments: Assessment[]): string[] => {
+  const firstAssessment = assessments[0];
+  return Object.keys(firstAssessment.clos).sort();
+};
+
 export default function AssessmentTable({ initialData, onSave }: AssessmentTableProps) {
-  const [assessments, setAssessments] = useState<Assessment[]>(initialData);
+  // Use initialData if it exists, otherwise use default empty assessment
+  const [assessments, setAssessments] = useState<Assessment[]>(
+    initialData.length > 0 ? initialData : [DEFAULT_ASSESSMENT]
+  );
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [tempInputs, setTempInputs] = useState<{ [key: string]: string }>({});
+
+  const removeCLONumber = (id: string, clo: string, index: number) => {
+    setAssessments(prev => prev.map(assessment => {
+      if (assessment.id === id) {
+        const newCLOs = [...assessment.clos[clo as keyof Assessment['clos']]];
+        newCLOs.splice(index, 1);
+        return {
+          ...assessment,
+          clos: {
+            ...assessment.clos,
+            [clo]: newCLOs
+          }
+        };
+      }
+      return assessment;
+    }));
+  };
+
+  // Get CLO keys dynamically
+  const cloKeys = getCLOKeys(assessments);
 
   const handleCLOInput = (id: string, clo: 'clo1' | 'clo2' | 'clo3', value: string) => {
     const lastChar = value[value.length - 1];
@@ -58,16 +100,25 @@ export default function AssessmentTable({ initialData, onSave }: AssessmentTable
   };
 
   const addNewRow = () => {
-    setAssessments(prev => [...prev, {
-      id: (prev.length + 1).toString(),
-      type: '',
-      clos: {
-        clo1: [],
-        clo2: [],
-        clo3: [],
-      },
-      weight: 0
-    }]);
+    setAssessments(prev => {
+      const uniqueId = crypto.randomUUID();  // Generate unique ID
+      
+      if (prev.length === 0) {
+        return [...prev, { ...DEFAULT_ASSESSMENT, id: uniqueId }];
+      }
+
+      const newClos: Assessment['clos'] = Object.keys(prev[0].clos).reduce((acc, cloKey) => {
+        acc[cloKey as keyof Assessment['clos']] = [];
+        return acc;
+      }, {} as Assessment['clos']);
+
+      return [...prev, {
+        id: uniqueId,  // Use unique ID instead of array length
+        type: '',
+        clos: newClos,
+        weight: 0
+      }];
+    });
   };
 
   const deleteSelectedRows = () => {
@@ -103,10 +154,12 @@ export default function AssessmentTable({ initialData, onSave }: AssessmentTable
                 />
               </TableHead>
               <TableHead>Assessment Type</TableHead>
-              <TableHead>CLOs1</TableHead>
-              <TableHead>CLOs2</TableHead>
-              <TableHead>CLOs3</TableHead>
-              <TableHead>Weight</TableHead>
+              {cloKeys.map((clo) => (
+                <TableHead key={clo}>
+                  {clo.toUpperCase()}
+                </TableHead>
+              ))}
+              <TableHead>Weight (%)</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -133,67 +186,36 @@ export default function AssessmentTable({ initialData, onSave }: AssessmentTable
                     ))}
                   />
                 </TableCell>
-                {(['clo1', 'clo2', 'clo3'] as const).map((clo) => (
+                {cloKeys.map((clo) => (
                   <TableCell key={clo}>
-                    <div className="flex flex-wrap gap-1 p-1 border rounded">
-                      {assessment.clos[clo].map((num, idx) => (
-                        <span key={idx} className="bg-blue-100 px-2 py-1 rounded text-sm">
+                    <div className="flex flex-wrap gap-1 p-1 border rounded min-h-[40px]">
+                      {assessment.clos[clo as keyof Assessment['clos']].map((num, idx) => (
+                        <span key={idx} className="bg-blue-100 px-2 py-1 rounded text-sm flex items-center gap-1">
                           {num}
+                          <X 
+                            className="h-3 w-3 cursor-pointer hover:text-red-500"
+                            onClick={() => removeCLONumber(assessment.id, clo, idx)}
+                          />
                         </span>
                       ))}
                       <Input 
                         className="border-none focus-visible:ring-0 p-1 flex-1 min-w-[60px]"
-                        placeholder="Type & press comma"
+                        placeholder="Enter number"
                         value={tempInputs[`${assessment.id}-${clo}`] || ''}
                         onChange={(e) => {
-                          const value = e.target.value;
-                          if (value.endsWith(',') || value.endsWith(' ')) {
-                            const number = parseInt(value.slice(0, -1));
-                            if (!isNaN(number) && !assessment.clos[clo].includes(number)) {
-                              setAssessments(prev => prev.map(a => 
-                                a.id === assessment.id 
-                                  ? {
-                                      ...a,
-                                      clos: {
-                                        ...a.clos,
-                                        [clo]: [...a.clos[clo], number]
-                                      }
-                                    }
-                                  : a
-                              ));
-                              setTempInputs(prev => ({
-                                ...prev,
-                                [`${assessment.id}-${clo}`]: ''
-                              }));
-                            }
-                          } else {
-                            setTempInputs(prev => ({
-                              ...prev,
-                              [`${assessment.id}-${clo}`]: value
-                            }));
-                          }
+                          setTempInputs(prev => ({
+                            ...prev,
+                            [`${assessment.id}-${clo}`]: e.target.value
+                          }));
                         }}
                         onKeyDown={(e) => {
-                          if (e.key === 'Enter') {
-                            const value = tempInputs[`${assessment.id}-${clo}`];
-                            const number = parseInt(value);
-                            if (!isNaN(number) && !assessment.clos[clo].includes(number)) {
-                              setAssessments(prev => prev.map(a => 
-                                a.id === assessment.id 
-                                  ? {
-                                      ...a,
-                                      clos: {
-                                        ...a.clos,
-                                        [clo]: [...a.clos[clo], number]
-                                      }
-                                    }
-                                  : a
-                              ));
-                              setTempInputs(prev => ({
-                                ...prev,
-                                [`${assessment.id}-${clo}`]: ''
-                              }));
-                            }
+                          if (e.key === 'Enter' || e.key === ',' || e.key === ' ') {
+                            e.preventDefault();
+                            handleCLOInput(
+                              assessment.id, 
+                              clo as keyof Assessment['clos'], 
+                              tempInputs[`${assessment.id}-${clo}`] || ''
+                            );
                           }
                         }}
                       />

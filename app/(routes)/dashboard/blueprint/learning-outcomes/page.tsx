@@ -12,7 +12,9 @@ const dummyData = {
       clos: {
         clo1: [1, 2],
         clo2: [3, 4],
-        clo3: [5, 6],
+        clo3: [5],
+        clo4: [6],
+        clo5: [7],
       },
       weight: 10
     },
@@ -23,6 +25,8 @@ const dummyData = {
         clo1: [2, 3],
         clo2: [4, 5],
         clo3: [1, 6],
+        clo4: [7],
+        clo5: [8],
       },
       weight: 30
     }
