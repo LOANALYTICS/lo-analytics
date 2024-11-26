@@ -45,27 +45,22 @@ const generatePDF = async (html: string, fileName: string) => {
         unit: 'in', 
         format: 'a4', 
         orientation: 'portrait',
-        compress: true,
-        marginTop: 0.5,
-        marginBottom: 0.5
+        compress: true
       },
-      pagebreak: { 
-        mode: 'avoid-all',
-        after: '.table-wrapper',
-        avoid: 'tr'
-      }
+      pagebreak: {}
     };
 
-    // Special handling for year comparison
+    // Special handling for different report types
     if (fileName === 'year-comparison') {
       opt.pagebreak = { 
         mode: ['css', 'avoid-all'],
         before: '.table-wrapper'
-      } as any;
-      opt.html2canvas = {
-        ...opt.html2canvas,
-        windowHeight: container.scrollHeight
-      } as any;
+      };
+    } else if (fileName === 'semester-analysis') {
+      opt.pagebreak = {
+        mode: 'avoid-all',
+        before: '.table-wrapper'
+      };
     }
 
     await html2pdf()
@@ -206,6 +201,28 @@ export default function ItemAnalysisPage() {
     }
   }
 
+  const onAnalysisSubmit = async (data: FormValues) => {
+    try {
+      console.log("Analysis Submit Data:", data);
+      const params = new URLSearchParams({
+        collegeId: user?.cid,
+        semester: data.semester.toString(),
+        year: data.academic_year,
+      });
+
+      const response = await fetch(`/api/semester-analysis?${params}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch analysis data');
+      }
+
+      const htmlContent = await response.text();
+      await generatePDF(htmlContent, 'semester-analysis');
+      setFilterOpen(false);
+    } catch (error) {
+      console.error('Analysis error:', error);
+    }
+  }
+
   useEffect(() => {
     const getData = async () => {
       const currentUser = await getCurrentUser()
@@ -262,7 +279,7 @@ export default function ItemAnalysisPage() {
             <DialogTitle>Semester Analysis</DialogTitle>
           </DialogHeader>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <form onSubmit={form.handleSubmit(onAnalysisSubmit)} className="space-y-4">
               <FormField
                 control={form.control}
                 name="academic_year"
@@ -311,7 +328,16 @@ export default function ItemAnalysisPage() {
               />
 
               <DialogFooter>
-                <Button type="submit">Generate</Button>
+                <Button 
+                  type="button"
+                  onClick={async () => {
+                    const values = form.getValues();
+                    console.log("Button clicked, values:", values);
+                    await onAnalysisSubmit(values);
+                  }}
+                >
+                  Generate
+                </Button>
               </DialogFooter>
             </form>
           </Form>

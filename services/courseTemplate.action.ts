@@ -29,7 +29,7 @@ export async function getCoursesTemplates(): Promise<any[]> {
             students_withdrawn: course.students_withdrawn,
             student_absent: course.student_absent,
             gender: course.gender,
-            // createdBy: course.createdBy ? course.createdBy.toString() : undefined, // Convert createdBy ObjectId to string if present
+            createdBy: course.createdBy ? course.createdBy.toString() : undefined, // Convert createdBy ObjectId to string if present
         };
 
         return serializedCourse;
