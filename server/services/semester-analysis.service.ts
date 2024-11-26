@@ -98,7 +98,7 @@ function generateTableHTML(title: string, courses: any[], semester: number, year
   const averages = calculateAverages(courses);
   
   return `
-    <table class="min-w-full border-collapse border border-gray-300">
+    <table class="min-w-full border-collapse border rounded-md overflow-hidden border-gray-300">
       <colgroup>
         <col style="width: 40px;">
         <col style="width: 200px;">
@@ -107,10 +107,10 @@ function generateTableHTML(title: string, courses: any[], semester: number, year
       <thead>
         <tr>
           <th colspan="2" style="width: 300px !important;" class="border border-gray-300 bg-yellow-200 p-1">
-            <p style="text-align: left; margin: 0; margin-bottom: 10px;">${isLevel ? `LEVEL ${title}` : `DEPARTMENT: ${title}`}</p>
+            <p style="text-align: center; margin: 0; margin-bottom: 10px;">${isLevel ? `LEVEL ${title}` : `DEPARTMENT: ${title}`}</p>
           </th>
-          <th colspan="8" class="border border-gray-300 p-1">
-            <p style="text-align: left; margin: 0; margin-bottom: 10px;">Semester ${semester}, ${year}</p>
+          <th colspan="9" class="border border-gray-300 p-1">
+            <p style="text-align: center; margin: 0; margin-bottom: 10px;">Semester ${semester}, ${year}</p>
           </th>
         </tr>
         <tr>
@@ -213,7 +213,7 @@ function generateTableHTML(title: string, courses: any[], semester: number, year
         }).join('')}
         <tr>
           <td rowspan="2" colspan="2" class="border border-gray-300 p-1 font-bold" style="width: 30px !important; max-width: 30px !important;">
-            <p style="text-align: left; margin: 0; margin-bottom: 10px;">Average</p>
+            <p style="text-align: center; margin: 0; margin-bottom: 10px;">Average</p>
           </td>
           <td class="border border-gray-300 p-1 font-bold">
             <p style="text-align: center; margin: 0; margin-bottom: 10px;">${averages.goodQuestions}</p>
@@ -469,7 +469,7 @@ function generateSummaryTableHTML(title: string, summaries: any[], isLevel: bool
   };
 
   return `
-    <table class="min-w-full border-collapse border border-gray-300">
+    <table class="min-w-full border-collapse border rounded-md overflow-hidden border-gray-300">
       <colgroup>
         <col style="width: 30px;">
         <col style="width: 270px;">
@@ -478,10 +478,10 @@ function generateSummaryTableHTML(title: string, summaries: any[], isLevel: bool
       <thead>
         <tr>
           <th colspan="2" style="width: 300px !important;" class="border border-gray-300 bg-yellow-200 p-1">
-            <p style="text-align: left; margin: 0; margin-bottom: 10px;">${title}</p>
+            <p style="text-align: center; margin: 0; margin-bottom: 10px;">${title}</p>
           </th>
-          <th colspan="8" class="border border-gray-300 p-1">
-            <p style="text-align: left; margin: 0; margin-bottom: 10px;">Summary</p>
+          <th colspan="9" class="border border-gray-300 p-1">
+            <p style="text-align: center; margin: 0; margin-bottom: 10px;">Summary</p>
           </th>
         </tr>
         <tr>
@@ -579,10 +579,9 @@ function generateSummaryTableHTML(title: string, summaries: any[], isLevel: bool
           </tr>
         `).join('')}
         
-        <!-- Average Row -->
         <tr>
-          <td rowspan="2" colspan="2" class="border border-gray-300 p-1 font-bold" style="text-align: left;">
-            <p style="margin: 0; margin-bottom: 10px;">Average</p>
+          <td rowspan="2" colspan="2" class="border border-gray-300 p-1 font-bold" style="text-align: center;">
+            <p style="text-align: center; margin: 0; margin-bottom: 10px;">Average</p>
           </td>
           <td class="border border-gray-300 p-1 font-bold">
             <p style="text-align: center; margin: 0; margin-bottom: 10px;">${finalAverages.goodQuestions}</p>

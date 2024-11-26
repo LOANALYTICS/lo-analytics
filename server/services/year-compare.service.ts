@@ -41,7 +41,7 @@ function generateTableHTML(title: string, courses: any[], yearA: string, yearB: 
   const averages = calculateAverages(courses);
   
   return `
-    <table class="min-w-full border-collapse border border-gray-300">
+    <table class="min-w-full border-collapse border mt-[5px] rounded-md overflow-hidden border-gray-300">
       <colgroup>
         <col style="width: 40px;">
         <col style="width: 200px;">
@@ -50,7 +50,7 @@ function generateTableHTML(title: string, courses: any[], yearA: string, yearB: 
       <thead>
         <tr>
           <th colspan="2" style="width: 300px !important;" class="border border-gray-300 bg-yellow-200 p-1">
-            <p style="text-align: left; margin: 0; margin-bottom: 10px;">${isLevel ? `LEVEL ${title}` : `DEPARTMENT: ${title}`}</p>
+            <p style="text-align: center; margin: 0; margin-bottom: 10px;">${isLevel ? `LEVEL ${title}` : `DEPARTMENT: ${title}`}</p>
           </th>
           <th colspan="3" class="border border-gray-300 p-1">
             <p style="text-align: center; margin: 0; margin-bottom: 10px;">Semester ${courses[0]?.semisterA}, ${yearA}</p>
@@ -90,7 +90,7 @@ function generateTableHTML(title: string, courses: any[], yearA: string, yearB: 
           </tr>
         `).join('')}
         <tr>
-          <td rowspan="2" colspan="2" class="border border-gray-300 p-1 font-bold"><p style="text-align: left; margin: 0; margin-bottom: 10px;">Average</p></td>
+          <td rowspan="2" colspan="2" class="border border-gray-300 p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px;">Average</p></td>
           <td class="border border-gray-300 p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${averages.accepted}</p></td>
           <td class="border border-gray-300 p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${averages.rejected}</p></td>
           <td rowspan="2" class="border border-gray-300 p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${averages.kr20A}</p></td>
@@ -336,7 +336,7 @@ export async function compareYears({
 
 function generateSummaryTableHTML(title: string, summaries: any[], isLevel: boolean = true, yearA: string, yearB: string) {
   return `
-    <table class="min-w-full border-collapse border border-gray-300">
+    <table class="min-w-full border-collapse border rounded-md mt-[5px] overflow-hidden border-gray-300">
       <colgroup>
         <col style="width: 40px;">
         <col style="width: 200px;">
@@ -345,7 +345,7 @@ function generateSummaryTableHTML(title: string, summaries: any[], isLevel: bool
       <thead>
         <tr>
           <th colspan="2" style="width: 300px !important;" class="border border-gray-300 bg-yellow-200 p-1">
-            <p style="text-align: left; margin: 0; margin-bottom: 10px;">${title}</p>
+            <p style="text-align: center; margin: 0; margin-bottom: 10px;">${title}</p>
           </th>
           <th colspan="3" class="border border-gray-300 p-1">
             <p style="text-align: center; margin: 0; margin-bottom: 10px;">Semester ${summaries[0]?.semisterA}, ${yearA}</p>
@@ -385,7 +385,7 @@ function generateSummaryTableHTML(title: string, summaries: any[], isLevel: bool
           </tr>
         `).join('')}
         <tr>
-          <td rowspan="2" colspan="2" class="border border-gray-300 p-1 font-bold"><p style="text-align: left; margin: 0; margin-bottom: 10px;">Average</p></td>
+          <td rowspan="2" colspan="2" class="border border-gray-300 p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px;">Average</p></td>
           <td class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${Math.round(summaries.reduce((acc, curr) => acc + curr.averages.accepted, 0) / summaries.length)}</p></td>
           <td class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${Math.round(summaries.reduce((acc, curr) => acc + curr.averages.rejected, 0) / summaries.length)}</p></td>
           <td rowspan="2" class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${(summaries.reduce((acc, curr) => acc + curr.averages.kr20A, 0) / summaries.length).toFixed(2)}</p></td>

@@ -1,8 +1,12 @@
 import { NextResponse } from 'next/server';
 import { analyzeSemester } from '@/server/services/semester-analysis.service';
+import { Collage } from '@/lib/models';
+import { connectToMongoDB } from '@/lib/db';
 
 export async function GET(request: Request) {
   try {
+    await connectToMongoDB();
+    
     const { searchParams } = new URL(request.url);
     const collegeId = searchParams.get('collegeId');
     const semester = searchParams.get('semester');
@@ -10,6 +14,16 @@ export async function GET(request: Request) {
 
     if (!collegeId || !semester || !year) {
       return new NextResponse('Missing required parameters', { status: 400 });
+    }
+
+    const college = await Collage.findById(collegeId).lean().exec() as unknown as {
+      logo?: string;
+      english: string;
+      regional?: string;
+      university: string;
+    };
+    if (!college) {
+      return new NextResponse('College not found', { status: 404 });
     }
 
     const analysis = await analyzeSemester({
@@ -26,8 +40,61 @@ export async function GET(request: Request) {
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <title>Semester Analysis</title>
           ${analysis.styles}
+          <style>
+            .header-container {
+              margin-bottom: 80px;
+            }
+            .header {
+              text-align: center;
+              padding: 4px;
+              margin-bottom: 10px;
+            }
+            .header-description {
+              max-width: fit-content;
+              margin: 0 auto;
+            }
+            .header-description h2 {
+              font-size: 16px;
+              text-align: center;
+            }
+            .header-description hr {
+              margin-top: 10px;
+            }
+            .header-description p {
+              font-size: 12px;
+              margin-top: -4px;
+              text-align: center;
+            }
+            .college-logo {
+              max-width: 200px;
+              margin: 0 auto;
+              aspect-ratio: 16/9;
+            }
+            .college-name {
+              font-size: 18px;
+              font-weight: bold;
+            }
+            .university-name {
+              font-size: 16px;
+            }
+          </style>
         </head>
         <body>
+          <div class="header-container">
+            <div class="header">
+              ${college.logo ? `<img src="${college.logo}" alt="College Logo" class="college-logo"/>` : ''}
+              <div class="college-name">
+                ${college.english} | ${college.regional}
+              </div>
+              <div class="university-name">${college.university}</div>
+            </div>
+            <hr style="margin-bottom: 40px;"/>
+            <div class="header-description">
+              <h2>Semester Analysis Report</h2>
+              <hr/>
+              <p>Sem-${semester} ${year}</p>
+            </div>
+          </div>
           <div class="tables-container">
             ${analysis.tables.join('\n')}
           </div>

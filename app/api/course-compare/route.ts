@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { connectToMongoDB } from '@/lib/db';
 import { compareCourses } from '@/server/services/course.service';
+import { Collage } from '@/lib/models';
 
 export async function GET(request: Request) {
   try {
@@ -18,6 +19,16 @@ export async function GET(request: Request) {
       return NextResponse.json({
         message: 'Missing required parameters'
       }, { status: 400 });
+    }
+
+    const college = await Collage.findById(collegeId).lean().exec() as unknown as {
+      logo?: string;
+      english: string;
+      regional?: string;
+      university: string;
+    };
+    if (!college) {
+      return NextResponse.json({ message: 'College not found' }, { status: 404 });
     }
 
     const { tables, styles } = await compareCourses({
@@ -63,9 +74,60 @@ export async function GET(request: Request) {
                 break-inside: avoid !important;
               }
             }
+            .header-container {
+              margin-bottom: 80px;
+            }
+            .header {
+              text-align: center;
+              padding: 4px;
+              margin-bottom: 10px;
+            }
+            .header-description {
+              max-width: fit-content;
+              margin: 0 auto;
+            }
+            .header-description h2 {
+              font-size: 16px;
+              text-align: center;
+            }
+            .header-description hr {
+              margin-top: 10px;
+            }
+            .header-description p {
+              font-size: 12px;
+              margin-top: -4px;
+              text-align: center;
+            }
+            .college-logo {
+              max-width: 200px;
+              margin: 0 auto;
+              aspect-ratio: 16/9;
+            }
+            .college-name {
+              font-size: 18px;
+              font-weight: bold;
+            }
+            .university-name {
+              font-size: 16px;
+            }
           </style>
         </head>
         <body>
+          <div class="header-container">
+            <div class="header">
+              ${college.logo ? `<img src="${college.logo}" alt="College Logo" class="college-logo"/>` : ''}
+              <div class="college-name">
+                ${college.english} | ${college.regional}
+              </div>
+              <div class="university-name">${college.university}</div>
+            </div>
+            <hr style="margin-bottom: 40px;"/>
+            <div class="header-description">
+              <h2>Course Comparison Report</h2>
+              <hr/>
+              <p>Sem-${semister} ${yearA} Section ${sectionA} vs ${yearB} Section ${sectionB}</p>
+            </div>
+          </div>
           <div class="tables-container">
             ${tables.join('\n')}
           </div>

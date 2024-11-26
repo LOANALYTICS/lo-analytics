@@ -33,7 +33,7 @@ const generatePDF = async (html: string, fileName: string) => {
     document.body.appendChild(container);
 
     const opt = {
-      margin: [0.5, 0.5, 0.5, 0.5],
+      margin: [0.2, 0.5, 0.5, 0.5],
       filename: `${fileName}.pdf`,
       image: { type: 'jpeg', quality: 0.98 },
       html2canvas: { 
