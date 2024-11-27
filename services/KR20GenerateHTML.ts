@@ -84,9 +84,10 @@ export function generateHTML(data: any): string {
         min-width: max-content;
         border-collapse: collapse; 
         margin: 20px 0; 
+        border: 1px solid #000 !important;
       }
       .table th, .table td { 
-        border: 1px solid #333; 
+        border: 1px solid #000; 
         padding: 8px 8px 8px 8px; 
         text-align: center;
         white-space: nowrap;
@@ -94,6 +95,10 @@ export function generateHTML(data: any): string {
         vertical-align: middle !important;
         text-align: center !important;
         padding: 8px !important;
+      }
+      .table td p, .table th p {
+        margin-bottom: 10px;
+        text-align: center;
       }
       .section-title { font-weight: bold; font-size: 18px; margin-top: 20px; }
       .info-box { padding: 10px; border: 1px solid #000; margin: 10px 0; }
@@ -126,6 +131,10 @@ export function generateHTML(data: any): string {
         line-height: 1.4;
         overflow-wrap: break-word;
       }
+      .question-no-cell p {
+        text-align: left;
+        margin-bottom: 10px;
+      }
       .course-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;  /* Creates 2 equal columns */
@@ -133,20 +142,67 @@ export function generateHTML(data: any): string {
       }
       .grid-item {
         padding: 2px;
-        // border: 1px solid #333;
         text-align: center;
+      }
+      .header-container {
+        margin-bottom: 80px;
+      }
+      .header {
+        text-align: center;
+        padding: 4px;
+        margin-bottom: 10px;
+      }
+      .header-description {
+        max-width: fit-content;
+        margin: 0 auto;
+      }
+      .header-description h2 {
+        font-size: 16px;
+        text-align: center;
+      }
+      .header-description hr {
+        margin-top: 10px;
+      }
+      .header-description p {
+        font-size: 12px;
+        margin-top: -4px;
+        text-align: center;
+      }
+      .college-logo {
+        max-width: 200px;
+        margin: 0 auto;
+        aspect-ratio: 16/9;
+      }
+      .college-name {
+        font-size: 18px;
+        font-weight: bold;
+      }
+      .university-name {
+        font-size: 16px;
       }
     </style>
   </head>
   <body>
     <!-- Header with Logo and College Information -->
-    <header>
-      <img src="data:image/png;base64,${collegeInfo?.logo || ''}" alt="College Logo" class="logo" onerror="this.style.display='none'">
-      <p>${collegeInfo?.english || ''} | ${collegeInfo?.regional || ''} | ${collegeInfo?.university || ''}</p>
-    </header>
+    <div class="header-container">
+      <div class="header">
+        ${collegeInfo.logo ? `<img src="${collegeInfo.logo}" alt="College Logo" class="college-logo"/>` : ''}
+        <div class="college-name">
+          ${collegeInfo.english} | ${collegeInfo.regional}
+        </div>
+        <div class="university-name">${collegeInfo.university}</div>
+      </div>
+      <hr style="margin-bottom: 40px;"/>
+      <div class="header-description">
+        <h2>Item Analysis Report</h2>
+        <hr/>
+        <p>Course: ${course.course_name || ''}</p>
+      </div>
+    </div>
+
 
     <!-- Course Details Section -->
-    <div class="info-box">
+    <div class="info-box  rounded-md overflow-hidden  border-collapse border border-black">
       <div class="course-grid">
         <div class="grid-item">
           <p>Course Name: ${course?.course_name || ''}</p>
@@ -169,72 +225,83 @@ export function generateHTML(data: any): string {
       </div>
     </div>
 
-    <!-- Item Analysis Table -->
-    <table class="table">
+    <table class="table rounded-md overflow-hidden border-collapse border border-black">
       <tr>
-        <th>S.No</th>
-        <th>Item Category</th>
-        <th>Question No</th>
-        <th>Total Questions</th>
-        <th>%</th>
-        <th>Comments/Recommendations</th>
+        <th><p style="text-align: center; margin-bottom: 10px;">S.No</p></th>
+        <th><p style="text-align: center; margin-bottom: 10px;">Item Category</p></th>
+        <th><p style="text-align: center; margin-bottom: 10px;">Question No</p></th>
+        <th><p style="text-align: center; margin-bottom: 10px;">Total Questions</p></th>
+        <th><p style="text-align: center; margin-bottom: 10px;">%</p></th>
+        <th><p style="text-align: center; margin-bottom: 10px;">Comments/Recommendations</p></th>
       </tr>
       ${(groupedItemAnalysisResults || [])?.map((item: any, index: number) => `
         <tr>
-          <td><p style="margin-bottom: 10px;">${index + 1}</p></td>
-          <td><p style="margin-bottom: 10px;">${item?.classification || ''}</p></td>
+          <td><p style="text-align: center; margin-bottom: 10px;">${index + 1}</p></td>
+          <td><p style="text-align: center; margin-bottom: 10px;">${item?.classification || ''}</p></td>
           ${item?.classification === 'Reliability' 
-            ? `<td colspan="3" style="vertical-align: middle; text-align: center;"><p style="margin-bottom: 10px;">KR20 = ${(KR_20 || 0).toFixed(2)}</p></td>`
+            ? `<td colspan="3" style="vertical-align: middle; text-align: center;"><p style="text-align: center; margin-bottom: 10px;">KR20 = ${(KR_20 || 0).toFixed(2)}</p></td>`
             : `
-              <td class="question-no-cell"><p style="margin-bottom: 10px;">${formatQuestions(item?.questions || [])}</p></td>
-              <td style="vertical-align: middle; text-align: center;"><p style="margin-bottom: 10px;">${(item?.questions || []).length}</p></td>
-              <td style="vertical-align: middle; text-align: center;"><p style="margin-bottom: 10px;">${Number((item?.perc || 0).toFixed(1))}%</p></td>
+              <td class="question-no-cell"><p style="text-align: center; margin-bottom: 10px;">${formatQuestions(item?.questions || [])}</p></td>
+              <td style="vertical-align: middle; text-align: center;"><p style="text-align: center; margin-bottom: 10px;">${(item?.questions || []).length}</p></td>
+              <td style="vertical-align: middle; text-align: center;"><p style="text-align: center; margin-bottom: 10px;">${Number((item?.perc || 0).toFixed(1))}%</p></td>
             `
           }
-          <td><p style="margin-bottom: 10px;">${getCommentByClassification(item?.classification || '')}</p></td>
+          <td><p style="text-align: center; margin-bottom: 10px;">${getCommentByClassification(item?.classification || '')}</p></td>
         </tr>
       `).join("")}
     </table>
 
     <!-- Segregated Graded Students Table -->
-    <table class="table">
+    <table class="table  rounded-md overflow-hidden  border-collapse border border-black">
+      <colgroup>
+        <col style="width: 60px;">
+        <col style="width: 60px;">
+        <col style="width: 60px;">
+        <col style="width: 60px;">
+        <col style="width: auto;"> <!-- "Students Passed" column takes remaining space -->
+        <col style="width: 60px;">
+        <col style="width: 60px;">
+        <col style="width: 60px;">
+        <col style="width: 60px;">
+        <col style="width: 60px;">
+        <col style="width: 60px;">
+        <col style="width: 60px;">
+        <col style="width: 60px;">
+        <col style="width: 60px;">
+      </colgroup>
       <tr>
-        <th>Course Code</th>
-        <th>Credit Hour</th>
-        <th>Students Number</th>
-        <th>Students Withdrawn</th>
-        <th>Students Absent</th>
-        <th>Students Attended</th>
-        <th>Students Passed</th>
-        <th>A+</th>
-        <th>A</th>
-        <th>B+</th>
-        <th>B</th>
-        <th>C+</th>
-        <th>C</th>
-        <th>D+</th>
-        <th>D</th>
-        <th>F</th>
+        <th><p style="text-align: center; margin-bottom: 10px;">Students Number</p></th>
+        <th><p style="text-align: center; margin-bottom: 10px;">Students Withdrawn</p></th>
+        <th><p style="text-align: center; margin-bottom: 10px;">Students Absent</p></th>
+        <th><p style="text-align: center; margin-bottom: 10px;">Students Attended</p></th>
+        <th><p style="text-align: center; margin-bottom: 10px;">Students Passed</p></th>
+        <th><p style="text-align: center; margin-bottom: 10px;">A+</p></th>
+        <th><p style="text-align: center; margin-bottom: 10px;">A</p></th>
+        <th><p style="text-align: center; margin-bottom: 10px;">B+</p></th>
+        <th><p style="text-align: center; margin-bottom: 10px;">B</p></th>
+        <th><p style="text-align: center; margin-bottom: 10px;">C+</p></th>
+        <th><p style="text-align: center; margin-bottom: 10px;">C</p></th>
+        <th><p style="text-align: center; margin-bottom: 10px;">D+</p></th>
+        <th><p style="text-align: center; margin-bottom: 10px;">D</p></th>
+        <th><p style="text-align: center; margin-bottom: 10px;">F</p></th>
       </tr>
       <tr>
-        <td><p style="margin-bottom: 10px;">${course?.code || ''}</p></td>
-        <td><p style="margin-bottom: 10px;">${course?.creditHours || ''}</p></td>
-        <td><p style="margin-bottom: 10px;">${course?.studentsNumber || ''}</p></td>
-        <td style="vertical-align: middle; text-align: center;"><p style="margin-bottom: 10px;">${course?.studentsWithdrawn || ''}</p></td>
-        <td style="vertical-align: middle; text-align: center;"><p style="margin-bottom: 10px;">${course?.studentsAbsent || ''}</p></td>
-        <td style="vertical-align: middle; text-align: center;"><p style="margin-bottom: 10px;">${course?.studentsAttended || ''}</p></td>
+        <td><p style="text-align: center; margin-bottom: 10px;">${course?.studentsNumber || ''}</p></td>
+        <td style="vertical-align: middle; text-align: center;"><p style="text-align: center; margin-bottom: 10px;">${course?.studentsWithdrawn || ''}</p></td>
+        <td style="vertical-align: middle; text-align: center;"><p style="text-align: center; margin-bottom: 10px;">${course?.studentsAbsent || ''}</p></td>
+        <td style="vertical-align: middle; text-align: center;"><p style="text-align: center; margin-bottom: 10px;">${course?.studentsAttended || ''}</p></td>
         <td class="split-cell" style="padding: 0;">
           <div class="cell-row">
-            <p style="margin-bottom: 10px;">${course?.studentsPassed?.number || ''}</p>
+            <p style="text-align: center; margin-bottom: 10px;">${course?.studentsPassed?.number || ''}</p>
           </div>
           <div class="cell-row">
-            <p style="margin-bottom: 10px;">${course?.studentsPassed?.percentage || ''}%</p>
+            <p style="text-align: center; margin-bottom: 10px;">${course?.studentsPassed?.percentage || ''}%</p>
           </div>
         </td>
         ${(segregatedGradedStudents || []).map((grade: any) => `
           <td class="split-cell">
-            <div class="cell-row"><p style="margin-bottom: 10px;">${grade?.count || '0'}</p></div>
-            <div class="cell-row"><p style="margin-bottom: 10px;">${grade?.studentPercentage || ''}%</p></div>
+            <div class="cell-row"><p style="text-align: center; margin-bottom: 10px;">${grade?.count || '0'}</p></div>
+            <div class="cell-row"><p style="text-align: center; margin-bottom: 10px;">${grade?.studentPercentage || ''}%</p></div>
           </td>
         `).join("")}
       </tr>

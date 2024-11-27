@@ -6,8 +6,9 @@ export async function compareKRValues(courseId1: string, courseId2: string) {
     try {
         const [course1Data, course2Data] = await Promise.all([
             Course.findById(courseId1)
-                .select('course_name section academic_year examType krValues')
-                .lean<ICourse>(),
+                .select('course_name section academic_year examType krValues collage')
+                .populate('collage', 'logo english regional university')
+                .lean<ICourse & { collage: { _id: string, logo?: string, english?: string, regional?: string, university?: string } }>(),
             Course.findById(courseId2)
                 .select('course_name section academic_year examType krValues')
                 .lean<ICourse>()
@@ -47,7 +48,14 @@ export async function compareKRValues(courseId1: string, courseId2: string) {
                         examType: course2Data.examType
                     },
                     kr: JSON.parse(JSON.stringify(kr2))
-                }
+                },
+                college: course1Data.collage ? {
+                    _id: course1Data.collage._id.toString(),
+                    logo: course1Data.collage.logo || '',
+                    english: course1Data.collage.english || '',
+                    regional: course1Data.collage.regional || '',
+                    university: course1Data.collage.university || ''
+                } : null
             }
         };
     } catch (error) {
