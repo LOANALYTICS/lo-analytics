@@ -48,21 +48,11 @@ const generatePDF = async (html: string, fileName: string) => {
         orientation: 'portrait',
         compress: true
       },
-      pagebreak: {}
-    };
-
-    // Special handling for different report types
-    if (fileName === 'year-comparison') {
-      opt.pagebreak = { 
+      pagebreak: { 
         mode: ['css', 'avoid-all'],
         before: '.table-wrapper'
-      };
-    } else if (fileName === 'semester-analysis') {
-      opt.pagebreak = {
-        mode: 'avoid-all',
-        before: '.table-wrapper'
-      };
-    }
+      }
+    };
 
     await html2pdf()
       .set(opt)

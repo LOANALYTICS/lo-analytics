@@ -67,7 +67,7 @@ function generateComparisonHTML(title: string, courses: any[], yearA: string, ye
   const averages = calculateLevelTotals(courses);
   
   return `
-    <table class="min-w-full border-collapse border rounded-md overflow-hidden mt-[5px] border-gray-300">
+    <table style="margin-top: 15px;" class="min-w-full border-collapse border rounded-md overflow-hidden  border-gray-300">
       <colgroup>
         <col style="width: 40px;">
         <col style="width: 200px;">
@@ -301,19 +301,12 @@ export async function compareCourses({
     tables: [...levelTables, ...departmentTables, levelSummaryTable, departmentSummaryTable],
     styles: `
       <style>
-      
-        .table-wrapper {
-          page-break-inside: avoid !important;
-          display: block !important;
-          position: relative !important;
-          break-inside: avoid !important;
-        }
-        
         table {
           width: 100% !important;
           border-collapse: collapse !important;
           table-layout: fixed !important;
           font-size: 7pt !important;
+          margin-bottom: 15px !important;
         }
         
         table:last-child {
@@ -359,14 +352,8 @@ export async function compareCourses({
         }
 
         @media print {
-          div {
-            break-inside: avoid !important;
-          }
-          
-          .table-wrapper {
-            margin: 15px 0 !important;
-            page-break-inside: avoid !important;
-            break-inside: avoid !important;
+          table {
+            page-break-inside: avoid;
           }
         }
       </style>
