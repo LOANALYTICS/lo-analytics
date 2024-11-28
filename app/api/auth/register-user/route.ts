@@ -32,6 +32,7 @@ export async function POST(request: Request) {
       email: userWithoutPassword.email,
       role: userWithoutPassword.role,
       cid: userWithoutPassword.collage._id.toString(),
+      permissions: userWithoutPassword.permissions,
     }, process.env.JWT_SECRET!, { expiresIn: '1h' });
 
 

@@ -27,7 +27,7 @@ import {
 
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { ThumbsUp } from 'lucide-react'
+import { ThumbsUp, Loader2 } from 'lucide-react'
 import { generatePDF } from '@/services/PdfGeneratorService'
 import { createCourse } from '@/services/courses.action';
 import { toast } from "sonner"
@@ -61,6 +61,7 @@ export default function NewCoursePage() {
     const [open, setOpen] = useState(false)
     const [isSubmitting, setIsSubmitting] = useState(false)
     const dialogRef = useRef<any>(null)
+    const [isUploading, setIsUploading] = useState(false);
     
     const form = useForm<FormValues>({
         resolver: zodResolver(formSchema),
@@ -193,10 +194,11 @@ export default function NewCoursePage() {
    
       const handleUpload = async () => {
         if (!selectedFile) {
-          alert("Please select a file before uploading.");
+          toast.error("Please select a file before uploading.");
           return;
         }
     
+        setIsUploading(true);
         const formData = new FormData();
         formData.append("file", selectedFile);
         formData.append("courseId", createdCourseId);
@@ -212,22 +214,21 @@ export default function NewCoursePage() {
             throw new Error("Failed to upload file");
           }
     
-          console.log(response, "response")
-          // Check content type to handle both HTML and JSON responses
           const contentType = response.headers.get("content-type");
           if (contentType?.includes("application/json")) {
             const result = await response.json();
             console.log("File uploaded successfully:", result);
           } else {
             const htmlContent = await response.text();
-            // Handle HTML content - perhaps generate PDF here
             await generatePDF(htmlContent, "analysis-report.pdf");
-            console.log("PDF generated successfully");
+            toast.success("Report downloaded successfully");
           }
-          router.push(`/dashboard/item-analysis`)
+          router.push(`/dashboard/item-analysis`);
         } catch (error) {
           console.error("Error uploading file:", error);
           toast.error("Failed to upload file");
+        } finally {
+          setIsUploading(false);
         }
       };
     return (
@@ -509,7 +510,20 @@ selectedFile ? (
 
                     <DialogFooter className='w-full'>
                         <Button className='w-full' variant={'outline'} onClick={() => setOpen(false)}>Cancel</Button>
-                        <Button className='w-full' disabled={!selectedFile} onClick={handleUpload}>Add File</Button>
+                        <Button 
+                            className='w-full' 
+                            disabled={!selectedFile || isUploading} 
+                            onClick={handleUpload}
+                        >
+                            {isUploading ? (
+                                <>
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                    Uploading...
+                                </>
+                            ) : (
+                                "Add File"
+                            )}
+                        </Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>

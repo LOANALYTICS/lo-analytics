@@ -3,13 +3,14 @@ import LogoutButton from '@/components/core/LogoutButton';
 import Sidebar from '@/components/core/sidebar/sidebar';
 import { Plus } from 'lucide-react';
 import Link from 'next/link';
-import { getRole } from '@/server/utils/helper';
+import { getCurrentUser, getRole } from '@/server/utils/helper';
 
 const BaseLayout = async ({ children }: { children: React.ReactNode }) => {
 
   const role = await getRole("token");
+  const user = await getCurrentUser();
   
-  console.log('User Cokie:', role);
+  console.log('User Cokie:', role,user);
 
   const topbarLinks = [
     { name: "Add Course", href: "/dashboard/new-course", icon: Plus },
@@ -17,7 +18,7 @@ const BaseLayout = async ({ children }: { children: React.ReactNode }) => {
 
   return (
     <div className="flex p-2 h-screen gap-2">
-      <Sidebar userRole={role} />
+      <Sidebar userRole={role} userPermissions={user?.permissions ?? []} />
       <div className="flex-1 flex flex-col gap-2">
         <section className="h-16 min-h-16 w-full border flex justify-end px-4 rounded-xl">
           <div className="flex gap-3 items-center">

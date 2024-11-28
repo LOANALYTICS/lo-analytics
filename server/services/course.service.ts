@@ -362,33 +362,48 @@ export async function compareCourses({
 }
 
 function generateSummaryTableHTML(title: string, summaries: any[], isLevel: boolean = true, yearA: string, yearB: string, sectionA: string, sectionB: string) {
+  // Calculate totals for percentages with null checks
+  const avgAcceptedA = Math.round(summaries.reduce((acc, curr) => acc + (curr.averages.yearA?.accepted || 0), 0) / summaries.length);
+  const avgRejectedA = Math.round(summaries.reduce((acc, curr) => acc + (curr.averages.yearA?.rejected || 0), 0) / summaries.length);
+  const avgAcceptedB = Math.round(summaries.reduce((acc, curr) => acc + (curr.averages.yearB?.accepted || 0), 0) / summaries.length);
+  const avgRejectedB = Math.round(summaries.reduce((acc, curr) => acc + (curr.averages.yearB?.rejected || 0), 0) / summaries.length);
+  
+  const totalA = avgAcceptedA + avgRejectedA;
+  const totalB = avgAcceptedB + avgRejectedB;
+
+  // Calculate percentages with NaN handling
+  const acceptedPercentageA = totalA ? ((avgAcceptedA / totalA) * 100) : 0;
+  const rejectedPercentageA = totalA ? ((avgRejectedA / totalA) * 100) : 0;
+  const acceptedPercentageB = totalB ? ((avgAcceptedB / totalB) * 100) : 0;
+  const rejectedPercentageB = totalB ? ((avgRejectedB / totalB) * 100) : 0;
+
   return `
     <table class="min-w-full border-collapse border mt-[5px] rounded-md overflow-hidden border-gray-300">
       <colgroup>
-        <col style="width: 30px;">
-        <col style="width: 270px;">
+         <col style="width: 40px;">
+        <col style="width: 200px;">
         <col span="6" style="width: auto;">
       </colgroup>
       <thead>
         <tr>
           <th colspan="2" class="border border-gray-300 bg-yellow-200 p-1">
-            <p style="text-align: center; margin: 0;">${title}</p>
+            <p style="text-align: center; margin: 0; margin-bottom: 10px;">${title}</p>
           </th>
           <th colspan="3" class="border border-gray-300 p-1">
-            <p style="text-align: center; margin: 0;">1st Semester, ${yearA} (${sectionA})</p>
+            <p style="text-align: center; margin: 0; margin-bottom: 10px;">1st Semester, ${yearA} (${sectionA})</p>
           </th>
           <th colspan="3" class="border border-gray-300 p-1">
-            <p style="text-align: center; margin: 0;">1st Semester, ${yearB} (${sectionB})</p>
+            <p style="text-align: center; margin: 0; margin-bottom: 10px;">1st Semester, ${yearB} (${sectionB})</p>
           </th>
         </tr>
         <tr>
-          <th class="border border-gray-300 p-1">S.No</th>
-          <th class="border border-gray-300 p-1">${isLevel ? 'Level' : 'Department'}</th>
-          <th class="border border-gray-300 p-1">Total Accepted</th>
-          <th class="border border-gray-300 p-1">Total Rejected</th>
-          <th class="border border-gray-300 p-1">KR20</th>
-          <th class="border border-gray-300 p-1">Total Accepted</th>
-          <th class="border border-gray-300 p-1">Total Rejected</th>
+          <th class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">S.No</p></th>
+          <th class="border border-gray-300 p-1"><p style="text-align: left; margin: 0; margin-bottom: 10px;">${isLevel ? 'Level' : 'Department'}</p></th>
+          <th class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">Total Accepted</p></th>
+          <th class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">Total Rejected</p></th>
+          <th class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">KR20</p></th>
+          <th class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">Total Accepted</p></th>
+          <th class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">Total Rejected</p></th>
           <th class="border border-gray-300 p-1">KR20</th>
         </tr>
       </thead>
@@ -396,42 +411,42 @@ function generateSummaryTableHTML(title: string, summaries: any[], isLevel: bool
         ${summaries.map((summary, index) => `
           <tr>
             <td rowspan="2" class="border border-gray-300 p-1">
-              <p style="text-align: center; margin: 0;">${index + 1}</p>
+              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${index + 1}</p>
             </td>
             <td rowspan="2" class="border border-gray-300 p-1">
-              <p style="text-align: left; margin: 0;">${isLevel ? `Level ${summary.name}` : summary.name}</p>
+              <p style="text-align: left; margin: 0; margin-bottom: 10px; ">${isLevel ? `Level ${summary.name}` : summary.name}</p>
             </td>
             <td class="border border-gray-300 p-1">
-              <p style="text-align: center; margin: 0;">${summary.averages.yearA.accepted}</p>
+              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${summary.averages.yearA.accepted}</p>
             </td>
             <td class="border border-gray-300 p-1">
-              <p style="text-align: center; margin: 0;">${summary.averages.yearA.rejected}</p>
+              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${summary.averages.yearA.rejected}</p>
             </td>
             <td rowspan="2" class="border border-gray-300 p-1">
-              <p style="text-align: center; margin: 0;">${summary.averages.yearA.kr20.toFixed(2)}</p>
+              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${summary.averages.yearA.kr20.toFixed(2)}</p>
             </td>
             <td class="border border-gray-300 p-1">
-              <p style="text-align: center; margin: 0;">${summary.averages.yearB.accepted}</p>
+              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${summary.averages.yearB.accepted}</p>
             </td>
             <td class="border border-gray-300 p-1">
-              <p style="text-align: center; margin: 0;">${summary.averages.yearB.rejected}</p>
+              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${summary.averages.yearB.rejected}</p>
             </td>
             <td rowspan="2" class="border border-gray-300 p-1">
-              <p style="text-align: center; margin: 0;">${summary.averages.yearB.kr20.toFixed(2)}</p>
+              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${summary.averages.yearB.kr20.toFixed(2)}</p>
             </td>
           </tr>
           <tr>
             <td class="border border-gray-300 p-1">
-              <p style="text-align: center; margin: 0;">${((summary.averages.yearA.accepted / (summary.averages.yearA.accepted + summary.averages.yearA.rejected)) * 100).toFixed(2)}%</p>
+              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${!isNaN(acceptedPercentageA) ? acceptedPercentageA.toFixed(2) : '0'}%</p>
             </td>
             <td class="border border-gray-300 p-1">
-              <p style="text-align: center; margin: 0;">${((summary.averages.yearA.rejected / (summary.averages.yearA.accepted + summary.averages.yearA.rejected)) * 100).toFixed(2)}%</p>
+              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${!isNaN(rejectedPercentageA) ? rejectedPercentageA.toFixed(2) : '0'}%</p>
             </td>
             <td class="border border-gray-300 p-1">
-              <p style="text-align: center; margin: 0;">${((summary.averages.yearB.accepted / (summary.averages.yearB.accepted + summary.averages.yearB.rejected)) * 100).toFixed(2)}%</p>
+              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${!isNaN(acceptedPercentageB) ? acceptedPercentageB.toFixed(2) : '0'}%</p>
             </td>
             <td class="border border-gray-300 p-1">
-              <p style="text-align: center; margin: 0;">${((summary.averages.yearB.rejected / (summary.averages.yearB.accepted + summary.averages.yearB.rejected)) * 100).toFixed(2)}%</p>
+              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${!isNaN(rejectedPercentageB) ? rejectedPercentageB.toFixed(2) : '0'}%</p>
             </td>
           </tr>
         `).join('')}
@@ -441,22 +456,36 @@ function generateSummaryTableHTML(title: string, summaries: any[], isLevel: bool
             <p style="text-align: center; margin: 0; margin-bottom: 10px;">Average</p>
           </td>
           <td class="border border-gray-300 p-1">
-            <p style="text-align: center; margin: 0; margin-bottom: 10px;">${Math.round(summaries.reduce((acc, curr) => acc + curr.averages.yearA.accepted, 0) / summaries.length)}</p>
+            <p style="text-align: center; margin: 0; margin-bottom: 10px;">${avgAcceptedA}</p>
           </td>
           <td class="border border-gray-300 p-1">
-            <p style="text-align: center; margin: 0; margin-bottom: 10px;">${Math.round(summaries.reduce((acc, curr) => acc + curr.averages.yearA.rejected, 0) / summaries.length)}</p>
+            <p style="text-align: center; margin: 0; margin-bottom: 10px;">${avgRejectedA}</p>
           </td>
           <td rowspan="2" class="border border-gray-300 p-1">
             <p style="text-align: center; margin: 0; margin-bottom: 10px;">${(summaries.reduce((acc, curr) => acc + curr.averages.yearA.kr20, 0) / summaries.length).toFixed(2)}</p>
           </td>
           <td class="border border-gray-300 p-1">
-            <p style="text-align: center; margin: 0; margin-bottom: 10px;">${Math.round(summaries.reduce((acc, curr) => acc + curr.averages.yearB.accepted, 0) / summaries.length)}</p>
+            <p style="text-align: center; margin: 0; margin-bottom: 10px;">${avgAcceptedB}</p>
           </td>
           <td class="border border-gray-300 p-1">
-            <p style="text-align: center; margin: 0; margin-bottom: 10px;">${Math.round(summaries.reduce((acc, curr) => acc + curr.averages.yearB.rejected, 0) / summaries.length)}</p>
+            <p style="text-align: center; margin: 0; margin-bottom: 10px;">${avgRejectedB}</p>
           </td>
           <td rowspan="2" class="border border-gray-300 p-1">
             <p style="text-align: center; margin: 0; margin-bottom: 10px;">${(summaries.reduce((acc, curr) => acc + curr.averages.yearB.kr20, 0) / summaries.length).toFixed(2)}</p>
+          </td>
+        </tr>
+        <tr>
+          <td class="border border-gray-300 p-1">
+            <p style="text-align: center; margin: 0; margin-bottom: 10px;">${totalA ? ((avgAcceptedA / totalA) * 100).toFixed(2) : '0'}%</p>
+          </td>
+          <td class="border border-gray-300 p-1">
+            <p style="text-align: center; margin: 0; margin-bottom: 10px;">${totalA ? ((avgRejectedA / totalA) * 100).toFixed(2) : '0'}%</p>
+          </td>
+          <td class="border border-gray-300 p-1">
+            <p style="text-align: center; margin: 0; margin-bottom: 10px;">${totalB ? ((avgAcceptedB / totalB) * 100).toFixed(2) : '0'}%</p>
+          </td>
+          <td class="border border-gray-300 p-1">
+            <p style="text-align: center; margin: 0; margin-bottom: 10px;">${totalB ? ((avgRejectedB / totalB) * 100).toFixed(2) : '0'}%</p>
           </td>
         </tr>
       </tbody>

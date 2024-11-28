@@ -11,6 +11,7 @@ interface CustomJwtPayloadRole {
       name: string;
       role: string;
       cid: any;
+      permissions: string[];
   }
 export async function getRole(cookieName: string): Promise<any> {
     const cookieStore = await cookies(); // Correctly typed
@@ -40,7 +41,8 @@ export async function getCurrentUser() {
         email: decoded?.email,
         name: decoded?.name,
         role: decoded?.role,
-        cid: decoded?.cid
+        cid: decoded?.cid,
+        permissions: decoded?.permissions,
       };
     } catch (error) {
       console.error('Error getting current user:', error);

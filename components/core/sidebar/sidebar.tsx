@@ -10,7 +10,7 @@ const sidebarItems: SidebarItem[] = [
 
   { name: "Question Bank", href: "/dashboard/question-bank", icon: SquareLibrary },
   {
-    name: "Blueprint", href: "/dashboard/blueprint", icon: BookOpenCheck,
+    name: "Learning Outcome", href: "/dashboard/blueprint", icon: BookOpenCheck,
     others: [
       { name: "Student Details", href: "/dashboard/blueprint/student-details", icon: UsersRound },
       { name: "Learning Outcomes", href: "/dashboard/blueprint/learning-outcomes", icon: BookDashed },
@@ -33,7 +33,7 @@ interface SidebarItem {
 }
 
 
-const Sidebar = ({ userRole }: { userRole: string }) => {
+const Sidebar = ({ userRole, userPermissions }: { userRole: string, userPermissions: string[] }) => {
   const [expandedItems, setExpandedItems] = useState<{ [key: string]: boolean }>({});
   const toggleExpand = (name: any) => {
     setExpandedItems((prev) => ({
@@ -47,6 +47,12 @@ const Sidebar = ({ userRole }: { userRole: string }) => {
   const toggleSidebarCollapse = () => {
     setIsCollapsed((prev) => !prev);
   };
+
+  // Filter sidebar items based on permissions
+  const filteredSidebarItems = sidebarItems.filter(item => {
+    // If user has permission for this item, show it
+    return userPermissions.includes(item.name);
+  });
 
   return (
     <div className="relative">
@@ -117,10 +123,9 @@ const Sidebar = ({ userRole }: { userRole: string }) => {
               )
             )
             }
-            {sidebarItems.map(({ name, href, icon: Icon, others }) => (
+            {filteredSidebarItems.map(({ name, href, icon: Icon, others }) => (
               <li key={name}>
                 {!others ? (
-                  // Simple link for items without "others"
                   <Link
                     href={href}
                     className={`flex items-center p-2 rounded-lg text-black transition-colors duration-200 ${pathname === href ? "bg-neutral-500 text-white" : "hover:bg-gray-200"}`}
@@ -131,33 +136,20 @@ const Sidebar = ({ userRole }: { userRole: string }) => {
                     </span>
                   </Link>
                 ) : (
-                  // Expandable item for items with "others"
                   <>
                     <button
-                      onClick={() => {
-                        toggleExpand(name)
-
-                        isCollapsed && expandedItems[name]
-                      }
-                      }
+                      onClick={() => toggleExpand(name)}
                       className="flex items-center p-2 rounded-lg text-black transition-colors duration-200 hover:bg-gray-200 w-full"
                     >
                       <Icon className="text-xl min-w-[20px] w-[20px] ml-1" />
                       <span className={`ml-4 break-keep line-clamp-1 text-sm font-medium transition-opacity duration-300 ${isCollapsed ? "opacity-0 pointer-events-none" : "opacity-100"}`}>
                         {name}
                       </span>
-                      {
-                        isCollapsed ? null : (
-                          <span className="ml-auto text-xl">{expandedItems[name] ? '−' : '+'}</span>
-                        )
-                      }
+                      {!isCollapsed && <span className="ml-auto text-xl">{expandedItems[name] ? '−' : '+'}</span>}
                     </button>
-                    <div
-                      className={`overflow-hidden transition-all duration-300 ease-in-out ${expandedItems[name] ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0 scale-95'
-                        }`}
-                    >
-                      <ul className={` ${isCollapsed ? "": "ml-6"} mt-2 space-y-1`}>
-                        {others.map(({ name: otherName, href: otherHref, icon: OtherIcon }) => (
+                    <div className={`overflow-hidden transition-all duration-300 ease-in-out ${expandedItems[name] ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0 scale-95'}`}>
+                      <ul className={`${isCollapsed ? "" : "ml-6"} mt-2 space-y-1`}>
+                        {others.filter(subItem => userPermissions.includes(subItem.name)).map(({ name: otherName, href: otherHref, icon: OtherIcon }) => (
                           <li key={otherName}>
                             <Link
                               href={otherHref}

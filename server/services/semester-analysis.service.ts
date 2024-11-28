@@ -471,8 +471,8 @@ function generateSummaryTableHTML(title: string, summaries: any[], isLevel: bool
   return `
     <table class="min-w-full border-collapse border rounded-md overflow-hidden border-gray-300">
       <colgroup>
-        <col style="width: 30px;">
-        <col style="width: 270px;">
+        <col style="width: 40px;">
+        <col style="width: 200px;">
         <col span="9" style="width: auto;">
       </colgroup>
       <thead>
