@@ -268,6 +268,71 @@ function generateTableHTML(title: string, courses: any[], semester: number, year
   `;
 }
 
+function generateKR20SegregationHTML(courses: any[]) {
+  // Group courses by KR20 ranges
+  const goodExams = courses.filter(c => c.krValues?.KR_20 >= 0.80);
+  const averageExams = courses.filter(c => c.krValues?.KR_20 >= 0.70 && c.krValues?.KR_20 < 0.80);
+  const badExams = courses.filter(c => c.krValues?.KR_20 < 0.70 || !c.krValues?.KR_20);
+
+  return `
+    <div class="kr20-segregation" style="height: 500px; width: 100%; overflow-y: auto; margin-bottom: 40px; border: 1px solid #e2e8f0; border-radius: 8px;">
+      <h2 style="text-align: center; font-size: 16px; font-weight: bold; padding: 24px; background-color: #f8fafc; border-bottom: 1px solid #e2e8f0; margin: 0; margin-top: -16px;">
+        Observation of individual courses
+      </h2>
+      
+      <div style="padding: 16px;">
+        <div class="exam-category">
+          <h3 style="color: #16a34a; font-size: 14px; font-weight: bold; margin-bottom: 8px;">
+            Good Exams (KR20 ≥ 0.80)
+          </h3>
+          <ul style="list-style-type: none; padding-left: 16px; margin: 0;">
+            ${goodExams.map(course => `
+              <li style="margin-bottom: 4px; font-size: 12px;">
+                ${course.course_name} (${course.course_code})
+                ${course.section ? `- Section ${course.section}` : ''} 
+                - KR20: ${course.krValues?.KR_20?.toFixed(2) || 'N/A'}
+              </li>
+            `).join('')}
+            ${goodExams.length === 0 ? '<li style="color: #64748b; font-size: 12px;">No courses found</li>' : ''}
+          </ul>
+        </div>
+
+        <div class="exam-category" style="margin-top: 16px;">
+          <h3 style="color: #ca8a04; font-size: 14px; font-weight: bold; margin-bottom: 8px;">
+            Average Exams (KR20: 0.70-0.79)
+          </h3>
+          <ul style="list-style-type: none; padding-left: 16px; margin: 0;">
+            ${averageExams.map(course => `
+              <li style="margin-bottom: 4px; font-size: 12px;">
+                ${course.course_name} (${course.course_code})
+                ${course.section ? `- Section ${course.section}` : ''} 
+                - KR20: ${course.krValues?.KR_20?.toFixed(2) || 'N/A'}
+              </li>
+            `).join('')}
+            ${averageExams.length === 0 ? '<li style="color: #64748b; font-size: 12px;">No courses found</li>' : ''}
+          </ul>
+        </div>
+
+        <div class="exam-category" style="margin-top: 16px;">
+          <h3 style="color: #dc2626; font-size: 14px; font-weight: bold; margin-bottom: 8px;">
+            Bad Exams (KR20 < 0.70)
+          </h3>
+          <ul style="list-style-type: none; padding-left: 16px; margin: 0;">
+            ${badExams.map(course => `
+              <li style="margin-bottom: 4px; font-size: 12px;">
+                ${course.course_name} (${course.course_code})
+                ${course.section ? `- Section ${course.section}` : ''} 
+                - KR20: ${course.krValues?.KR_20?.toFixed(2) || 'N/A'}
+              </li>
+            `).join('')}
+            ${badExams.length === 0 ? '<li style="color: #64748b; font-size: 12px;">No courses found</li>' : ''}
+          </ul>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
 export async function analyzeSemester({
   collegeId,
   semester,
@@ -329,8 +394,11 @@ export async function analyzeSemester({
   const levelSummaryTable = generateSummaryTableHTML('Level Summary', levelSummaries, true);
   const departmentSummaryTable = generateSummaryTableHTML('Department Summary', departmentSummaries, false);
 
+  // Add KR20 segregation before the tables
+  const kr20SegregationHTML = generateKR20SegregationHTML(courses);
+
   return {
-    tables: [...levelTables, ...departmentTables, levelSummaryTable, departmentSummaryTable],
+    tables: [kr20SegregationHTML, ...levelTables, ...departmentTables, levelSummaryTable, departmentSummaryTable],
     styles: `
       <style>
         .table-wrapper {
@@ -421,6 +489,38 @@ export async function analyzeSemester({
             page-break-inside: avoid !important;
             break-inside: avoid !important;
           }
+        }
+
+        .kr20-segregation {
+          background-color: white;
+          box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+        }
+        
+        .exam-category h3 {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+        
+        .exam-category h3::before {
+          content: '';
+          display: inline-block;
+          width: 8px;
+          margin-top: 14px;
+          height: 8px;
+          border-radius: 50%;
+        }
+        
+        .exam-category:nth-child(1) h3::before {
+          background-color: #16a34a;
+        }
+        
+        .exam-category:nth-child(2) h3::before {
+          background-color: #ca8a04;
+        }
+        
+        .exam-category:nth-child(3) h3::before {
+          background-color: #dc2626;
         }
       </style>
     `
