@@ -1,73 +1,39 @@
 // app/api/createCourseTemplate/route.ts
 
-import { NextResponse } from 'next/server';
 import courseTemplateModel from '@/server/models/courseTemplate.model';
-import { connectToMongoDB } from '@/lib/db';
+import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
   try {
-    await connectToMongoDB()
-    const {
-      course_name,
-      sem,
-      department,
-      university_name,
-      course_code,
-      credit_hours,
-      level,
-      question_ref,
-      college_name,
-      coordinator,
-      academic_year,
-      no_of_question,
-      no_of_student,
-      students_withdrawn,
-      student_absent,
-      KR20,
-      gender,
-      createdBy,
-      
-    } = await request.json();
-
-    const newCourseTemplate = new courseTemplateModel({
-      course_name,
-      sem,
-      department,
-      university_name,
-      course_code,
-      credit_hours,
-      level,
-      question_ref,
-      college_name,
-      coordinator,
-      academic_year,
-      no_of_question,
-      no_of_student,
-      students_withdrawn,
-      student_absent,
-      KR20,
-      gender,
-      createdBy,
+    const body = await request.json();
+    
+    // Check for existing course with same name or code in the same college
+    const existingCourse = await courseTemplateModel.findOne({
+      $and: [
+        { college: body.college },
+        {
+          $or: [
+            { course_name: body.course_name },
+            { course_code: body.course_code }
+          ]
+        }
+      ]
     });
 
-    // Save the document to the database
-    const savedCourseTemplate = await newCourseTemplate.save();
+    if (existingCourse) {
+      return NextResponse.json(
+        { error: "A course with this name or code already exists in this college" },
+        { status: 409 }
+      );
+    }
 
-    // Return success response
-    return NextResponse.json(
-      {
-        message: 'Course Template created successfully',
-        data: savedCourseTemplate,
-      },
-      { status: 201 }
-    );
+    const course = await courseTemplateModel.create(body);
+    return NextResponse.json(course, { status: 201 });
+
   } catch (error) {
-    console.error('Error creating course template:', error);
+    console.error("Error creating course template:", error);
     return NextResponse.json(
-      {
-        message: 'Error creating course template',
-        error: error instanceof Error ? error.message : 'Unknown error',
-      },
+      { error: "Internal server error" },
       { status: 500 }
     );
   }

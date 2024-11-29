@@ -11,37 +11,29 @@ interface CourseTemplate extends Document {
   course_code: string;
   credit_hours: string;
   level: number;
-  examType: string;
-  question_ref?: string;
-  college?: string;
-  coordinator: string[]; 
-  academic_year: Date;
-  students_withdrawn: number;
-  student_absent: number;
-  KR20?: string; 
-  gender?: string;
-  createdBy: string; 
-  permissions: string[];
+  college: mongoose.Types.ObjectId;
+  coordinator: mongoose.Types.ObjectId[];
+  createdBy?: mongoose.Types.ObjectId;
 }
 
 // Define the schema
 const CourseTemplateSchema = new Schema<CourseTemplate>({
-  course_name: { type: String },
-  sem: { type: Number },
-  department: { type: String },
-  university_name: { type: String },
-  course_code: { type: String },
-  credit_hours: { type: String },
-  level: { type: Number },
-  examType: { type: String,},
-  question_ref: { type: String },
-  college: [{ type: Schema.Types.ObjectId, ref: 'Collage' }],
-  coordinator: [{ type: Schema.Types.ObjectId, ref: 'User' }],
-  academic_year: { type: Date },
-  students_withdrawn: { type: Number },
-  student_absent: { type: Number },
-  KR20: { type: String },
-  gender: { type: String },
+  course_name: { type: String, required: true },
+  sem: { type: Number, required: true },
+  department: { type: String, required: true },
+  course_code: { type: String, required: true },
+  credit_hours: { type: String, required: true },
+  level: { type: Number, required: true },
+  college: { type: Schema.Types.ObjectId, ref: 'Collage', required: true },
+  coordinator: [{
+    type: Schema.Types.ObjectId,
+    ref: 'User',
+    required: false
+  }],
+  createdBy: {
+    type: Schema.Types.ObjectId,
+    ref: 'User'
+  }
 });
 
 export default models.CourseTemplate || model<CourseTemplate>('CourseTemplate', CourseTemplateSchema);

@@ -3,33 +3,33 @@ import { ICourse } from "@/server/models/course.model";
 import courseTemplateModel from "@/server/models/courseTemplate.model";
 
 export async function getCoursesTemplates(): Promise<any[]> {
-    // Fetch courses and populate the coordinators
-    const courses = await courseTemplateModel.find().populate('coordinator').lean() as any[];
+    // Fetch courses and populate both college and coordinator
+    const courses = await courseTemplateModel.find()
+        .populate("college")
+        .populate("coordinator", "name")  // Add coordinator population
+        .lean() as any[];
 
     return courses.map((course) => {
         const serializedCourse: any = {
-            _id: course._id.toString(), // Convert the main course ObjectId to string
+            _id: course._id.toString(),
             course_name: course.course_name,
             sem: course.sem,
             department: course.department,
-            university_name: course.university_name,
             course_code: course.course_code,
             credit_hours: course.credit_hours,
             level: course.level,
-            question_ref: course.question_ref,
-            // college_name: course.college,
-            // Handle coordinator (which is an array of objects) and convert _id to string
+            college: {
+                _id: course.college._id.toString(),
+                english: course.college.english
+            },
+            // Add coordinator serialization
             coordinator: course.coordinator
-                ? course.coordinator.map((coordinator: any) => ({
-                      _id: coordinator._id.toString(), // Convert each coordinator's ObjectId to string
-                      name: coordinator.name, // Assuming you want other fields like name
-                  }))
+                ? course.coordinator.map((coord: any) => ({
+                    _id: coord._id.toString(),
+                    name: coord.name
+                }))
                 : [],
-            academic_year: course.academic_year,
-            students_withdrawn: course.students_withdrawn,
-            student_absent: course.student_absent,
-            gender: course.gender,
-            createdBy: course.createdBy ? course.createdBy.toString() : undefined, // Convert createdBy ObjectId to string if present
+            createdBy: course.createdBy ? course.createdBy.toString() : undefined,
         };
 
         return serializedCourse;
