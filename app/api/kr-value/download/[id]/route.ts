@@ -17,7 +17,9 @@ export async function GET(
   try {
     await connectToMongoDB();
 
-    const courseData = await Course.findById(params.id).populate('krValues');
+    const courseData = await Course.findById(params.id)
+      .populate('collage')
+      .populate('krValues', 'groupedItemAnalysisResults KR_20 gradeDistribution collegeInfo')
     
     if (!courseData || !courseData.krValues) {
       return NextResponse.json(
@@ -25,6 +27,13 @@ export async function GET(
         { status: 404 }
       );
     }
+
+    const collegeInfo = {
+      logo: courseData.collage.logo,
+      english: courseData.collage.english,
+      regional: courseData.collage.regional,
+      university: courseData.collage.university
+    };
 
     const course = {
         course_name: courseData.course_name,
@@ -45,7 +54,7 @@ export async function GET(
         KR_20: courseData.krValues.KR_20,
         segregatedGradedStudents: courseData.krValues.gradeDistribution,
         course: course,
-        collegeInfo: courseData.krValues.collegeInfo
+        collegeInfo
     });
 
     // Return HTML content with proper headers

@@ -104,16 +104,22 @@ export async function POST(request: Request) {
 
     // Fetch course and college data
     const courseData: any = await Course.findById(courseId)
+      .populate('collage')
       .select('course_name level semister department course_code credit_hours no_of_student students_withdrawn student_absent coordinator')
       .lean();
 
-    const collegeData : any = await Collage.findById(collegeId).lean();
-
-    if (!courseData || !collegeData) {
+    if (!courseData || !courseData.collage) {
       return NextResponse.json({ 
         message: 'Course or College not found' 
       }, { status: 404 });
     }
+
+    const collegeInfo = {
+      logo: courseData.collage.logo,
+      english: courseData.collage.english,
+      regional: courseData.collage.regional,
+      university: courseData.collage.university
+    };
 
     // Calculate passed students
     const totalStudents = gradeDistribution.reduce((sum, grade) => sum + grade.count, 0);
@@ -137,12 +143,6 @@ export async function POST(request: Request) {
       studentsPassed: passedStudents
     };
 
-    const collegeInfo = {
-      logo: collegeData.logo,
-      english: collegeData.english,
-      regional: collegeData.regional,
-      university: collegeData.university
-    };
     console.log(course, "krs")
 
     // Create KR value document
