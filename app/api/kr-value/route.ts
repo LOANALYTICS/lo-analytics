@@ -50,6 +50,23 @@ function calculateGradeDistribution(results: any[]): GradeDistribution[] {
 
 export async function POST(request: Request) {
   try {
+    // Get the cookies from the request headers
+    const cookieHeader = request.headers.get('cookie');
+    const cookies = new Map(
+      cookieHeader?.split(';').map(cookie => {
+        const [key, value] = cookie.trim().split('=');
+        return [key, value];
+      }) || []
+    );
+    
+    const userInformationCookie = cookies.get('userInformation');
+    
+    if (!userInformationCookie) {
+      return NextResponse.json({ error: "User information not found" }, { status: 401 });
+    }
+
+    const userInformation = JSON.parse(decodeURIComponent(userInformationCookie));
+    
     await connectToMongoDB()
     const formData = await request.formData();
     const file = formData.get('file') as Blob;
@@ -133,7 +150,7 @@ export async function POST(request: Request) {
       course_name: courseData.course_name,
       level: courseData.level,
       semister: courseData.semister,
-      coordinator: courseData.coordinator,
+      coordinator: userInformation.name,
       course_code: courseData.course_code,
       credit_hours: courseData.credit_hours,
       studentsNumber: courseData.no_of_student,
