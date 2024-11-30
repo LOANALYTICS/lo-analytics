@@ -17,15 +17,35 @@ import Link from 'next/link'
 export default function ManageCollage() {
     const [collages, setCollages] = useState<any>([])
     const [isOpen, setIsOpen] = useState(false)
+    const [loading, setLoading] = useState(true)
 
     useEffect(() => {
         const fetchCollages = async () => {
-            const collageData = await getCollage()
-            setCollages(collageData)
+            setLoading(true)
+            try {
+                const collageData = await getCollage()
+                setCollages(collageData)
+            } catch (error) {
+                console.error('Error fetching collages:', error)
+            } finally {
+                setLoading(false)
+            }
         }
 
         fetchCollages()
     }, [])
+
+    const refetchCollages = async () => {
+        setLoading(true)
+        try {
+            const collageData = await getCollage()
+            setCollages(collageData)
+        } catch (error) {
+            console.error('Error refetching collages:', error)
+        } finally {
+            setLoading(false)
+        }
+    }
 
     return (
         <main className="px-2">
@@ -39,12 +59,17 @@ export default function ManageCollage() {
                         <DialogHeader>
                             <DialogTitle>Add new collage</DialogTitle>
                         </DialogHeader>
-                        <AddCollegeForm onClose={() => setIsOpen(false)} />
+                        <AddCollegeForm onClose={() => {
+                            setIsOpen(false)
+                            refetchCollages()
+                        }} />
                     </DialogContent>
                 </Dialog>
             </div>
             <section className="flex flex-col gap-2 mt-4 ">
-                {collages.length > 0 ? (
+                {loading ? (
+                    <div>Loading collages...</div>
+                ) : collages.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
                         {collages.map((collage : any) => (
                             <Link key={collage._id} href={`/dashboard/admin/manage-collage/${collage._id}`} className='flex gap-2 items-center border border-gray-300 shadow-sm rounded-md p-2'>
