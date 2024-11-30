@@ -12,6 +12,7 @@ import {
   } from "@/components/ui/dialog"
 import AddCollegeForm from '@/components/shared/admin/AddCollegeForm'
 import Image from 'next/image'
+import Link from 'next/link'
 export default async function ManageCollage() {
     const collages = await getCollage()
   return (
@@ -38,7 +39,7 @@ export default async function ManageCollage() {
         collages.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
             {collages.map((collage) => (
-              <div key={collage._id} className='flex gap-2 items-center border border-gray-300 shadow-sm rounded-md p-2'>
+              <Link key={collage._id} href={`/dashboard/admin/manage-collage/${collage._id}`} className='flex gap-2 items-center border border-gray-300 shadow-sm rounded-md p-2'>
                 <div>
                     <Image src={collage.logo} alt={collage.english} width={100} height={100} />
                 </div>
@@ -47,7 +48,7 @@ export default async function ManageCollage() {
                     <p>{collage.regional}</p>
                     <p>{collage.university}</p>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         ) : (

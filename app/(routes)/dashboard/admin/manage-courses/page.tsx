@@ -31,11 +31,12 @@ interface CourseDisplay {
   coordinator: Array<{ _id: string; name: string; }>;
 }
 
-export default function ManageCoordinators() {
+export default function ManageCourses() {
   const [courses, setCourses] = useState<CourseDisplay[]>([])
   const [coordinators, setCoordinators] = useState<IUser[]>([])
   const [colleges, setColleges] = useState<College[]>([])
   const [dropdownState, setDropdownState] = useState<Record<string, Record<string, boolean>>>({})
+  const [selectedCollege, setSelectedCollege] = useState<string>('all');
 
   const fetchData = async () => {
     const [courseData, coordinatorData, collegeData] = await Promise.all([
@@ -70,8 +71,11 @@ export default function ManageCoordinators() {
       <div className="flex justify-between items-center mb-6">
         <h1 className="font-semibold text-lg">Manage Courses - ( {courses.length} )</h1>
         <Select
-          value={'all'}
-          onValueChange={(value) => console.log(value)} // Placeholder for college selection
+          value={selectedCollege}
+          onValueChange={(value) => {
+            setSelectedCollege(value);
+            console.log(value);
+          }}
         >
           <SelectTrigger className="w-[200px]">
             <SelectValue placeholder="Filter by College" />
@@ -88,42 +92,44 @@ export default function ManageCoordinators() {
       </div>
 
       <section className="flex flex-col gap-2 mt-4">
-        {courses.map((course) => {
-          // Filter coordinators based on the college of the current course
-          const courseCoordinators = coordinators.filter((coordinator: any) => 
-            coordinator.collage?._id?.toString() === course.college._id.toString()
-          );
+        {courses
+          .filter(course => selectedCollege === 'all' || course.college._id === selectedCollege)
+          .map((course) => {
+            // Filter coordinators based on the college of the current course
+            const courseCoordinators = coordinators.filter((coordinator: any) => 
+              coordinator.collage?._id?.toString() === course.college._id.toString()
+            );
 
-          console.log(`Coordinators for ${course.course_name}:`, courseCoordinators); // Log for debugging
+            console.log(`Coordinators for ${course.course_name}:`, courseCoordinators); // Log for debugging
 
-          return (
-            <div key={course._id} className="flex justify-between items-center border border-gray-300 shadow-sm px-3 rounded-md p-2">
-              <div>
-                <h2 className="font-medium">
-                  {course?.course_name} ({course?.college?.english})
-                </h2>
-                <p className="text-sm text-gray-500">
-                  {course?.college?.english || 'No College Assigned'}
-                </p>
+            return (
+              <div key={course._id} className="flex justify-between items-center border border-gray-300 shadow-sm px-3 rounded-md p-2">
+                <div>
+                  <h2 className="font-medium">
+                    {course?.course_name} ({course?.college?.english})
+                  </h2>
+                  <p className="text-sm text-gray-500">
+                    {course?.college?.english || 'No College Assigned'}
+                  </p>
+                </div>
+                <DynamicDropdownMenu
+                  options={courseCoordinators.map(coordinator => coordinator.name)} // Use coordinators filtered by the course's college
+                  state={dropdownState[course._id] || {}}
+                  handleCheckedChange={(name, checked) => {
+                    console.log(`Changed ${name} to ${checked}`); // Placeholder for handling changes
+                    // Update dropdown state if needed
+                    setDropdownState(prev => ({
+                      ...prev,
+                      [course._id]: {
+                        ...prev[course._id],
+                        [name]: checked,
+                      }
+                    }));
+                  }}
+                />
               </div>
-              <DynamicDropdownMenu
-                options={courseCoordinators.map(coordinator => coordinator.name)} // Use coordinators filtered by the course's college
-                state={dropdownState[course._id] || {}}
-                handleCheckedChange={(name, checked) => {
-                  console.log(`Changed ${name} to ${checked}`); // Placeholder for handling changes
-                  // Update dropdown state if needed
-                  setDropdownState(prev => ({
-                    ...prev,
-                    [course._id]: {
-                      ...prev[course._id],
-                      [name]: checked,
-                    }
-                  }));
-                }}
-              />
-            </div>
-          );
-        })}
+            );
+          })}
       </section>
     </main>
   )
