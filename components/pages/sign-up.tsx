@@ -1,5 +1,5 @@
 "use client"
-import React from 'react'
+import React, { useState } from 'react'
 import { z } from "zod"
 import axios from 'axios'
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -29,6 +29,7 @@ import { Separator } from '../ui/separator'
 import Link from 'next/link'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
+import { Loader2 } from 'lucide-react'
 const formSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters" }),
   email: z.string().email({ message: "Please enter a valid email" }),
@@ -36,6 +37,7 @@ const formSchema = z.object({
   collage: z.string(),
 })
 export default function SignUp({collages}:{collages:any}) {
+  const [loading, setLoading] = useState(false)
   const router = useRouter()
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -48,6 +50,7 @@ export default function SignUp({collages}:{collages:any}) {
       })
      
       async function onSubmit(values: z.infer<typeof formSchema>) {
+        setLoading(true)
         console.log(values)
         try {
           const res = await axios.post("/api/auth/register-user", values)
@@ -60,7 +63,7 @@ export default function SignUp({collages}:{collages:any}) {
         } catch (error) {
           console.error(error)
         }
-
+        setLoading(false)
       }
       const collagesData = collages?.map((collage:any)=>({
         value:collage._id,
@@ -134,7 +137,9 @@ export default function SignUp({collages}:{collages:any}) {
             </FormItem>
           )}
         />
-            <Button type="submit" className='w-full ' style={{marginTop:"20px"}}>Sign Up</Button>
+            <Button type="submit" className='w-full ' style={{marginTop:"20px"}} disabled={loading}>
+              {loading ? <Loader2 className='animate-spin' /> : "Sign Up"}
+            </Button>
             <p className='text-xs'>Already have an account? <Link href="/sign-in" className='font-semibold hover:underline '>Sign In</Link></p>
           </form>
         </Form>

@@ -1,5 +1,5 @@
 "use client"
-import React from 'react'
+import React, { useState } from 'react'
 import { z } from "zod"
 
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -30,13 +30,14 @@ import { Separator } from '../ui/separator'
 import axios from 'axios'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
+import { Loader2 } from 'lucide-react'
 const formSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email" }),
   password: z.string().min(6, { message: "Password must be at least 6 characters" }),
   collage: z.string(),
 })
 export default function SignIn({collages}:{collages:any}) {
-
+const [loading, setLoading] = useState(false)
     const router = useRouter()
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -48,6 +49,7 @@ export default function SignIn({collages}:{collages:any}) {
       })
      
       async function onSubmit(values: z.infer<typeof formSchema>) {
+        setLoading(true)
         try {
           const res = await axios.post("/api/auth/login-user", values)
           console.log(res)
@@ -62,6 +64,7 @@ export default function SignIn({collages}:{collages:any}) {
           console.log(error)
           toast.error(error.message)
         }
+        setLoading(false)
       }
       const collagesData = collages?.map((collage:any)=>({
         value:collage._id,
@@ -122,7 +125,9 @@ export default function SignIn({collages}:{collages:any}) {
             </FormItem>
           )}
         />
-            <Button type="submit" className='w-full ' style={{marginTop:"20px"}}>Sign In</Button>
+            <Button type="submit" className='w-full ' style={{marginTop:"20px"}} disabled={loading}>
+              {loading ? <Loader2 className='animate-spin' /> : "Sign In"}
+            </Button>
             <p className='text-xs'>Dont have an account? <Link href="/sign-up" className='font-semibold hover:underline'>Sign Up</Link></p>
           </form>
         </Form>

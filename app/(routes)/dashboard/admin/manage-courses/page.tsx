@@ -142,7 +142,10 @@ export default function ManageCoordinators() {
           <section className="flex flex-col gap-2 mt-4">
             {filteredCourses.map((course) => (
               <div key={course._id} className="flex justify-between items-center border border-gray-300 shadow-sm px-3 rounded-md p-2">
-                <h2>{course?.course_name}</h2>
+                <div className="flex flex-col "> 
+                  <h2>{course?.course_name}</h2>
+                  <p className="text-xs text-gray-500">{course?.college?.english}</p>
+                </div>
                 <DynamicDropdownMenu
                   options={courseCoordinators(course)} // Pass the filtered list of coordinators to the dropdown
                   state={dropdownState[course._id] || {}} // Pass the state for this course

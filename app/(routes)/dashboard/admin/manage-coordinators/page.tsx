@@ -108,12 +108,15 @@ export default function ManageCoordinators() {
             </Select>
           </div>
           <section className="flex flex-col gap-2 mt-4">
-            {filteredCoordinators.map(coordinator => (
+            {filteredCoordinators.map((coordinator : any) => (
               <div
                 key={coordinator._id}
                 className="flex justify-between items-center border border-gray-300 shadow-sm px-3 rounded-md p-2"
               >
-                <h2>{coordinator.name}</h2>
+                <div className="flex flex-col">
+                  <h2>{coordinator.name}</h2>
+                  <p className="text-xs text-gray-500">Accociated with college: {coordinator.collage?.english}</p>
+                </div>
                 <DynamicDropdownMenu
                   options={["Item Analysis", "Question Bank", "Learning Outcome"]}
                   state={dropdownState[coordinator._id] || {}} // Pass the state for this coordinator
