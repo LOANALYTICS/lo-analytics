@@ -297,7 +297,7 @@ export default function NewCoursePage() {
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Semester</FormLabel>
-                                    <Select onValueChange={field.onChange} defaultValue={field.value?.toString()}>
+                                    <Select onValueChange={(value) => field.onChange(Number(value))} defaultValue={field.value?.toString()}>
                                         <FormControl>
                                             <SelectTrigger>
                                                 <SelectValue placeholder="Select Semester" />
@@ -312,41 +312,42 @@ export default function NewCoursePage() {
                                 </FormItem>
                             )}
                         />
-                        <FormField
-                            control={form.control}
-                            name="level"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Level</FormLabel>
-                                    <Select 
-                                        onValueChange={(value) => field.onChange(Number(value))} 
-                                        defaultValue={field.value?.toString()}
-                                    >
-                                        <FormControl>
-                                            <SelectTrigger>
-                                                <SelectValue placeholder="Select Level" />
-                                            </SelectTrigger>
-                                        </FormControl>
-                                        <SelectContent>
-                                            {[...Array(20)].map((_, index) => {
-                                                const level = index + 1;
-                                                const semester = form.watch("semister");
-                                                if ((semester === 1 && level % 2 === 1) || 
-                                                    (semester === 2 && level % 2 === 0)) {
-                                                    return (
-                                                        <SelectItem key={level} value={level.toString()}>
-                                                            Level {level}
-                                                        </SelectItem>
-                                                    );
-                                                }
-                                                return null;
-                                            })}
-                                        </SelectContent>
-                                    </Select>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
+<FormField
+    control={form.control}
+    name="level"
+    render={({ field }) => (
+        <FormItem>
+            <FormLabel>Level</FormLabel>
+            <Select 
+                onValueChange={(value) => field.onChange(Number(value))} 
+                defaultValue={field.value?.toString()} // Keep the current value
+            >
+                <FormControl>
+                    <SelectTrigger>
+                        <SelectValue placeholder="Select Level" />
+                    </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                    {[...Array(20)].map((_, index) => {
+                        const level = index + 1;
+                        const semester = form.watch("semister");
+                        // Render odd levels for semester 1 and even levels for semester 2
+                        if ((semester === 1 && level % 2 === 1) || 
+                            (semester === 2 && level % 2 === 0)) {
+                            return (
+                                <SelectItem key={level} value={level.toString()}>
+                                    Level {level}
+                                </SelectItem>
+                            );
+                        }
+                        return null;
+                    })}
+                </SelectContent>
+            </Select>
+            <FormMessage />
+        </FormItem>
+    )}
+/>
                     
                         <FormField
                             control={form.control}
