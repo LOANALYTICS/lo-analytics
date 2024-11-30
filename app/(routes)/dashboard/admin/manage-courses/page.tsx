@@ -14,6 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { Loader2 } from "lucide-react"
 
 export default function ManageCoordinators() {
   const [courses, setCourses] = useState<any[]>([])
@@ -21,8 +22,10 @@ export default function ManageCoordinators() {
   const [dropdownState, setDropdownState] = useState<Record<string, Record<string, boolean>>>({})
   const [colleges, setColleges] = useState<any[]>([])
   const [selectedCollege, setSelectedCollege] = useState<string | null>("all")
+  const [loading, setLoading] = useState<boolean>(false)
 
   const fetchData = async () => {
+    setLoading(true)
     console.log("Fetching courses and coordinators...") 
     const courseData = await getCoursesTemplates()
     const coordinatorData = await getUsersByRole("course_coordinator")
@@ -50,6 +53,7 @@ export default function ManageCoordinators() {
     }, {})
 
     setDropdownState(initialState)
+    setLoading(false)
   }
 
   useEffect(() => {
@@ -115,34 +119,42 @@ export default function ManageCoordinators() {
     <main className="px-2">
       <h1 className="font-semibold text-lg">Manage Courses - ( {filteredCourses.length} )</h1>
       
-      <Select onValueChange={setSelectedCollege} defaultValue={selectedCollege || ""}>
-        <SelectTrigger>
-          <SelectValue placeholder="Select College" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">All Colleges</SelectItem>
-          {colleges.map((college) => (
-            <SelectItem key={college._id} value={college._id}>
-              {college.english}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      {loading ? (
+        <div className="flex justify-center items-center h-64">
+          <Loader2 className="animate-spin" />
+        </div>
+      ) : (
+        <>
+          <Select onValueChange={setSelectedCollege} defaultValue={selectedCollege || ""}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select College" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Colleges</SelectItem>
+              {colleges.map((college) => (
+                <SelectItem key={college._id} value={college._id}>
+                  {college.english}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
 
-      <section className="flex flex-col gap-2 mt-4">
-        {filteredCourses.map((course) => (
-          <div key={course._id} className="flex justify-between items-center border border-gray-300 shadow-sm px-3 rounded-md p-2">
-            <h2>{course?.course_name}</h2>
-            <DynamicDropdownMenu
-              options={courseCoordinators(course)} // Pass the filtered list of coordinators to the dropdown
-              state={dropdownState[course._id] || {}} // Pass the state for this course
-              handleCheckedChange={(name, checked) =>
-                handleCheckedChange(course._id, name, checked) // Handle state changes for this course
-              }
-            />
-          </div>
-        ))}
-      </section>
+          <section className="flex flex-col gap-2 mt-4">
+            {filteredCourses.map((course) => (
+              <div key={course._id} className="flex justify-between items-center border border-gray-300 shadow-sm px-3 rounded-md p-2">
+                <h2>{course?.course_name}</h2>
+                <DynamicDropdownMenu
+                  options={courseCoordinators(course)} // Pass the filtered list of coordinators to the dropdown
+                  state={dropdownState[course._id] || {}} // Pass the state for this course
+                  handleCheckedChange={(name, checked) =>
+                    handleCheckedChange(course._id, name, checked) // Handle state changes for this course
+                  }
+                />
+              </div>
+            ))}
+          </section>
+        </>
+      )}
     </main>
   )
 }

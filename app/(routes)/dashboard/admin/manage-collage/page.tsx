@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { getCollage } from '@/services/collage.action'
-import { Plus } from 'lucide-react'
+import { Loader2, Plus } from 'lucide-react'
 import {
     Dialog,
     DialogContent,
@@ -68,7 +68,9 @@ export default function ManageCollage() {
             </div>
             <section className="flex flex-col gap-2 mt-4 ">
                 {loading ? (
-                    <div>Loading collages...</div>
+                    <div className="flex justify-center items-center h-64">
+                    <Loader2 className="animate-spin" />
+                  </div>
                 ) : collages.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
                         {collages.map((collage : any) => (
