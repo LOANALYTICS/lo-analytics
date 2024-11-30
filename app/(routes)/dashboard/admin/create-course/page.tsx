@@ -56,8 +56,10 @@ export default function CreateCoursePage() {
     const [colleges, setColleges] = React.useState<any>([]);
     const [departments, setDepartments] = React.useState<any>([]);
     const [selectedCollege, setSelectedCollege] = React.useState("");
+    const [isLoading, setIsLoading] = React.useState(false);
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
+        setIsLoading(true);
         try {
             console.log("Submitting values:", values);
             const response = await axios.post("/api/course-template/create-course-template", values)
@@ -74,6 +76,8 @@ export default function CreateCoursePage() {
                 toast("Something went wrong. Please try again.");
                 console.error("Error details:", error.response?.data);
             }
+        } finally {
+            setIsLoading(false);
         }
     }
 
@@ -92,14 +96,8 @@ export default function CreateCoursePage() {
         if (value) {
             const collegeData = await getCollegeById(value);
             setDepartments(collegeData?.departments || []); // Set departments based on selected college
-            if (collegeData?.departments?.length > 0) {
-                form.setValue("department", collegeData.departments[0]._id); // Set the first department as default
-            } else {
-                form.setValue("department", ""); // Reset department if no departments are available
-            }
         } else {
             setDepartments([]); // Reset departments if no college is selected
-            form.setValue("department", ""); // Reset department
         }
     };
 
@@ -249,7 +247,9 @@ export default function CreateCoursePage() {
                             )}
                         />
                     </div>
-                    <Button type="submit" className='w-full' style={{ marginTop: "20px" }}>Create</Button>
+                    <Button type="submit" className='w-full' style={{ marginTop: "20px" }} disabled={isLoading}>
+                        {isLoading ? "Creating..." : "Create"}
+                    </Button>
                 </form>
             </Form>
         </section>
