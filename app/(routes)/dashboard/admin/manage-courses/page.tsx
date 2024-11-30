@@ -20,7 +20,7 @@ export default function ManageCoordinators() {
   const [coordinators, setCoordinators] = useState<any>([])
   const [dropdownState, setDropdownState] = useState<Record<string, Record<string, boolean>>>({})
   const [colleges, setColleges] = useState<any[]>([])
-  const [selectedCollege, setSelectedCollege] = useState<string | null>(null)
+  const [selectedCollege, setSelectedCollege] = useState<string | null>("all")
 
   const fetchData = async () => {
     console.log("Fetching courses and coordinators...") 
@@ -56,10 +56,10 @@ export default function ManageCoordinators() {
     fetchData()
   }, [])
 
-  // Filter courses based on selected college
-  const filteredCourses = selectedCollege
-    ? courses.filter(course => course.college._id === selectedCollege)
-    : courses
+  // Filter courses based on selected college or show all if no college is selected
+  const filteredCourses = selectedCollege !== "all"
+    ? courses.filter(course => course.college?._id === selectedCollege)
+    : courses // Show all courses if "All Colleges" is selected
 
   // Handle state change for a specific course's dropdown and assign coordinators
   const handleCheckedChange = async (courseId: string, coordinatorName: string, checked: boolean) => {
@@ -120,6 +120,7 @@ export default function ManageCoordinators() {
           <SelectValue placeholder="Select College" />
         </SelectTrigger>
         <SelectContent>
+          <SelectItem value="all">All Colleges</SelectItem>
           {colleges.map((college) => (
             <SelectItem key={college._id} value={college._id}>
               {college.english}
