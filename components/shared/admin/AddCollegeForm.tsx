@@ -19,8 +19,6 @@ import {
 
 
 import { Input } from "@/components/ui/input"
-import Link from 'next/link'
-import axios from 'axios'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { ThumbsUp } from 'lucide-react'
@@ -30,7 +28,12 @@ const formSchema = z.object({
     regional: z.string(),
     university: z.string(),
 })
-export default function AddCollegeForm() {
+
+interface AddCollegeFormProps {
+    onClose: () => void;
+}
+
+export default function AddCollegeForm({ onClose }: AddCollegeFormProps) {
     const [selectedFile, setSelectedFile] = useState(null);
     const [progress, setProgress] = useState(0);
     const [loading, setLoading] = useState(false);
@@ -46,6 +49,7 @@ export default function AddCollegeForm() {
       })
      
       async function onSubmit(values: z.infer<typeof formSchema>) {
+        setLoading(true);
         try {
           let base64Image = '';
           if (selectedFile) {
@@ -70,10 +74,13 @@ export default function AddCollegeForm() {
           if (response) {
             toast.success('College added successfully');
             router.refresh(); 
+            onClose();
           }
         } catch (error) {
           console.error(error);
           toast.error('Something went wrong');
+        } finally {
+          setLoading(false);
         }
       }
 
@@ -175,7 +182,9 @@ export default function AddCollegeForm() {
               )}
             />
        
-            <Button type="submit" className='w-full ' style={{marginTop:"20px"}}>Confirm</Button>
+            <Button type="submit" className='w-full ' style={{marginTop:"20px"}} disabled={loading}>
+              {loading ? 'Creating...' : 'Confirm'}
+            </Button>
           </form>
         </Form>
         </section>

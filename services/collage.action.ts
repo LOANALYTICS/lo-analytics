@@ -18,8 +18,17 @@ export async function getCollage() {
 }
 
 export async function createCollage(collage: any) {
-    const newCollage = await Collage.create(collage)
-    return newCollage ? true : false
+    const existingCollage = await Collage.findOne({ 
+        english: collage.english,
+        university: collage.university // Check for duplicates based on both fields
+    });
+
+    if (existingCollage) {
+        throw new Error('A collage with this name already exists in the specified university');
+    }
+
+    const newCollage = await Collage.create(collage);
+    return newCollage ? true : false;
 }
 
 export async function addDepartment(collegeId: string, department: { name: string; shortName: string }) {

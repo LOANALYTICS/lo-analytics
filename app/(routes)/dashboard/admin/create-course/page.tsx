@@ -8,17 +8,18 @@ import { Button } from "@/components/ui/button"
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+Select,
+SelectContent,
+SelectItem,
+SelectTrigger,
+SelectValue,
 } from "@/components/ui/select"
 
 import { Input } from "@/components/ui/input"
@@ -91,8 +92,14 @@ export default function CreateCoursePage() {
         if (value) {
             const collegeData = await getCollegeById(value);
             setDepartments(collegeData?.departments || []); // Set departments based on selected college
+            if (collegeData?.departments?.length > 0) {
+                form.setValue("department", collegeData.departments[0]._id); // Set the first department as default
+            } else {
+                form.setValue("department", ""); // Reset department if no departments are available
+            }
         } else {
             setDepartments([]); // Reset departments if no college is selected
+            form.setValue("department", ""); // Reset department
         }
     };
 
@@ -246,5 +253,30 @@ export default function CreateCoursePage() {
                 </form>
             </Form>
         </section>
-    )
+      )
 }
+
+
+// <FormField
+// control={form.control}
+// name="collage_name"
+// render={({ field }) => (
+//   <FormItem>
+//     <FormLabel>Collage</FormLabel>
+//     <Select onValueChange={field.onChange} defaultValue={field.value}>
+//       <FormControl>
+//         <SelectTrigger>
+//           <SelectValue placeholder="Select Collage" />
+//         </SelectTrigger>
+//       </FormControl>
+//       <SelectContent>
+//         <SelectItem value="collage_092">Collage 092</SelectItem>
+//         <SelectItem value="collage_82">Collage 82</SelectItem>
+//         <SelectItem value="collage_23">Collage 23</SelectItem>
+//       </SelectContent>
+//     </Select>
+ 
+//     <FormMessage />
+//   </FormItem>
+// )}
+// />
