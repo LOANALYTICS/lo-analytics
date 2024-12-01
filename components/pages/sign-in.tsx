@@ -62,7 +62,7 @@ const [loading, setLoading] = useState(false)
           }
         } catch (error: any) {
           console.log(error)
-          toast.error(error.message)
+          toast.error(error?.response?.data?.message)
         }
         setLoading(false)
       }
