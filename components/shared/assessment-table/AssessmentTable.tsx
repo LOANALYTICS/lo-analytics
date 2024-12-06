@@ -47,6 +47,7 @@ export default function AssessmentTable({ initialData, onSave }: AssessmentTable
   const [assessments, setAssessments] = useState<Assessment[]>(
     initialData.length > 0 ? initialData : [DEFAULT_ASSESSMENT]
   );
+  console.log((assessments),":skd");
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [tempInputs, setTempInputs] = useState<{ [key: string]: string }>({});
 
@@ -71,32 +72,40 @@ export default function AssessmentTable({ initialData, onSave }: AssessmentTable
   const cloKeys = getCLOKeys(assessments);
 
   const handleCLOInput = (id: string, clo: 'clo1' | 'clo2' | 'clo3', value: string) => {
-    const lastChar = value[value.length - 1];
-    
-    if (lastChar === ',' || lastChar === ' ') {
-      const numberStr = value.slice(0, -1).trim();
-      const number = parseInt(numberStr);
-      
-      if (!isNaN(number)) {
-        setAssessments(prev => prev.map(assessment => {
-          if (assessment.id === id) {
-            if (!assessment.clos[clo].includes(number)) {
-              return {
-                ...assessment,
-                clos: {
-                  ...assessment.clos,
-                  [clo]: [...assessment.clos[clo], number]
+    console.log(`Handling CLO Input for ID: ${id}, CLO: ${clo}, Value: ${value}`); // Debugging log
+
+    const number = parseInt(value.trim()); // Parse the number directly from the trimmed input value
+    console.log(`Parsed Number: ${number}`); // Debugging log
+
+    if (!isNaN(number)) {
+        setAssessments(prev => {
+            const updatedAssessments = prev.map(assessment => {
+                if (assessment.id === id) {
+                    // Check if the number already exists in the CLO array
+                    if (!assessment.clos[clo].includes(number)) {
+                        console.log(`Adding number ${number} to ${clo}`); // Debugging log
+                        return {
+                            ...assessment,
+                            clos: {
+                                ...assessment.clos,
+                                [clo]: [...assessment.clos[clo], number] // Add the new number
+                            }
+                        };
+                    } else {
+                        console.warn(`Number ${number} already exists in ${clo}`);
+                    }
                 }
-              };
-            }
-          }
-          return assessment;
-        }));
-      }
-      return '';
+                return assessment;
+            });
+            console.log('Updated Assessments:', updatedAssessments); // Debugging log
+            return updatedAssessments;
+        });
+        return ''; // Clear the input
+    } else {
+        console.warn(`Invalid number: ${value}`); // Log if the number is invalid
     }
-    
-    return value;
+
+    return value; // Return the unchanged value if not a valid input
   };
 
   const addNewRow = () => {
@@ -122,7 +131,14 @@ export default function AssessmentTable({ initialData, onSave }: AssessmentTable
   };
 
   const deleteSelectedRows = () => {
-    setAssessments(prev => prev.filter(assessment => !selectedRows.includes(assessment.id)));
+    setAssessments(prev => {
+      const updatedAssessments = prev.filter(assessment => !selectedRows.includes(assessment.id));
+      // Ensure at least one empty row remains
+      if (updatedAssessments.length === 0) {
+        return [DEFAULT_ASSESSMENT]; // Add a new empty assessment row
+      }
+      return updatedAssessments;
+    });
     setSelectedRows([]);
   };
 
@@ -166,7 +182,7 @@ export default function AssessmentTable({ initialData, onSave }: AssessmentTable
           <TableBody>
             {assessments.map((assessment) => (
               <TableRow key={assessment.id}>
-                <TableCell>
+                <TableCell className='w-10 py-1'>
                   <Checkbox 
                     checked={selectedRows.includes(assessment.id)}
                     onCheckedChange={(checked) => {
@@ -178,8 +194,9 @@ export default function AssessmentTable({ initialData, onSave }: AssessmentTable
                     }}
                   />
                 </TableCell>
-                <TableCell>
+                <TableCell className='py-1'>
                   <Input 
+                    className='border-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0'
                     value={assessment.type}
                     onChange={(e) => setAssessments(prev => prev.map(a => 
                       a.id === assessment.id ? { ...a, type: e.target.value } : a
@@ -187,42 +204,68 @@ export default function AssessmentTable({ initialData, onSave }: AssessmentTable
                   />
                 </TableCell>
                 {cloKeys.map((clo) => (
-                  <TableCell key={clo}>
-                    <div className="flex flex-wrap gap-1 p-1 border rounded min-h-[40px]">
+                  <TableCell key={clo} className='py-1'>
+                    <div className="flex items-center flex-wrap gap-1 p-1 border-l border-r min-h-[40px]">
                       {assessment.clos[clo as keyof Assessment['clos']].map((num, idx) => (
-                        <span key={idx} className="bg-blue-100 px-2 py-1 rounded text-sm flex items-center gap-1">
+                        <span key={idx} className="bg-blue-100 group relative h-5 w-5 rounded text-xs flex items-center justify-center gap-1">
                           {num}
                           <X 
-                            className="h-3 w-3 cursor-pointer hover:text-red-500"
+                            className="h-3 w-3 absolute -right-1 -top-1 cursor-pointer hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
                             onClick={() => removeCLONumber(assessment.id, clo, idx)}
                           />
                         </span>
                       ))}
-                      <Input 
-                        className="border-none focus-visible:ring-0 p-1 flex-1 min-w-[60px]"
-                        placeholder="Enter number"
-                        value={tempInputs[`${assessment.id}-${clo}`] || ''}
-                        onChange={(e) => {
-                          setTempInputs(prev => ({
-                            ...prev,
-                            [`${assessment.id}-${clo}`]: e.target.value
-                          }));
-                        }}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter' || e.key === ',' || e.key === ' ') {
-                            e.preventDefault();
-                            handleCLOInput(
-                              assessment.id, 
-                              clo as keyof Assessment['clos'], 
-                              tempInputs[`${assessment.id}-${clo}`] || ''
-                            );
-                          }
-                        }}
-                      />
+                    <Input 
+    className="border-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 p-1 flex-1 min-w-[60px]"
+    placeholder="Enter number"
+    value={tempInputs[`${assessment.id}-${clo}`] || ''}
+    onChange={(e) => {
+        setTempInputs(prev => ({
+            ...prev,
+            [`${assessment.id}-${clo}`]: e.target.value
+        }));
+    }}
+    onKeyDown={(e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            const inputValue = tempInputs[`${assessment.id}-${clo}`] || '';
+            console.log(`Input Value Before Processing: '${inputValue}'`); // Debugging log
+            
+            // Trim the input value to remove any leading/trailing whitespace
+            const trimmedInputValue = inputValue.trim();
+            console.log(`Trimmed Input Value: '${trimmedInputValue}'`); // Debugging log
+            
+            // Parse the number directly from the trimmed input value
+            const number = parseInt(trimmedInputValue);
+            console.log(`Parsed Number: ${number}`); // Debugging log
+
+            if (!isNaN(number)) {
+                const result = handleCLOInput(
+                    assessment.id, 
+                    clo as keyof Assessment['clos'], 
+                    trimmedInputValue
+                );
+
+                console.log(`Result from handleCLOInput: ${result}`); // Debugging log
+
+                // Clear the input after processing
+                if (result === '') {
+                    console.log(`Clearing input for ${assessment.id}-${clo}`); // Debugging log
+                    setTempInputs(prev => ({
+                        ...prev,
+                        [`${assessment.id}-${clo}`]: ''
+                    }));
+                }
+            } else {
+                console.warn(`Invalid number: ${trimmedInputValue}`); // Log if the number is invalid
+            }
+        }
+    }}
+/>
                     </div>
                   </TableCell>
                 ))}
-                <TableCell>
+                <TableCell className='py-1'>
                   <Input 
                     type="number"
                     value={assessment.weight}
@@ -231,14 +274,13 @@ export default function AssessmentTable({ initialData, onSave }: AssessmentTable
                     ))}
                   />
                 </TableCell>
-                <TableCell>
+                <TableCell className='py-1'>
                   <div className="flex gap-2">
                     <Button variant="outline" size="sm">
-                      <Upload className="h-4 w-4 mr-2" />
-                      Upload
+                      <Upload className="h-4 w-4" />
                     </Button>
                     <Button variant="outline" size="sm">
-                      Insert
+                      <Plus className="h-4 w-4" />
                     </Button>
                   </div>
                 </TableCell>

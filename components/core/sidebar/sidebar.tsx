@@ -150,7 +150,7 @@ const Sidebar = ({ userRole, userPermissions }: { userRole: string, userPermissi
                     </button>
                     <div className={`overflow-hidden transition-all duration-300 ease-in-out ${expandedItems[name] ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0 scale-95'}`}>
                       <ul className={`${isCollapsed ? "" : "ml-6"} mt-2 space-y-1`}>
-                        {others.filter(subItem => userPermissions.includes(subItem.name)).map(({ name: otherName, href: otherHref, icon: OtherIcon }) => (
+                        {others.map(({ name: otherName, href: otherHref, icon: OtherIcon }) => (
                           <li key={otherName}>
                             <Link
                               href={otherHref}

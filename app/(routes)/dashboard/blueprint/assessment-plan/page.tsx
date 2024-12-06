@@ -1,35 +1,50 @@
 'use client'
-import MappingTable, { CLO } from '@/components/shared/mapping-table/MappingTable'
 
-export default function AssessmentPlanPage() {
-  const defaultColumnCounts = {
-    k: 4,
-    s: 4,
-    v: 4
-  };
+import AssessmentTable from '@/components/shared/assessment-table/AssessmentTable'
+import { Button } from '@/components/ui/button'
 
-  const initialData: CLO[] = [{
-    id: '1',
-    description: 'CLO 1',
-    ploMapping: {
-      k: Array(defaultColumnCounts.k).fill(0).map((_, i) => ({ [`k${i + 1}`]: false })),
-      s: Array(defaultColumnCounts.s).fill(0).map((_, i) => ({ [`s${i + 1}`]: false })),
-      v: Array(defaultColumnCounts.v).fill(0).map((_, i) => ({ [`v${i + 1}`]: false }))
+// Dummy data with the same structure as your MongoDB model will have
+const dummyData = {
+  assessments: [
+    {
+      id: '1',
+      type: 'Quiz 1',
+      clos: {
+        clo1: [1, 2],
+        clo2: [3, 4],
+        clo3: [5],
+        clo4: [6],
+        clo5: [7],
+      },
+      weight: 10
+    },
+    {
+      id: '2',
+      type: 'Mid Term',
+      clos: {
+        clo1: [2, 3],
+        clo2: [4, 5],
+        clo3: [1, 6],
+        clo4: [7],
+        clo5: [8],
+      },
+      weight: 30
     }
-  }];
+  ]
+}
 
-  const handleUpdate = (newData: CLO[]) => {
-    console.log('Updated data:', newData);
-  };
+export default function LearningOutcomesPage() {
+  const handleSave = (data: any) => {
+    // This is where you'll make your API call to save to MongoDB
+    console.log('Saving data:', data);
+  }
 
   return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">Assessment Plan</h1>
-      <MappingTable 
-        initialData={initialData}
-        defaultColumnCounts={defaultColumnCounts}
-        onUpdate={handleUpdate}
+    <div className="space-y-4 p-4">
+      <AssessmentTable 
+        initialData={dummyData.assessments}
+        onSave={handleSave}
       />
     </div>
-  );
+  )
 }
