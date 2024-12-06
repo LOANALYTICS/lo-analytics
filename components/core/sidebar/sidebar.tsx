@@ -6,11 +6,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const sidebarItems: SidebarItem[] = [
-  { name: "Item Analysis", href: "/dashboard/item-analysis", icon: ChartBarStacked },
+  { name: "Item Analysis", displayName: "Item Analysis (KR20)", href: "/dashboard/item-analysis", icon: ChartBarStacked },
 
-  { name: "Question Bank", href: "/dashboard/question-bank", icon: SquareLibrary },
+  { name: "Question Bank", displayName: "Question Bank", href: "/dashboard/question-bank", icon: SquareLibrary },
   {
-    name: "Learning Outcome", href: "/dashboard/blueprint", icon: BookOpenCheck,
+    name: "Learning Outcome", displayName: "Learning Outcome", href: "/dashboard/blueprint", icon: BookOpenCheck,
     others: [
       { name: "Student Details", href: "/dashboard/blueprint/student-details", icon: UsersRound },
       { name: "Learning Outcomes", href: "/dashboard/blueprint/learning-outcomes", icon: BookDashed },
@@ -20,13 +20,14 @@ const sidebarItems: SidebarItem[] = [
 ];
 
 const adminSidebarLinks: SidebarItem[] = [
-  { name: "Manage Collage", href: "/dashboard/admin/manage-collage", icon: Building },
+  { name: "Manage College", href: "/dashboard/admin/manage-collage", icon: Building },
   { name: "Create Course", href: "/dashboard/admin/create-course", icon: Plus },
   { name: "Manage Course", href: "/dashboard/admin/manage-courses", icon: BookDashed },
   { name: "Manage", href: "/dashboard/admin/manage-coordinators", icon: User },
 ];
 interface SidebarItem {
   name: string;
+  displayName?: string;
   href: string;
   icon: any;
   others?: SidebarItem[]; // Optional for expandable items
@@ -123,7 +124,7 @@ const Sidebar = ({ userRole, userPermissions }: { userRole: string, userPermissi
               )
             )
             }
-            {filteredSidebarItems.map(({ name, href, icon: Icon, others }) => (
+            {filteredSidebarItems.map(({ name, displayName, href, icon: Icon, others }) => (
               <li key={name}>
                 {!others ? (
                   <Link
@@ -132,7 +133,7 @@ const Sidebar = ({ userRole, userPermissions }: { userRole: string, userPermissi
                   >
                     <Icon className="text-xl min-w-[20px] w-[20px] ml-1" />
                     <span className={`ml-4 break-keep line-clamp-1 text-sm font-medium transition-opacity duration-300 ${isCollapsed ? "opacity-0 pointer-events-none" : "opacity-100"}`}>
-                      {name}
+                      {displayName || name}
                     </span>
                   </Link>
                 ) : (
@@ -143,7 +144,7 @@ const Sidebar = ({ userRole, userPermissions }: { userRole: string, userPermissi
                     >
                       <Icon className="text-xl min-w-[20px] w-[20px] ml-1" />
                       <span className={`ml-4 break-keep line-clamp-1 text-sm font-medium transition-opacity duration-300 ${isCollapsed ? "opacity-0 pointer-events-none" : "opacity-100"}`}>
-                        {name}
+                        {displayName || name}
                       </span>
                       {!isCollapsed && <span className="ml-auto text-xl">{expandedItems[name] ? '−' : '+'}</span>}
                     </button>

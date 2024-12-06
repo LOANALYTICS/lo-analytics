@@ -183,7 +183,7 @@ export default function CreateCoursePage() {
                                         </FormControl>
                                         <SelectContent>
                                             {departments.map((dept: any) => (
-                                                <SelectItem key={dept._id} value={dept._id}>
+                                                <SelectItem key={dept._id} value={dept.name}>
                                                     {dept.name}
                                                 </SelectItem>
                                             ))}

@@ -58,8 +58,8 @@ export async function GET(
             credit_hours: courseData.credit_hours,
             studentsNumber: courseData.students?.length || 0,
             studentsWithdrawn: courseData.students_withdrawn,
-            studentsAbsent: courseData.student_absent,
-            studentsAttended: (courseData.students?.length || 0) - (courseData.students_withdrawn + courseData.student_absent),
+            studentsAbsent: courseData.student_absent || 0,
+            studentsAttended: (courseData.students?.length || 0) - (courseData.students_withdrawn + courseData.student_absent) || 0,
             studentsPassed: courseData.passedStudents
         };
 

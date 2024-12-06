@@ -154,9 +154,9 @@ export async function POST(request: Request) {
       course_code: courseData.course_code,
       credit_hours: courseData.credit_hours,
       studentsNumber: courseData.no_of_student,
-      studentsWithdrawn: courseData.students_withdrawn,
-      studentsAbsent: courseData.student_absent,
-      studentsAttended: courseData.no_of_student - (courseData.students_withdrawn + courseData.student_absent),
+      studentsWithdrawn: courseData.students_withdrawn || 0,
+      studentsAbsent: courseData.student_absent || 0,
+      studentsAttended: courseData.no_of_student - (courseData.students_withdrawn + courseData.student_absent) || 0,
       studentsPassed: passedStudents
     };
 

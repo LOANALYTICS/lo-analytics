@@ -110,7 +110,7 @@ export async function getCoordinatorCourseTemplates(userId: string): Promise<any
 
 export async function getCourseTemplateById(id: string) {
     const course = await courseTemplateModel.findById(id).lean() as any;
-    
+    console.log(course, "course")
     if (!course) return null;
 
     return {

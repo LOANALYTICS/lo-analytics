@@ -43,8 +43,6 @@ const formSchema = z.object({
   level: z.number().min(1, { message: "Level is required" }),
   section: z.string().min(1, { message: "Section is required" }),
   academic_year: z.string().min(1, { message: "Academic year is required" }),
-  student_withdrawn: z.string().min(1, { message: "Student withdrawn is required" }),
-  student_absent: z.string().min(1, { message: "Student absent is required" }),
 })
 
 type FormValues = z.infer<typeof formSchema>
@@ -75,8 +73,6 @@ export default function NewCoursePage() {
             level: 0,
             section: "",
             academic_year: "",
-            student_withdrawn: "",
-            student_absent: "",
         },
     })
 
@@ -92,7 +88,7 @@ export default function NewCoursePage() {
 
             try {
                 const template = await getCourseTemplateById(params.tempId as string)
-                console.log(template)
+                console.log(template, "template")
                 if (template) {
                     form.reset({
                         course_name: template.course_name ?? "",
@@ -104,8 +100,6 @@ export default function NewCoursePage() {
                         level: template.level ?? "",
                         section: template.section ?? "",
                         academic_year: template.academic_year ?? "",
-                        student_withdrawn: template.student_withdrawn ?? "",
-                        student_absent: template.student_absent ?? "",
                     })
                     setUser(user)
                 } else {
@@ -220,7 +214,7 @@ export default function NewCoursePage() {
             console.log("File uploaded successfully:", result);
           } else {
             const htmlContent = await response.text();
-            await generatePDF(htmlContent, "analysis-report.pdf");
+            await generatePDF(htmlContent, `${form.watch("course_code")} - Item Analysis Report.pdf`);
             toast.success("Report downloaded successfully");
           }
           router.push(`/dashboard/item-analysis`);
@@ -413,30 +407,6 @@ export default function NewCoursePage() {
                                         </SelectContent>
                                     </Select>
                                     <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="student_withdrawn"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Student Withdrawn</FormLabel>
-                                    <FormControl>
-                                        <Input type='number' placeholder="Student withdrawn" {...field} />
-                                    </FormControl>
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="student_absent"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Student Absent</FormLabel>
-                                    <FormControl>
-                                        <Input type='number' placeholder="Student absent" {...field} />
-                                    </FormControl>
                                 </FormItem>
                             )}
                         />

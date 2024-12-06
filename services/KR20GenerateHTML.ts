@@ -142,7 +142,7 @@ export function generateHTML(data: any): string {
       }
       .grid-item {
         padding: 2px;
-        text-align: center;
+        text-align: start;
       }
       .header-container {
         margin-bottom: 80px;
@@ -157,15 +157,15 @@ export function generateHTML(data: any): string {
         margin: 0 auto;
       }
       .header-description h2 {
-        font-size: 16px;
+        font-size: 24px;
         text-align: center;
       }
       .header-description hr {
         margin-top: 10px;
       }
       .header-description p {
-        font-size: 12px;
-        margin-top: -4px;
+        font-size: 20px;
+        margin-top: -8px;
         text-align: center;
       }
       .college-logo {
@@ -174,7 +174,7 @@ export function generateHTML(data: any): string {
         aspect-ratio: 16/9;
       }
       .college-name {
-        font-size: 18px;
+        font-size: 40px;
         font-weight: bold;
       }
       .university-name {
@@ -205,22 +205,22 @@ export function generateHTML(data: any): string {
     <div class="info-box  rounded-md overflow-hidden  border-collapse border border-black">
       <div class="course-grid">
         <div class="grid-item">
-          <p>Course Name: ${course?.course_name || ''}</p>
+          <p><span style="font-weight: bold;">Course Name:</span> ${course?.course_name || ''}</p>
         </div>
         <div class="grid-item">
-          <p>Course Code: ${course?.course_code || ''}</p>
+          <p><span style="font-weight: bold;">Course Code:</span> ${course?.course_code || ''}</p>
         </div>
         <div class="grid-item">
-          <p>Credit Hour: ${course?.credit_hours || ''}</p>
+          <p><span style="font-weight: bold;">Credit Hour:</span> ${course?.credit_hours || ''}</p>
         </div>
         <div class="grid-item">
-          <p>Level: ${course?.level || ''}</p>
+          <p><span style="font-weight: bold;">Level:</span> ${course?.level || ''}</p>
         </div>
         <div class="grid-item">
-          <p>Semister: ${course?.semister || ''}</p>
+          <p><span style="font-weight: bold;">Semister:</span> ${course?.semister === 1 ? 'First Semester' : 'Second Semester'}</p>
         </div>
         <div class="grid-item">
-          <p>Course Coordinator: ${course?.coordinator || ''}</p>
+          <p><span style="font-weight: bold;">Course Coordinator:</span> ${course?.coordinator || ''}</p>
         </div>
       </div>
     </div>
@@ -239,11 +239,11 @@ export function generateHTML(data: any): string {
           <td><p style="text-align: center; margin-bottom: 10px;">${index + 1}</p></td>
           <td><p style="text-align: center; margin-bottom: 10px;">${item?.classification || ''}</p></td>
           ${item?.classification === 'Reliability' 
-            ? `<td colspan="3" style="vertical-align: middle; text-align: center;"><p style="text-align: center; margin-bottom: 10px;">KR20 = ${(KR_20 || 0).toFixed(2)}</p></td>`
+            ? `<td colspan="3" style="vertical-align: middle; text-align: center;"><p style="text-align: center; margin-bottom: 10px; font-weight: bold;">KR20 = ${(KR_20 || 0).toFixed(2)}</p></td>`
             : `
               <td class="question-no-cell"><p style="text-align: center; margin-bottom: 10px;">${formatQuestions(item?.questions || [])}</p></td>
               <td style="vertical-align: middle; text-align: center;"><p style="text-align: center; margin-bottom: 10px;">${(item?.questions || []).length}</p></td>
-              <td style="vertical-align: middle; text-align: center;"><p style="text-align: center; margin-bottom: 10px;">${Number((item?.perc || 0).toFixed(1))}%</p></td>
+              <td style="vertical-align: middle; text-align: center;"><p style="text-align: center; margin-bottom: 10px;">${Number((Math.round(item?.perc || 0)).toFixed(1))}%</p></td>
             `
           }
           <td><p style="text-align: center; margin-bottom: 10px;">${getCommentByClassification(item?.classification || '')}</p></td>
@@ -254,27 +254,18 @@ export function generateHTML(data: any): string {
     <!-- Segregated Graded Students Table -->
     <table class="table  rounded-md overflow-hidden  border-collapse border border-black">
       <colgroup>
-        <col style="width: 60px;">
-        <col style="width: 60px;">
-        <col style="width: 60px;">
-        <col style="width: 60px;">
-        <col style="width: auto;"> <!-- "Students Passed" column takes remaining space -->
-        <col style="width: 60px;">
-        <col style="width: 60px;">
-        <col style="width: 60px;">
-        <col style="width: 60px;">
-        <col style="width: 60px;">
-        <col style="width: 60px;">
-        <col style="width: 60px;">
-        <col style="width: 60px;">
-        <col style="width: 60px;">
+        <col style="width: auto;">
+        <col style="width: 100px;">
+        <col style="width: 100px;">
+        <col style="width: 100px;">
+        <col style="width: 100px;">
+        <col style="width: 100px;">
+        <col style="width: 100px;">
+        <col style="width: 100px;">
+        <col style="width: 100px;">
       </colgroup>
       <tr>
         <th><p style="text-align: center; margin-bottom: 10px;">Students Number</p></th>
-        <th><p style="text-align: center; margin-bottom: 10px;">Students Withdrawn</p></th>
-        <th><p style="text-align: center; margin-bottom: 10px;">Students Absent</p></th>
-        <th><p style="text-align: center; margin-bottom: 10px;">Students Attended</p></th>
-        <th><p style="text-align: center; margin-bottom: 10px;">Students Passed</p></th>
         <th><p style="text-align: center; margin-bottom: 10px;">A+</p></th>
         <th><p style="text-align: center; margin-bottom: 10px;">A</p></th>
         <th><p style="text-align: center; margin-bottom: 10px;">B+</p></th>
@@ -287,21 +278,11 @@ export function generateHTML(data: any): string {
       </tr>
       <tr>
         <td><p style="text-align: center; margin-bottom: 10px;">${course?.studentsNumber || ''}</p></td>
-        <td style="vertical-align: middle; text-align: center;"><p style="text-align: center; margin-bottom: 10px;">${course?.studentsWithdrawn || ''}</p></td>
-        <td style="vertical-align: middle; text-align: center;"><p style="text-align: center; margin-bottom: 10px;">${course?.studentsAbsent || ''}</p></td>
-        <td style="vertical-align: middle; text-align: center;"><p style="text-align: center; margin-bottom: 10px;">${course?.studentsAttended || ''}</p></td>
-        <td class="split-cell" style="padding: 0;">
-          <div class="cell-row">
-            <p style="text-align: center; margin-bottom: 10px;">${course?.studentsPassed?.number || ''}</p>
-          </div>
-          <div class="cell-row">
-            <p style="text-align: center; margin-bottom: 10px;">${course?.studentsPassed?.percentage || ''}%</p>
-          </div>
-        </td>
+       
         ${(segregatedGradedStudents || []).map((grade: any) => `
           <td class="split-cell">
-            <div class="cell-row"><p style="text-align: center; margin-bottom: 10px;">${grade?.count || '0'}</p></div>
-            <div class="cell-row"><p style="text-align: center; margin-bottom: 10px;">${grade?.studentPercentage || ''}%</p></div>
+            <div class="cell-row"><p style="text-align: center; margin-bottom: 10px;">${grade?.count === 0 ? '' : grade?.count}</p></div>
+            <div class="cell-row"><p style="text-align: center; margin-bottom: 10px;">${ Number((Math.round(grade?.studentPercentage || 0)).toFixed(1)) === 0 ? "" : Number((Math.round(grade?.studentPercentage || 0)).toFixed(1)) + "%" }</p></div>
           </td>
         `).join("")}
       </tr>

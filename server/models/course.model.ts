@@ -22,8 +22,6 @@ export interface ICourse extends Document {
   collage: Schema.Types.ObjectId;
   coordinator: string[]; 
   academic_year: String;
-  students_withdrawn: number;
-  student_absent: number;
   section?: string;
   createdBy?: typeof Schema.Types.ObjectId; 
   permissions: string[];
@@ -44,8 +42,6 @@ export const courseSchema = new Schema<ICourse>({
   collage: { type: Schema.Types.ObjectId, ref: 'Collage' },
   coordinator: [{ type: Schema.Types.ObjectId, ref: 'User' }],
   academic_year: { type: String },
-  students_withdrawn: { type: Number },
-  student_absent: { type: Number },
   section: { type: String },
   students: [{
     id: { type: String, required: true },

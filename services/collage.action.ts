@@ -62,3 +62,10 @@ export async function getCollegeById(id: string): Promise<any> {
         throw error;
     }
 }
+
+export async function editDepartment(collegeId: string, departmentId: string, updatedDepartment: { name?: string; shortName?: string }) {
+    await Collage.updateOne(
+        { _id: collegeId, "departments._id": departmentId },
+        { $set: { "departments.$": updatedDepartment } }
+    );
+}

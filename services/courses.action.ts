@@ -28,8 +28,7 @@ export async function getCourses(): Promise<any[]> {
                   }))
                 : [],
             academic_year: course.academic_year,
-            students_withdrawn: course.students_withdrawn,
-            student_absent: course.student_absent,
+        
             section: course.section,
             createdBy: course.createdBy ? course.createdBy.toString() : undefined, // Convert createdBy ObjectId to string if present
             students: course.students || [],
@@ -51,8 +50,6 @@ type CreateCourseInput = {
   section: string;
   collage: string;
   academic_year: string;
-  student_withdrawn: string;
-  student_absent: string;
   createdBy: string;
 }
 
@@ -86,8 +83,6 @@ export async function createCourse(data: CreateCourseInput) {
             section: data.section,
             collage: data.collage,
             academic_year: data.academic_year,
-            students_withdrawn: data.student_withdrawn,
-            student_absent: data.student_absent,
             createdBy: data.createdBy
         });
 
@@ -191,8 +186,7 @@ export async function getCoursesByCreator(userId: string): Promise<any> {
                       }))
                     : [],   
                 academic_year: course.academic_year,
-                students_withdrawn: course.students_withdrawn,
-                student_absent: course.student_absent,
+             
                 section: course.section,
                 examType: course.examType,
                 krValues: course.krValues !== null ? true : false,
@@ -239,8 +233,7 @@ export async function getCourseById(courseId: string) {
                   }))
                 : [],
             academic_year: course.academic_year,
-            students_withdrawn: course.students_withdrawn,
-            student_absent: course.student_absent,
+       
             section: course.section,
             createdBy: course.createdBy ? course.createdBy.toString() : undefined,
             students: course.students.map((student) => {

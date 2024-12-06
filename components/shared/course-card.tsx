@@ -88,7 +88,7 @@ export default function CourseCard({ href, template, user }: {
         toast.error(result.error || 'Failed to download KR Report');
       } else {
         const htmlContent = await response.text();
-        await generatePDF(htmlContent, `kr-report-${template.course_name}.pdf`);
+        await generatePDF(htmlContent, `${template.course_code} - Item Analysis Report.pdf`);
         toast.success('KR Report downloaded successfully');
       }
     } catch (error) {
@@ -186,7 +186,7 @@ export default function CourseCard({ href, template, user }: {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant='outline' size='sm' className='p-0 text-[11px] w-[74px] h-7'>
-                      <p className={template.krValues ? "text-green-500" : "text-red-500"}>KR Report </p>
+                      <p className={template.krValues ? "text-green-500" : "text-red-500"}>KR20 Report </p>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
