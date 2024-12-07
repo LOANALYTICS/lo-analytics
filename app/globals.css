@@ -70,3 +70,27 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+.resize-layer{
+  border: 1px solid gainsboro !important;
+}
+.handler.top-left{
+  border: 1px solid gainsboro !important;
+  background-color: gainsboro !important;
+  border-radius: 0.1rem !important;
+}
+.handler.top-right{
+  border: 1px solid gainsboro !important;
+  background-color: gainsboro !important;
+  border-radius: 0.1rem !important;
+}
+.handler.bottom-left{
+  border: 1px solid gainsboro !important;
+  background-color: gainsboro !important;
+  border-radius: 0.1rem !important;
+}
+.handler.bottom-right{
+  border: 1px solid gainsboro !important;
+  background-color: gainsboro !important;
+  border-radius: 0.1rem !important;
+}
