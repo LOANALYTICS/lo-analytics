@@ -118,10 +118,17 @@ export async function deleteQuestion(questionId: string, questionBankId: string,
     }
 }
 
-export async function getQuestions(questionBankId: string, topic: string) {
+export async function getQuestions(courseId: string, topic: string) {
     try {
+        // First get the QuestionBank ID
+        const questionBank = await QuestionBank.findOne({ course: courseId })
+        if (!questionBank) {
+            return []
+        }
+
+        // Then fetch questions using QuestionBank ID
         const questions = await Question.find({
-            questionBank: questionBankId,
+            questionBank: questionBank._id,
             topic: topic
         }).lean()
         

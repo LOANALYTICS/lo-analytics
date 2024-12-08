@@ -8,16 +8,16 @@ interface Props {
 }
 
 export default async function TopicQuestionsPage({ params }: Props) {
-    const { questionId, topicId } = await params
+    const { questionId: courseId, topicId } = await params
     
     return (
-        <div className="p-6 max-w-4xl mx-auto">
+        <div className="p-6 h-full">
             <h1 className="text-2xl font-bold mb-4">
-                Questions for Topic: {decodeURIComponent(topicId)}
+                Topic: {decodeURIComponent(topicId)}
             </h1>
             
             <QuestionForm 
-                courseId={questionId}
+                courseId={courseId}
                 topic={decodeURIComponent(topicId)}
             />
         </div>

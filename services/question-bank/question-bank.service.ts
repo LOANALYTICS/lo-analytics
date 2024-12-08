@@ -29,25 +29,25 @@ export async function addTopic(courseId: string, topicName: string) {
                 course: courseId,
                 topics: [{ name: topicName, questions: [] }]
             })
-        } else {
-            await QuestionBank.findByIdAndUpdate(
-                questionBank._id,
-                {
-                    $push: {
-                        topics: {
-                            name: topicName,
-                            questions: []
-                        }
-                    }
-                }
-            )
+            return [topicName]
         }
 
-        const updatedQuestionBank = await QuestionBank.findOne({ course: courseId }).lean() as QuestionBankDoc | null
-        return JSON.parse(JSON.stringify(updatedQuestionBank?.topics.map(t => t.name) || []))
+        // Check if topic already exists (case insensitive)
+        const topicExists = questionBank.topics.some(
+            (topic: { name: string }) => topic.name.toLowerCase() === topicName.toLowerCase()
+        )
+
+        if (topicExists) {
+            throw new Error('Topic already exists')
+        }
+
+        questionBank.topics.push({ name: topicName, questions: [] })
+        await questionBank.save()
+
+        return questionBank.topics.map((topic: { name: string }) => topic.name)
     } catch (error) {
-        console.error(error)
-        return null
+        console.error('Error adding topic:', error)
+        throw error
     }
 }
 

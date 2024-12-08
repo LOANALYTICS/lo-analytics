@@ -7,7 +7,7 @@ import Resizable from "tiptap-extension-resizable"
 import TextAlign from '@tiptap/extension-text-align'
 import { Bold, Italic, List, ListOrdered, Strikethrough, Image as ImageIcon, AlignLeft, AlignCenter, AlignRight, Heading1, Heading2, Heading3 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { useRef } from 'react'
+import { useRef, useEffect } from 'react'
 
 interface TiptapEditorProps {
     content: string
@@ -54,6 +54,13 @@ export function TiptapEditor({ content, onChange, placeholder, isQuestion = fals
         },
         immediatelyRender: false
     })
+
+    // Update editor content when prop changes
+    useEffect(() => {
+        if (editor && content !== editor.getHTML()) {
+            editor.commands.setContent(content)
+        }
+    }, [content, editor])
 
     const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0]

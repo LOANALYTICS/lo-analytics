@@ -1,14 +1,13 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { TiptapEditor } from "./TiptapEditor"
 import { Button } from "@/components/ui/button"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { toast } from "sonner"
-import { createQuestion } from "@/services/question-bank/question.service"
+import { createQuestion, getQuestions, updateQuestion } from "@/services/question-bank/question.service"
 import { Card, CardContent } from "@/components/ui/card"
-import { Plus, Trash2 } from "lucide-react"
+import { Plus, Trash2, Loader2 } from "lucide-react"
+import QuestionsListing from "./QuestionsListing"
 
 interface QuestionFormProps {
     courseId: string;
@@ -20,6 +19,27 @@ export function QuestionForm({ courseId, topic }: QuestionFormProps) {
     const [options, setOptions] = useState<string[]>(['', '', '', ''])
     const [correctAnswer, setCorrectAnswer] = useState<string>('')
     const [isLoading, setIsLoading] = useState(false)
+    const [questions, setQuestions] = useState<any[]>([])
+    const [selectedQuestion, setSelectedQuestion] = useState<any>(null)
+
+    const fetchQuestions = async () => {
+        const questions = await getQuestions(courseId, topic)
+        setQuestions(questions)
+    }
+
+    const handleQuestionSelect = (question: any) => {
+        setSelectedQuestion(question)
+        if (!question) {
+            // Reset form when selection becomes null
+            setQuestion('')
+            setOptions(['', '', '', ''])
+            setCorrectAnswer('')
+        } else {
+            setQuestion(question.question)
+            setOptions(question.options)
+            setCorrectAnswer(question.correctAnswer)
+        }
+    }
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -30,28 +50,65 @@ export function QuestionForm({ courseId, topic }: QuestionFormProps) {
 
         try {
             setIsLoading(true)
-            await createQuestion({
-                courseId,
-                topic,
-                question,
-                options,
-                correctAnswer
-            })
+            
+            if (selectedQuestion) {
+                // Update existing question
+                await updateQuestion(selectedQuestion._id, {
+                    courseId,
+                    topic,
+                    question,
+                    options,
+                    correctAnswer
+                })
+                toast.success('Question updated successfully')
+            } else {
+                // Create new question
+                await createQuestion({
+                    courseId,
+                    topic,
+                    question,
+                    options,
+                    correctAnswer
+                })
+                toast.success('Question added successfully')
+            }
 
-            toast.success('Question added successfully')
+            // Reset form and selection
             setQuestion('')
             setOptions(['', '', '', ''])
             setCorrectAnswer('')
+            setSelectedQuestion(null)
+            
+            // Fetch updated questions
+            await fetchQuestions()
         } catch (error) {
-            toast.error('Failed to add question')
+            toast.error(selectedQuestion ? 'Failed to update question' : 'Failed to add question')
             console.error(error)
         } finally {
             setIsLoading(false)
         }
     }
 
+    const handleOptionChange = useCallback((index: number, content: string) => {
+        setOptions(prev => {
+            const newOptions = [...prev]
+            newOptions[index] = content
+            return newOptions
+        })
+        
+        // Update correctAnswer if the edited option was selected
+        if (correctAnswer === options[index]) {
+            setCorrectAnswer(content)
+        }
+    }, [correctAnswer, options])
+
+    useEffect(() => {
+        fetchQuestions()
+    }, [courseId, topic])
+
     return (
-        <form onSubmit={handleSubmit}>
+        <main className="flex gap-2 w-full">
+            <form onSubmit={handleSubmit} className="w-full flex-1">
             <Card className="bg-background">
                 <CardContent className="space-y-4 pt-6">
                     <div className="space-y-2">
@@ -68,40 +125,22 @@ export function QuestionForm({ courseId, topic }: QuestionFormProps) {
                         <label className="text-sm font-medium">Options</label>
                         {options.map((option, index) => (
                             <div key={index} className="flex items-center gap-2">
-                                <input
-                                    type="radio"
-                                    name="correctAnswer"
-                                    checked={correctAnswer === option}
-                                    onChange={() => setCorrectAnswer(option)}
-                                    className="w-4 h-4"
-                                />
                                 <div className="flex-1">
                                     <TiptapEditor
+                                        key={`option-${index}`}
                                         content={option}
-                                        onChange={(content) => {
-                                            const newOptions = [...options]
-                                            newOptions[index] = content
-                                            setOptions(newOptions)
-                                            if (correctAnswer === options[index]) {
-                                                setCorrectAnswer(content)
-                                            }
-                                        }}
+                                        onChange={(content) => handleOptionChange(index, content)}
                                         placeholder={`Option ${index + 1}`}
                                     />
                                 </div>
-                                {index >= 4 && (
-                                    <Button
-                                        size="icon"
-                                        variant="ghost"
-                                        onClick={() => {
-                                            const newOptions = options.filter((_, i) => i !== index)
-                                            setOptions(newOptions)
-                                            if (correctAnswer === option) setCorrectAnswer("")
-                                        }}
-                                    >
-                                        <Trash2 className="h-4 w-4" />
-                                    </Button>
-                                )}
+                                <div
+                                    className={`w-3 h-full min-h-[40px] cursor-pointer rounded-sm border ${
+                                        correctAnswer && correctAnswer === option 
+                                            ? 'bg-green-500 border-green-500' 
+                                            : 'bg-white hover:bg-muted'
+                                    }`}
+                                    onClick={() => setCorrectAnswer(option)}
+                                />
                             </div>
                         ))}
                         {options.length < 6 && (
@@ -119,13 +158,27 @@ export function QuestionForm({ courseId, topic }: QuestionFormProps) {
                     <div className="flex justify-end gap-2">
                         <Button 
                             type="submit"
-                            disabled={!question || options.some(opt => !opt) || !correctAnswer}
+                            disabled={!question || options.some(opt => !opt) || !correctAnswer || isLoading}
                         >
-                            Save Question
+                            {isLoading ? (
+                                <>
+                                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                    {selectedQuestion ? 'Updating...' : 'Saving...'}
+                                </>
+                            ) : (
+                                selectedQuestion ? 'Update Question' : 'Save Question'
+                            )}
                         </Button>
                     </div>
                 </CardContent>
             </Card>
         </form>
+        <QuestionsListing 
+            questions={questions} 
+            onQuestionSelect={handleQuestionSelect}
+            selectedQuestion={selectedQuestion}
+        />
+        </main>
+        
     )
 } 

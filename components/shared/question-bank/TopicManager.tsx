@@ -6,6 +6,7 @@ import { Plus, Save, Trash2, Edit2, ReceiptPoundSterling, File } from "lucide-re
 import { useEffect, useState } from "react"
 import { addTopic, deleteTopic, updateTopic, getTopics } from "@/services/question-bank/question-bank.service"
 import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 
 interface TopicManagerProps {
     courseId: string
@@ -30,10 +31,18 @@ export function TopicManager({ courseId }: TopicManagerProps) {
     const handleSave = async (value: string) => {
         if (!value.trim()) return
 
-        const newTopics = await addTopic(courseId, value)
-        if (newTopics) {
+        try {
+            const newTopics = await addTopic(courseId, value)
             setTopics(newTopics)
             setNewInput("") // Clear input after save
+            toast.success('Topic added successfully')
+        } catch (error: any) {
+            if (error.message === 'Topic already exists') {
+                toast.warning('Topic already exists')
+            } else {
+                toast.error('Failed to add topic')
+            }
+            console.log(error)
         }
     }
     useEffect(() => {
