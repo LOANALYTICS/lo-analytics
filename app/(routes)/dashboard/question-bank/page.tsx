@@ -7,7 +7,7 @@ export default async function QuestionBank() {
   const user = await getCurrentUser()
   const coursesTemplate = await getCoordinatorCourseTemplates(user?.id!) 
   return (
-    <main className="px-2">
+  <main className="px-2">
     <h1 className="font-semibold text-lg"> Courses - ( {coursesTemplate.length} )</h1>
     <section className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-2 mt-4">
       {coursesTemplate.map(template => (

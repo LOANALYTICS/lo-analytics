@@ -1,6 +1,7 @@
 import React from 'react'
 import { getCourseTemplateById } from '@/services/courseTemplate.action'
 import { TopicManager } from '@/components/shared/question-bank/TopicManager'
+import Link from 'next/link'
 
 interface Props {
     params: Promise<{
@@ -17,15 +18,21 @@ export default async function QuestionBankPage({ params }: Props) {
   }
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">
+    <div className="p-6 h-full  flex flex-col w-full">
+    
+     
+      <section className='flex-1 flex flex-col'>
+      <div className="text-sm text-muted-foreground mb-6">
+      <h1 className="text-2xl font-bold ">
         Question Bank - {courseTemplate.course_name}
       </h1>
-      <div className="text-sm text-muted-foreground mb-6">
         Course Code: {courseTemplate.course_code}
       </div>
-      
+
       <TopicManager courseId={courseTemplate._id} />
+      </section>
+     
+
     </div>
   )
 }

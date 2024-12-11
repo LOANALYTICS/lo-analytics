@@ -15,7 +15,6 @@ export default async function TopicQuestionsPage({ params }: Props) {
             <h1 className="text-2xl font-bold mb-4">
                 Topic: {decodeURIComponent(topicId)}
             </h1>
-            
             <QuestionForm 
                 courseId={courseId}
                 topic={decodeURIComponent(topicId)}
