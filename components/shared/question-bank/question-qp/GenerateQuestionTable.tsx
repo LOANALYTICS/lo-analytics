@@ -4,11 +4,7 @@ import React, { useState } from 'react'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-
-interface TopicData {
-    name: string;
-    allowedQuestion: number;
-}
+import { TopicData } from '@/types/question-bank'
 
 interface TopicRow {
     id: string;
