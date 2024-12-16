@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { connectToMongoDB } from '@/lib/db';
-import { compareCourses } from '@/server/services/course.service';
+import { compareCourses } from '@/server/services/course-compare.service';
 import { Collage } from '@/lib/models';
 
 export async function GET(request: Request) {

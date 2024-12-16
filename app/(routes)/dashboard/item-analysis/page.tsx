@@ -147,6 +147,7 @@ export default function ItemAnalysisPage() {
         sectionA: data?.left?.section?.toLowerCase(),
         sectionB: data?.right?.section?.toLowerCase()
       });
+      console.log(params, 'params');
 
       const response = await fetch(`/api/course-compare?${params}`);
       console.log(response, 'responsess');

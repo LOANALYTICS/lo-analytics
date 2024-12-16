@@ -140,7 +140,7 @@ export async function getCoursesByCreator(userId: string): Promise<any> {
             createdBy: new Types.ObjectId(userId) 
         })
         .lean() as ICourse[];
-        console.log(courses,"hello")
+
         // Serialize the courses similar to getCourses
         // return courses.map((course) => ({
         //     _id: course._id.toString(),

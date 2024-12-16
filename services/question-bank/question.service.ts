@@ -9,7 +9,7 @@ interface CreateQuestionInput {
     question: string
     options: string[]
     correctAnswer: string
-    clos?: string
+    clos?: number
 }
 
 export async function createQuestion(input: CreateQuestionInput) {

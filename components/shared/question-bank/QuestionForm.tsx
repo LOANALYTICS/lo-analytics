@@ -8,10 +8,20 @@ import { createQuestion, getQuestions, updateQuestion } from "@/services/questio
 import { Card, CardContent } from "@/components/ui/card"
 import { Plus, Trash2, Loader2 } from "lucide-react"
 import QuestionsListing from "./QuestionsListing"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 interface QuestionFormProps {
     courseId: string;
     topic: string;
+}
+
+interface CreateQuestionInput {
+    courseId: string
+    topic: string
+    question: string
+    options: string[]
+    correctAnswer: string
+    clos?: number
 }
 
 export function QuestionForm({ courseId, topic }: QuestionFormProps) {
@@ -21,6 +31,7 @@ export function QuestionForm({ courseId, topic }: QuestionFormProps) {
     const [isLoading, setIsLoading] = useState(false)
     const [questions, setQuestions] = useState<any[]>([])
     const [selectedQuestion, setSelectedQuestion] = useState<any>(null)
+    const [selectedClo, setSelectedClo] = useState<string>('')
 
     const fetchQuestions = async () => {
         const questions = await getQuestions(courseId, topic)
@@ -34,10 +45,12 @@ export function QuestionForm({ courseId, topic }: QuestionFormProps) {
             setQuestion('')
             setOptions(['', '', '', ''])
             setCorrectAnswer('')
+            setSelectedClo('')
         } else {
             setQuestion(question.question)
             setOptions(question.options)
             setCorrectAnswer(question.correctAnswer)
+            setSelectedClo(question.clos.toString())
         }
     }
 
@@ -58,7 +71,8 @@ export function QuestionForm({ courseId, topic }: QuestionFormProps) {
                     topic,
                     question,
                     options,
-                    correctAnswer
+                    correctAnswer,
+                    clos: selectedClo ? parseInt(selectedClo) : undefined
                 })
                 toast.success('Question updated successfully')
             } else {
@@ -68,7 +82,8 @@ export function QuestionForm({ courseId, topic }: QuestionFormProps) {
                     topic,
                     question,
                     options,
-                    correctAnswer
+                    correctAnswer,
+                    clos: selectedClo ? parseInt(selectedClo) : undefined
                 })
                 toast.success('Question added successfully')
             }
@@ -112,7 +127,28 @@ export function QuestionForm({ courseId, topic }: QuestionFormProps) {
             <Card className="bg-background">
                 <CardContent className="space-y-4 pt-6">
                     <div className="space-y-2">
+                        <div className="flex items-center justify-between gap-2">
                         <label className="text-sm font-medium">Question</label>
+                        <div className="flex items-center gap-2">
+                        <label className="text-sm font-medium">(CLO)</label>
+                        <Select
+                            value={selectedClo}
+                            onValueChange={setSelectedClo}
+                        >
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select CLO" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {Array.from({ length: 4 }, (_, i) => (
+                                    <SelectItem key={i + 1} value={(i + 1).toString()}>
+                                        CLO {i + 1}
+                                    </SelectItem>
+                                ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+
+                        </div>
                         <TiptapEditor
                             content={question}
                             onChange={setQuestion}
@@ -125,6 +161,14 @@ export function QuestionForm({ courseId, topic }: QuestionFormProps) {
                         <label className="text-sm font-medium">Options</label>
                         {options.map((option, index) => (
                             <div key={index} className="flex items-center gap-2">
+                                <div
+                                    className={`w-3.5 h-full min-h-[40px] self-start cursor-pointer rounded-sm border ${
+                                        correctAnswer && correctAnswer === option 
+                                            ? 'bg-green-500 border-green-500' 
+                                            : 'bg-white hover:bg-muted'
+                                    }`}
+                                    onClick={() => setCorrectAnswer(option)}
+                                />
                                 <div className="flex-1">
                                     <TiptapEditor
                                         key={`option-${index}`}
@@ -133,14 +177,7 @@ export function QuestionForm({ courseId, topic }: QuestionFormProps) {
                                         placeholder={`Option ${index + 1}`}
                                     />
                                 </div>
-                                <div
-                                    className={`w-3 h-full min-h-[40px] cursor-pointer rounded-sm border ${
-                                        correctAnswer && correctAnswer === option 
-                                            ? 'bg-green-500 border-green-500' 
-                                            : 'bg-white hover:bg-muted'
-                                    }`}
-                                    onClick={() => setCorrectAnswer(option)}
-                                />
+                                
                             </div>
                         ))}
                         {options.length < 6 && (
@@ -154,6 +191,8 @@ export function QuestionForm({ courseId, topic }: QuestionFormProps) {
                             </Button>
                         )}
                     </div>
+
+                    
 
                     <div className="flex justify-end gap-2">
                         <Button 

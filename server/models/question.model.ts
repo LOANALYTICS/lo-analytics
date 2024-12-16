@@ -6,7 +6,7 @@ export interface IQuestion {
     question: string;
     options: string[];
     correctAnswer: string;
-    clos?: string;
+    clos?: number;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -34,8 +34,9 @@ export const questionSchema = new mongoose.Schema({
         required: true
     },
     clos: {
-        type: String,
-        required: false
+        type: Number,
+        required: false,
+  
     }
 }, {
     timestamps: true

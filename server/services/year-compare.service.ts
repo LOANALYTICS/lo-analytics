@@ -109,14 +109,15 @@ function generateTableHTML(title: string, courses: any[], yearA: string, yearB: 
   `;
 }
 
-function processCoursesForComparison(courses: any[], semisterA: number, semisterB: number, yearA: string) {
+function processCoursesForComparison(courses: any[], semisterA: number, semisterB: number, yearA: string, yearB: string) {
   const groupedByLevel: { [key: number]: any[] } = {};
   const groupedByDepartment: { [key: string]: any[] } = {};
 
   courses.forEach(course => {
     const level = course.level;
     const department = course.department || 'Uncategorized';
-    const yearKey = course.academic_year === yearA ? 'yearA' : 'yearB';
+    const yearKey = yearA === yearB ? 'yearA' : 
+                    (course.academic_year === yearA ? 'yearA' : 'yearB');
     const semister = course.semister;
     const section = course.section?.toLowerCase(); // Get the section (male/female)
 
@@ -150,7 +151,13 @@ function processCoursesForComparison(courses: any[], semisterA: number, semister
     if (!groupedByLevel[level]) groupedByLevel[level] = [];
     const existingLevelCourse = groupedByLevel[level].find(c => c.courseIdentifier === courseIdentifier);
     if (existingLevelCourse) {
-      existingLevelCourse[yearKey] = courseData;
+      if (yearA === yearB) {
+        existingLevelCourse.yearA = courseData;
+        existingLevelCourse.yearB = courseData;
+      } else {
+        const yearKey = course.academic_year === yearA ? 'yearA' : 'yearB';
+        existingLevelCourse[yearKey] = courseData;
+      }
     } else {
       groupedByLevel[level].push({
         courseIdentifier,
@@ -158,7 +165,8 @@ function processCoursesForComparison(courses: any[], semisterA: number, semister
         courseTitle: displayTitle,
         semisterA,
         semisterB,
-        [yearKey]: courseData
+        yearA: yearA === yearB ? courseData : (course.academic_year === yearA ? courseData : undefined),
+        yearB: yearA === yearB ? courseData : (course.academic_year === yearB ? courseData : undefined)
       });
     }
 
@@ -166,7 +174,13 @@ function processCoursesForComparison(courses: any[], semisterA: number, semister
     if (!groupedByDepartment[department]) groupedByDepartment[department] = [];
     const existingDeptCourse = groupedByDepartment[department].find(c => c.courseIdentifier === courseIdentifier);
     if (existingDeptCourse) {
-      existingDeptCourse[yearKey] = courseData;
+      if (yearA === yearB) {
+        existingDeptCourse.yearA = courseData;
+        existingDeptCourse.yearB = courseData;
+      } else {
+        const yearKey = course.academic_year === yearA ? 'yearA' : 'yearB';
+        existingDeptCourse[yearKey] = courseData;
+      }
     } else {
       groupedByDepartment[department].push({
         courseIdentifier,
@@ -174,7 +188,8 @@ function processCoursesForComparison(courses: any[], semisterA: number, semister
         courseTitle: displayTitle,
         semisterA,
         semisterB,
-        [yearKey]: courseData
+        yearA: yearA === yearB ? courseData : (course.academic_year === yearA ? courseData : undefined),
+        yearB: yearA === yearB ? courseData : (course.academic_year === yearB ? courseData : undefined)
       });
     }
   });
@@ -222,7 +237,7 @@ export async function compareYears({
   })
   .lean();
 
-  const { groupedByLevel, groupedByDepartment } = processCoursesForComparison(courses, semisterA, semisterB, yearA);
+  const { groupedByLevel, groupedByDepartment } = processCoursesForComparison(courses, semisterA, semisterB, yearA, yearB);
 
   // Generate HTML tables
   const levelTables = Object.entries(groupedByLevel)
