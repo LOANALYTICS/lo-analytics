@@ -10,9 +10,9 @@ export function generateHTML(data: any): string {
   // Interpret KR-20 Reliability score
   const getKR20Message = (kr20: number): string => {
     if (kr20 >= 0.90) return "Excellent reliability; at the level of the best standardized tests.";
-    if (kr20 >= 0.85) return "Exam seems to be Very Good and reliable.";
+    if (kr20 >= 0.85) return "Exam seems to be <u>Very Good</u> and reliable.";
     if (kr20 >= 0.80) return "Exam seems to be Good and reliable.";
-    if (kr20 >= 0.71) return "Value lies between the marginally acceptable ranges. Items could be improved.";
+    if (kr20 >= 0.71) return "Value lies between the <u>marginally acceptable ranges</u>. Items could be improved.";
     if (kr20 >= 0.61) return "Somewhat low. Supplement with other measures for grading.";
     if (kr20 >= 0.51) return "Revision needed. Supplement with more tests.";
     return "Questionable reliability. Revision is needed.";
@@ -42,9 +42,13 @@ export function generateHTML(data: any): string {
   
   // Add this helper function before the return statement
   const formatQuestions = (questions: any[]): string => {
-    const questionNumbers = questions.map(q => q?.question || '');
-    const chunks: string[] = [];
+    const questionNumbers = questions.map(q => {
+      // Remove 'Q' prefix and return just the number
+      const questionNum = q?.question || '';
+      return questionNum.replace(/^Q/i, '');
+    });
     
+    const chunks: string[] = [];
     for (let i = 0; i < questionNumbers.length; i += 20) {
       chunks.push(questionNumbers.slice(i, i + 20).join(", "));
     }
@@ -68,7 +72,7 @@ export function generateHTML(data: any): string {
       }
       header { 
         text-align: center; 
-        margin-bottom: 20px;
+        margin-bottom: 20px; 
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -143,11 +147,13 @@ export function generateHTML(data: any): string {
       .grid-item {
         padding: 2px;
         text-align: start;
+        font-size: 20px;
       }
       .header-container {
         margin-bottom: 80px;
       }
       .header {
+        width: 100%;
         text-align: center;
         padding: 4px;
         margin-bottom: 10px;
@@ -157,21 +163,22 @@ export function generateHTML(data: any): string {
         margin: 0 auto;
       }
       .header-description h2 {
-        font-size: 24px;
+        font-size: 28px;
         text-align: center;
       }
       .header-description hr {
         margin-top: 10px;
       }
       .header-description p {
-        font-size: 20px;
+        font-size: 24px;
         margin-top: -8px;
         text-align: center;
+        font-weight: 500;
       }
       .college-logo {
-        max-width: 200px;
+        // max-width: 200px;
         margin: 0 auto;
-        aspect-ratio: 16/9;
+        // aspect-ratio: 16/9;
       }
       .college-name {
         font-size: 40px;
@@ -180,6 +187,26 @@ export function generateHTML(data: any): string {
       .university-name {
         font-size: 16px;
       }
+      .table td p {
+        font-size: 20px;
+      }
+      .table th p {
+        font-size: 20px;
+      }
+      .comments-cell {
+        max-width: 500px;
+        white-space: normal;
+        word-wrap: break-word;
+        height: auto !important;
+      }
+      .comments-cell p {
+        white-space: normal !important;
+        word-wrap: break-word !important;
+        text-align: center;
+        margin-bottom: 10px;
+        line-height: 1.4;
+        height: auto !important;
+      }
     </style>
   </head>
   <body>
@@ -187,16 +214,12 @@ export function generateHTML(data: any): string {
     <div class="header-container">
       <div class="header">
         ${collegeInfo.logo ? `<img src="${collegeInfo.logo}" alt="College Logo" class="college-logo"/>` : ''}
-        <div class="college-name">
-          ${collegeInfo.english} | ${collegeInfo.regional}
-        </div>
-        <div class="university-name">${collegeInfo.university}</div>
+       
       </div>
       <hr style="margin-bottom: 40px;"/>
       <div class="header-description">
         <h2>Item Analysis Report</h2>
-        <hr/>
-        <p>Course: ${course.course_name || ''}</p>
+       
       </div>
     </div>
 
@@ -225,7 +248,7 @@ export function generateHTML(data: any): string {
       </div>
     </div>
 
-    <table class="table rounded-md overflow-hidden border-collapse border border-black">
+    <table class="table  rounded-md overflow-hidden border-collapse border border-black">
       <tr>
         <th><p style="text-align: center; margin-bottom: 10px;">S.No</p></th>
         <th><p style="text-align: center; margin-bottom: 10px;">Item Category</p></th>
@@ -236,17 +259,19 @@ export function generateHTML(data: any): string {
       </tr>
       ${(groupedItemAnalysisResults || [])?.map((item: any, index: number) => `
         <tr>
-          <td><p style="text-align: center; margin-bottom: 10px;">${index + 1}</p></td>
-          <td><p style="text-align: center; margin-bottom: 10px;">${item?.classification || ''}</p></td>
+          <td><p style="text-align: center; margin-bottom: 10px;${item?.classification === 'Reliability' ? ' font-weight: bold;' : ''}">${index + 1}</p></td>
+          <td><p style="text-align: center; margin-bottom: 10px;${item?.classification === 'Reliability' ? ' font-weight: bold;' : ''}">${item?.classification || ''}</p></td>
           ${item?.classification === 'Reliability' 
-            ? `<td colspan="3" style="vertical-align: middle; text-align: center;"><p style="text-align: center; margin-bottom: 10px; font-weight: bold;">KR20 = ${(KR_20 || 0).toFixed(2)}</p></td>`
+            ? `<td colspan="3" style="vertical-align: middle; text-align: center; padding: 16px;"><p style="text-align: center; margin-bottom: 10px; font-weight: bold;">KR20 = ${(KR_20 || 0).toFixed(2)}</p></td>`
             : `
               <td class="question-no-cell"><p style="text-align: center; margin-bottom: 10px;">${formatQuestions(item?.questions || [])}</p></td>
               <td style="vertical-align: middle; text-align: center;"><p style="text-align: center; margin-bottom: 10px;">${(item?.questions || []).length}</p></td>
               <td style="vertical-align: middle; text-align: center;"><p style="text-align: center; margin-bottom: 10px;">${Number((Math.round(item?.perc || 0)).toFixed(1))}%</p></td>
             `
           }
-          <td><p style="text-align: center; margin-bottom: 10px;">${getCommentByClassification(item?.classification || '')}</p></td>
+          <td class="comments-cell">
+            <p style="text-align: center; margin-bottom: 10px;${item?.classification === 'Reliability' ? ' font-weight: bold;' : ''}">${getCommentByClassification(item?.classification || '')}</p>
+          </td>
         </tr>
       `).join("")}
     </table>
