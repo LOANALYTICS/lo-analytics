@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "
 import { Loader2, ThumbsUp } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
+import { createQuestion } from "@/services/question-bank/question.service"
 
 interface QuestionUploadProps {
     courseId: string;
@@ -45,15 +46,31 @@ export function QuestionUpload({ courseId, topic }: QuestionUploadProps) {
         }
 
         setIsUploading(true)
+        const formData = new FormData()
+        formData.append('file', selectedFile)
+        formData.append('courseId', courseId)
+        formData.append('topic', topic)
+
         try {
-            // Implement your file upload logic here
-            await new Promise(resolve => setTimeout(resolve, 2000))
-            toast.success("File uploaded successfully")
+            const response = await fetch('/api/bulk-questions', {
+                method: 'POST',
+                body: formData,
+            })
+
+            const data = await response.json()
+
+            if (!response.ok) {
+                throw new Error(data.error || 'Failed to upload questions')
+            }
+
+            toast.success(
+                `Successfully created ${data.successfullyCreated} out of ${data.totalParsed} questions`
+            )
             setOpen(false)
             setSelectedFile(null)
             setProgress(0)
         } catch (error) {
-            toast.error("Failed to upload file")
+            toast.error(error instanceof Error ? error.message : 'Failed to upload questions')
         } finally {
             setIsUploading(false)
         }
@@ -69,6 +86,22 @@ export function QuestionUpload({ courseId, topic }: QuestionUploadProps) {
                 <DialogContent onInteractOutside={(e) => e.preventDefault()}>
                     <DialogHeader>
                         <DialogTitle>Upload Questions</DialogTitle>
+                        <p className="text-sm text-gray-500 mt-2">
+                            Upload a text file (.txt) with questions in the following format:
+                        </p>
+                        <pre className="bg-gray-100 p-2 rounded-md text-sm mt-2 dark:bg-gray-800">
+                            {`Q:How long is the progress of caries?
+First option
+*Correct option (marked with *)
+Third option
+Fourth option
+
+Q:Next question...
+Option 1
+Option 2
+*Correct answer
+Option 4`}
+                        </pre>
                     </DialogHeader>
                     {selectedFile ? (
                         loading ? (
@@ -95,7 +128,7 @@ export function QuestionUpload({ courseId, topic }: QuestionUploadProps) {
                                     </svg>
                                     <p className="mb-2 text-sm text-gray-500 dark:text-gray-400"><span className="font-semibold">Click to upload</span> or drag and drop</p>
                                 </div>
-                                <input id="dropzone-file" type="file" accept=".xlsx, .xls" onChange={handleFileChange} className="hidden" />
+                                <input id="dropzone-file" type="file" accept=".txt,.doc,.docx" onChange={handleFileChange} className="hidden" />
                             </label>
                         </div>
                     )}

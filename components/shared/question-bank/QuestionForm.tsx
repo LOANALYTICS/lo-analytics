@@ -61,6 +61,11 @@ export function QuestionForm({ courseId, topic }: QuestionFormProps) {
             return
         }
 
+        if (!selectedClo) {
+            toast.error('Please select a CLO')
+            return
+        }
+
         try {
             setIsLoading(true)
             
@@ -72,7 +77,7 @@ export function QuestionForm({ courseId, topic }: QuestionFormProps) {
                     question,
                     options,
                     correctAnswer,
-                    clos: selectedClo ? parseInt(selectedClo) : undefined
+                    clos: parseInt(selectedClo)
                 })
                 toast.success('Question updated successfully')
             } else {
@@ -83,7 +88,7 @@ export function QuestionForm({ courseId, topic }: QuestionFormProps) {
                     question,
                     options,
                     correctAnswer,
-                    clos: selectedClo ? parseInt(selectedClo) : undefined
+                    clos: parseInt(selectedClo)
                 })
                 toast.success('Question added successfully')
             }
@@ -139,7 +144,7 @@ export function QuestionForm({ courseId, topic }: QuestionFormProps) {
                                 <SelectValue placeholder="Select CLO" />
                             </SelectTrigger>
                             <SelectContent>
-                                {Array.from({ length: 4 }, (_, i) => (
+                                {Array.from({ length: 20 }, (_, i) => (
                                     <SelectItem key={i + 1} value={(i + 1).toString()}>
                                         CLO {i + 1}
                                     </SelectItem>

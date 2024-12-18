@@ -24,6 +24,9 @@ const QuestionsListing = memo(({
                             dangerouslySetInnerHTML={{ __html: question.question }}
                             className="prose prose-sm max-w-none"
                         />
+                        <p className='text-xs text-gray-500'>
+                           CLO: {question.clos}
+                        </p>
                         {selectedQuestion?._id === question._id && (
                             <Button 
                                 variant="ghost" 
