@@ -1,0 +1,44 @@
+import mongoose from "mongoose";
+
+export interface IQuestionPaper {
+    examName: string;
+    course: mongoose.Types.ObjectId;
+    topicQuestions: {
+        topic: string;
+        clos: Record<string, number>;
+        total: number;
+    }[];
+    createdAt: Date;
+    updatedAt: Date;
+}
+
+export const questionPaperSchema = new mongoose.Schema({
+    examName: {
+        type: String,
+        required: true
+    },
+    course: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'CourseTemplate',
+        required: true
+    },
+    topicQuestions: [{
+        topic: {
+            type: String,
+            required: true
+        },
+        clos: {
+            type: Map,
+            of: Number,
+            required: true
+        },
+        total: {
+            type: Number,
+            required: true
+        }
+    }]
+}, {
+    timestamps: true
+});
+
+export default mongoose.models.QuestionPaper || mongoose.model<IQuestionPaper>('QuestionPaper', questionPaperSchema); 

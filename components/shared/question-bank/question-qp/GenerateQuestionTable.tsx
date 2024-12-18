@@ -4,17 +4,16 @@ import React, { useState } from 'react'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
+import { Plus } from "lucide-react"
 import { TopicData } from '@/types/question-bank'
+import { createQuestionPaper } from "@/services/question-bank/generate-qp.service"
+import { toast } from "sonner"
 
 interface TopicRow {
     id: string;
     topicName: string;
     allowedQuestion: number;
-    clos: {
-        clo1: number | null;
-        clo2: number | null;
-        clo3: number | null;
-    };
+    clos: Record<string, number | null>;
     total: number;
 }
 
@@ -25,21 +24,32 @@ interface GenerateQuestionTableProps {
 
 export function GenerateQuestionTable({ topics, courseId }: GenerateQuestionTableProps) {
     const [examName, setExamName] = useState<string>('')
+    const [cloCount, setCloCount] = useState(3)
+    
     const [tableData, setTableData] = useState<TopicRow[]>(() => 
         topics.map((topic, index) => ({
             id: `${index + 1}`,
             topicName: topic.name,
             allowedQuestion: topic.allowedQuestion,
-            clos: {
-                clo1: null,
-                clo2: null,
-                clo3: null
-            },
+            clos: Object.fromEntries([...Array(cloCount)].map((_, i) => [`clo${i + 1}`, null])),
             total: 0
         }))
     )
 
-    const updateCLO = (rowId: string, clo: keyof TopicRow['clos'], value: string) => {
+    const addNewClo = () => {
+        const newCloKey = `clo${cloCount + 1}`
+        setCloCount(prev => prev + 1)
+        
+        setTableData(prev => prev.map(row => ({
+            ...row,
+            clos: {
+                ...row.clos,
+                [newCloKey]: null
+            }
+        })))
+    }
+
+    const updateCLO = (rowId: string, clo: string, value: string) => {
         const numValue = value === '' ? null : parseInt(value)
         
         setTableData(prev => prev.map(row => {
@@ -61,22 +71,33 @@ export function GenerateQuestionTable({ topics, courseId }: GenerateQuestionTabl
         }))
     }
 
-    const handleGenerate = () => {
+    const handleGenerate = async () => {
         if (!examName.trim()) {
-            alert('Please enter an exam name')
+            toast.error('Please enter an exam name')
             return
         }
 
-        const result = {
-            examName,
-            topicQuestions: tableData.map(row => ({
-                topic: row.topicName,
-                clos: row.clos,
-                total: row.total
-            }))
-        }
+        try {
+            const result = await createQuestionPaper({
+                examName,
+                courseId,
+                topicQuestions: tableData.map(row => ({
+                    topic: row.topicName,
+                    clos: Object.fromEntries(
+                        Object.entries(row.clos)
+                            .filter(([_, value]) => value !== null)
+                            .map(([key, value]) => [key, value as number])
+                    ),
+                    total: row.total
+                }))
+            })
 
-        console.log('Generated Question Paper Structure:', result)
+            toast.success('Question paper structure created successfully')
+            console.log('Generated Question Paper:', result)
+        } catch (error) {
+            toast.error('Failed to create question paper')
+            console.error(error)
+        }
     }
 
     return (
@@ -100,9 +121,21 @@ export function GenerateQuestionTable({ topics, courseId }: GenerateQuestionTabl
                             <TableHead className="w-[100px]">S.No</TableHead>
                             <TableHead>Topic Name</TableHead>
                             <TableHead>Allowed Questions</TableHead>
-                            <TableHead>CLO1</TableHead>
-                            <TableHead>CLO2</TableHead>
-                            <TableHead>CLO3</TableHead>
+                            {[...Array(cloCount)].map((_, index) => (
+                                <TableHead key={`clo${index + 1}`} className="relative">
+                                    CLO{index + 1}
+                                    {index === cloCount - 1 && (
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            className="absolute -right-2 top-1/2 transform -translate-y-1/2"
+                                            onClick={addNewClo}
+                                        >
+                                            <Plus className="h-4 w-4" />
+                                        </Button>
+                                    )}
+                                </TableHead>
+                            ))}
                             <TableHead>Total Questions</TableHead>
                         </TableRow>
                     </TableHeader>
@@ -116,8 +149,8 @@ export function GenerateQuestionTable({ topics, courseId }: GenerateQuestionTabl
                                     <TableCell key={clo}>
                                         <Input
                                             type="number"
-                                            value={row.clos[clo as keyof TopicRow['clos']] ?? ''}
-                                            onChange={(e) => updateCLO(row.id, clo as keyof TopicRow['clos'], e.target.value)}
+                                            value={row.clos[clo] ?? ''}
+                                            onChange={(e) => updateCLO(row.id, clo, e.target.value)}
                                             className="w-20"
                                         />
                                     </TableCell>
