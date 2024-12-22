@@ -38,96 +38,169 @@ async function getTextContent(file: File): Promise<string> {
     }
 }
 
+function parseNormalQuestion(lines: string[], cloIndex: number) {
+    const questionLines = lines.slice(0, cloIndex + 1);
+    const questionText = questionLines
+        .join(' ')
+        .replace(/Q:/, '')
+        .replace(/\(CLO\d+\)/, '')
+        .trim();
+
+    return `<p>${questionText}</p>`;
+}
+
+function parseListQuestion(lines: string[], cloIndex: number) {
+    console.log('Parsing list question. Lines:', lines); // Debug log
+    console.log('Raw lines:', lines);
+    console.log('CLO index:', cloIndex);
+    // Get the main question text (first line)
+    const mainQuestion = lines[0].replace(/Q:/, '').trim();
+    console.log('Main question:', mainQuestion); // Debug log
+    
+    // Get list items with more flexible matching
+    const listItems = lines
+        .slice(1, cloIndex)
+        .map(line => {
+            console.log('Processing line:', line); // Debug log
+            return line;
+        })
+        .filter(line => {
+            // More flexible pattern matching
+            const isListItem = 
+                /^[ivxIVX]+\.\s+/i.test(line) || // Roman numerals with dot
+                /^[ivxIVX]+\)\s+/i.test(line) || // Roman numerals with parenthesis
+                /^[0-9]+\.\s+/.test(line) ||     // Numbers with dot
+                /^[a-zA-Z]\.\s+/.test(line) ||   // Letters with dot
+                /^\([0-9]+\)\s+/.test(line) ||   // Numbers in parentheses
+                /^\([a-zA-Z]\)\s+/.test(line);   // Letters in parentheses
+            
+            console.log('Is list item?', isListItem, 'for line:', line); // Debug log
+            return isListItem;
+        })
+        .map(item => {
+            return `<li style="display: block; margin-bottom: 8px;">${item.trim()}</li>`;
+        })
+        .join('\n');
+
+    console.log('Generated list items HTML:', listItems); // Debug log
+
+    const result = `
+        <p>${mainQuestion}</p>
+        <ul style="list-style: none; padding-left: 20px; margin-top: 10px;">
+            ${listItems}
+        </ul>
+    `.trim().replace(/\(CLO\d+\)/, '');
+
+    console.log('Final HTML:', result); // Debug log
+    return result;
+}
+
+function parseTableQuestion(lines: string[], cloIndex: number) {
+    // Will implement later
+    return '';
+}
+
 function parseQuestions(content: string): ParsedQuestion[] {
     const questions: ParsedQuestion[] = [];
+    const blocks = content
+        .substring(content.indexOf('Q:'))
+        .split(/(?=Q:)/)
+        .filter(block => block.trim().startsWith('Q:'));
     
-    // First, normalize line endings
-    const normalizedContent = content.replace(/\r\n|\r/g, '\n');
-    
-    // Count how many questions we expect
-    const questionCount = (normalizedContent.match(/Q:/g) || []).length;
-    console.log('Expected number of questions:', questionCount);
-
-    // Split the content by Q: and process each block
-    const blocks = normalizedContent.split('Q:').slice(1);
-    
-    console.log('Found blocks:', blocks.length);
-
     blocks.forEach((block, index) => {
         try {
-            // Split into lines and clean them
-            const lines = block
-                .split('\n')
-                .map(line => line.trim())
-                .filter(line => line.length > 0);
+            const lines = block.split('\n').map(line => line.trim()).filter(Boolean);
+            const cloIndex = lines.findIndex(line => line.includes('(CLO'));
+            if (cloIndex === -1) return;
 
-            if (lines.length < 3) {
-                console.warn(`Block ${index + 1} has insufficient lines:`, block);
-                return;
-            }
+            // Get CLO number
+            const cloMatch = lines[cloIndex].match(/\(CLO(\d+)\)/);
+            if (!cloMatch) return;
+            const clos = parseInt(cloMatch[1]);
 
-            // Convert text to HTML format
-            const questionText = `<p>${lines[0].trim()}</p>`;
-            const optionLines = lines.filter(line => !line.toLowerCase().startsWith('clo:'));
-            const cloLine = lines.find(line => line.toLowerCase().startsWith('clo:'));
-            
-            let correctAnswer = '';
-            const options: string[] = [];
-            let clos: number | undefined;
-
-            // Extract CLO if present
-            if (cloLine) {
-                const cloValue = cloLine.toLowerCase().replace('clo:', '').trim();
-                clos = parseInt(cloValue);
-                if (isNaN(clos)) {
-                    console.warn(`Invalid CLO value in block ${index + 1}:`, cloLine);
-                    clos = undefined;
-                }
-            }
-
-            // Process options (excluding the first line which is the question and any CLO line)
-            optionLines.slice(1).forEach(line => {
+            // Determine question type and parse accordingly
+            let questionText = '';
+            const hasTable = lines.some(line => 
+                line.includes('\t') || 
+                line.match(/\s{3,}/) || 
+                line.includes('School grade')
+            );
+            const hasList = lines.some(line => {
                 const trimmedLine = line.trim();
-                if (trimmedLine.startsWith('*')) {
-                    // Store correct answer in HTML format
-                    correctAnswer = `<p>${trimmedLine.substring(1).trim()}</p>`;
-                    options.push(correctAnswer);
-                } else if (trimmedLine) {
-                    // Store options in HTML format
-                    options.push(`<p>${trimmedLine}</p>`);
-                }
+                // Log the line and test result to see what's happening
+                const isMatch = /^[ivxIVX]+\.\t/.test(trimmedLine);
+                console.log('Lisne:', trimmedLine, 'Is match:', isMatch);
+                return isMatch;
             });
 
-            if (questionText && options.length >= 2 && correctAnswer) {
-                questions.push({
-                    question: questionText,
-                    options,
-                    correctAnswer,
-                    clos
-                });
-                console.log(`Successfully parsed question ${index + 1}:`, {
-                    question: questionText,
-                    clos
-                });
+            if (hasTable) {
+                // Skip table questions for now
+                console.log(`Skipping question ${index + 1} - contains table`);
+                return;
+            } else if (hasList) {
+                questionText = parseListQuestion(lines, cloIndex);
             } else {
-                console.warn(`Invalid format in block ${index + 1}:`, {
-                    questionText,
-                    options,
-                    correctAnswer,
-                    clos
-                });
+                questionText = parseNormalQuestion(lines, cloIndex);
+            }
+
+            // Process options (everything after CLO)
+            let options: string[] = [];
+            let correctAnswer = '';
+            for (let i = cloIndex + 1; i < lines.length; i++) {
+                const line = lines[i];
+                if (line.startsWith('*')) {
+                    correctAnswer = `<p>${line.substring(1).trim()}</p>`;
+                    options.push(correctAnswer);
+                } else {
+                    options.push(`<p>${line.trim()}</p>`);
+                }
+            }
+
+            if (questionText && options.length >= 2 && correctAnswer) {
+                questions.push({ question: questionText, options, correctAnswer, clos });
+                console.log(`Successfully parsed question ${index + 1}`);
             }
         } catch (error) {
-            console.error(`Error parsing block ${index + 1}:`, block);
+            console.error(`Error parsing block ${index + 1}:`, error);
         }
     });
 
-    console.log(`Successfully parsed ${questions.length} out of ${questionCount} questions`);
     return questions;
+}
+
+function convertTableToHtml(tableContent: string[]): string {
+    const rows = tableContent.map(line => 
+        line.split(/\t|\s{3,}/)
+            .filter(Boolean)
+            .map(cell => cell.trim())
+    );
+
+    let html = '<table class="border-collapse border w-full">';
+    
+    // Add header
+    html += '<thead><tr>';
+    rows[0].forEach(header => {
+        html += `<th class="border p-2 bg-gray-100">${header}</th>`;
+    });
+    html += '</tr></thead>';
+
+    // Add body
+    html += '<tbody>';
+    rows.slice(1).forEach(row => {
+        html += '<tr>';
+        row.forEach(cell => {
+            html += `<td class="border p-2">${cell}</td>`;
+        });
+        html += '</tr>';
+    });
+    html += '</tbody></table>';
+
+    return html;
 }
 
 export async function POST(request: NextRequest) {
     try {
+        console.log('Request received');
         const formData = await request.formData();
         const file = formData.get('file') as File;
         const courseId = formData.get('courseId') as string;
