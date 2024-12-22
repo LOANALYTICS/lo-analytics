@@ -66,11 +66,18 @@ function parseListQuestion(lines: string[], cloIndex: number): string {
     // Get main question (first line)
     const mainQuestion = lines[0].replace(/Q:/, '').trim();
     
-    // Get list items (up to CLO line)
+    // Get list items (up to and including CLO line if it's part of list)
     const listItems = lines
-        .slice(1, cloIndex)
-        .filter(line => line.match(/^[ivxIVX]+\./))
-        .map(item => `<li>${item}</li>`)
+        .slice(1)  // Start from second line
+        .filter(line => {
+            // Include line if it's a list item or if it's the CLO line and starts with list marker
+            return line.match(/^[ivxIVX]+\./) || 
+                   (line.includes('(CLO') && line.match(/^[ivxIVX]+\./));
+        })
+        .map(item => {
+            // Remove CLO marker if present but keep the list item text
+            return `<li>${item.replace(/\(CLO\d+\)/, '').trim()}</li>`;
+        })
         .join('\n');
 
     return `
