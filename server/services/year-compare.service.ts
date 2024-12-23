@@ -41,71 +41,156 @@ function generateTableHTML(title: string, courses: any[], yearA: string, yearB: 
   const averages = calculateAverages(courses);
   
   return `
-    <table class="min-w-full border-collapse border mt-[5px] rounded-md overflow-hidden border-gray-300">
-      <colgroup>
-        <col style="width: 40px;">
-        <col style="width: 200px;">
-        <col span="6" style="width: auto;">
-      </colgroup>
-      <thead>
-        <tr>
-          <th colspan="2" style="width: 300px !important;" class="border border-gray-300 bg-yellow-200 p-1">
-            <p style="text-align: center; margin: 0; margin-bottom: 10px;">${isLevel ? `LEVEL ${title}` : `DEPARTMENT: ${title}`}</p>
-          </th>
-          <th colspan="3" class="border border-gray-300 p-1">
-            <p style="text-align: center; margin: 0; margin-bottom: 10px;">Semester ${courses[0]?.semisterA}, ${yearA}</p>
-          </th>
-          <th colspan="3" class="border border-gray-300 p-1">
-            <p style="text-align: center; margin: 0; margin-bottom: 10px;">Semester ${courses[0]?.semisterB}, ${yearB}</p>
-          </th>
-        </tr>
-        <tr>
-          <th class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">N</p></th>
-          <th class="border border-gray-300 p-1"><p style="text-align: left; margin: 0; margin-bottom: 10px;">Course Title & Code</p></th>
-          <th class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">Accepted</p></th>
-          <th class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">Rejected</p></th>
-          <th class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">KR20</p></th>
-          <th class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">Accepted</p></th>
-          <th class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">Rejected</p></th>
-          <th class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">KR20</p></th>
-        </tr>
-      </thead>
-      <tbody>
-        ${courses.map((course, index) => `
+    <div class="table-container" style="margin-bottom: 20px;">
+      <table class="data-table" style="width: 100%; border-collapse: collapse;">
+        <colgroup>
+          <col style="width: 4%;">
+          <col style="width: 20%;">
+          <col style="width: 12%;">
+          <col style="width: 12%;">
+          <col style="width: 12%;">
+          <col style="width: 12%;">
+          <col style="width: 12%;">
+          <col style="width: 12%;">
+        </colgroup>
+        <thead>
           <tr>
-            <td rowspan="2" class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${index + 1}</p></td>
-            <td rowspan="2" class="border border-gray-300 p-1"><p style="text-align: left; margin: 0; margin-bottom: 10px;">${course.courseTitle} (${course.courseCode})</p></td>
-            <td class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${course.yearA?.accepted || 0}</p></td>
-            <td class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${course.yearA?.rejected || 0}</p></td>
-            <td rowspan="2" class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${course.yearA?.kr20?.toFixed(2) || '-'}</p></td>
-            <td class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${course.yearB?.accepted || 0}</p></td>
-            <td class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${course.yearB?.rejected || 0}</p></td>
-            <td rowspan="2" class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${course.yearB?.kr20?.toFixed(2) || '-'}</p></td>
+            <th colspan="2" class="border border-gray-300 bg-yellow-200 p-1">
+              <p style="text-align: center; margin: 0;">${isLevel ? `LEVEL ${title}` : `DEPARTMENT: ${title}`}</p>
+            </th>
+            <th colspan="3" class="border border-gray-300 p-1">
+              <p style="text-align: center; margin: 0;">Semester ${courses[0]?.semisterA}, ${yearA}</p>
+            </th>
+            <th colspan="3" class="border border-gray-300 p-1">
+              <p style="text-align: center; margin: 0;">Semester ${courses[0]?.semisterB}, ${yearB}</p>
+            </th>
           </tr>
           <tr>
-            <td class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${course.yearA?.acceptedPercentage?.toFixed(2) || '0'}%</p></td>
-            <td class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${course.yearA?.rejectedPercentage?.toFixed(2) || '0'}%</p></td>
-            <td class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${course.yearB?.acceptedPercentage?.toFixed(2) || '0'}%</p></td>
-            <td class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${course.yearB?.rejectedPercentage?.toFixed(2) || '0'}%</p></td>
+            <th class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">N</p></th>
+            <th class="border border-gray-300 p-1"><p style="text-align: left; margin: 0; margin-bottom: 10px;">Course Title & Code</p></th>
+            <th class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">Accepted</p></th>
+            <th class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">Rejected</p></th>
+            <th class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">KR20</p></th>
+            <th class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">Accepted</p></th>
+            <th class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">Rejected</p></th>
+            <th class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">KR20</p></th>
           </tr>
-        `).join('')}
-        <tr>
-          <td rowspan="2" colspan="2" class="border border-gray-300 p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px;">Average</p></td>
-          <td class="border border-gray-300 p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${averages.accepted}</p></td>
-          <td class="border border-gray-300 p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${averages.rejected}</p></td>
-          <td rowspan="2" class="border border-gray-300 p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${averages.kr20A}</p></td>
-          <td class="border border-gray-300 p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${averages.acceptedB}</p></td>
-          <td class="border border-gray-300 p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${averages.rejectedB}</p></td>
-          <td rowspan="2" class="border border-gray-300 p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${averages.kr20B}</p></td>
-        </tr>
-        <tr>
-          <td class="border border-gray-300 p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${averages.acceptedPercentageA}%</p></td>
-          <td class="border border-gray-300 p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${averages.rejectedPercentageA}%</p></td>
-          <td class="border border-gray-300 p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${averages.acceptedPercentageB}%</p></td>
-          <td class="border border-gray-300 p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${averages.rejectedPercentageB}%</p></td>
-        </tr>
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          ${courses.map((course, index) => `
+            <tr>
+              <td rowspan="2" class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${index + 1}</p></td>
+              <td rowspan="2" class="border border-gray-300 p-1"><p style="text-align: left; margin: 0; margin-bottom: 10px;">${course.courseTitle} (${course.courseCode})</p></td>
+              <td class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${course.yearA?.accepted || 0}</p></td>
+              <td class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${course.yearA?.rejected || 0}</p></td>
+              <td rowspan="2" class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${course.yearA?.kr20?.toFixed(2) || '-'}</p></td>
+              <td class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${course.yearB?.accepted || 0}</p></td>
+              <td class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${course.yearB?.rejected || 0}</p></td>
+              <td rowspan="2" class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${course.yearB?.kr20?.toFixed(2) || '-'}</p></td>
+            </tr>
+            <tr>
+              <td class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${course.yearA?.acceptedPercentage?.toFixed(2) || '0'}%</p></td>
+              <td class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${course.yearA?.rejectedPercentage?.toFixed(2) || '0'}%</p></td>
+              <td class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${course.yearB?.acceptedPercentage?.toFixed(2) || '0'}%</p></td>
+              <td class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${course.yearB?.rejectedPercentage?.toFixed(2) || '0'}%</p></td>
+            </tr>
+          `).join('')}
+          <tr>
+            <td rowspan="2" colspan="2" class="border border-gray-300 p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px;">Average</p></td>
+            <td class="border border-gray-300 p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${averages.accepted}</p></td>
+            <td class="border border-gray-300 p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${averages.rejected}</p></td>
+            <td rowspan="2" class="border border-gray-300 p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${averages.kr20A}</p></td>
+            <td class="border border-gray-300 p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${averages.acceptedB}</p></td>
+            <td class="border border-gray-300 p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${averages.rejectedB}</p></td>
+            <td rowspan="2" class="border border-gray-300 p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${averages.kr20B}</p></td>
+          </tr>
+          <tr>
+            <td class="border border-gray-300 p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${averages.acceptedPercentageA}%</p></td>
+            <td class="border border-gray-300 p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${averages.rejectedPercentageA}%</p></td>
+            <td class="border border-gray-300 p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${averages.acceptedPercentageB}%</p></td>
+            <td class="border border-gray-300 p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${averages.rejectedPercentageB}%</p></td>
+          </tr>
+        </tbody>
+      </table>
+      <style>
+        .table-container {
+          width: 100%;
+          margin-bottom: 20px;
+        }
+        
+        .data-table {
+          border-collapse: collapse;
+          width: 100%;
+          font-size: 8pt;
+        }
+        
+        .data-table th,
+        .data-table td {
+          border: 1px solid #e5e7eb;
+          padding: 4px;
+          text-align: center;
+          vertical-align: middle;
+        }
+        
+        .data-table th {
+          background-color: #f8fafc;
+        }
+        
+        .data-table tr {
+          break-inside: avoid;
+          page-break-inside: avoid;
+        }
+        
+        .data-table tbody tr {
+          page-break-inside: auto;
+        }
+        
+        .data-table thead {
+          display: table-header-group;
+        }
+        
+        .data-table tbody {
+          display: table-row-group;
+        }
+        
+        .data-table p {
+          margin: 0;
+          padding: 0;
+          line-height: 1.2;
+        }
+
+        @page {
+          margin: 0.5in 0.3in;
+        }
+
+        @media print {
+          .table-container {
+            page-break-inside: auto !important;
+          }
+          
+          .data-table {
+            page-break-inside: auto !important;
+          }
+          
+          .data-table tr {
+            page-break-inside: avoid !important;
+          }
+          
+          .data-table thead {
+            display: table-header-group !important;
+          }
+          
+          .data-table tbody {
+            display: table-row-group !important;
+          }
+          
+          .data-table th,
+          .data-table td {
+            page-break-inside: avoid !important;
+          }
+        }
+      </style>
+    </div>
   `;
 }
 

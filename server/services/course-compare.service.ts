@@ -42,73 +42,153 @@ function generateTableHTML(title: string, courses: any[], yearA: string, yearB: 
   const averages = calculateAverages(courses);
   
   return `
-    <table class="min-w-full border-collapse border mt-[5px] rounded-md overflow-hidden border-black" style="border-color: #000000 !important;">
-      <colgroup>
-        <col style="width: 40px;">
-        <col style="width: 200px;">
-        <col span="6" style="width: auto;">
-      </colgroup>
-      <thead>
-        <tr>
-          <th colspan="2" style="width: 300px !important; background-color: #f0f0f0;" class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;">
-            <p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 14px;">${title}</p>
-          </th>
-          <th colspan="3" class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;">
-            <p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 14px;">Section ${sectionA}, ${yearA}</p>
-          </th>
-          <th colspan="3" class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;">
-            <p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 14px;">Section ${sectionB}, ${yearB}</p>
-          </th>
-        </tr>
-        <tr>
-          <th class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">N</p></th>
-          <th class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: left; margin: 0; margin-bottom: 10px; font-size: 12px;">Course Title & Code</p></th>
-          <th class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">Accepted</p></th>
-          <th class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">Rejected</p></th>
-          <th class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">KR20</p></th>
-          <th class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">Accepted</p></th>
-          <th class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">Rejected</p></th>
-          <th class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">KR20</p></th>
-        </tr>
-      </thead>
-      <tbody>
-        ${courses.map((course, index) => `
+    <div class="table-container" style="margin-bottom: 20px;">
+      <table class="data-table" style="width: 100%; border-collapse: collapse;">
+        <colgroup>
+          <col style="width: 40px;">
+          <col style="width: 200px;">
+          <col span="6" style="width: auto;">
+        </colgroup>
+        <thead>
           <tr>
-            <td rowspan="2" class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">${index + 1}</p></td>
-            <td rowspan="2" class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: left; margin: 0; margin-bottom: 10px; font-size: 12px;">${course.courseTitle}</p></td>
-            <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">${course.yearA?.accepted || '-'}</p></td>
-            <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">${course.yearA?.rejected || '-'}</p></td>
-            <td rowspan="2" class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px; font-weight: bold">${course.yearA?.kr20?.toFixed(2) || '-'}</p></td>
-            <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">${course.yearB?.accepted || '-'}</p></td>
-            <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">${course.yearB?.rejected || '-'}</p></td>
-            <td rowspan="2" class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px; font-weight: bold">${course.yearB?.kr20?.toFixed(2) || '-'}</p></td>
+            <th colspan="2" style="width: 300px !important; background-color: #f0f0f0;" class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;">
+              <p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 14px;">${title}</p>
+            </th>
+            <th colspan="3" class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;">
+              <p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 14px;">Section ${sectionA}, ${yearA}</p>
+            </th>
+            <th colspan="3" class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;">
+              <p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 14px;">Section ${sectionB}, ${yearB}</p>
+            </th>
           </tr>
           <tr>
-            <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">${course.yearA?.acceptedPercentage?.toFixed(2) || '-'}${course.yearA?.acceptedPercentage ? '%' : ''}</p></td>
-            <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">${course.yearA?.rejectedPercentage?.toFixed(2) || '-'}${course.yearA?.rejectedPercentage ? '%' : ''}</p></td>
-            <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">${course.yearB?.acceptedPercentage?.toFixed(2) || '-'}${course.yearB?.acceptedPercentage ? '%' : ''}</p></td>
-            <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">${course.yearB?.rejectedPercentage?.toFixed(2) || '-'}${course.yearB?.rejectedPercentage ? '%' : ''}</p></td>
+            <th class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">N</p></th>
+            <th class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: left; margin: 0; margin-bottom: 10px; font-size: 12px;">Course Title & Code</p></th>
+            <th class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">Accepted</p></th>
+            <th class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">Rejected</p></th>
+            <th class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">KR20</p></th>
+            <th class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">Accepted</p></th>
+            <th class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">Rejected</p></th>
+            <th class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">KR20</p></th>
           </tr>
-        `).join('')}
-        <tr>
-          <td rowspan="2" colspan="2" class="border border-black p-1 font-bold">
-            <p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px;">Average</p>
-          </td>
-          <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px;">${averages.accepted}</p></td>
-          <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px;">${averages.rejected}</p></td>
-          <td rowspan="2" class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px;">${averages.kr20A}</p></td>
-          <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px;">${averages.acceptedB}</p></td>
-          <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px;">${averages.rejectedB}</p></td>
-          <td rowspan="2" class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px;">${averages.kr20B}</p></td>
-        </tr>
-        <tr>
-          <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px;">${averages.acceptedPercentageA}%</p></td>
-          <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px;">${averages.rejectedPercentageA}%</p></td>
-          <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px;">${averages.acceptedPercentageB}%</p></td>
-          <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px;">${averages.rejectedPercentageB}%</p></td>
-        </tr>
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          ${courses.map((course, index) => `
+            <tr>
+              <td rowspan="2" class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">${index + 1}</p></td>
+              <td rowspan="2" class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: left; margin: 0; margin-bottom: 10px; font-size: 12px;">${course.courseTitle}</p></td>
+              <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">${course.yearA?.accepted || '-'}</p></td>
+              <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">${course.yearA?.rejected || '-'}</p></td>
+              <td rowspan="2" class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px; font-weight: bold">${course.yearA?.kr20?.toFixed(2) || '-'}</p></td>
+              <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">${course.yearB?.accepted || '-'}</p></td>
+              <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">${course.yearB?.rejected || '-'}</p></td>
+              <td rowspan="2" class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px; font-weight: bold">${course.yearB?.kr20?.toFixed(2) || '-'}</p></td>
+            </tr>
+            <tr>
+              <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">${course.yearA?.acceptedPercentage?.toFixed(2) || '-'}${course.yearA?.acceptedPercentage ? '%' : ''}</p></td>
+              <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">${course.yearA?.rejectedPercentage?.toFixed(2) || '-'}${course.yearA?.rejectedPercentage ? '%' : ''}</p></td>
+              <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">${course.yearB?.acceptedPercentage?.toFixed(2) || '-'}${course.yearB?.acceptedPercentage ? '%' : ''}</p></td>
+              <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">${course.yearB?.rejectedPercentage?.toFixed(2) || '-'}${course.yearB?.rejectedPercentage ? '%' : ''}</p></td>
+            </tr>
+          `).join('')}
+          <tr>
+            <td rowspan="2" colspan="2" class="border border-black p-1 font-bold">
+              <p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px;">Average</p>
+            </td>
+            <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px;">${averages.accepted}</p></td>
+            <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px;">${averages.rejected}</p></td>
+            <td rowspan="2" class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px;">${averages.kr20A}</p></td>
+            <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px;">${averages.acceptedB}</p></td>
+            <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px;">${averages.rejectedB}</p></td>
+            <td rowspan="2" class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px;">${averages.kr20B}</p></td>
+          </tr>
+          <tr>
+            <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px;">${averages.acceptedPercentageA}%</p></td>
+            <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px;">${averages.rejectedPercentageA}%</p></td>
+            <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px;">${averages.acceptedPercentageB}%</p></td>
+            <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px;">${averages.rejectedPercentageB}%</p></td>
+          </tr>
+        </tbody>
+      </table>
+      <style>
+        .table-container {
+          width: 100%;
+          margin-bottom: 20px;
+        }
+        
+        .data-table {
+          border-collapse: collapse;
+          width: 100%;
+          font-size: 8pt;
+        }
+        
+        .data-table th,
+        .data-table td {
+          border: 1px solid #e5e7eb;
+          padding: 4px;
+          text-align: center;
+          vertical-align: middle;
+        }
+        
+        .data-table th {
+          background-color: #f8fafc;
+        }
+        
+        .data-table tr {
+          break-inside: avoid;
+          page-break-inside: avoid;
+        }
+        
+        .data-table tbody tr {
+          page-break-inside: auto;
+        }
+        
+        .data-table thead {
+          display: table-header-group;
+        }
+        
+        .data-table tbody {
+          display: table-row-group;
+        }
+        
+        .data-table p {
+          margin: 0;
+          padding: 0;
+          line-height: 1.2;
+        }
+
+        @page {
+          margin: 0.5in 0.3in;
+        }
+
+        @media print {
+          .table-container {
+            page-break-inside: auto !important;
+          }
+          
+          .data-table {
+            page-break-inside: auto !important;
+          }
+          
+          .data-table tr {
+            page-break-inside: avoid !important;
+          }
+          
+          .data-table thead {
+            display: table-header-group !important;
+          }
+          
+          .data-table tbody {
+            display: table-row-group !important;
+          }
+          
+          .data-table th,
+          .data-table td {
+            page-break-inside: avoid !important;
+          }
+        }
+      </style>
+    </div>
   `;
 }
 
