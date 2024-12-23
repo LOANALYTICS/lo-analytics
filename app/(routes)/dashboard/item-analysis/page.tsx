@@ -31,26 +31,47 @@ const generatePDF = async (html: string, fileName: string) => {
     
     const container = document.createElement('div');
     container.innerHTML = html;
+    container.style.width = '100%';
     document.body.appendChild(container);
 
     const opt = {
-      margin: [0.2, 0.5, 0.5, 0.5],
+      margin: [0.5, 0.3, 0.5, 0.3],
       filename: `${fileName}.pdf`,
-      image: { type: 'jpeg', quality: 0.98 },
+      image: { 
+        type: 'jpeg', 
+        quality: 0.98 
+      },
       html2canvas: { 
         scale: 2,
         useCORS: true,
         letterRendering: true,
+        width: 1240,
+        windowWidth: 1240,
+        scrollY: -window.scrollY,
+        foreignObjectRendering: true,
+        removeContainer: true,
+        allowTaint: true,
+        imageTimeout: 0
       },
       jsPDF: { 
         unit: 'in', 
         format: 'a4', 
         orientation: 'portrait',
-        compress: true
+        compress: true,
+        precision: 16,
+        putTotalPages: true,
+        floatPrecision: 16,
+        hotfixes: ["px_scaling"]
       },
       pagebreak: { 
-        mode: ['css', 'avoid-all'],
-        before: '.table-wrapper'
+        mode: ['avoid-all'],
+        before: '.table-container',
+        after: '.table-container',
+        avoid: [
+          'tr',
+          '.data-table thead',
+          '.data-table tfoot'
+        ]
       }
     };
 
