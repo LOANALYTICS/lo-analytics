@@ -31,47 +31,37 @@ const generatePDF = async (html: string, fileName: string) => {
     
     const container = document.createElement('div');
     container.innerHTML = html;
-    container.style.width = '100%';
     document.body.appendChild(container);
 
     const opt = {
-      margin: [0.5, 0.3, 0.5, 0.3],
+      margin: 0.5,
       filename: `${fileName}.pdf`,
       image: { 
         type: 'jpeg', 
-        quality: 0.98 
+        quality: 1
       },
       html2canvas: { 
         scale: 2,
         useCORS: true,
-        letterRendering: true,
-        width: 1240,
-        windowWidth: 1240,
         scrollY: -window.scrollY,
-        foreignObjectRendering: true,
         removeContainer: true,
         allowTaint: true,
-        imageTimeout: 0
+        imageTimeout: 0,
+        logging: false,
+        letterRendering: true,
+        tableWidth: '100%'
       },
       jsPDF: { 
-        unit: 'in', 
+        unit: 'in',
         format: 'a4', 
         orientation: 'portrait',
         compress: true,
-        precision: 16,
-        putTotalPages: true,
-        floatPrecision: 16,
-        hotfixes: ["px_scaling"]
+        precision: 16
       },
       pagebreak: { 
-        mode: ['avoid-all'],
-        before: '.table-container',
-        after: '.table-container',
-        avoid: [
-          'tr',
-          '.data-table thead',
-          '.data-table tfoot'
-        ]
+        mode: 'css',
+        before: '.page-break',
+        avoid: 'table'
       }
     };
 
@@ -82,16 +72,13 @@ const generatePDF = async (html: string, fileName: string) => {
       .get('pdf')
       .then((pdf: any) => {
         const totalPages = pdf.internal.getNumberOfPages();
-        
         for (let i = 1; i <= totalPages; i++) {
           pdf.setPage(i);
           pdf.setFontSize(8);
-          const pageHeight = pdf.internal.pageSize.height;
-          const pageWidth = pdf.internal.pageSize.width;
           pdf.text(
             `Page ${i} of ${totalPages}`,
-            pageWidth - 0.5,
-            pageHeight - 0.25,
+            pdf.internal.pageSize.width - 0.5,
+            pdf.internal.pageSize.height - 0.25,
             { align: 'right' }
           );
         }
