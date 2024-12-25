@@ -659,13 +659,13 @@ function generateSummaryTableHTML(title: string, summaries: any[], isLevel: bool
   };
 
   return `
-    <table class="min-w-full border-collapse border rounded-md overflow-hidden border-gray-300">
+    <table class="table-container min-w-full border-collapse border rounded-md overflow-hidden border-gray-300">
       <colgroup>
         <col style="width: 40px;">
         <col style="width: 200px;">
         <col span="9" style="width: auto;">
       </colgroup>
-      <thead>
+      <thead class="row-pair">
         <tr>
           <th colspan="2" style="width: 300px !important;" class="border border-gray-300 bg-yellow-200 p-1">
             <p style="text-align: center; margin: 0; margin-bottom: 10px;">${title}</p>
@@ -710,7 +710,7 @@ function generateSummaryTableHTML(title: string, summaries: any[], isLevel: bool
           </th>
         </tr>
       </thead>
-      <tbody>
+      <tbody class="row-pair">
         ${summaries.map((summary, index) => `
           <tr>
             <td rowspan="2" style="width: 30px !important;" class="border border-gray-300 p-1">
