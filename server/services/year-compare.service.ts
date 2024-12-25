@@ -78,22 +78,24 @@ function generateTableHTML(title: string, courses: any[], yearA: string, yearB: 
         </thead>
         <tbody>
           ${courses.map((course, index) => `
-            <tr>
-              <td rowspan="2" class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${index + 1}</p></td>
-              <td rowspan="2" class="border border-gray-300 p-1"><p style="text-align: left; margin: 0; margin-bottom: 10px;">${course.courseTitle} (${course.courseCode})</p></td>
-              <td class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${course.yearA?.accepted || 0}</p></td>
-              <td class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${course.yearA?.rejected || 0}</p></td>
-              <td rowspan="2" class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${course.yearA?.kr20?.toFixed(2) || '-'}</p></td>
-              <td class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${course.yearB?.accepted || 0}</p></td>
-              <td class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${course.yearB?.rejected || 0}</p></td>
-              <td rowspan="2" class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${course.yearB?.kr20?.toFixed(2) || '-'}</p></td>
-            </tr>
-            <tr>
-              <td class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${course.yearA?.acceptedPercentage?.toFixed(2) || '0'}%</p></td>
-              <td class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${course.yearA?.rejectedPercentage?.toFixed(2) || '0'}%</p></td>
-              <td class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${course.yearB?.acceptedPercentage?.toFixed(2) || '0'}%</p></td>
-              <td class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${course.yearB?.rejectedPercentage?.toFixed(2) || '0'}%</p></td>
-            </tr>
+            <tbody class="row-pair">
+              <tr>
+                <td rowspan="2" class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${index + 1}</p></td>
+                <td rowspan="2" class="border border-gray-300 p-1"><p style="text-align: left; margin: 0; margin-bottom: 10px;">${course.courseTitle} (${course.courseCode})</p></td>
+                <td class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${course.yearA?.accepted || 0}</p></td>
+                <td class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${course.yearA?.rejected || 0}</p></td>
+                <td rowspan="2" class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${course.yearA?.kr20?.toFixed(2) || '-'}</p></td>
+                <td class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${course.yearB?.accepted || 0}</p></td>
+                <td class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${course.yearB?.rejected || 0}</p></td>
+                <td rowspan="2" class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${course.yearB?.kr20?.toFixed(2) || '-'}</p></td>
+              </tr>
+              <tr>
+                <td class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${course.yearA?.acceptedPercentage?.toFixed(2) || '0'}%</p></td>
+                <td class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${course.yearA?.rejectedPercentage?.toFixed(2) || '0'}%</p></td>
+                <td class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${course.yearB?.acceptedPercentage?.toFixed(2) || '0'}%</p></td>
+                <td class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${course.yearB?.rejectedPercentage?.toFixed(2) || '0'}%</p></td>
+              </tr>
+            </tbody>
           `).join('')}
           <tr>
             <td rowspan="2" colspan="2" class="border border-gray-300 p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px;">Average</p></td>

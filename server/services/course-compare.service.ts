@@ -74,22 +74,24 @@ function generateTableHTML(title: string, courses: any[], yearA: string, yearB: 
         </thead>
         <tbody>
           ${courses.map((course, index) => `
-            <tr>
-              <td rowspan="2" class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">${index + 1}</p></td>
-              <td rowspan="2" class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: left; margin: 0; margin-bottom: 10px; font-size: 12px;">${course.courseTitle}</p></td>
-              <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">${course.yearA?.accepted || '-'}</p></td>
-              <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">${course.yearA?.rejected || '-'}</p></td>
-              <td rowspan="2" class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px; font-weight: bold">${course.yearA?.kr20?.toFixed(2) || '-'}</p></td>
-              <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">${course.yearB?.accepted || '-'}</p></td>
-              <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">${course.yearB?.rejected || '-'}</p></td>
-              <td rowspan="2" class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px; font-weight: bold">${course.yearB?.kr20?.toFixed(2) || '-'}</p></td>
-            </tr>
-            <tr>
-              <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">${course.yearA?.acceptedPercentage?.toFixed(2) || '-'}${course.yearA?.acceptedPercentage ? '%' : ''}</p></td>
-              <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">${course.yearA?.rejectedPercentage?.toFixed(2) || '-'}${course.yearA?.rejectedPercentage ? '%' : ''}</p></td>
-              <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">${course.yearB?.acceptedPercentage?.toFixed(2) || '-'}${course.yearB?.acceptedPercentage ? '%' : ''}</p></td>
-              <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">${course.yearB?.rejectedPercentage?.toFixed(2) || '-'}${course.yearB?.rejectedPercentage ? '%' : ''}</p></td>
-            </tr>
+            <tbody class="row-pair">
+              <tr>
+                <td rowspan="2" class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">${index + 1}</p></td>
+                <td rowspan="2" class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: left; margin: 0; margin-bottom: 10px; font-size: 12px;">${course.courseTitle}</p></td>
+                <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">${course.yearA?.accepted || '-'}</p></td>
+                <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">${course.yearA?.rejected || '-'}</p></td>
+                <td rowspan="2" class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px; font-weight: bold">${course.yearA?.kr20?.toFixed(2) || '-'}</p></td>
+                <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">${course.yearB?.accepted || '-'}</p></td>
+                <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">${course.yearB?.rejected || '-'}</p></td>
+                <td rowspan="2" class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px; font-weight: bold">${course.yearB?.kr20?.toFixed(2) || '-'}</p></td>
+              </tr>
+              <tr>
+                <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">${course.yearA?.acceptedPercentage?.toFixed(2) || '-'}${course.yearA?.acceptedPercentage ? '%' : ''}</p></td>
+                <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">${course.yearA?.rejectedPercentage?.toFixed(2) || '-'}${course.yearA?.rejectedPercentage ? '%' : ''}</p></td>
+                <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">${course.yearB?.acceptedPercentage?.toFixed(2) || '-'}${course.yearB?.acceptedPercentage ? '%' : ''}</p></td>
+                <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">${course.yearB?.rejectedPercentage?.toFixed(2) || '-'}${course.yearB?.rejectedPercentage ? '%' : ''}</p></td>
+              </tr>
+            </tbody>
           `).join('')}
           <tr>
             <td rowspan="2" colspan="2" class="border border-black p-1 font-bold">
