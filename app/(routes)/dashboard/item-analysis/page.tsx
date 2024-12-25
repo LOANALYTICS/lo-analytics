@@ -38,7 +38,7 @@ const generatePDF = async (html: string, fileName: string) => {
       filename: `${fileName}.pdf`,
       image: { 
         type: 'jpeg', 
-        quality: 1
+        quality: 0.98
       },
       html2canvas: { 
         scale: 2,
@@ -47,21 +47,21 @@ const generatePDF = async (html: string, fileName: string) => {
         removeContainer: true,
         allowTaint: true,
         imageTimeout: 0,
-        logging: false,
-        letterRendering: true,
-        tableWidth: '100%'
+        logging: true
       },
       jsPDF: { 
         unit: 'in',
         format: 'a4', 
         orientation: 'portrait',
-        compress: true,
-        precision: 16
+        compress: true
       },
       pagebreak: { 
-        mode: 'css',
-        before: '.page-break',
-        avoid: 'table'
+        mode: ['css', 'legacy'],
+        before: '.table-container',
+        avoid: [
+          '.row-pair',
+          'thead'
+        ]
       }
     };
 

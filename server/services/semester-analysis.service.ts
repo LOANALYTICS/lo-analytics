@@ -163,61 +163,63 @@ function generateTableHTML(title: string, courses: any[], semester: number, year
             const stats = calculateQuestionStats(course);
             const sectionText = course.section ? ` (${course.section.toUpperCase()})` : '';
             return `
-              <tr>
-                <td rowspan="2" style="width: 30px !important;" class="border border-gray-300 p-1">
-                  <p style="text-align: center; margin: 0; margin-bottom: 10px;">${index + 1}</p>
-                </td>
-                <td rowspan="2" style="width: 270px !important;" class="border border-gray-300 p-1">
-                  <p style="text-align: left; margin: 0; margin-bottom: 10px;">${course.course_name} (${course.course_code})${sectionText}</p>
-                </td>
-                <td class="border border-gray-300 p-1">
-                  <p style="text-align: center; margin: 0; margin-bottom: 10px;">${stats.goodQuestions}</p>
-                </td>
-                <td class="border border-gray-300 p-1">
-                  <p style="text-align: center; margin: 0; margin-bottom: 10px;">${stats.easyQuestions}</p>
-                </td>
-                <td class="border border-gray-300 p-1">
-                  <p style="text-align: center; margin: 0; margin-bottom: 10px;">${stats.difficultQuestions}</p>
-                </td>
-                <td rowspan="2" class="border border-gray-300 p-1">
-                  <p style="text-align: center; margin: 0; margin-bottom: 10px;">${stats.totalAccepted}</p>
-                </td>
-                <td class="border border-gray-300 p-1">
-                  <p style="text-align: center; margin: 0; margin-bottom: 10px;">${stats.veryDifficultQuestions}</p>
-                </td>
-                <td class="border border-gray-300 p-1">
-                  <p style="text-align: center; margin: 0; margin-bottom: 10px;">${stats.poorQuestions}</p>
-                </td>
-                <td class="border border-gray-300 p-1">
-                  <p style="text-align: center; margin: 0; margin-bottom: 10px;">${stats.veryEasyQuestions}</p>
-                </td>
-                <td rowspan="2" class="border border-gray-300 p-1">
-                  <p style="text-align: center; margin: 0; margin-bottom: 10px;">${stats.totalRejected}</p>
-                </td>
-                <td rowspan="2" class="border border-gray-300 p-1">
-                  <p style="text-align: center; margin: 0; margin-bottom: 10px;">${stats.kr20.toFixed(2)}</p>
-                </td>
-              </tr>
-              <tr>
-                <td class="border border-gray-300 p-1">
-                  <p style="text-align: center; margin: 0; margin-bottom: 10px;">${((stats.goodQuestions / stats.totalAccepted) * 100).toFixed(2)}%</p>
-                </td>
-                <td class="border border-gray-300 p-1">
-                  <p style="text-align: center; margin: 0; margin-bottom: 10px;">${((stats.easyQuestions / stats.totalAccepted) * 100).toFixed(2)}%</p>
-                </td>
-                <td class="border border-gray-300 p-1">
-                  <p style="text-align: center; margin: 0; margin-bottom: 10px;">${((stats.difficultQuestions / stats.totalAccepted) * 100).toFixed(2)}%</p>
-                </td>
-                <td class="border border-gray-300 p-1">
-                  <p style="text-align: center; margin: 0; margin-bottom: 10px;">${((stats.veryDifficultQuestions / stats.totalAccepted) * 100).toFixed(2)}%</p>
-                </td>
-                <td class="border border-gray-300 p-1">
-                  <p style="text-align: center; margin: 0; margin-bottom: 10px;">${((stats.poorQuestions / stats.totalAccepted) * 100).toFixed(2)}%</p>
-                </td>
-                <td class="border border-gray-300 p-1">
-                  <p style="text-align: center; margin: 0; margin-bottom: 10px;">${((stats.veryEasyQuestions / stats.totalAccepted) * 100).toFixed(2)}%</p>
-                </td>
-              </tr>
+              <tbody class="row-pair">
+                <tr>
+                  <td rowspan="2" style="width: 30px !important;" class="border border-gray-300 p-1">
+                    <p style="text-align: center; margin: 0; margin-bottom: 10px;">${index + 1}</p>
+                  </td>
+                  <td rowspan="2" style="width: 270px !important;" class="border border-gray-300 p-1">
+                    <p style="text-align: left; margin: 0; margin-bottom: 10px;">${course.course_name} (${course.course_code})${sectionText}</p>
+                  </td>
+                  <td class="border border-gray-300 p-1">
+                    <p style="text-align: center; margin: 0; margin-bottom: 10px;">${stats.goodQuestions}</p>
+                  </td>
+                  <td class="border border-gray-300 p-1">
+                    <p style="text-align: center; margin: 0; margin-bottom: 10px;">${stats.easyQuestions}</p>
+                  </td>
+                  <td class="border border-gray-300 p-1">
+                    <p style="text-align: center; margin: 0; margin-bottom: 10px;">${stats.difficultQuestions}</p>
+                  </td>
+                  <td rowspan="2" class="border border-gray-300 p-1">
+                    <p style="text-align: center; margin: 0; margin-bottom: 10px;">${stats.totalAccepted}</p>
+                  </td>
+                  <td class="border border-gray-300 p-1">
+                    <p style="text-align: center; margin: 0; margin-bottom: 10px;">${stats.veryDifficultQuestions}</p>
+                  </td>
+                  <td class="border border-gray-300 p-1">
+                    <p style="text-align: center; margin: 0; margin-bottom: 10px;">${stats.poorQuestions}</p>
+                  </td>
+                  <td class="border border-gray-300 p-1">
+                    <p style="text-align: center; margin: 0; margin-bottom: 10px;">${stats.veryEasyQuestions}</p>
+                  </td>
+                  <td rowspan="2" class="border border-gray-300 p-1">
+                    <p style="text-align: center; margin: 0; margin-bottom: 10px;">${stats.totalRejected}</p>
+                  </td>
+                  <td rowspan="2" class="border border-gray-300 p-1">
+                    <p style="text-align: center; margin: 0; margin-bottom: 10px;">${stats.kr20.toFixed(2)}</p>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="border border-gray-300 p-1">
+                    <p style="text-align: center; margin: 0; margin-bottom: 10px;">${((stats.goodQuestions / stats.totalAccepted) * 100).toFixed(2)}%</p>
+                  </td>
+                  <td class="border border-gray-300 p-1">
+                    <p style="text-align: center; margin: 0; margin-bottom: 10px;">${((stats.easyQuestions / stats.totalAccepted) * 100).toFixed(2)}%</p>
+                  </td>
+                  <td class="border border-gray-300 p-1">
+                    <p style="text-align: center; margin: 0; margin-bottom: 10px;">${((stats.difficultQuestions / stats.totalAccepted) * 100).toFixed(2)}%</p>
+                  </td>
+                  <td class="border border-gray-300 p-1">
+                    <p style="text-align: center; margin: 0; margin-bottom: 10px;">${((stats.veryDifficultQuestions / stats.totalAccepted) * 100).toFixed(2)}%</p>
+                  </td>
+                  <td class="border border-gray-300 p-1">
+                    <p style="text-align: center; margin: 0; margin-bottom: 10px;">${((stats.poorQuestions / stats.totalAccepted) * 100).toFixed(2)}%</p>
+                  </td>
+                  <td class="border border-gray-300 p-1">
+                    <p style="text-align: center; margin: 0; margin-bottom: 10px;">${((stats.veryEasyQuestions / stats.totalAccepted) * 100).toFixed(2)}%</p>
+                  </td>
+                </tr>
+              </tbody>
             `;
           }).join('')}
           <tr>
