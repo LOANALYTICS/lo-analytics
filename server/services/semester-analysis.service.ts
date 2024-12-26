@@ -527,7 +527,7 @@ export async function analyzeSemester({
 
         /* Headers */
         th[colspan="2"] {
-          background-color: #ffd700 !important;
+          background-color: #01b9fe !important;
           text-align: left !important;
           width: 300px !important;
         }
@@ -545,7 +545,7 @@ export async function analyzeSemester({
         /* Total rows */
         tr:last-child td,
         tr:nth-last-child(2) td {
-          font-weight: bold !important;
+          // font-weight: bold !important;
           background-color: #f8f9fa !important;
         }
 
@@ -659,7 +659,7 @@ function generateSummaryTableHTML(title: string, summaries: any[], isLevel: bool
   };
 
   return `
-    <table class="table-container min-w-full border-collapse border rounded-md overflow-hidden border-gray-300">
+    <table class="table-container mt-3 min-w-full border-collapse border rounded-md overflow-hidden border-gray-300">
       <colgroup>
         <col style="width: 40px;">
         <col style="width: 200px;">

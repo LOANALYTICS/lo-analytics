@@ -53,7 +53,7 @@ function generateTableHTML(title: string, courses: any[], yearA: string, yearB: 
           <col style="width: 12%;">
           <col style="width: 12%;">
         </colgroup>
-        <thead>
+        <thead class="row-pair">
           <tr>
             <th colspan="2" class="border border-gray-300 bg-yellow-200 p-1">
               <p style="text-align: center; margin: 0; padding-top: 4px !important; padding-bottom: 14px !important;">${isLevel ? `LEVEL ${title}` : `DEPARTMENT: ${title}`}</p>
@@ -97,7 +97,7 @@ function generateTableHTML(title: string, courses: any[], yearA: string, yearB: 
               </tr>
             </tbody>
           `).join('')}
-          <tr>
+          <tr class="row-pair">
             <td rowspan="2" colspan="2" class="border border-gray-300 p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px;">Average</p></td>
             <td class="border border-gray-300 p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${averages.accepted}</p></td>
             <td class="border border-gray-300 p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${averages.rejected}</p></td>
@@ -402,7 +402,7 @@ export async function compareYears({
 
         /* Headers */
         th[colspan="2"] {
-          background-color: #ffd700 !important;
+          background-color: #04b0fb !important;
           text-align: left !important;
           width: 300px !important;
         }
@@ -420,7 +420,7 @@ export async function compareYears({
         /* Total rows */
         tr:last-child td,
         tr:nth-last-child(2) td {
-          font-weight: bold !important;
+          // font-weight: bold !important;
           background-color: #f8f9fa
         }
 
@@ -457,13 +457,13 @@ function generateSummaryTableHTML(title: string, summaries: any[], isLevel: bool
   const avgRejectedPercentageB = !isNaN(totalRejectedB) ? (totalRejectedB / summaries.length).toFixed(2) : '0';
 
   return `
-    <table class="min-w-full border-collapse border rounded-md mt-[5px] overflow-hidden border-black" style="border-color: #000000 !important;">
+    <table class="table-container mt-5 min-w-full border-collapse border rounded-md  overflow-hidden border-black" style="border-color: #000000 !important;">
       <colgroup>
         <col style="width: 40px;">
         <col style="width: 200px;">
         <col span="6" style="width: auto;">
       </colgroup>
-      <thead>
+      <thead class="row-pair">
         <tr>
           <th colspan="2" style="width: 300px !important;" class="border border-gray-300 bg-yellow-200 p-1" style="border-color: #000000 !important;">
             <p style="text-align: center; margin: 0;  padding-top: 4px !important; padding-bottom: 14px !important;">${title}</p>
@@ -486,7 +486,7 @@ function generateSummaryTableHTML(title: string, summaries: any[], isLevel: bool
           <th class="border border-gray-300 p-1" style="border-color: #000000 !important;"><p style="text-align: center; margin: 0; margin-bottom: 10px;">KR20</p></th>
         </tr>
       </thead>
-      <tbody>
+      <tbody class="row-pair">
         ${summaries.map((summary, index) => `
           <tr>
             <td rowspan="2" class="border border-gray-300 p-1" style="border-color: #000000 !important;"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${index + 1}</p></td>

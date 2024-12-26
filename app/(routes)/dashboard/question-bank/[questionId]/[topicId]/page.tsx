@@ -1,14 +1,9 @@
 import { QuestionForm } from "@/components/shared/question-bank/QuestionForm"
 import { QuestionUpload } from "@/components/shared/question-bank/questionUpload"
 
-interface Props {
-    params: {
-        questionId: string
-        topicId: string
-    }
-}
 
-export default async function TopicQuestionsPage({ params }: Props) {
+
+export default async function TopicQuestionsPage({ params }: any) {
     const { questionId: courseId, topicId } = await params
     
     return (

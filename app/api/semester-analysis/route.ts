@@ -66,27 +66,18 @@ export async function GET(request: Request) {
               text-align: center;
             }
             .college-logo {
-              max-width: 200px;
-              margin: 0 auto;
-              aspect-ratio: 16/9;
+               max-height: 440px;
+              width: 100%;
+              object-fit: contain;
             }
-            .college-name {
-              font-size: 18px;
-              font-weight: bold;
-            }
-            .university-name {
-              font-size: 16px;
-            }
+         
           </style>
         </head>
         <body>
           <div class="header-container">
             <div class="header">
               ${college.logo ? `<img src="${college.logo}" alt="College Logo" class="college-logo"/>` : ''}
-              <div class="college-name">
-                ${college.english} | ${college.regional}
-              </div>
-              <div class="university-name">${college.university}</div>
+             
             </div>
             <hr style="margin-bottom: 40px;"/>
             <div class="header-description">
