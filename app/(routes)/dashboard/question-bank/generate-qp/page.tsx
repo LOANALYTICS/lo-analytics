@@ -13,6 +13,7 @@ export default function GenerateQPPage() {
         <div className="p-6">
             <h1 className="text-2xl font-bold mb-6">Generate Question Paper</h1>
             <GenerateQuestionTable topics={topics} courseId={courseId} />
+           
         </div>
     )
 }

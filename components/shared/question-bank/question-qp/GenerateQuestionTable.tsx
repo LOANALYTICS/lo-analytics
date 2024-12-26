@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
 import { TopicData } from '@/types/question-bank'
-import { createQuestionPaper } from "@/services/question-bank/generate-qp.service"
+import { createQuestionPaper, generateQuestionsByPaperId } from "@/services/question-bank/generate-qp.service"
 import { toast } from "sonner"
 
 interface TopicRow {
@@ -47,6 +47,10 @@ export function GenerateQuestionTable({ topics, courseId }: GenerateQuestionTabl
                 [newCloKey]: null
             }
         })))
+    }
+    const generateQuestionsByPaperIdFunc = async () => {
+        const questionpaper = await generateQuestionsByPaperId("676dab84c3e92be653264a31")
+        console.log(questionpaper, "questionpaper")
     }
 
     const updateCLO = (rowId: string, clo: string, value: string) => {
@@ -111,6 +115,9 @@ export function GenerateQuestionTable({ topics, courseId }: GenerateQuestionTabl
                 />
                 <Button onClick={handleGenerate}>
                     Generate
+                </Button>
+                <Button onClick={generateQuestionsByPaperIdFunc}>
+                    Generate Questions
                 </Button>
             </div>
 

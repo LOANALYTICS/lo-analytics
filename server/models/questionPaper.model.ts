@@ -19,7 +19,7 @@ export const questionPaperSchema = new mongoose.Schema({
     },
     course: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'CourseTemplate',
+        ref: 'Course',
         required: true
     },
     topicQuestions: [{
