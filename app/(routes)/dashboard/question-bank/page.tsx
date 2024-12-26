@@ -11,7 +11,7 @@ export default async function QuestionBank() {
     <h1 className="font-semibold text-lg"> Courses - ( {coursesTemplate.length} )</h1>
     <section className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-2 mt-4">
       {coursesTemplate.map(template => (
-        <CourseCard key={template._id} href={`/dashboard/question-bank/${template._id}`} template={template} />
+        <CourseCard key={template._id}  href={`/dashboard/question-bank/${template._id}?course_name=${template.course_name}&course_code=${template.course_code}`} template={template} />
       ))}
     </section>
   </main>

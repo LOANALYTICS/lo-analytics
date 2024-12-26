@@ -7,7 +7,8 @@ import { useEffect, useState } from "react"
 import { addTopic, deleteTopic, updateTopic, getTopics } from "@/services/question-bank/question-bank.service"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
-import Link from "next/link"
+import QuestionPaperDropdown from "./question-qp/QuestionPaperDropdown"
+import { getCurrentUser } from "@/server/utils/helper"
 
 interface TopicManagerProps {
     courseId: string
@@ -24,6 +25,8 @@ interface Topic extends TopicData {
 
 export function TopicManager({ courseId }: TopicManagerProps) {
     const router = useRouter()
+    const [user, setUser] = useState<any>(null)
+    const [topicsData, setTopicsData] = useState<TopicData[]>([])
     const [topics, setTopics] = useState<Topic[]>([])
     const [newInput, setNewInput] = useState("")
     const [newAllowedQuestion, setNewAllowedQuestion] = useState<string>('')
@@ -31,6 +34,8 @@ export function TopicManager({ courseId }: TopicManagerProps) {
     const [editValue, setEditValue] = useState("")
     const [selectedTopics, setSelectedTopics] = useState<Topic[]>([])
     const [editAllowedQuestion, setEditAllowedQuestion] = useState<string>('')
+    const [questionPapers, setQuestionPapers] = useState<{ id: string; name: string }[]>([])
+    const [dialogOpen, setDialogOpen] = useState(false)
 
     useEffect(() => {
         const fetchTopics = async () => {
@@ -38,6 +43,24 @@ export function TopicManager({ courseId }: TopicManagerProps) {
             setTopics(fetchedTopics)
         }
         fetchTopics()
+    }, [courseId])
+    useEffect(() => {
+        const fetchUser = async () => {
+            const user = await getCurrentUser()
+            setUser(user)
+        }
+        fetchUser()
+    }, [])
+
+    useEffect(() => {
+        const fetchQuestionPapers = async () => {
+            const papers = [
+                { id: "1", name: "Midterm 2024" },
+                { id: "2", name: "Final 2024" },
+            ]
+            setQuestionPapers(papers)
+        }
+        fetchQuestionPapers()
     }, [courseId])
 
     const handleSave = async (value: string, allowedQuestionStr: string) => {
@@ -106,7 +129,17 @@ export function TopicManager({ courseId }: TopicManagerProps) {
             name: t.name,
             allowedQuestion: t.allowedQuestion
         }))
-        router.push(`/dashboard/question-bank/generate-qp?courseId=${courseId}&topics=${encodeURIComponent(JSON.stringify(topicsData))}`)
+        setTopicsData(topicsData)
+        setDialogOpen(true)
+    }
+
+    const handleQuestionPaperSelect = (paperId: string) => {
+        console.log("Selected paper:", paperId)
+    }
+
+    const handleCourseSelect = (courseId: string) => {
+        console.log("Selected course:", courseId)
+        // Add your course selection logic here
     }
 
     return (
@@ -205,7 +238,8 @@ export function TopicManager({ courseId }: TopicManagerProps) {
                     </Button>
                 </div>
             </div>
-            <section className='w-full h-fit flex justify-center'>
+            <section className='w-full h-fit flex justify-center gap-4'>
+                <QuestionPaperDropdown topicsData={topicsData} open={dialogOpen} userId={user?.id} setOpen={setDialogOpen} />
                 <Button
                     onClick={handleGenerateQuestionPaperClick}
                     className='bg-primary text-white self-end px-4 py-2 rounded-md'
