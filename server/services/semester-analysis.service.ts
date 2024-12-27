@@ -679,7 +679,6 @@ export async function analyzeSemester({
           font-size: 7pt !important;
           margin-top: 5px !important;
           margin-bottom: 20px !important;
-          page-break-inside: auto !important;
         }
         
         table:last-child {
@@ -746,38 +745,31 @@ export async function analyzeSemester({
           
           div {
             break-inside: avoid !important;
+            page-break-after: auto !important;
+            page-break-before: auto !important;
           }
           
           .table-wrapper {
             margin: 15px 0 !important;
             page-break-inside: avoid !important;
             break-inside: avoid !important;
-          }
-
-          table {
-            page-break-inside: auto !important;
-          }
-
-          tr {
-            page-break-inside: avoid !important;
+            page-break-after: auto !important;
+            page-break-before: auto !important;
           }
 
           thead {
             display: table-header-group !important;
           }
 
-          tfoot {
-            display: table-row-group !important;
-          }
-
-          tbody {
-            page-break-inside: auto !important;
+          tr {
+            page-break-inside: avoid !important;
           }
         }
 
         .kr20-segregation {
           background-color: white;
           box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+          margin-bottom: 20px !important;
         }
         
         .exam-category h3 {

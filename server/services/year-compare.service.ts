@@ -507,6 +507,12 @@ export async function compareYears({
 
   return {
     tables: [
+      `<div class="logo-container">
+        <svg width="100" height="40" viewBox="0 0 100 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M10 20C10 14.4772 14.4772 10 20 10H80C85.5228 10 90 14.4772 90 20C90 25.5228 85.5228 30 80 30H20C14.4772 30 10 25.5228 10 20Z" fill="#04b0fb"/>
+          <text x="50" y="25" font-family="Arial" font-size="12" fill="white" text-anchor="middle">Your Logo</text>
+        </svg>
+      </div>`,
       ...levelTables,
       ...departmentTables,
       levelSummaryTable,
@@ -570,16 +576,25 @@ export async function compareYears({
           background-color: #f8f9fa
         }
 
+        /* Add logo styles */
+        .logo-container {
+          position: fixed;
+          top: 10px;
+          right: 10px;
+          z-index: 9999;
+        }
+
+        /* Ensure logo appears on every printed page */
         @media print {
-          div {
-            break-inside: avoid !important;
+          .logo-container {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
           }
           
-          .table-wrapper {
-            margin: 15px 0 !important;
-            page-break-inside: avoid !important;
-            break-inside: avoid !important;
-          }
+          /* Existing print styles ... */
         }
       </style>
     `,
