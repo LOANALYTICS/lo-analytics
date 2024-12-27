@@ -1,5 +1,5 @@
-import { Types } from 'mongoose';
-import { Course } from '@/lib/models';
+import { Types } from "mongoose";
+import { Course } from "@/lib/models";
 
 interface SemesterAnalysisParams {
   collegeId: string;
@@ -15,62 +15,79 @@ function calculateQuestionStats(course: any) {
     poorQuestions: 0,
     difficultQuestions: 0,
     veryDifficultQuestions: 0,
-    kr20: course.krValues?.KR_20 || 0
+    kr20: course.krValues?.KR_20 || 0,
   };
 
   course.krValues?.groupedItemAnalysisResults?.forEach((group: any) => {
-    switch(group.classification) {
-      case 'Good Questions':
+    switch (group.classification) {
+      case "Good Questions":
         stats.goodQuestions = group.questions?.length || 0;
         break;
-      case 'Easy Questions':
+      case "Easy Questions":
         stats.easyQuestions = group.questions?.length || 0;
         break;
-      case 'Very Easy Questions':
+      case "Very Easy Questions":
         stats.veryEasyQuestions = group.questions?.length || 0;
         break;
-      case 'Poor (Bad) Questions':
+      case "Poor (Bad) Questions":
         stats.poorQuestions = group.questions?.length || 0;
         break;
-      case 'Difficult Questions':
+      case "Difficult Questions":
         stats.difficultQuestions = group.questions?.length || 0;
         break;
-      case 'Very Difficult Questions':
+      case "Very Difficult Questions":
         stats.veryDifficultQuestions = group.questions?.length || 0;
         break;
     }
   });
 
-  const totalAccepted = stats.goodQuestions + stats.easyQuestions + stats.difficultQuestions;
-  const totalRejected = stats.veryDifficultQuestions + stats.poorQuestions + stats.veryEasyQuestions;
+  const totalAccepted =
+    stats.goodQuestions + stats.easyQuestions + stats.difficultQuestions;
+  const totalRejected =
+    stats.veryDifficultQuestions +
+    stats.poorQuestions +
+    stats.veryEasyQuestions;
 
   return {
     ...stats,
     totalAccepted,
-    totalRejected
+    totalRejected,
   };
 }
 
 function calculateAverages(courses: any[]) {
-  const totals = courses.reduce((acc, course) => {
-    const stats = calculateQuestionStats(course);
-    return {
-      goodQuestions: acc.goodQuestions + stats.goodQuestions,
-      easyQuestions: acc.easyQuestions + stats.easyQuestions,
-      difficultQuestions: acc.difficultQuestions + stats.difficultQuestions,
-      veryDifficultQuestions: acc.veryDifficultQuestions + stats.veryDifficultQuestions,
-      poorQuestions: acc.poorQuestions + stats.poorQuestions,
-      veryEasyQuestions: acc.veryEasyQuestions + stats.veryEasyQuestions,
-      kr20: acc.kr20 + stats.kr20
-    };
-  }, {
-    goodQuestions: 0, easyQuestions: 0, difficultQuestions: 0,
-    veryDifficultQuestions: 0, poorQuestions: 0, veryEasyQuestions: 0, kr20: 0
-  });
+  const totals = courses.reduce(
+    (acc, course) => {
+      const stats = calculateQuestionStats(course);
+      return {
+        goodQuestions: acc.goodQuestions + stats.goodQuestions,
+        easyQuestions: acc.easyQuestions + stats.easyQuestions,
+        difficultQuestions: acc.difficultQuestions + stats.difficultQuestions,
+        veryDifficultQuestions:
+          acc.veryDifficultQuestions + stats.veryDifficultQuestions,
+        poorQuestions: acc.poorQuestions + stats.poorQuestions,
+        veryEasyQuestions: acc.veryEasyQuestions + stats.veryEasyQuestions,
+        kr20: acc.kr20 + stats.kr20,
+      };
+    },
+    {
+      goodQuestions: 0,
+      easyQuestions: 0,
+      difficultQuestions: 0,
+      veryDifficultQuestions: 0,
+      poorQuestions: 0,
+      veryEasyQuestions: 0,
+      kr20: 0,
+    }
+  );
 
   const count = courses.length || 1;
-  const totalAccepted = totals.goodQuestions + totals.easyQuestions + totals.difficultQuestions;
-  const totalRejected = totals.veryDifficultQuestions + totals.poorQuestions + totals.veryEasyQuestions;
+  const totalAccepted =
+    totals.goodQuestions + totals.easyQuestions + totals.difficultQuestions;
+  const totalRejected =
+    totals.veryDifficultQuestions +
+    totals.poorQuestions +
+    totals.veryEasyQuestions;
   const total = totalAccepted + totalRejected;
 
   return {
@@ -86,17 +103,28 @@ function calculateAverages(courses: any[]) {
     percentages: {
       goodQuestions: ((totals.goodQuestions / total) * 100).toFixed(2),
       easyQuestions: ((totals.easyQuestions / total) * 100).toFixed(2),
-      difficultQuestions: ((totals.difficultQuestions / total) * 100).toFixed(2),
-      veryDifficultQuestions: ((totals.veryDifficultQuestions / total) * 100).toFixed(2),
+      difficultQuestions: ((totals.difficultQuestions / total) * 100).toFixed(
+        2
+      ),
+      veryDifficultQuestions: (
+        (totals.veryDifficultQuestions / total) *
+        100
+      ).toFixed(2),
       poorQuestions: ((totals.poorQuestions / total) * 100).toFixed(2),
-      veryEasyQuestions: ((totals.veryEasyQuestions / total) * 100).toFixed(2)
-    }
+      veryEasyQuestions: ((totals.veryEasyQuestions / total) * 100).toFixed(2),
+    },
   };
 }
 
-function generateTableHTML(title: string, courses: any[], semester: number, year: string, isLevel: boolean = true) {
+function generateTableHTML(
+  title: string,
+  courses: any[],
+  semester: number,
+  year: string,
+  isLevel: boolean = true
+) {
   const averages = calculateAverages(courses);
-  
+
   return `
     <div class="table-container" style="margin-bottom: 20px;">
       <table class="data-table" style="width: 100%; border-collapse: collapse;">
@@ -116,7 +144,9 @@ function generateTableHTML(title: string, courses: any[], semester: number, year
         <thead>
           <tr>
             <th colspan="2" style="width: 300px !important;" class="border border-gray-300 bg-yellow-200 p-1">
-              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${isLevel ? `LEVEL ${title}` : `DEPARTMENT: ${title}`}</p>
+              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
+                isLevel ? `LEVEL ${title}` : `DEPARTMENT: ${title}`
+              }</p>
             </th>
             <th colspan="9" class="border border-gray-300 p-1">
               <p style="text-align: center; margin: 0; margin-bottom: 10px;">Semester ${semester}, ${year}</p>
@@ -159,119 +189,196 @@ function generateTableHTML(title: string, courses: any[], semester: number, year
           </tr>
         </thead>
         <tbody>
-          ${courses.map((course, index) => {
-            const stats = calculateQuestionStats(course);
-            const sectionText = course.section ? ` (${course.section.toUpperCase()})` : '';
-            return `
+          ${courses
+            .map((course, index) => {
+              const stats = calculateQuestionStats(course);
+              const sectionText = course.section
+                ? ` (${
+                    course.section.charAt(0).toUpperCase() +
+                    course.section.slice(1).toLowerCase()
+                  })`
+                : "";
+              return `
               <tbody class="row-pair">
                 <tr>
                   <td rowspan="2" style="width: 30px !important;" class="border border-gray-300 p-1">
-                    <p style="text-align: center; margin: 0; margin-bottom: 10px;">${index + 1}</p>
+                    <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
+                      index + 1
+                    }</p>
                   </td>
                   <td rowspan="2" style="width: 270px !important;" class="border border-gray-300 p-1">
-                    <p style="text-align: left; margin: 0; margin-bottom: 10px;">${course.course_name} (${course.course_code})${sectionText}</p>
+                    <p style="text-align: left; margin: 0; margin-bottom: 10px;">${
+                      course.course_name
+                    } (${course.course_code})${sectionText}</p>
                   </td>
                   <td class="border border-gray-300 p-1">
-                    <p style="text-align: center; margin: 0; margin-bottom: 10px;">${stats.goodQuestions}</p>
+                    <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
+                      stats.goodQuestions
+                    }</p>
                   </td>
                   <td class="border border-gray-300 p-1">
-                    <p style="text-align: center; margin: 0; margin-bottom: 10px;">${stats.easyQuestions}</p>
+                    <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
+                      stats.easyQuestions
+                    }</p>
                   </td>
                   <td class="border border-gray-300 p-1">
-                    <p style="text-align: center; margin: 0; margin-bottom: 10px;">${stats.difficultQuestions}</p>
+                    <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
+                      stats.difficultQuestions
+                    }</p>
                   </td>
                   <td rowspan="2" class="border border-gray-300 p-1">
-                    <p style="text-align: center; margin: 0; margin-bottom: 10px;">${stats.totalAccepted}</p>
+                    <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
+                      stats.totalAccepted
+                    }</p>
                   </td>
                   <td class="border border-gray-300 p-1">
-                    <p style="text-align: center; margin: 0; margin-bottom: 10px;">${stats.veryDifficultQuestions}</p>
+                    <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
+                      stats.veryDifficultQuestions
+                    }</p>
                   </td>
                   <td class="border border-gray-300 p-1">
-                    <p style="text-align: center; margin: 0; margin-bottom: 10px;">${stats.poorQuestions}</p>
+                    <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
+                      stats.poorQuestions
+                    }</p>
                   </td>
                   <td class="border border-gray-300 p-1">
-                    <p style="text-align: center; margin: 0; margin-bottom: 10px;">${stats.veryEasyQuestions}</p>
+                    <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
+                      stats.veryEasyQuestions
+                    }</p>
                   </td>
                   <td rowspan="2" class="border border-gray-300 p-1">
-                    <p style="text-align: center; margin: 0; margin-bottom: 10px;">${stats.totalRejected}</p>
+                    <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
+                      stats.totalRejected
+                    }</p>
                   </td>
                   <td rowspan="2" class="border border-gray-300 p-1">
-                    <p style="text-align: center; margin: 0; margin-bottom: 10px;">${stats.kr20.toFixed(2)}</p>
+                    <p style="text-align: center; margin: 0; margin-bottom: 10px;">${stats.kr20.toFixed(
+                      2
+                    )}</p>
                   </td>
                 </tr>
                 <tr>
                   <td class="border border-gray-300 p-1">
-                    <p style="text-align: center; margin: 0; margin-bottom: 10px;">${((stats.goodQuestions / stats.totalAccepted) * 100).toFixed(2)}%</p>
+                    <p style="text-align: center; margin: 0; margin-bottom: 10px;">${(
+                      (stats.goodQuestions / stats.totalAccepted) *
+                      100
+                    ).toFixed(2)}%</p>
                   </td>
                   <td class="border border-gray-300 p-1">
-                    <p style="text-align: center; margin: 0; margin-bottom: 10px;">${((stats.easyQuestions / stats.totalAccepted) * 100).toFixed(2)}%</p>
+                    <p style="text-align: center; margin: 0; margin-bottom: 10px;">${(
+                      (stats.easyQuestions / stats.totalAccepted) *
+                      100
+                    ).toFixed(2)}%</p>
                   </td>
                   <td class="border border-gray-300 p-1">
-                    <p style="text-align: center; margin: 0; margin-bottom: 10px;">${((stats.difficultQuestions / stats.totalAccepted) * 100).toFixed(2)}%</p>
+                    <p style="text-align: center; margin: 0; margin-bottom: 10px;">${(
+                      (stats.difficultQuestions / stats.totalAccepted) *
+                      100
+                    ).toFixed(2)}%</p>
                   </td>
                   <td class="border border-gray-300 p-1">
-                    <p style="text-align: center; margin: 0; margin-bottom: 10px;">${((stats.veryDifficultQuestions / stats.totalAccepted) * 100).toFixed(2)}%</p>
+                    <p style="text-align: center; margin: 0; margin-bottom: 10px;">${(
+                      (stats.veryDifficultQuestions / stats.totalAccepted) *
+                      100
+                    ).toFixed(2)}%</p>
                   </td>
                   <td class="border border-gray-300 p-1">
-                    <p style="text-align: center; margin: 0; margin-bottom: 10px;">${((stats.poorQuestions / stats.totalAccepted) * 100).toFixed(2)}%</p>
+                    <p style="text-align: center; margin: 0; margin-bottom: 10px;">${(
+                      (stats.poorQuestions / stats.totalAccepted) *
+                      100
+                    ).toFixed(2)}%</p>
                   </td>
                   <td class="border border-gray-300 p-1">
-                    <p style="text-align: center; margin: 0; margin-bottom: 10px;">${((stats.veryEasyQuestions / stats.totalAccepted) * 100).toFixed(2)}%</p>
+                    <p style="text-align: center; margin: 0; margin-bottom: 10px;">${(
+                      (stats.veryEasyQuestions / stats.totalAccepted) *
+                      100
+                    ).toFixed(2)}%</p>
                   </td>
                 </tr>
               </tbody>
             `;
-          }).join('')}
+            })
+            .join("")}
           <tr>
             <td rowspan="2" colspan="2" class="border border-gray-300 p-1 font-bold" style="width: 30px !important; max-width: 30px !important;">
               <p style="text-align: center; margin: 0; margin-bottom: 10px;">Average</p>
             </td>
             <td class="border border-gray-300 p-1 font-bold">
-              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${averages.goodQuestions}</p>
+              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
+                averages.goodQuestions
+              }</p>
             </td>
             <td class="border border-gray-300 p-1 font-bold">
-              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${averages.easyQuestions}</p>
+              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
+                averages.easyQuestions
+              }</p>
             </td>
             <td class="border border-gray-300 p-1 font-bold">
-              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${averages.difficultQuestions}</p>
+              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
+                averages.difficultQuestions
+              }</p>
             </td>
             <td rowspan="2" class="border border-gray-300 p-1 font-bold">
-              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${averages.totalAccepted}</p>
+              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
+                averages.totalAccepted
+              }</p>
             </td>
             <td class="border border-gray-300 p-1 font-bold">
-              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${averages.veryDifficultQuestions}</p>
+              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
+                averages.veryDifficultQuestions
+              }</p>
             </td>
             <td class="border border-gray-300 p-1 font-bold">
-              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${averages.poorQuestions}</p>
+              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
+                averages.poorQuestions
+              }</p>
             </td>
             <td class="border border-gray-300 p-1 font-bold">
-              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${averages.veryEasyQuestions}</p>
+              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
+                averages.veryEasyQuestions
+              }</p>
             </td>
             <td rowspan="2" class="border border-gray-300 p-1 font-bold">
-              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${averages.totalRejected}</p>
+              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
+                averages.totalRejected
+              }</p>
             </td>
             <td rowspan="2" class="border border-gray-300 p-1 font-bold">
-              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${averages.kr20}</p>
+              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
+                averages.kr20
+              }</p>
             </td>
           </tr>
           <tr>
             <td class="border border-gray-300 p-1 font-bold">
-              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${averages.percentages.goodQuestions}%</p>
+              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
+                averages.percentages.goodQuestions
+              }%</p>
             </td>
             <td class="border border-gray-300 p-1 font-bold">
-              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${averages.percentages.easyQuestions}%</p>
+              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
+                averages.percentages.easyQuestions
+              }%</p>
             </td>
             <td class="border border-gray-300 p-1 font-bold">
-              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${averages.percentages.difficultQuestions}%</p>
+              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
+                averages.percentages.difficultQuestions
+              }%</p>
             </td>
             <td class="border border-gray-300 p-1 font-bold">
-              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${averages.percentages.veryDifficultQuestions}%</p>
+              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
+                averages.percentages.veryDifficultQuestions
+              }%</p>
             </td>
             <td class="border border-gray-300 p-1 font-bold">
-              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${averages.percentages.poorQuestions}%</p>
+              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
+                averages.percentages.poorQuestions
+              }%</p>
             </td>
             <td class="border border-gray-300 p-1 font-bold">
-              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${averages.percentages.veryEasyQuestions}%</p>
+              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
+                averages.percentages.veryEasyQuestions
+              }%</p>
             </td>
           </tr>
         </tbody>
@@ -360,9 +467,13 @@ function generateTableHTML(title: string, courses: any[], semester: number, year
 
 function generateKR20SegregationHTML(courses: any[]) {
   // Group courses by KR20 ranges
-  const goodExams = courses.filter(c => c.krValues?.KR_20 >= 0.80);
-  const averageExams = courses.filter(c => c.krValues?.KR_20 >= 0.70 && c.krValues?.KR_20 < 0.80);
-  const badExams = courses.filter(c => c.krValues?.KR_20 < 0.70 || !c.krValues?.KR_20);
+  const goodExams = courses.filter((c) => c.krValues?.KR_20 >= 0.8);
+  const averageExams = courses.filter(
+    (c) => c.krValues?.KR_20 >= 0.7 && c.krValues?.KR_20 < 0.8
+  );
+  const badExams = courses.filter(
+    (c) => c.krValues?.KR_20 < 0.7 || !c.krValues?.KR_20
+  );
 
   return `
     <div class="kr20-segregation" style="height: 500px; width: 100%; overflow-y: auto; margin-bottom: 40px; border: 1px solid #e2e8f0; border-radius: 8px;">
@@ -376,14 +487,29 @@ function generateKR20SegregationHTML(courses: any[]) {
             Good Exams (KR20 ≥ 0.80)
           </h3>
           <ul style="list-style-type: none; padding-left: 16px; margin: 0;">
-            ${goodExams.map(course => `
+            ${goodExams
+              .map(
+                (course) => `
               <li style="margin-bottom: 4px; font-size: 12px;">
                 ${course.course_name} (${course.course_code})
-                ${course.section ? `- Section ${course.section}` : ''} 
-                - KR20: ${course.krValues?.KR_20?.toFixed(2) || 'N/A'}
+                ${
+                  course.section
+                    ? `- Section ${
+                        course.section.charAt(0).toUpperCase() +
+                        course.section.slice(1).toLowerCase()
+                      }`
+                    : ""
+                } 
+                - KR20: ${course.krValues?.KR_20?.toFixed(2) || "N/A"}
               </li>
-            `).join('')}
-            ${goodExams.length === 0 ? '<li style="color: #64748b; font-size: 12px;">No courses found</li>' : ''}
+            `
+              )
+              .join("")}
+            ${
+              goodExams.length === 0
+                ? '<li style="color: #64748b; font-size: 12px;">No courses found</li>'
+                : ""
+            }
           </ul>
         </div>
 
@@ -392,14 +518,29 @@ function generateKR20SegregationHTML(courses: any[]) {
             Average Exams (KR20: 0.70-0.79)
           </h3>
           <ul style="list-style-type: none; padding-left: 16px; margin: 0;">
-            ${averageExams.map(course => `
+            ${averageExams
+              .map(
+                (course) => `
               <li style="margin-bottom: 4px; font-size: 12px;">
                 ${course.course_name} (${course.course_code})
-                ${course.section ? `- Section ${course.section}` : ''} 
-                - KR20: ${course.krValues?.KR_20?.toFixed(2) || 'N/A'}
+                ${
+                  course.section
+                    ? `- Section ${
+                        course.section.charAt(0).toUpperCase() +
+                        course.section.slice(1).toLowerCase()
+                      }`
+                    : ""
+                } 
+                - KR20: ${course.krValues?.KR_20?.toFixed(2) || "N/A"}
               </li>
-            `).join('')}
-            ${averageExams.length === 0 ? '<li style="color: #64748b; font-size: 12px;">No courses found</li>' : ''}
+            `
+              )
+              .join("")}
+            ${
+              averageExams.length === 0
+                ? '<li style="color: #64748b; font-size: 12px;">No courses found</li>'
+                : ""
+            }
           </ul>
         </div>
 
@@ -408,14 +549,29 @@ function generateKR20SegregationHTML(courses: any[]) {
             Bad Exams (KR20 < 0.70)
           </h3>
           <ul style="list-style-type: none; padding-left: 16px; margin: 0;">
-            ${badExams.map(course => `
+            ${badExams
+              .map(
+                (course) => `
               <li style="margin-bottom: 4px; font-size: 12px;">
                 ${course.course_name} (${course.course_code})
-                ${course.section ? `- Section ${course.section}` : ''} 
-                - KR20: ${course.krValues?.KR_20?.toFixed(2) || 'N/A'}
+                ${
+                  course.section
+                    ? `- Section ${
+                        course.section.charAt(0).toUpperCase() +
+                        course.section.slice(1).toLowerCase()
+                      }`
+                    : ""
+                } 
+                - KR20: ${course.krValues?.KR_20?.toFixed(2) || "N/A"}
               </li>
-            `).join('')}
-            ${badExams.length === 0 ? '<li style="color: #64748b; font-size: 12px;">No courses found</li>' : ''}
+            `
+              )
+              .join("")}
+            ${
+              badExams.length === 0
+                ? '<li style="color: #64748b; font-size: 12px;">No courses found</li>'
+                : ""
+            }
           </ul>
         </div>
       </div>
@@ -426,29 +582,29 @@ function generateKR20SegregationHTML(courses: any[]) {
 export async function analyzeSemester({
   collegeId,
   semester,
-  academicYear
+  academicYear,
 }: SemesterAnalysisParams) {
   const collegeObjectId = new Types.ObjectId(collegeId);
 
   const courses = await Course.find({
     collage: collegeObjectId,
     semister: semester,
-    academic_year: academicYear
+    academic_year: academicYear,
   })
-  .select('course_name course_code level department section krValues')
-  .populate({
-    path: 'krValues',
-    select: 'KR_20 groupedItemAnalysisResults'
-  })
-  .lean();
+    .select("course_name course_code level department section krValues")
+    .populate({
+      path: "krValues",
+      select: "KR_20 groupedItemAnalysisResults",
+    })
+    .lean();
 
   // Group courses by level and department
   const groupedByLevel: { [key: number]: any[] } = {};
   const groupedByDepartment: { [key: string]: any[] } = {};
 
-  courses.forEach(course => {
+  courses.forEach((course) => {
     const level = course.level;
-    const department = course.department || 'Uncategorized';
+    const department = course.department || "Uncategorized";
 
     if (!groupedByLevel[level]) groupedByLevel[level] = [];
     groupedByLevel[level].push(course);
@@ -459,36 +615,54 @@ export async function analyzeSemester({
 
   const levelTables = Object.entries(groupedByLevel)
     .sort(([a], [b]) => Number(a) - Number(b))
-    .map(([level, courses]) => generateTableHTML(level, courses, semester, academicYear, true));
+    .map(([level, courses]) =>
+      generateTableHTML(level, courses, semester, academicYear, true)
+    );
 
   const departmentTables = Object.entries(groupedByDepartment)
     .sort(([a], [b]) => a.localeCompare(b))
-    .map(([dept, courses]) => generateTableHTML(dept, courses, semester, academicYear, false));
+    .map(([dept, courses]) =>
+      generateTableHTML(dept, courses, semester, academicYear, false)
+    );
 
   // Collect averages for summary tables
   const levelSummaries = Object.entries(groupedByLevel)
     .sort(([a], [b]) => Number(a) - Number(b))
     .map(([level, courses]) => ({
       name: level,
-      averages: calculateAverages(courses)
+      averages: calculateAverages(courses),
     }));
 
   const departmentSummaries = Object.entries(groupedByDepartment)
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([dept, courses]) => ({
       name: dept,
-      averages: calculateAverages(courses)
+      averages: calculateAverages(courses),
     }));
 
   // Generate summary tables HTML
-  const levelSummaryTable = generateSummaryTableHTML('Level Summary', levelSummaries, true);
-  const departmentSummaryTable = generateSummaryTableHTML('Department Summary', departmentSummaries, false);
+  const levelSummaryTable = generateSummaryTableHTML(
+    "Level Summary",
+    levelSummaries,
+    true
+  );
+  const departmentSummaryTable = generateSummaryTableHTML(
+    "Department Summary",
+    departmentSummaries,
+    false
+  );
 
   // Add KR20 segregation before the tables
   const kr20SegregationHTML = generateKR20SegregationHTML(courses);
 
   return {
-    tables: [kr20SegregationHTML, ...levelTables, ...departmentTables, levelSummaryTable, departmentSummaryTable],
+    tables: [
+      kr20SegregationHTML,
+      ...levelTables,
+      ...departmentTables,
+      levelSummaryTable,
+      departmentSummaryTable,
+    ],
     styles: `
       <style>
         .table-wrapper {
@@ -504,7 +678,8 @@ export async function analyzeSemester({
           table-layout: fixed !important;
           font-size: 7pt !important;
           margin-top: 5px !important;
-          margin-bottom: 40px !important;
+          margin-bottom: 20px !important;
+          page-break-inside: auto !important;
         }
         
         table:last-child {
@@ -545,7 +720,6 @@ export async function analyzeSemester({
         /* Total rows */
         tr:last-child td,
         tr:nth-last-child(2) td {
-          // font-weight: bold !important;
           background-color: #f8f9fa !important;
         }
 
@@ -578,6 +752,26 @@ export async function analyzeSemester({
             margin: 15px 0 !important;
             page-break-inside: avoid !important;
             break-inside: avoid !important;
+          }
+
+          table {
+            page-break-inside: auto !important;
+          }
+
+          tr {
+            page-break-inside: avoid !important;
+          }
+
+          thead {
+            display: table-header-group !important;
+          }
+
+          tfoot {
+            display: table-row-group !important;
+          }
+
+          tbody {
+            page-break-inside: auto !important;
           }
         }
 
@@ -613,49 +807,76 @@ export async function analyzeSemester({
           background-color: #dc2626;
         }
       </style>
-    `
+    `,
   };
 }
 
-function generateSummaryTableHTML(title: string, summaries: any[], isLevel: boolean = true) {
+function generateSummaryTableHTML(
+  title: string,
+  summaries: any[],
+  isLevel: boolean = true
+) {
   // Calculate the overall averages from all summaries
-  const overallAverages = summaries.reduce((acc, summary) => ({
-    goodQuestions: acc.goodQuestions + summary.averages.goodQuestions,
-    easyQuestions: acc.easyQuestions + summary.averages.easyQuestions,
-    difficultQuestions: acc.difficultQuestions + summary.averages.difficultQuestions,
-    veryDifficultQuestions: acc.veryDifficultQuestions + summary.averages.veryDifficultQuestions,
-    poorQuestions: acc.poorQuestions + summary.averages.poorQuestions,
-    veryEasyQuestions: acc.veryEasyQuestions + summary.averages.veryEasyQuestions,
-    totalAccepted: acc.totalAccepted + summary.averages.totalAccepted,
-    totalRejected: acc.totalRejected + summary.averages.totalRejected,
-    kr20: acc.kr20 + summary.averages.kr20
-  }), {
-    goodQuestions: 0, easyQuestions: 0, difficultQuestions: 0,
-    veryDifficultQuestions: 0, poorQuestions: 0, veryEasyQuestions: 0,
-    totalAccepted: 0, totalRejected: 0, kr20: 0
-  });
+  const overallAverages = summaries.reduce(
+    (acc, summary) => ({
+      goodQuestions: acc.goodQuestions + summary.averages.goodQuestions,
+      easyQuestions: acc.easyQuestions + summary.averages.easyQuestions,
+      difficultQuestions:
+        acc.difficultQuestions + summary.averages.difficultQuestions,
+      veryDifficultQuestions:
+        acc.veryDifficultQuestions + summary.averages.veryDifficultQuestions,
+      poorQuestions: acc.poorQuestions + summary.averages.poorQuestions,
+      veryEasyQuestions:
+        acc.veryEasyQuestions + summary.averages.veryEasyQuestions,
+      totalAccepted: acc.totalAccepted + summary.averages.totalAccepted,
+      totalRejected: acc.totalRejected + summary.averages.totalRejected,
+      kr20: acc.kr20 + summary.averages.kr20,
+    }),
+    {
+      goodQuestions: 0,
+      easyQuestions: 0,
+      difficultQuestions: 0,
+      veryDifficultQuestions: 0,
+      poorQuestions: 0,
+      veryEasyQuestions: 0,
+      totalAccepted: 0,
+      totalRejected: 0,
+      kr20: 0,
+    }
+  );
 
   const count = summaries.length || 1;
   const finalAverages = {
     goodQuestions: Math.round(overallAverages.goodQuestions / count),
     easyQuestions: Math.round(overallAverages.easyQuestions / count),
     difficultQuestions: Math.round(overallAverages.difficultQuestions / count),
-    veryDifficultQuestions: Math.round(overallAverages.veryDifficultQuestions / count),
+    veryDifficultQuestions: Math.round(
+      overallAverages.veryDifficultQuestions / count
+    ),
     poorQuestions: Math.round(overallAverages.poorQuestions / count),
     veryEasyQuestions: Math.round(overallAverages.veryEasyQuestions / count),
     totalAccepted: Math.round(overallAverages.totalAccepted / count),
     totalRejected: Math.round(overallAverages.totalRejected / count),
-    kr20: Number((overallAverages.kr20 / count).toFixed(2))
+    kr20: Number((overallAverages.kr20 / count).toFixed(2)),
   };
 
   const total = finalAverages.totalAccepted + finalAverages.totalRejected;
   const percentages = {
     goodQuestions: ((finalAverages.goodQuestions / total) * 100).toFixed(2),
     easyQuestions: ((finalAverages.easyQuestions / total) * 100).toFixed(2),
-    difficultQuestions: ((finalAverages.difficultQuestions / total) * 100).toFixed(2),
-    veryDifficultQuestions: ((finalAverages.veryDifficultQuestions / total) * 100).toFixed(2),
+    difficultQuestions: (
+      (finalAverages.difficultQuestions / total) *
+      100
+    ).toFixed(2),
+    veryDifficultQuestions: (
+      (finalAverages.veryDifficultQuestions / total) *
+      100
+    ).toFixed(2),
     poorQuestions: ((finalAverages.poorQuestions / total) * 100).toFixed(2),
-    veryEasyQuestions: ((finalAverages.veryEasyQuestions / total) * 100).toFixed(2)
+    veryEasyQuestions: (
+      (finalAverages.veryEasyQuestions / total) *
+      100
+    ).toFixed(2),
   };
 
   return `
@@ -679,7 +900,9 @@ function generateSummaryTableHTML(title: string, summaries: any[], isLevel: bool
             <p style="text-align: center; margin: 0; margin-bottom: 10px;">S.No</p>
           </th>
           <th style="width: 270px !important;" class="border border-gray-300 p-1">
-            <p style="text-align: left; margin: 0; margin-bottom: 10px;">${isLevel ? 'Level' : 'Department'}</p>
+            <p style="text-align: left; margin: 0; margin-bottom: 10px;">${
+              isLevel ? "Level" : "Department"
+            }</p>
           </th>
           <th class="border border-gray-300" style="padding: 2px 4px;">
             <p style="text-align: center; margin: 0; margin-bottom: 10px;">Good Questions</p>
@@ -711,117 +934,185 @@ function generateSummaryTableHTML(title: string, summaries: any[], isLevel: bool
         </tr>
       </thead>
       <tbody class="row-pair">
-        ${summaries.map((summary, index) => `
+        ${summaries
+          .map(
+            (summary, index) => `
           <tr>
             <td rowspan="2" style="width: 30px !important;" class="border border-gray-300 p-1">
-              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${index + 1}</p>
+              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
+                index + 1
+              }</p>
             </td>
             <td rowspan="2" style="width: 270px !important;" class="border border-gray-300 p-1">
-              <p style="text-align: left; margin: 0; margin-bottom: 10px;">${isLevel ? `Level ${summary.name}` : summary.name}</p>
+              <p style="text-align: left; margin: 0; margin-bottom: 10px;">${
+                isLevel ? `Level ${summary.name}` : summary.name
+              }</p>
             </td>
             <td class="border border-gray-300 p-1">
-              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${summary.averages.goodQuestions}</p>
+              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
+                summary.averages.goodQuestions
+              }</p>
             </td>
             <td class="border border-gray-300 p-1">
-              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${summary.averages.easyQuestions}</p>
+              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
+                summary.averages.easyQuestions
+              }</p>
             </td>
             <td class="border border-gray-300 p-1">
-              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${summary.averages.difficultQuestions}</p>
+              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
+                summary.averages.difficultQuestions
+              }</p>
             </td>
             <td rowspan="2" class="border border-gray-300 p-1">
-              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${summary.averages.totalAccepted}</p>
+              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
+                summary.averages.totalAccepted
+              }</p>
             </td>
             <td class="border border-gray-300 p-1">
-              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${summary.averages.veryDifficultQuestions}</p>
+              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
+                summary.averages.veryDifficultQuestions
+              }</p>
             </td>
             <td class="border border-gray-300 p-1">
-              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${summary.averages.poorQuestions}</p>
+              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
+                summary.averages.poorQuestions
+              }</p>
             </td>
             <td class="border border-gray-300 p-1">
-              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${summary.averages.veryEasyQuestions}</p>
+              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
+                summary.averages.veryEasyQuestions
+              }</p>
             </td>
             <td rowspan="2" class="border border-gray-300 p-1">
-              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${summary.averages.totalRejected}</p>
+              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
+                summary.averages.totalRejected
+              }</p>
             </td>
             <td rowspan="2" class="border border-gray-300 p-1">
-              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${summary.averages.kr20}</p>
+              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
+                summary.averages.kr20
+              }</p>
             </td>
           </tr>
           <tr>
             <td class="border border-gray-300 p-1">
-              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${summary.averages.percentages.goodQuestions}%</p>
+              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
+                summary.averages.percentages.goodQuestions
+              }%</p>
             </td>
             <td class="border border-gray-300 p-1">
-              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${summary.averages.percentages.easyQuestions}%</p>
+              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
+                summary.averages.percentages.easyQuestions
+              }%</p>
             </td>
             <td class="border border-gray-300 p-1">
-              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${summary.averages.percentages.difficultQuestions}%</p>
+              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
+                summary.averages.percentages.difficultQuestions
+              }%</p>
             </td>
             <td class="border border-gray-300 p-1">
-              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${summary.averages.percentages.veryDifficultQuestions}%</p>
+              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
+                summary.averages.percentages.veryDifficultQuestions
+              }%</p>
             </td>
             <td class="border border-gray-300 p-1">
-              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${summary.averages.percentages.poorQuestions}%</p>
+              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
+                summary.averages.percentages.poorQuestions
+              }%</p>
             </td>
             <td class="border border-gray-300 p-1">
-              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${summary.averages.percentages.veryEasyQuestions}%</p>
+              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
+                summary.averages.percentages.veryEasyQuestions
+              }%</p>
             </td>
           </tr>
-        `).join('')}
+        `
+          )
+          .join("")}
         
         <tr>
           <td rowspan="2" colspan="2" class="border border-gray-300 p-1 font-bold" style="text-align: center;">
             <p style="text-align: center; margin: 0; margin-bottom: 10px;">Average</p>
           </td>
           <td class="border border-gray-300 p-1 font-bold">
-            <p style="text-align: center; margin: 0; margin-bottom: 10px;">${finalAverages.goodQuestions}</p>
+            <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
+              finalAverages.goodQuestions
+            }</p>
           </td>
           <td class="border border-gray-300 p-1 font-bold">
-            <p style="text-align: center; margin: 0; margin-bottom: 10px;">${finalAverages.easyQuestions}</p>
+            <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
+              finalAverages.easyQuestions
+            }</p>
           </td>
           <td class="border border-gray-300 p-1 font-bold">
-            <p style="text-align: center; margin: 0; margin-bottom: 10px;">${finalAverages.difficultQuestions}</p>
+            <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
+              finalAverages.difficultQuestions
+            }</p>
           </td>
           <td rowspan="2" class="border border-gray-300 p-1 font-bold">
-            <p style="text-align: center; margin: 0; margin-bottom: 10px;">${finalAverages.totalAccepted}</p>
+            <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
+              finalAverages.totalAccepted
+            }</p>
           </td>
           <td class="border border-gray-300 p-1 font-bold">
-            <p style="text-align: center; margin: 0; margin-bottom: 10px;">${finalAverages.veryDifficultQuestions}</p>
+            <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
+              finalAverages.veryDifficultQuestions
+            }</p>
           </td>
           <td class="border border-gray-300 p-1 font-bold">
-            <p style="text-align: center; margin: 0; margin-bottom: 10px;">${finalAverages.poorQuestions}</p>
+            <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
+              finalAverages.poorQuestions
+            }</p>
           </td>
           <td class="border border-gray-300 p-1 font-bold">
-            <p style="text-align: center; margin: 0; margin-bottom: 10px;">${finalAverages.veryEasyQuestions}</p>
+            <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
+              finalAverages.veryEasyQuestions
+            }</p>
           </td>
           <td rowspan="2" class="border border-gray-300 p-1 font-bold">
-            <p style="text-align: center; margin: 0; margin-bottom: 10px;">${finalAverages.totalRejected}</p>
+            <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
+              finalAverages.totalRejected
+            }</p>
           </td>
           <td rowspan="2" class="border border-gray-300 p-1 font-bold">
-            <p style="text-align: center; margin: 0; margin-bottom: 10px;">${finalAverages.kr20}</p>
+            <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
+              finalAverages.kr20
+            }</p>
           </td>
         </tr>
         <tr>
           <td class="border border-gray-300 p-1 font-bold">
-            <p style="text-align: center; margin: 0; margin-bottom: 10px;">${percentages.goodQuestions}%</p>
+            <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
+              percentages.goodQuestions
+            }%</p>
           </td>
           <td class="border border-gray-300 p-1 font-bold">
-            <p style="text-align: center; margin: 0; margin-bottom: 10px;">${percentages.easyQuestions}%</p>
+            <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
+              percentages.easyQuestions
+            }%</p>
           </td>
           <td class="border border-gray-300 p-1 font-bold">
-            <p style="text-align: center; margin: 0; margin-bottom: 10px;">${percentages.difficultQuestions}%</p>
+            <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
+              percentages.difficultQuestions
+            }%</p>
           </td>
           <td class="border border-gray-300 p-1 font-bold">
-            <p style="text-align: center; margin: 0; margin-bottom: 10px;">${percentages.veryDifficultQuestions}%</p>
+            <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
+              percentages.veryDifficultQuestions
+            }%</p>
           </td>
           <td class="border border-gray-300 p-1 font-bold">
-            <p style="text-align: center; margin: 0; margin-bottom: 10px;">${percentages.poorQuestions}%</p>
+            <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
+              percentages.poorQuestions
+            }%</p>
           </td>
           <td class="border border-gray-300 p-1 font-bold">
-            <p style="text-align: center; margin: 0; margin-bottom: 10px;">${percentages.veryEasyQuestions}%</p>
+            <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
+              percentages.veryEasyQuestions
+            }%</p>
           </td>
         </tr>
       </tbody>
     </table>
   `;
-} 
+}
