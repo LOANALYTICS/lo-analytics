@@ -7,9 +7,11 @@ export function generateQuestionPaperHTML(data: {
     const questionsHTML = data.questions.map((q, index) => `
         <div class="question-container">
             <div class="question">
-                <span class="question-number">${index + 1}.</span>
-                ${q.question}
-                <span class="marks">[CLO${q.clo}]</span>
+                <span style="margin-right: 8px;">Q${index + 1}.</span>
+                <div>
+                    ${q.question}
+                    <span class="marks">[CLO${q.clo}]</span>
+                </div>
             </div>
             <div class="options">
                 ${q.options.map((opt: string, idx: number) => `
@@ -72,7 +74,8 @@ export function generateQuestionPaperHTML(data: {
                 .question {
                     margin-bottom: 10px;
                     font-weight: bold;
-                    white-space: nowrap;
+                    display: flex;
+                    align-items: flex-start;
                 }
                 .question-number {
                     margin-right: 8px;
@@ -104,19 +107,33 @@ export function generateQuestionPaperHTML(data: {
                     font-weight: bold;
                 }
                 table {
-                    width: 100%;
+                    width: 90%;
+                    max-width: 600px;
+                    margin: 10px auto;
                     border-collapse: collapse;
-                    margin: 10px 0;
+                    font-size: 9px;
+                    page-break-inside: avoid;
                 }
                 table, th, td {
                     border: 1px solid #000;
                 }
                 th, td {
-                    padding: 8px;
+                    padding: 2px 3px;
                     text-align: left;
+                    line-height: 1.1;
+                    vertical-align: top;
+                }
+                tr {
+                    page-break-inside: avoid;
                 }
                 th {
                     background-color: #f3f4f6;
+                    font-size: 9px;
+                    font-weight: bold;
+                }
+                table[colspan] td, 
+                table[colspan] th {
+                    padding: 2px 3px;
                 }
                 .questions {
                     display: block;
@@ -128,9 +145,18 @@ export function generateQuestionPaperHTML(data: {
                         margin-top: 0 !important;
                         padding-top: 0 !important;
                     }
-                    div {
+                    .question-container:first-child {
                         margin-top: 0 !important;
                     }
+                    .questions > .question-container:not(:first-child) {
+                        margin-top: initial;
+                    }
+                }
+                table td {
+                    white-space: nowrap;
+                }
+                table td:first-child {
+                    white-space: normal;
                 }
             </style>
         </head>
