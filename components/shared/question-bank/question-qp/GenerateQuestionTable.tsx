@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -8,6 +8,8 @@ import { Plus } from "lucide-react"
 import { TopicData } from '@/types/question-bank'
 import { createQuestionPaper, generateQuestionsByPaperId } from "@/services/question-bank/generate-qp.service"
 import { toast } from "sonner"
+import { useRouter } from 'next/navigation'
+import { getCurrentUser, UserJwtPayload } from '@/server/utils/helper'
 
 interface TopicRow {
     id: string;
@@ -25,7 +27,27 @@ interface GenerateQuestionTableProps {
 export function GenerateQuestionTable({ topics, courseId }: GenerateQuestionTableProps) {
     const [examName, setExamName] = useState<string>('')
     const [cloCount, setCloCount] = useState(3)
-    
+    const router = useRouter()
+    const [user, setUser] = useState<UserJwtPayload>({
+        _id: "",
+        email: "",
+        name: "",
+        role: "",
+        cid: "",
+        permissions: []
+    })
+    useEffect(() => {
+        const fetchUser = async () => {
+            const user = await getCurrentUser()
+            if (user) {
+                setUser({
+                    ...user,
+                    _id: user.id
+                })
+            }
+        }
+        fetchUser()
+    }, [])
     const [tableData, setTableData] = useState<TopicRow[]>(() => 
         topics.map((topic, index) => ({
             id: `${index + 1}`,
@@ -48,10 +70,7 @@ export function GenerateQuestionTable({ topics, courseId }: GenerateQuestionTabl
             }
         })))
     }
-    const generateQuestionsByPaperIdFunc = async () => {
-        const questionpaper = await generateQuestionsByPaperId("676dab84c3e92be653264a31")
-        console.log(questionpaper, "questionpaper")
-    }
+
 
     const updateCLO = (rowId: string, clo: string, value: string) => {
         const numValue = value === '' ? null : parseInt(value)
@@ -94,10 +113,10 @@ export function GenerateQuestionTable({ topics, courseId }: GenerateQuestionTabl
                     ),
                     total: row.total
                 }))
-            })
-
+            },user?._id)
+       
+            router.push(`/dashboard/question-bank/qps`)
             toast.success('Question paper structure created successfully')
-            console.log('Generated Question Paper:', result)
         } catch (error) {
             toast.error('Failed to create question paper')
             console.error(error)
@@ -116,9 +135,7 @@ export function GenerateQuestionTable({ topics, courseId }: GenerateQuestionTabl
                 <Button onClick={handleGenerate}>
                     Generate
                 </Button>
-                <Button onClick={generateQuestionsByPaperIdFunc}>
-                    Generate Questions
-                </Button>
+               
             </div>
 
             <div className="border rounded-lg">

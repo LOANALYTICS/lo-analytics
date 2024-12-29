@@ -21,10 +21,10 @@ const QuestionsListing = memo(({
                         onClick={() => onQuestionSelect(question)}
                     >
                         <div 
-                            dangerouslySetInnerHTML={{ __html: question.question }}
-                            className="prose prose-sm max-w-none"
+                            dangerouslySetInnerHTML={{ __html: question.question}}
+                            className="prose prose-sm max-w-none line-clamp-1"
                         />
-                        <p className='text-xs text-gray-500'>
+                        <p className='text-xs text-gray-500 min-w-10'>
                            CLO: {question.clos}
                         </p>
                         {selectedQuestion?._id === question._id && (

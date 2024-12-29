@@ -15,12 +15,13 @@ interface GenerateQPInput {
     }[]
 }
 
-export async function createQuestionPaper(input: GenerateQPInput) {
+export async function createQuestionPaper(input: GenerateQPInput,userId: string) {
     try {
         const questionPaper = await QuestionPaper.create({
             examName: input.examName,
             course: new mongoose.Types.ObjectId(input.courseId),
-            topicQuestions: input.topicQuestions
+            topicQuestions: input.topicQuestions,
+            createdBy: new mongoose.Types.ObjectId(userId)
         })
 
         return JSON.parse(JSON.stringify(questionPaper))
@@ -30,7 +31,7 @@ export async function createQuestionPaper(input: GenerateQPInput) {
     }
 }
 
-export async function generateQuestionsByPaperId(questionPaperId: string) {
+export async function generateQuestionsByPaperId(questionPaperId: string, withAnswers: boolean) {
     try {
         // 1. Fetch question paper and populate course details
         const questionPaper = JSON.parse(JSON.stringify(await QuestionPaper.findById(questionPaperId)
@@ -125,3 +126,8 @@ export async function generateQuestionsByPaperId(questionPaperId: string) {
         throw new Error('Failed to generate questions');
     }
 } 
+
+export async function getQuestionPapers(userId: string) {
+    const questionPapers = await QuestionPaper.find({ createdBy: new mongoose.Types.ObjectId(userId) }).populate('course')
+    return JSON.parse(JSON.stringify(questionPapers))
+}

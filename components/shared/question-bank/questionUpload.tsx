@@ -10,9 +10,10 @@ import { createQuestion } from "@/services/question-bank/question.service"
 interface QuestionUploadProps {
     courseId: string;
     topic: string;
+    onUploadSuccess: () => void;
 }
 
-export function QuestionUpload({ courseId, topic }: QuestionUploadProps) {
+export function QuestionUpload({ courseId, topic, onUploadSuccess }: QuestionUploadProps) {
     const [open, setOpen] = useState(false)
     const [selectedFile, setSelectedFile] = useState<File | null>(null)
     const [loading, setLoading] = useState(false)
@@ -67,6 +68,7 @@ export function QuestionUpload({ courseId, topic }: QuestionUploadProps) {
                 `Successfully created ${data.successfullyCreated} out of ${data.totalParsed} questions`
             )
             setOpen(false)
+            onUploadSuccess()
             setSelectedFile(null)
             setProgress(0)
         } catch (error) {

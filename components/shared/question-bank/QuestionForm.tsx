@@ -13,6 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 interface QuestionFormProps {
     courseId: string;
     topic: string;
+    refreshTrigger: number;
 }
 
 interface CreateQuestionInput {
@@ -22,9 +23,10 @@ interface CreateQuestionInput {
     options: string[]
     correctAnswer: string
     clos?: number
+
 }
 
-export function QuestionForm({ courseId, topic }: QuestionFormProps) {
+export function QuestionForm({ courseId, topic, refreshTrigger }: QuestionFormProps) {
     const [question, setQuestion] = useState('')
     const [options, setOptions] = useState<string[]>(['', '', '', ''])
     const [correctAnswer, setCorrectAnswer] = useState<string>('')
@@ -109,6 +111,7 @@ export function QuestionForm({ courseId, topic }: QuestionFormProps) {
         }
     }
 
+
     const handleOptionChange = useCallback((index: number, content: string) => {
         setOptions(prev => {
             const newOptions = [...prev]
@@ -125,6 +128,10 @@ export function QuestionForm({ courseId, topic }: QuestionFormProps) {
     useEffect(() => {
         fetchQuestions()
     }, [courseId, topic])
+
+    useEffect(() => {
+        fetchQuestions()
+    }, [refreshTrigger])
 
     return (
         <main className="flex gap-2 w-full">
