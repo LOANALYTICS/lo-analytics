@@ -6,10 +6,11 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
 import { TopicData } from '@/types/question-bank'
-import { createQuestionPaper, generateQuestionsByPaperId } from "@/services/question-bank/generate-qp.service"
+import { createQuestionPaper, generateQuestionsByPaperId, getPaperDetails } from "@/services/question-bank/generate-qp.service"
 import { toast } from "sonner"
 import { useRouter } from 'next/navigation'
 import { getCurrentUser, UserJwtPayload } from '@/server/utils/helper'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 interface TopicRow {
     id: string;
@@ -28,6 +29,39 @@ export function GenerateQuestionTable({ topics, courseId }: GenerateQuestionTabl
     const [examName, setExamName] = useState<string>('')
     const [cloCount, setCloCount] = useState(3)
     const router = useRouter()
+    const [selectedYear, setSelectedYear] = useState<string>("");
+
+    const handleYearChange = async (value: string) => {
+        setSelectedYear(value);
+        
+        try {
+            const topicCounts = await getPaperDetails(courseId, value);
+            console.log(topicCounts, 'topicCounts')
+            // Reset table data with original values first
+            setTableData(prev => prev.map((row, index) => ({
+                id: `${index + 1}`,
+                topicName: row.topicName,
+                allowedQuestion: topics.find(t => t.name === row.topicName)?.allowedQuestion || 0,
+                clos: Object.fromEntries([...Array(cloCount)].map((_, i) => [`clo${i + 1}`, null])),
+                total: 0
+            })));
+
+            // Then update with remaining counts if they exist
+            setTableData(prev => prev.map(row => {
+                const topicCount = topicCounts.find(tc => tc.topic === row.topicName);
+                return {
+                    ...row,
+                    allowedQuestion: topicCount?.remainingAllowed ?? 
+                        topics.find(t => t.name === row.topicName)?.allowedQuestion ?? 0,
+                    clos: Object.fromEntries([...Array(cloCount)].map((_, i) => [`clo${i + 1}`, null])),
+                    total: 0
+                };
+            }));
+            
+        } catch (error) {
+            console.error(error);
+        }
+    };
     const [user, setUser] = useState<UserJwtPayload>({
         _id: "",
         email: "",
@@ -48,7 +82,7 @@ export function GenerateQuestionTable({ topics, courseId }: GenerateQuestionTabl
         }
         fetchUser()
     }, [])
-    const [tableData, setTableData] = useState<TopicRow[]>(() => 
+    const [tableData, setTableData] = useState<TopicRow[]>(() =>
         topics.map((topic, index) => ({
             id: `${index + 1}`,
             topicName: topic.name,
@@ -61,7 +95,7 @@ export function GenerateQuestionTable({ topics, courseId }: GenerateQuestionTabl
     const addNewClo = () => {
         const newCloKey = `clo${cloCount + 1}`
         setCloCount(prev => prev + 1)
-        
+
         setTableData(prev => prev.map(row => ({
             ...row,
             clos: {
@@ -74,7 +108,7 @@ export function GenerateQuestionTable({ topics, courseId }: GenerateQuestionTabl
 
     const updateCLO = (rowId: string, clo: string, value: string) => {
         const numValue = value === '' ? null : parseInt(value)
-        
+
         setTableData(prev => prev.map(row => {
             if (row.id === rowId) {
                 const newClos = {
@@ -83,7 +117,7 @@ export function GenerateQuestionTable({ topics, courseId }: GenerateQuestionTabl
                 }
                 // Explicitly type the reduce function to return number
                 const total: number = Object.values(newClos).reduce((sum: number, val) => sum + (val ?? 0), 0)
-                
+
                 return {
                     ...row,
                     clos: newClos,
@@ -99,6 +133,21 @@ export function GenerateQuestionTable({ topics, courseId }: GenerateQuestionTabl
             toast.error('Please enter an exam name')
             return
         }
+        if (!selectedYear.trim()) {
+            toast.error('Please select a year')
+            return
+        }
+
+        // Validate total questions per topic against allowed questions
+        const invalidTopics = tableData.filter(row => row.total > row.allowedQuestion);
+        if (invalidTopics.length > 0) {
+            toast.error(
+                `Cannot exceed allowed questions for topics: ${invalidTopics
+                    .map(topic => `${topic.topicName} (max: ${topic.allowedQuestion})`)
+                    .join(', ')}`
+            );
+            return;
+        }
 
         try {
             const result = await createQuestionPaper({
@@ -113,8 +162,8 @@ export function GenerateQuestionTable({ topics, courseId }: GenerateQuestionTabl
                     ),
                     total: row.total
                 }))
-            },user?._id)
-       
+            }, user?._id, selectedYear)
+
             router.push(`/dashboard/question-bank/qps`)
             toast.success('Question paper structure created successfully')
         } catch (error) {
@@ -126,16 +175,33 @@ export function GenerateQuestionTable({ topics, courseId }: GenerateQuestionTabl
     return (
         <div className="space-y-4">
             <div className="flex items-center justify-between mb-6">
-                <Input
-                    placeholder="Enter Exam Name"
-                    value={examName}
-                    onChange={(e) => setExamName(e.target.value)}
-                    className="max-w-md"
-                />
+                <div className="flex items-center gap-2">
+                    <Input
+                        placeholder="Enter Exam Name"
+                        value={examName}
+                        onChange={(e) => setExamName(e.target.value)}
+                        className="max-w-lg w-full min-w-md"
+                    />
+                    <Select
+                        onValueChange={handleYearChange}
+                        value={selectedYear}
+                    >
+                        <SelectTrigger>
+                            <SelectValue placeholder="Select Year" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value={"2020-2021"}>2020-2021</SelectItem>
+                            <SelectItem value={"2021-2022"}>2021-2022</SelectItem>
+                            <SelectItem value={"2022-2023"}>2022-2023</SelectItem>
+                            <SelectItem value={"2023-2024"}>2023-2024</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+
                 <Button onClick={handleGenerate}>
                     Generate
                 </Button>
-               
+
             </div>
 
             <div className="border rounded-lg">

@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import QuestionPaperDropdown from "./question-qp/QuestionPaperDropdown"
 import { getCurrentUser } from "@/server/utils/helper"
+import Link from "next/link"
 
 interface TopicManagerProps {
     courseId: string
@@ -246,6 +247,12 @@ export function TopicManager({ courseId }: TopicManagerProps) {
                 >
                     Generate Question paper
                 </Button>
+                <Link
+                    href={`/dashboard/question-bank/qps`}
+                    className='bg-primary text-white self-end px-4 py-2 rounded-md'
+                >
+                    Previous Question Papers
+                </Link>
             </section>
         </>
     )

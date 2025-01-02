@@ -13,6 +13,9 @@ export interface IQuestionPaper {
 }
 
 export const questionPaperSchema = new mongoose.Schema({
+    academicYear: {
+        type: String,
+    },
     examName: {
         type: String,
         required: true
