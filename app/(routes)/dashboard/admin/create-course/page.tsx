@@ -67,6 +67,8 @@ export default function CreateCoursePage() {
             if (response.status === 201) {
                 toast("Course template created successfully");
                 form.reset();
+                setSelectedCollege("");  // Reset selected college
+                setDepartments([]);     // Reset departments
                 router.refresh();
             }
         } catch (error: any) {

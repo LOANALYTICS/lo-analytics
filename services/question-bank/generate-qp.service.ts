@@ -2,7 +2,7 @@
 
 import mongoose from "mongoose"
 import Question from '@/server/models/question.model';
-import { QuestionBank, QuestionPaper } from "@/lib/models";
+import { Course, QuestionBank, QuestionPaper } from "@/lib/models";
 import courseTemplateModel from "@/server/models/courseTemplate.model";
 
 interface GenerateQPInput {
@@ -15,12 +15,35 @@ interface GenerateQPInput {
     }[]
 }
 
-export async function createQuestionPaper(input: GenerateQPInput) {
+interface TopicQuestionCount {
+    topic: string;
+    remainingAllowed: number;
+    originalAllowed: number;
+}
+
+interface TopicQuestion {
+    topic: string;
+    total: number;
+}
+
+interface QuestionBankTopic {
+    name: string;
+    allowedQuestion: number;
+}
+
+interface FilteredPapersResponse {
+    success: boolean;
+    data: any[];
+}
+
+export async function createQuestionPaper(input: GenerateQPInput,userId: string,academicYear: string) {
     try {
         const questionPaper = await QuestionPaper.create({
+            academicYear: academicYear,
             examName: input.examName,
             course: new mongoose.Types.ObjectId(input.courseId),
-            topicQuestions: input.topicQuestions
+            topicQuestions: input.topicQuestions,
+            createdBy: new mongoose.Types.ObjectId(userId)
         })
 
         return JSON.parse(JSON.stringify(questionPaper))
@@ -30,7 +53,7 @@ export async function createQuestionPaper(input: GenerateQPInput) {
     }
 }
 
-export async function generateQuestionsByPaperId(questionPaperId: string) {
+export async function generateQuestionsByPaperId(questionPaperId: string, withAnswers: boolean) {
     try {
         // 1. Fetch question paper and populate course details
         const questionPaper = JSON.parse(JSON.stringify(await QuestionPaper.findById(questionPaperId)
@@ -125,3 +148,103 @@ export async function generateQuestionsByPaperId(questionPaperId: string) {
         throw new Error('Failed to generate questions');
     }
 } 
+
+export async function getQuestionPapers(userId: string) {
+    const questionPapers = await QuestionPaper.find({ createdBy: new mongoose.Types.ObjectId(userId) }).populate('course')
+    return JSON.parse(JSON.stringify(questionPapers))
+}
+
+export async function getPaperDetails(courseId: string, academicYear: string): Promise<TopicQuestionCount[]> {
+    try {
+        // 1. Get all question papers for this course and academic year
+        const existingPapers = await QuestionPaper.find({
+            course: new mongoose.Types.ObjectId(courseId),
+            academicYear: academicYear
+        }).populate('course');
+
+        // If no previous papers exist, return original allowed questions
+        if (!existingPapers.length) {
+            const questionBank = await QuestionBank.findOne({
+                course: new mongoose.Types.ObjectId(courseId)
+            });
+
+            if (!questionBank) {
+                throw new Error('Question bank not found');
+            }
+
+            return questionBank.topics.map((topic: QuestionBankTopic) => ({
+                topic: topic.name,
+                remainingAllowed: topic.allowedQuestion,
+                originalAllowed: topic.allowedQuestion
+            }));
+        }
+
+        // Rest of the existing logic for when there are previous papers
+        const courseTemplate = await courseTemplateModel.findOne({
+            course_code: existingPapers[0]?.course?.course_code
+        });
+
+        const questionBank = await QuestionBank.findOne({
+            course: new mongoose.Types.ObjectId(courseTemplate?._id)
+        });
+
+        // 3. Calculate used questions per topic
+        const usedQuestions: Record<string, number> = {};
+        
+        existingPapers.forEach(paper => {
+            paper.topicQuestions.forEach((topicQ: TopicQuestion) => {
+                if (!usedQuestions[topicQ.topic]) {
+                    usedQuestions[topicQ.topic] = 0;
+                }
+                usedQuestions[topicQ.topic] += topicQ.total;
+            });
+        });
+
+        // 4. Calculate remaining allowed questions for each topic
+        const topicCounts: TopicQuestionCount[] = questionBank.topics.map((topic: QuestionBankTopic) => {
+            const used = usedQuestions[topic.name] || 0;
+            return {
+                topic: topic.name,
+                remainingAllowed: Math.max(0, topic.allowedQuestion - used),
+                originalAllowed: topic.allowedQuestion
+            };
+        });
+
+        return topicCounts;
+
+    } catch (error) {
+        console.error('Error getting paper details:', error);
+       return []
+    }
+}
+
+export async function getFilteredQuestionPapers(courseCode: string, academicYear: string): Promise<FilteredPapersResponse> {
+    try {
+        // Find the course directly by course code
+        const course = await Course.findOne({ course_code: courseCode });
+        if (!course) {
+            return {
+                success: false,
+                data: []
+            };
+        }
+
+        // Get question papers matching the criteria
+        const questionPapers = await QuestionPaper.find({
+            course: new mongoose.Types.ObjectId(course._id),
+            academicYear: academicYear
+        }).populate('course').lean();
+
+        return {
+            success: true,
+            data: JSON.parse(JSON.stringify(questionPapers))
+        };
+
+    } catch (error) {
+        console.error('Error fetching filtered papers:', error);
+        return {
+            success: false,
+            data: []
+        };
+    }
+}

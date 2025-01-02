@@ -1,11 +1,11 @@
 'use server'
 import { cookies } from 'next/headers';
 import { jwtDecode } from "jwt-decode";
-interface CustomJwtPayloadRole {
+export interface CustomJwtPayloadRole {
         role: string;
   }
 
-  interface UserJwtPayload {
+  export interface UserJwtPayload {
       _id: string;
       email: string;
       name: string;
