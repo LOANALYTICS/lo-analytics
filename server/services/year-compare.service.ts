@@ -532,6 +532,8 @@ export async function compareYears({
           border-collapse: collapse !important;
           table-layout: fixed !important;
           font-size: 7pt !important;
+          margin-top: 5px !important;
+          margin-bottom: 20px !important;
         }
         
         table:last-child {
@@ -572,8 +574,7 @@ export async function compareYears({
         /* Total rows */
         tr:last-child td,
         tr:nth-last-child(2) td {
-          // font-weight: bold !important;
-          background-color: #f8f9fa
+          background-color: #f8f9fa !important;
         }
 
         /* Add logo styles */
@@ -584,8 +585,39 @@ export async function compareYears({
           z-index: 9999;
         }
 
-        /* Ensure logo appears on every printed page */
         @media print {
+          body {
+            margin: 0;
+            padding: 0;
+          }
+          
+          .tables-container {
+            padding: 0;
+            margin: 0;
+          }
+          
+          div {
+            break-inside: avoid !important;
+            page-break-after: auto !important;
+            page-break-before: auto !important;
+          }
+          
+          .table-wrapper {
+            margin: 15px 0 !important;
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+            page-break-after: auto !important;
+            page-break-before: auto !important;
+          }
+
+          thead {
+            display: table-header-group !important;
+          }
+
+          tr {
+            page-break-inside: avoid !important;
+          }
+
           .logo-container {
             position: fixed;
             top: 10px;
@@ -593,8 +625,6 @@ export async function compareYears({
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
           }
-          
-          /* Existing print styles ... */
         }
       </style>
     `,
