@@ -24,7 +24,9 @@ export async function generatePDF(
       orientation: "portrait",
       unit: "mm",
       format: "a4",
-    });
+    }) as jsPDF & {
+      GState: new (options: { opacity: number }) => any;
+    };
 
     // Calculate dimensions
     const imgWidth = 190;
@@ -44,6 +46,25 @@ export async function generatePDF(
         imgWidth,
         imgHeight
       );
+
+      // Add logo to each page
+      pdf.saveGraphicsState();
+      pdf.setGState(new pdf.GState({ opacity: 0.5 }));
+
+      const logoImg = new Image();
+      logoImg.src = "/pdf_logo.png";
+
+      // Add logo to bottom right corner
+      pdf.addImage(
+        logoImg,
+        "PNG",
+        pdf.internal.pageSize.width - 25, // 25mm from right
+        pdf.internal.pageSize.height - 25, // 25mm from bottom
+        15, // width in mm
+        15 // height in mm
+      );
+
+      pdf.restoreGraphicsState();
 
       heightLeft -= pageHeight;
 
