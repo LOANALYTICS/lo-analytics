@@ -1,26 +1,29 @@
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 
-export async function generatePDF(htmlContent: string, filename: string = 'download.pdf'): Promise<void> {
+export async function generatePDF(
+  htmlContent: string,
+  filename: string = "download.pdf"
+): Promise<void> {
   try {
     // Create a temporary div to hold the HTML content
-    const element = document.createElement('div');
+    const element = document.createElement("div");
     element.innerHTML = htmlContent;
-    element.style.padding = '20px';
+    element.style.padding = "20px";
     document.body.appendChild(element);
 
     // Convert HTML to canvas
     const canvas = await html2canvas(element, {
       scale: 2,
       useCORS: true,
-      logging: false
+      logging: false,
     });
 
     // Create PDF
     const pdf = new jsPDF({
-      orientation: 'portrait',
-      unit: 'mm',
-      format: 'a4'
+      orientation: "portrait",
+      unit: "mm",
+      format: "a4",
     });
 
     // Calculate dimensions
@@ -34,16 +37,16 @@ export async function generatePDF(htmlContent: string, filename: string = 'downl
     let page = 1;
     while (heightLeft >= 0) {
       pdf.addImage(
-        canvas.toDataURL('image/jpeg', 0.98),
-        'JPEG',
+        canvas.toDataURL("image/jpeg", 0.98),
+        "JPEG",
         10,
         position,
         imgWidth,
         imgHeight
       );
-      
+
       heightLeft -= pageHeight;
-      
+
       if (heightLeft > 0) {
         pdf.addPage();
         position = 10 - (imgHeight - pageHeight * page);
@@ -57,7 +60,7 @@ export async function generatePDF(htmlContent: string, filename: string = 'downl
     // Clean up
     document.body.removeChild(element);
   } catch (error) {
-    console.error('Error generating PDF:', error);
+    console.error("Error generating PDF:", error);
     throw error;
   }
-} 
+}
