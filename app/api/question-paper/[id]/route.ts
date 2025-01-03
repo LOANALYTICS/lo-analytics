@@ -5,7 +5,7 @@ import { generateQuestionPaperHTML } from '@/templates/questionPaper';
 
 export async function GET(
     request: Request,
-    { params }: { params: { id: string } }
+    { params }: any
 ) {
     try {
         await connectToMongoDB();
@@ -29,9 +29,14 @@ export async function GET(
 
     } catch (error) {
         console.error('Question paper generation error:', error);
-        return NextResponse.json({
+        return new NextResponse(JSON.stringify({
             message: 'Error generating question paper',
             error: error instanceof Error ? error.message : 'Unknown error'
-        }, { status: 500 });
+        }), {
+            status: 500,
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
     }
 } 
