@@ -1,58 +1,62 @@
 export function generateHTML(data: any): string {
-  const { 
-    groupedItemAnalysisResults = [], 
-    KR_20 = 0, 
-    segregatedGradedStudents = [], 
-    course = {}, 
-    collegeInfo = {} 
+  const {
+    groupedItemAnalysisResults = [],
+    KR_20 = 0,
+    segregatedGradedStudents = [],
+    course = {},
+    collegeInfo = {},
   } = data || {};
 
   // Interpret KR-20 Reliability score
   const getKR20Message = (kr20: number): string => {
-    if (kr20 >= 0.90) return "Excellent reliability; at the level of the best standardized tests.";
-    if (kr20 >= 0.85) return "Exam seems to be <u>Very Good</u> and reliable.";
-    if (kr20 >= 0.80) return "Exam seems to be Good and reliable.";
-    if (kr20 >= 0.71) return "Value lies between the <u>marginally acceptable ranges</u>. Items could be improved.";
-    if (kr20 >= 0.61) return "Somewhat low. Supplement with other measures for grading.";
-    if (kr20 >= 0.51) return "Revision needed. Supplement with more tests.";
-    return "Questionable reliability. Revision is needed.";
+    if (kr20 >= 0.9)
+      return "• Excellent reliability; at the level of the best standardized tests.";
+    if (kr20 >= 0.85)
+      return "• Exam seems to be <u>Very Good</u> and reliable.";
+    if (kr20 >= 0.8) return "• Exam seems to be Good and reliable.";
+    if (kr20 >= 0.71)
+      return "• Value lies between the <u>marginally acceptable ranges</u>. Items could be improved.";
+    if (kr20 >= 0.61)
+      return "• Somewhat low. Supplement with other measures for grading.";
+    if (kr20 >= 0.51) return "• Revision needed. Supplement with more tests.";
+    return "• Questionable reliability. Revision is needed.";
   };
 
   const getCommentByClassification = (classification: string): string => {
-    if (classification === 'Reliability') return getKR20Message(KR_20);
-    
+    if (classification === "Reliability") return getKR20Message(KR_20);
+
     switch (classification) {
-      case 'Poor (Bad) Questions':
-        return 'All the questions should be rejected.';
-      case 'Very Difficult Questions':
-        return 'Keys of these items are needed to be checked.';
-      case 'Difficult Questions':
-        return 'Items should be rejected.';
-      case 'Good Questions':
-        return 'Key of this item is also needed to be checked.';
-      case 'Easy Questions':
-        return 'Items could be stored in question bank for further use.';
-      case 'Very Easy Questions':
-        return 'Item should be revised before re-use.';
-    
+      case "Poor (Bad) Questions":
+        return "• All the questions should be rejected.";
+      case "Very Difficult Questions":
+        return "• Keys of these items are needed to be checked.";
+      case "Difficult Questions":
+        return "• Items should be rejected.";
+      case "Good Questions":
+        return "• Key of this item is also needed to be checked.";
+      case "Easy Questions":
+        return "• Items could be stored in question bank for further use.";
+      case "Very Easy Questions":
+        return "• Item should be revised before re-use.";
+
       default:
-        return '';
+        return "";
     }
   };
-  
+
   // Add this helper function before the return statement
   const formatQuestions = (questions: any[]): string => {
-    const questionNumbers = questions.map(q => {
+    const questionNumbers = questions.map((q) => {
       // Remove 'Q' prefix and return just the number
-      const questionNum = q?.question || '';
-      return questionNum.replace(/^Q/i, '');
+      const questionNum = q?.question || "";
+      return questionNum.replace(/^Q/i, "");
     });
-    
+
     const chunks: string[] = [];
     for (let i = 0; i < questionNumbers.length; i += 20) {
       chunks.push(questionNumbers.slice(i, i + 20).join(", "));
     }
-    
+
     return chunks.join("<br>");
   };
 
@@ -213,7 +217,11 @@ export function generateHTML(data: any): string {
     <!-- Header with Logo and College Information -->
     <div class="header-container">
       <div class="header">
-        ${collegeInfo.logo ? `<img src="${collegeInfo.logo}" alt="College Logo" class="college-logo"/>` : ''}
+        ${
+          collegeInfo.logo
+            ? `<img src="${collegeInfo.logo}" alt="College Logo" class="college-logo"/>`
+            : ""
+        }
        
       </div>
       <hr style="margin-bottom: 40px;"/>
@@ -228,22 +236,34 @@ export function generateHTML(data: any): string {
     <div class="info-box  rounded-md overflow-hidden  border-collapse border border-black">
       <div class="course-grid">
         <div class="grid-item">
-          <p><span style="font-weight: bold;">Course Name:</span> ${course?.course_name || ''}</p>
+          <p><span style="font-weight: bold;">Course Name:</span> ${
+            course?.course_name || ""
+          }</p>
         </div>
         <div class="grid-item">
-          <p><span style="font-weight: bold;">Course Code:</span> ${course?.course_code || ''}</p>
+          <p><span style="font-weight: bold;">Course Code:</span> ${
+            course?.course_code || ""
+          }</p>
         </div>
         <div class="grid-item">
-          <p><span style="font-weight: bold;">Credit Hour:</span> ${course?.credit_hours || ''}</p>
+          <p><span style="font-weight: bold;">Credit Hour:</span> ${
+            course?.credit_hours || ""
+          }</p>
         </div>
         <div class="grid-item">
-          <p><span style="font-weight: bold;">Level:</span> ${course?.level || ''}</p>
+          <p><span style="font-weight: bold;">Level:</span> ${
+            course?.level || ""
+          }</p>
         </div>
         <div class="grid-item">
-          <p><span style="font-weight: bold;">Semister:</span> ${course?.semister === 1 ? 'First Semester' : 'Second Semester'}</p>
+          <p><span style="font-weight: bold;">Semister:</span> ${
+            course?.semister === 1 ? "First Semester" : "Second Semester"
+          }</p>
         </div>
         <div class="grid-item">
-          <p><span style="font-weight: bold;">Course Coordinator:</span> ${course?.coordinator || ''}</p>
+          <p><span style="font-weight: bold;">Course Coordinator:</span> ${
+            course?.coordinator || ""
+          }</p>
         </div>
       </div>
     </div>
@@ -257,23 +277,44 @@ export function generateHTML(data: any): string {
         <th><p style="text-align: center; margin-bottom: 10px;">%</p></th>
         <th><p style="text-align: center; margin-bottom: 10px;">Comments/Recommendations</p></th>
       </tr>
-      ${(groupedItemAnalysisResults || [])?.map((item: any, index: number) => `
+      ${(groupedItemAnalysisResults || [])
+        ?.map(
+          (item: any, index: number) => `
         <tr>
-          <td><p style="text-align: center; margin-bottom: 10px;${item?.classification === 'Reliability' ? ' font-weight: bold;' : ''}">${index + 1}</p></td>
-          <td><p style="text-align: center; margin-bottom: 10px;${item?.classification === 'Reliability' ? ' font-weight: bold;' : ''}">${item?.classification || ''}</p></td>
-          ${item?.classification === 'Reliability' 
-            ? `<td colspan="3" style="vertical-align: middle; text-align: center; padding: 16px;"><p style="text-align: center; margin-bottom: 10px; font-weight: bold;">KR20 = ${(KR_20 || 0).toFixed(2)}</p></td>`
-            : `
-              <td class="question-no-cell"><p style="text-align: center; margin-bottom: 10px;">${formatQuestions(item?.questions || [])}</p></td>
-              <td style="vertical-align: middle; text-align: center;"><p style="text-align: center; margin-bottom: 10px;">${(item?.questions || []).length}</p></td>
-              <td style="vertical-align: middle; text-align: center;"><p style="text-align: center; margin-bottom: 10px;">${Number((Math.round(item?.perc || 0)).toFixed(1))}%</p></td>
+          <td><p style="text-align: center; margin-bottom: 10px;${
+            item?.classification === "Reliability" ? " font-weight: bold;" : ""
+          }">${index + 1}</p></td>
+          <td><p style="text-align: center; margin-bottom: 10px;${
+            item?.classification === "Reliability" ? " font-weight: bold;" : ""
+          }">${item?.classification || ""}</p></td>
+          ${
+            item?.classification === "Reliability"
+              ? `<td colspan="3" style="vertical-align: middle; text-align: center; padding: 16px;"><p style="text-align: center; margin-bottom: 10px; font-weight: bold;">KR20 = ${(
+                  KR_20 || 0
+                ).toFixed(2)}</p></td>`
+              : `
+              <td class="question-no-cell"><p style="text-align: center; margin-bottom: 10px;">${formatQuestions(
+                item?.questions || []
+              )}</p></td>
+              <td style="vertical-align: middle; text-align: center;"><p style="text-align: center; margin-bottom: 10px;">${
+                (item?.questions || []).length
+              }</p></td>
+              <td style="vertical-align: middle; text-align: center;"><p style="text-align: center; margin-bottom: 10px;">${Number(
+                Math.round(item?.perc || 0).toFixed(1)
+              )}%</p></td>
             `
           }
           <td class="comments-cell">
-            <p style="text-align: center; margin-bottom: 10px;${item?.classification === 'Reliability' ? ' font-weight: bold;' : ''}">${getCommentByClassification(item?.classification || '')}</p>
+            <p style="text-align: center; margin-bottom: 10px;${
+              item?.classification === "Reliability"
+                ? " font-weight: bold;"
+                : ""
+            }">${getCommentByClassification(item?.classification || "")}</p>
           </td>
         </tr>
-      `).join("")}
+      `
+        )
+        .join("")}
     </table>
 
     <!-- Segregated Graded Students Table -->
@@ -302,14 +343,27 @@ export function generateHTML(data: any): string {
         <th><p style="text-align: center; margin-bottom: 10px;">F</p></th>
       </tr>
       <tr>
-        <td><p style="text-align: center; margin-bottom: 10px;">${course?.studentsNumber || ''}</p></td>
+        <td><p style="text-align: center; margin-bottom: 10px;">${
+          course?.studentsNumber || ""
+        }</p></td>
        
-        ${(segregatedGradedStudents || []).map((grade: any) => `
+        ${(segregatedGradedStudents || [])
+          .map(
+            (grade: any) => `
           <td class="split-cell">
-            <div class="cell-row"><p style="text-align: center; margin-bottom: 10px;">${grade?.count === 0 ? '' : grade?.count}</p></div>
-            <div class="cell-row"><p style="text-align: center; margin-bottom: 10px;">${ Number((Math.round(grade?.studentPercentage || 0)).toFixed(1)) === 0 ? "" : Number((Math.round(grade?.studentPercentage || 0)).toFixed(1)) + "%" }</p></div>
+            <div class="cell-row"><p style="text-align: center; margin-bottom: 10px;">${
+              grade?.count === 0 ? "" : grade?.count
+            }</p></div>
+            <div class="cell-row"><p style="text-align: center; margin-bottom: 10px;">${
+              Number(Math.round(grade?.studentPercentage || 0).toFixed(1)) === 0
+                ? ""
+                : Number(Math.round(grade?.studentPercentage || 0).toFixed(1)) +
+                  "%"
+            }</p></div>
           </td>
-        `).join("")}
+        `
+          )
+          .join("")}
       </tr>
     </table>
   </body>
