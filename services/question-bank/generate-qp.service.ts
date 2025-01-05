@@ -113,7 +113,8 @@ export async function createQuestionPaper(input: GenerateQPInput,userId: string,
             topicQuestions: input.topicQuestions,
             QuestionsOrder: finalQuestions.map((question, index) => ({
                 questionId: question._id,
-                orderNumber: index + 1
+                orderNumber: index + 1,
+                clo: question.clos
             })),
             createdBy: new mongoose.Types.ObjectId(userId)
         })

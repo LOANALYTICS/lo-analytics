@@ -49,6 +49,10 @@ export const questionPaperSchema = new mongoose.Schema({
         orderNumber: {
             type: Number,
             required: true
+        },
+        clo: {
+            type: Number,
+            required: true
         }
     }],
     createdBy: {
