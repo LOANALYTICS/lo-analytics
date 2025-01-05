@@ -40,6 +40,17 @@ export const questionPaperSchema = new mongoose.Schema({
             required: true
         }
     }],
+    QuestionsOrder: [{
+        questionId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Question',
+            required: true
+        },
+        orderNumber: {
+            type: Number,
+            required: true
+        }
+    }],
     createdBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',

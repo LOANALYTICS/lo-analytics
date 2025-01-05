@@ -15,6 +15,11 @@ interface GenerateQPInput {
     }[]
 }
 
+interface QuestionOrder {
+    questionId: mongoose.Types.ObjectId;
+    orderNumber: number;
+}
+
 interface TopicQuestionCount {
     topic: string;
     remainingAllowed: number;
@@ -38,35 +43,11 @@ interface FilteredPapersResponse {
 
 export async function createQuestionPaper(input: GenerateQPInput,userId: string,academicYear: string) {
     try {
-        const questionPaper = await QuestionPaper.create({
-            academicYear: academicYear,
-            examName: input.examName,
-            course: new mongoose.Types.ObjectId(input.courseId),
-            topicQuestions: input.topicQuestions,
-            createdBy: new mongoose.Types.ObjectId(userId)
-        })
-
-        return JSON.parse(JSON.stringify(questionPaper))
-    } catch (error) {
-        console.error('Error creating question paper:', error)
-        throw new Error('Failed to create question paper')
-    }
-}
-
-export async function generateQuestionsByPaperId(questionPaperId: string, withAnswers: boolean) {
-    try {
-        // 1. Fetch question paper and populate course details
-        const questionPaper = JSON.parse(JSON.stringify(await QuestionPaper.findById(questionPaperId)
-            .populate('course')
-            .lean()));
-
-        if (!questionPaper) {
-            throw new Error('Question paper not found');
+        const course = await Course.findOne({ _id: input.courseId })
+        if(!course) {
+            throw new Error('Course not found');
         }
-
-        // 2. Get course code and fetch course template
-        const courseCode = questionPaper?.course?.course_code;
-        const courseTemplate = await courseTemplateModel.findOne({ course_code: courseCode });
+        const courseTemplate = await courseTemplateModel.findOne({ course_code: course.course_code });
 
         if (!courseTemplate) {
             throw new Error('Course template not found');
@@ -80,11 +61,9 @@ export async function generateQuestionsByPaperId(questionPaperId: string, withAn
         if (!questionBank) {
             throw new Error('Question bank not found');
         }
-
-        // 4. Generate questions based on requirements
         const selectedQuestions = [];
 
-        for (const topicQuestion of questionPaper.topicQuestions) {
+        for (const topicQuestion of input.topicQuestions) {
             const topicInBank = questionBank.topics.find((t: any) => t.name === topicQuestion.topic);
             
             if (!topicInBank) {
@@ -127,20 +106,58 @@ export async function generateQuestionsByPaperId(questionPaperId: string, withAn
         // Randomize final question order
         const finalQuestions = selectedQuestions.sort(() => 0.5 - Math.random());
 
-        // Format questions for PDF
-        const formattedQuestions = finalQuestions.map((q, index) => ({
-            questionNumber: index + 1,
-            question: q.question,
-            options: q.options,
-            correctAnswer: q.correctAnswer,
-            topic: q.topic,
-            clo: q.clos
-        }));
+        const questionPaperSaved = await QuestionPaper.create({
+            academicYear: academicYear,
+            examName: input.examName,
+            course: new mongoose.Types.ObjectId(input.courseId),
+            topicQuestions: input.topicQuestions,
+            QuestionsOrder: finalQuestions.map((question, index) => ({
+                questionId: question._id,
+                orderNumber: index + 1
+            })),
+            createdBy: new mongoose.Types.ObjectId(userId)
+        })
+
+        return JSON.parse(JSON.stringify(questionPaperSaved))
+    } catch (error) {
+        console.error('Error creating question paper:', error)
+        throw new Error('Failed to create question paper')
+    }
+}
+
+export async function generateQuestionsByPaperId(questionPaperId: string, withAnswers: boolean) {
+    try {
+        // 1. Fetch question paper and populate course details
+        const questionPaper = JSON.parse(JSON.stringify(await QuestionPaper.findById(questionPaperId)
+            .populate('course')
+            .lean()));
+
+        if (!questionPaper) {
+            throw new Error('Question paper not found');
+        }
+
+        // 2. Get all questions from QuestionsOrder
+        const questionIds = questionPaper.QuestionsOrder.map((q: QuestionOrder) => q.questionId);
+        const questions = await Question.find({ _id: { $in: questionIds } });
+
+        // 3. Map questions in order (they're already in 1,2,3,4... sequence)
+        const orderedQuestions = questionPaper.QuestionsOrder
+            .map((order: QuestionOrder) => {
+                const question = questions.find(q => q._id.toString() === order.questionId.toString());
+                return {
+                    questionNumber: order.orderNumber,
+                    question: question.question,
+                    options: question.options,
+                    correctAnswer: withAnswers ? question.correctAnswer : undefined,
+                    topic: question.topic,
+                    clo: question.clos
+                };
+            });
 
         return {
             examName: questionPaper.examName,
-            courseCode,
-            questions: formattedQuestions
+            courseCode: questionPaper.course.course_code,
+            questions: orderedQuestions
         };
 
     } catch (error) {
