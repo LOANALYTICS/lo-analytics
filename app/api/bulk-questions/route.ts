@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createQuestion } from '@/services/question-bank/question.service';
 import mammoth from 'mammoth';
+import mongoose from 'mongoose';
 
 interface ParsedQuestion {
     question: string;
@@ -139,16 +140,27 @@ export async function POST(request: NextRequest) {
             }, { status: 400 });
         }
 
+        // Get the last index before bulk upload
+        const Question = mongoose.model('Question');
+        const lastQuestion = await Question.findOne({
+            courseId,
+            topic
+        }).sort({ index: -1 });
+
+        let currentIndex = lastQuestion ? lastQuestion.index : 0;
+
         const successfulQuestions = [];
         for (const q of parsedQuestions) {
             try {
+                currentIndex++; // Increment for each new question
                 const created = await createQuestion({
                     courseId,
                     topic,
                     question: q.question,
                     options: q.options,
                     correctAnswer: q.correctAnswer,
-                    clos: q.clos
+                    clos: q.clos,
+                    index: currentIndex // Add the index to the creation
                 });
                 
                 if (created) {

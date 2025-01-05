@@ -10,6 +10,7 @@ interface CreateQuestionInput {
     options: string[]
     correctAnswer: string
     clos?: number
+    index?: number
 }
 
 export async function createQuestion(input: CreateQuestionInput) {
@@ -48,9 +49,18 @@ export async function createQuestion(input: CreateQuestionInput) {
             }
         }
 
-        // Create question
+        // Before creating the question, get the last index
+        const lastQuestion = await Question.findOne({
+            questionBank: questionBank._id,
+            topic: input.topic
+        }).sort({ index: -1 });
+
+        const nextIndex = lastQuestion ? lastQuestion.index + 1 : 1;
+
+        // Create question with the calculated index
         const question = await Question.create([{
             questionBank: questionBank._id,
+            index: nextIndex,
             ...input
         }], { session })
 
@@ -130,7 +140,7 @@ export async function getQuestions(courseId: string, topic: string) {
         const questions = await Question.find({
             questionBank: questionBank._id,
             topic: topic
-        }).lean()
+        }).sort({ index: 1 }).lean()
         
         return JSON.parse(JSON.stringify(questions))
     } catch (error) {
