@@ -43,7 +43,10 @@ export default function DropdownBtn({ questionPaperId }: DropdownBtnProps) {
                     allowTaint: true,
                     imageTimeout: 0,
                     logging: true,
-                    windowHeight: window.document.documentElement.offsetHeight
+                    windowHeight: window.document.documentElement.offsetHeight,
+
+                    
+                    letterRendering: true,    
                 },
                 jsPDF: { 
                     unit: 'in',
@@ -55,7 +58,7 @@ export default function DropdownBtn({ questionPaperId }: DropdownBtnProps) {
                 },
                 pagebreak: { 
                     mode: ['css', 'legacy'],
-                    avoid: '.question-container'
+                    avoid: '.question, .answer, .no-break-class'
                 }
             };
 

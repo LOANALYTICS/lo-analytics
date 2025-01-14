@@ -5,28 +5,28 @@ export function generateQuestionPaperHTML(data: {
     withAnswers?: boolean;
 }) {
     const questionsHTML = data.questions.map((q, index) => `
-        <div class="question-container">
-            <div class="question">
-                <span style="margin-right: 8px;">Q${index + 1}.</span>
-                <div>
-                    ${q.question}
-                    <span class="marks">[CLO${q.clo}]</span>
-                </div>
-            </div>
-            <div class="options">
-                ${q.options.map((opt: string, idx: number) => `
-                    <div class="option" data-letter="${String.fromCharCode(65 + idx)})">
-                        ${opt}
-                    </div>
-                `).join('')}
-            </div>
-            ${data.withAnswers ? `
-                <div class="answer">
-                    Answer: ${q.correctAnswer}
-                </div>
-            ` : ''}
+    <div class="question-container">
+        <div class="question">
+            <span style="margin-right: 8px;">Q${index + 1}.</span>
+         <div>
+    ${q.question}
+    <span class="marks" style="font-size: 0;">.</span>
+</div>
         </div>
-    `).join('');
+        <div class="options">
+            ${q.options.map((opt: string, idx: number) => `
+                <div class="option" data-letter="${String.fromCharCode(65 + idx)})">
+                    ${opt}
+                </div>
+            `).join('')}
+        </div>
+        ${data.withAnswers ? `
+            <div class="answer">
+                Answer: ${q.correctAnswer}
+            </div>
+        ` : ''}
+    </div>
+`).join('');
 
     return `
         <!DOCTYPE html>
@@ -47,7 +47,7 @@ export function generateQuestionPaperHTML(data: {
                 }
                 .header {
                     text-align: center;
-                    margin-bottom: 30px;
+                    margin-bottom: 20px;
                     border-bottom: 2px solid #000;
                     padding-bottom: 20px;
                 }
@@ -62,17 +62,19 @@ export function generateQuestionPaperHTML(data: {
                 }
                 .question-container {
                     margin-bottom: 25px;
-                    page-break-inside: avoid !important;
-                    break-inside: avoid !important;
+                    // page-break-inside: avoid !important;
+                    // break-inside: avoid !important;
                 }
                 .question-container:first-of-type {
-                    margin-top: 0;
-                }
+                margin-top: 0;
+                padding-top: 0;
+            }
                 .question-container + .question-container {
                     margin-top: 0;
+                    padding-top: 0;
                 }
                 .question {
-                    margin-bottom: 10px;
+                    margin-bottom: 5px;
                     font-weight: bold;
                     display: flex;
                     align-items: flex-start;
@@ -80,12 +82,7 @@ export function generateQuestionPaperHTML(data: {
                 .question-number {
                     margin-right: 8px;
                 }
-                .marks {
-                    font-weight: normal;
-                    font-style: italic;
-                    font-size: 0.9em;
-                    color: #666;
-                }
+          
                 .options {
                     padding-left: 25px;
                     page-break-inside: avoid !important;
@@ -166,7 +163,7 @@ export function generateQuestionPaperHTML(data: {
                 <div class="course-code">Course Code: ${data.courseCode}</div>
                 ${data.withAnswers ? '<div class="answer-key">(Answer Key)</div>' : ''}
             </div>
-            <div class="questions">
+            <div class="questions no-break-class">
                 ${questionsHTML}
             </div>
         </body>
