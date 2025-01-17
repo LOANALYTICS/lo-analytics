@@ -1,10 +1,12 @@
 export function generateQuestionPaperHTML(data: {
-    examName: string;
-    courseCode: string;
-    questions: any[];
-    withAnswers?: boolean;
+  examName: string;
+  courseCode: string;
+  questions: any[];
+  withAnswers?: boolean;
 }) {
-    const questionsHTML = data.questions.map((q, index) => `
+  const questionsHTML = data.questions
+    .map(
+      (q, index) => `
     <div class="question-container">
         <div class="question">
             <span style="margin-right: 8px;">Q${index + 1}.</span>
@@ -14,21 +16,33 @@ export function generateQuestionPaperHTML(data: {
 </div>
         </div>
         <div class="options">
-            ${q.options.map((opt: string, idx: number) => `
-                <div class="option" data-letter="${String.fromCharCode(65 + idx)})">
+            ${q.options
+              .map(
+                (opt: string, idx: number) => `
+                <div class="option" data-letter="${String.fromCharCode(
+                  65 + idx
+                )})">
                     ${opt}
                 </div>
-            `).join('')}
+            `
+              )
+              .join("")}
         </div>
-        ${data.withAnswers ? `
+        ${
+          data.withAnswers
+            ? `
             <div class="answer">
                 Answer: ${q.correctAnswer}
             </div>
-        ` : ''}
+        `
+            : ""
+        }
     </div>
-`).join('');
+`
+    )
+    .join("");
 
-    return `
+  return `
         <!DOCTYPE html>
         <html>
         <head>
@@ -161,7 +175,11 @@ export function generateQuestionPaperHTML(data: {
             <div class="header">
                 <div class="title">${data.examName}</div>
                 <div class="course-code">Course Code: ${data.courseCode}</div>
-                ${data.withAnswers ? '<div class="answer-key">(Answer Key)</div>' : ''}
+                ${
+                  data.withAnswers
+                    ? '<div class="answer-key">(Answer Key)</div>'
+                    : ""
+                }
             </div>
             <div class="questions no-break-class">
                 ${questionsHTML}
@@ -169,4 +187,4 @@ export function generateQuestionPaperHTML(data: {
         </body>
         </html>
     `;
-} 
+}
