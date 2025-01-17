@@ -34,7 +34,7 @@ interface SidebarItem {
 }
 
 
-const Sidebar = ({ userRole, userPermissions }: { userRole: string, userPermissions: string[] }) => {
+const Sidebar = ({ userRole, userPermissions,user }: { userRole: string, userPermissions: string[],user:any }) => {
   const [expandedItems, setExpandedItems] = useState<{ [key: string]: boolean }>({});
   const toggleExpand = (name: any) => {
     setExpandedItems((prev) => ({
@@ -72,8 +72,8 @@ const Sidebar = ({ userRole, userPermissions }: { userRole: string, userPermissi
             <Image
               width={36}
               height={36}
-              className="rounded-lg aspect-square border "
-              src="/logo.jpg"
+              className="rounded-lg aspect-square border p-1"
+              src="/assets/logo.svg"
               alt="logo"
             />
             <p className=

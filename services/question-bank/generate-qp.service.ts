@@ -4,6 +4,8 @@ import mongoose from "mongoose"
 import Question from '@/server/models/question.model';
 import { Course, QuestionBank, QuestionPaper } from "@/lib/models";
 import courseTemplateModel from "@/server/models/courseTemplate.model";
+import { getTopics } from "./question-bank.service";
+import { generateDistributionReportHTML } from "@/templates/distributionReport";
 
 interface GenerateQPInput {
     examName: string
@@ -251,7 +253,9 @@ export async function getFilteredQuestionPapers(courseCode: string, academicYear
         const questionPapers = await QuestionPaper.find({
             course: new mongoose.Types.ObjectId(course._id),
             academicYear: academicYear
-        }).populate('course').lean();
+        }).populate('course')
+        .populate('QuestionsOrder.questionId') 
+        .lean();
 
         return {
             success: true,
@@ -266,3 +270,25 @@ export async function getFilteredQuestionPapers(courseCode: string, academicYear
         };
     }
 }
+
+export const generateDistributionReport = async (courseId: string, courseCode: string, year: string) => {
+    try {
+        const response = await getFilteredQuestionPapers(courseCode, year);
+        const topicsResponse = await getTopics(courseId);
+        
+        if (!response.data || !topicsResponse) {
+            throw new Error('Failed to fetch data');
+        }
+
+        const html = generateDistributionReportHTML({
+            courseName: courseCode,
+            topics: topicsResponse,
+            papers: response.data
+        });
+
+        return html;
+    } catch (error) {
+        console.error('Error generating distribution report:', error);
+        throw error;
+    }
+};

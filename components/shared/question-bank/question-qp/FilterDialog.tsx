@@ -16,10 +16,11 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 import { Filter } from "lucide-react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { toast } from "sonner"
-import { getFilteredQuestionPapers } from "@/services/question-bank/generate-qp.service"
+import { generateDistributionReport, getFilteredQuestionPapers } from "@/services/question-bank/generate-qp.service"
 import { getTopics } from "@/services/question-bank/question-bank.service"
+import { useEditor } from "@tiptap/react"
 
 interface CourseTemplate {
     _id: string;
@@ -57,18 +58,64 @@ export function FilterDialog({ courseTemplates }: FilterDialogProps) {
         }
 
         try {
+            toast.loading("Generating Report...")
             const topicsData = await getTopics(selectedCourse._id);
             const result = await getFilteredQuestionPapers(selectedCourse.course_code, selectedYear);
             
+                const html = await generateDistributionReport(selectedCourse._id, selectedCourse.course_code, selectedYear);
+                
+                const container = document.createElement('div');
+                container.innerHTML = html;
+                document.body.appendChild(container);
+        
+                const opt = {
+                    margin: [0.5, 0.5, 0.5, 0.5],
+                    filename: 'distribution_report.pdf',
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { 
+                        scale: 2,
+                        useCORS: true,
+                        scrollY: 0,
+                        removeContainer: true,
+                        allowTaint: true,
+                    },
+                    jsPDF: { 
+                        unit: 'in',
+                        format: 'a4', 
+                        orientation: 'landscape',
+                    }
+                };
+        
+                const html2pdf = (await import('html2pdf.js')).default;
+                await html2pdf().set(opt).from(container).save();
+                document.body.removeChild(container);
+                
+                setOpen(false);
+            
+            console.log(result.data)
             setTopics(topicsData);
             setPapers(result.data);
             setOpen(false);
             setShowDistribution(true);
+            toast.dismiss()
+            toast.success("Report Generated Successfully")
         } catch (error) {
             toast.error("Failed to fetch data");
             console.error(error);
         }
     }
+
+    
+    useEffect(() => {
+        console.log("Component mounted");
+        console.log("Topics:", topics);
+        console.log("Raw topics object:", JSON.stringify(topics, null, 2));
+        
+        // Add this to check if useEffect is running at all
+        return () => {
+            console.log("Component unmounting");
+        }
+    }, [])
 
     return (
         <>
@@ -78,7 +125,7 @@ export function FilterDialog({ courseTemplates }: FilterDialogProps) {
                         <Filter className="h-4 w-4" />
                     </Button>
                 </DialogTrigger>
-                <DialogContent>
+                <DialogContent >
                     <DialogHeader>
                         <DialogTitle>Filter Question Papers</DialogTitle>
                     </DialogHeader>
@@ -173,21 +220,31 @@ export function FilterDialog({ courseTemplates }: FilterDialogProps) {
                                             <td key={clo} className="border p-2">
                                                 <table className="w-full">
                                                     <tbody>
-                                                        {papers
-                                                            .filter(paper => paper.topicQuestions
-                                                                .some((tq: TopicQuestion) => tq.topic === topic.name))
-                                                            .map(paper => {
-                                                                const topicQ = paper.topicQuestions
-                                                                    .find((tq: TopicQuestion) => tq.topic === topic.name);
-                                                                return (
-                                                                    <tr key={paper.examName}>
-                                                                        <td className="border-b p-1">
-                                                                            {topicQ?.clos[clo] || '-'}
-                                                                        </td>
-                                                                    </tr>
-                                                                );
-                                                            })
-                                                        }
+                                                    {papers
+                    .filter(paper => paper.topicQuestions
+                        .some((tq: TopicQuestion) => tq.topic === topic.name))
+                    .map(paper => {
+                        const topicQ = paper.topicQuestions
+                            .find((tq: TopicQuestion) => tq.topic === topic.name);
+                        const cloCount = topicQ?.clos[clo] || 0;
+                        const orderNumbers = paper.QuestionsOrder
+                            .filter((q: any) => 
+                                q.questionId.topic === topic.name && 
+                                q.clo.toString() === clo.replace('clo', '')
+                            )
+                            .slice(0, cloCount)
+                            .map((q: any) => q.orderNumber)
+                            .join(', ');
+                        return (
+                            <tr key={paper.examName}>
+                                <td className="border-b p-1">
+                                    {topicQ?.clos[clo] || '-'}
+                                    {topicQ?.clos[clo] ? ` (${orderNumbers})` : ''}
+                                </td>
+                            </tr>
+                        );
+                    })
+                }
                                                     </tbody>
                                                 </table>
                                             </td>

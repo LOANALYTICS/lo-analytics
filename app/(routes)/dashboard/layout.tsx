@@ -18,10 +18,14 @@ const BaseLayout = async ({ children }: { children: React.ReactNode }) => {
 
   return (
     <div className="flex p-2 h-screen gap-2">
-      <Sidebar userRole={role} userPermissions={user?.permissions ?? []} />
+      <Sidebar userRole={role} user={user} userPermissions={user?.permissions ?? []} />
       <div className="flex-1 flex flex-col gap-2">
-        <section className="h-16 min-h-16 w-full border flex justify-end px-4 rounded-xl">
+        <section className="h-16 min-h-16 w-full border flex justify-between pl-16 pr-4 rounded-xl">
           <div className="flex gap-3 items-center">
+            
+           <p className=''><span className='font-semibold'>You: </span>{user?.name}</p>
+          </div>
+          <div className='flex gap-3 items-center'>
             {
               topbarLinks.map((link) => (
                 <Link
@@ -36,7 +40,7 @@ const BaseLayout = async ({ children }: { children: React.ReactNode }) => {
             }
 
             <LogoutButton />
-          </div>
+            </div>
         </section>
         <section className="  flex-1 overflow-y-auto bg-white border rounded-xl p-2 ">
           {children}
