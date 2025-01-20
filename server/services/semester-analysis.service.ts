@@ -1,5 +1,6 @@
 import { Types } from "mongoose";
 import { Course } from "@/lib/models";
+import { formatPercentage } from "../utils/format.utils";
 
 interface SemesterAnalysisParams {
   collegeId: string;
@@ -41,12 +42,12 @@ function calculateQuestionStats(course: any) {
     }
   });
 
-  const totalAccepted =
-    stats.goodQuestions + stats.easyQuestions + stats.difficultQuestions;
-  const totalRejected =
-    stats.veryDifficultQuestions +
-    stats.poorQuestions +
-    stats.veryEasyQuestions;
+  const totalAccepted = Math.round(
+    stats.goodQuestions + stats.easyQuestions + stats.difficultQuestions
+  );
+  const totalRejected = Math.round(
+    stats.veryDifficultQuestions + stats.poorQuestions + stats.veryEasyQuestions
+  );
 
   return {
     ...stats,
@@ -259,40 +260,34 @@ function generateTableHTML(
                 </tr>
                 <tr>
                   <td class="border border-gray-300 p-1">
-                    <p style="text-align: center; margin: 0; margin-bottom: 10px;">${(
-                      (stats.goodQuestions / stats.totalAccepted) *
-                      100
-                    ).toFixed(2)}%</p>
+                    <p style="text-align: center; margin: 0; margin-bottom: 10px;">${formatPercentage(
+                      (stats.goodQuestions / stats.totalAccepted) * 100
+                    )}</p>
                   </td>
                   <td class="border border-gray-300 p-1">
-                    <p style="text-align: center; margin: 0; margin-bottom: 10px;">${(
-                      (stats.easyQuestions / stats.totalAccepted) *
-                      100
-                    ).toFixed(2)}%</p>
+                    <p style="text-align: center; margin: 0; margin-bottom: 10px;">${formatPercentage(
+                      (stats.easyQuestions / stats.totalAccepted) * 100
+                    )}</p>
                   </td>
                   <td class="border border-gray-300 p-1">
-                    <p style="text-align: center; margin: 0; margin-bottom: 10px;">${(
-                      (stats.difficultQuestions / stats.totalAccepted) *
-                      100
-                    ).toFixed(2)}%</p>
+                    <p style="text-align: center; margin: 0; margin-bottom: 10px;">${formatPercentage(
+                      (stats.difficultQuestions / stats.totalAccepted) * 100
+                    )}</p>
                   </td>
                   <td class="border border-gray-300 p-1">
-                    <p style="text-align: center; margin: 0; margin-bottom: 10px;">${(
-                      (stats.veryDifficultQuestions / stats.totalAccepted) *
-                      100
-                    ).toFixed(2)}%</p>
+                    <p style="text-align: center; margin: 0; margin-bottom: 10px;">${formatPercentage(
+                      (stats.veryDifficultQuestions / stats.totalAccepted) * 100
+                    )}</p>
                   </td>
                   <td class="border border-gray-300 p-1">
-                    <p style="text-align: center; margin: 0; margin-bottom: 10px;">${(
-                      (stats.poorQuestions / stats.totalAccepted) *
-                      100
-                    ).toFixed(2)}%</p>
+                    <p style="text-align: center; margin: 0; margin-bottom: 10px;">${formatPercentage(
+                      (stats.poorQuestions / stats.totalAccepted) * 100
+                    )}</p>
                   </td>
                   <td class="border border-gray-300 p-1">
-                    <p style="text-align: center; margin: 0; margin-bottom: 10px;">${(
-                      (stats.veryEasyQuestions / stats.totalAccepted) *
-                      100
-                    ).toFixed(2)}%</p>
+                    <p style="text-align: center; margin: 0; margin-bottom: 10px;">${formatPercentage(
+                      (stats.veryEasyQuestions / stats.totalAccepted) * 100
+                    )}</p>
                   </td>
                 </tr>
               </tbody>
@@ -854,21 +849,24 @@ function generateSummaryTableHTML(
 
   const total = finalAverages.totalAccepted + finalAverages.totalRejected;
   const percentages = {
-    goodQuestions: ((finalAverages.goodQuestions / total) * 100).toFixed(2),
-    easyQuestions: ((finalAverages.easyQuestions / total) * 100).toFixed(2),
-    difficultQuestions: (
-      (finalAverages.difficultQuestions / total) *
-      100
-    ).toFixed(2),
-    veryDifficultQuestions: (
-      (finalAverages.veryDifficultQuestions / total) *
-      100
-    ).toFixed(2),
-    poorQuestions: ((finalAverages.poorQuestions / total) * 100).toFixed(2),
-    veryEasyQuestions: (
-      (finalAverages.veryEasyQuestions / total) *
-      100
-    ).toFixed(2),
+    goodQuestions: formatPercentage(
+      (finalAverages.goodQuestions / total) * 100
+    ),
+    easyQuestions: formatPercentage(
+      (finalAverages.easyQuestions / total) * 100
+    ),
+    difficultQuestions: formatPercentage(
+      (finalAverages.difficultQuestions / total) * 100
+    ),
+    veryDifficultQuestions: formatPercentage(
+      (finalAverages.veryDifficultQuestions / total) * 100
+    ),
+    poorQuestions: formatPercentage(
+      (finalAverages.poorQuestions / total) * 100
+    ),
+    veryEasyQuestions: formatPercentage(
+      (finalAverages.veryEasyQuestions / total) * 100
+    ),
   };
 
   return `

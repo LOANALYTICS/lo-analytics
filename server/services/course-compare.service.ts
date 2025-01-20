@@ -1,5 +1,6 @@
 import { Course } from "@/lib/models";
 import { Types } from "mongoose";
+import { formatPercentage, formatNumber } from "../utils/format.utils";
 
 interface CourseCompareParams {
   collegeId: string;
@@ -118,38 +119,38 @@ function generateTableHTML(
                 <td rowspan="2" class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: left; margin: 0; margin-bottom: 10px; font-size: 12px;">${
                   course.courseTitle
                 }</p></td>
-                <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">${
-                  course.yearA?.accepted || "-"
-                }</p></td>
-                <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">${
-                  course.yearA?.rejected || "-"
-                }</p></td>
+                <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">${formatNumber(
+                  course.yearA?.accepted
+                )}</p></td>
+                <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">${formatNumber(
+                  course.yearA?.rejected
+                )}</p></td>
                 <td rowspan="2" class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px; font-weight: bold">${
                   course.yearA?.kr20?.toFixed(2) || "-"
                 }</p></td>
-                <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">${
-                  course.yearB?.accepted || "-"
-                }</p></td>
-                <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">${
-                  course.yearB?.rejected || "-"
-                }</p></td>
+                <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">${formatNumber(
+                  course.yearB?.accepted
+                )}</p></td>
+                <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">${formatNumber(
+                  course.yearB?.rejected
+                )}</p></td>
                 <td rowspan="2" class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px; font-weight: bold">${
                   course.yearB?.kr20?.toFixed(2) || "-"
                 }</p></td>
               </tr>
               <tr>
-                <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">${
-                  course.yearA?.acceptedPercentage?.toFixed(2) || "-"
-                }${course.yearA?.acceptedPercentage ? "%" : ""}</p></td>
-                <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">${
-                  course.yearA?.rejectedPercentage?.toFixed(2) || "-"
-                }${course.yearA?.rejectedPercentage ? "%" : ""}</p></td>
-                <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">${
-                  course.yearB?.acceptedPercentage?.toFixed(2) || "-"
-                }${course.yearB?.acceptedPercentage ? "%" : ""}</p></td>
-                <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">${
-                  course.yearB?.rejectedPercentage?.toFixed(2) || "-"
-                }${course.yearB?.rejectedPercentage ? "%" : ""}</p></td>
+                <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">${formatPercentage(
+                  course.yearA?.acceptedPercentage
+                )}</p></td>
+                <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">${formatPercentage(
+                  course.yearA?.rejectedPercentage
+                )}</p></td>
+                <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">${formatPercentage(
+                  course.yearB?.acceptedPercentage
+                )}</p></td>
+                <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">${formatPercentage(
+                  course.yearB?.rejectedPercentage
+                )}</p></td>
               </tr>
             </tbody>
           `
@@ -159,38 +160,38 @@ function generateTableHTML(
             <td rowspan="2" colspan="2"   style="border-color: #000000 !important;" class="border border-black p-1">
               <p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px;">Average</p>
             </td>
-            <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px;">${
+            <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px;">${formatNumber(
               averages.accepted
-            }</p></td>
-            <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px;">${
+            )}</p></td>
+            <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px;">${formatNumber(
               averages.rejected
-            }</p></td>
+            )}</p></td>
             <td rowspan="2" class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px;">${
-              averages.kr20A
+              averages.kr20A?.toFixed(2) || "-"
             }</p></td>
-            <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px;">${
+            <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px;">${formatNumber(
               averages.acceptedB
-            }</p></td>
-            <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px;">${
+            )}</p></td>
+            <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px;">${formatNumber(
               averages.rejectedB
-            }</p></td>
+            )}</p></td>
             <td rowspan="2" class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px;">${
-              averages.kr20B
+              averages.kr20B?.toFixed(2) || "-"
             }</p></td>
           </tr>
           <tr>
-            <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px;">${
-              averages.acceptedPercentageA
-            }%</p></td>
-            <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px;">${
-              averages.rejectedPercentageA
-            }%</p></td>
-            <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px;">${
-              averages.acceptedPercentageB
-            }%</p></td>
-            <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px;">${
-              averages.rejectedPercentageB
-            }%</p></td>
+            <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px;">${formatPercentage(
+              Number(averages.acceptedPercentageA)
+            )}</p></td>
+            <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px;">${formatPercentage(
+              Number(averages.rejectedPercentageA)
+            )}</p></td>
+            <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px;">${formatPercentage(
+              Number(averages.acceptedPercentageB)
+            )}</p></td>
+            <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px;">${formatPercentage(
+              Number(averages.rejectedPercentageB)
+            )}</p></td>
           </tr>
         </tbody>
       </table>
