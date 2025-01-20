@@ -1,35 +1,23 @@
-'use client'
-import MappingTable, { CLO } from '@/components/shared/mapping-table/MappingTable'
+export const dynamic = 'force-dynamic'
 
-export default function AssessmentPlanPage() {
-  const defaultColumnCounts = {
-    k: 4,
-    s: 4,
-    v: 4
-  };
+import CourseCard from '@/components/shared/course-card'
+import { getCurrentUser } from '@/server/utils/helper'
+import { getCoursesByCreator } from '@/services/courses.action'
+import React from 'react'
 
-  const initialData: CLO[] = [{
-    id: '1',
-    description: 'CLO 1',
-    ploMapping: {
-      k: Array(defaultColumnCounts.k).fill(0).map((_, i) => ({ [`k${i + 1}`]: false })),
-      s: Array(defaultColumnCounts.s).fill(0).map((_, i) => ({ [`s${i + 1}`]: false })),
-      v: Array(defaultColumnCounts.v).fill(0).map((_, i) => ({ [`v${i + 1}`]: false }))
-    }
-  }];
-
-  const handleUpdate = (newData: CLO[]) => {
-    console.log('Updated data:', newData);
-  };
-
+export default async function LearningOutcomesPage() {
+  const user = await getCurrentUser()
+  const courses = await getCoursesByCreator(user?.id!);
   return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">Assessment Plan</h1>
-      <MappingTable 
-        initialData={initialData}
-        defaultColumnCounts={defaultColumnCounts}
-        onUpdate={handleUpdate}
-      />
-    </div>
-  );
+
+    <main className="px-2">
+      <h1 className="font-semibold text-lg"> Learning Outcomes - ( {courses.data.length} )</h1>
+      <section className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-2 mt-4">
+        {courses.data.map((course: any) => (
+          <CourseCard key={course._id} href={`/dashboard/blueprint/learning-outcomes/${course._id}`} template={course} />
+        ))}
+      </section>
+    </main>
+ 
+  )
 }

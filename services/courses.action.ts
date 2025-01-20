@@ -112,6 +112,8 @@ type Student = {
 
 export async function updateCourseStudents(courseId: string, students: Student[]) {
   try {
+
+    console.log(students, 'students')
     const updatedCourse = await Course.findByIdAndUpdate(
       courseId,
       { $set: { students: students } },

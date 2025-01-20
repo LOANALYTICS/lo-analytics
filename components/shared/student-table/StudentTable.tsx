@@ -9,6 +9,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { toast } from "sonner"
 import { Checkbox } from "@/components/ui/checkbox"
 import { updateCourseStudents } from '@/services/courses.action';
+import { updateAssessmentStudents } from '@/services/assessment.action'
 
 export type Student = {
   id: string
@@ -63,7 +64,8 @@ export default function StudentTable({data, courseId} : {data: any, courseId: st
 
   const saveToDatabase = async (updatedStudents: Student[]) => {
     try {
-      await updateCourseStudents(courseId, updatedStudents);
+      console.log(updatedStudents, "updatedCourseStudent")
+      await updateAssessmentStudents(courseId, updatedStudents);
       toast.success('Changes saved successfully');
     } catch (error) {
       toast.error('Failed to save changes');
@@ -97,6 +99,7 @@ export default function StudentTable({data, courseId} : {data: any, courseId: st
       toast.error('Failed to save changes');
     }
   };
+
 
   const cancelEdit = () => {
     const studentBeingEdited = students.find(s => s.id === editingId);
