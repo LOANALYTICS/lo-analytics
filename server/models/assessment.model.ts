@@ -30,11 +30,15 @@ export interface IAssessment extends Document {
                 correct: number;
                 total: number;
                 percentage: number;
+                marksScored: number;
+                totalMarks: number;
             };
             cloResults: {
                 [key: string]: {
                     totalQuestions: number;
                     correctAnswers: number;
+                    marksScored: number;
+                    totalMarks: number;
                 };
             };
         }[];
@@ -64,8 +68,7 @@ export const assessmentSchema = new Schema<IAssessment>({
     assessments: [{
         type: { type: String, required: true },
         clos: {
-            type: Map,
-            of: [Number],
+            type: Object,
             required: true
         },
         weight: { type: Number, required: true }
@@ -75,17 +78,15 @@ export const assessmentSchema = new Schema<IAssessment>({
         results: [{
             studentId: { type: String, required: true },
             studentName: { type: String, required: true },
-            totalScore: {
-                correct: { type: Number, required: true },
-                total: { type: Number, required: true },
-                percentage: { type: Number, required: true }
-            },
+            "totalScore.correct": { type: Number, required: true },
+            "totalScore.total": { type: Number, required: true },
+            "totalScore.percentage": { type: Number, required: true },
+            "totalScore.marksScored": { type: Number, required: true },
+            "totalScore.totalMarks": { type: Number, required: true },
             cloResults: {
-                type: Map,
-                of: {
-                    totalQuestions: { type: Number, required: true },
-                    correctAnswers: { type: Number, required: true }
-                }
+                type: Object,
+                required: true,
+                default: {}
             }
         }],
         questionKeys: [{
@@ -93,4 +94,4 @@ export const assessmentSchema = new Schema<IAssessment>({
             correctAnswer: { type: String, required: true }
         }]
     }]
-}, { timestamps: true }); 
+}, { timestamps: true, strict: false }); 

@@ -157,6 +157,7 @@ export default function CourseCard({ cardOf, href, template, user }: {
     }
   };
 
+
   return (
     <main className='w-full h-full'>
       {href ? (

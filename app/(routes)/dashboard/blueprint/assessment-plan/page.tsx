@@ -1,5 +1,6 @@
 export const dynamic = 'force-dynamic'
 
+import AssessmentCard from '@/components/shared/assessment-table/AssessmentCard'
 import CourseCard from '@/components/shared/course-card'
 import { getCurrentUser } from '@/server/utils/helper'
 import { getCoursesByCreator } from '@/services/courses.action'
@@ -14,10 +15,9 @@ export default async function AssessmentPlanPage() {
       <h1 className="font-semibold text-lg"> Assessment Plan - ( {courses.data.length} )</h1>
       <section className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-2 mt-4">
         {courses.data.map((course: any) => (
-          <CourseCard cardOf={'assessment-plan'} key={course._id} href={`/dashboard/blueprint/assessment-plan/${course._id}`} template={course} />
+          <AssessmentCard key={course._id} href={`/dashboard/blueprint/assessment-plan/${course._id}`} course={course}  />
         ))}
       </section>
     </main>
- 
   )
 }
