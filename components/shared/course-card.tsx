@@ -18,7 +18,8 @@ import { compareKRValues } from '@/services/compareKRValues.action';
 import { generateComparisonHTML } from '@/services/CompareKRHTML';
 import axios from 'axios';
 
-export default function CourseCard({ href, template, user }: { 
+export default function CourseCard({ cardOf, href, template, user }: { 
+  cardOf?: string,
   href?: string, 
   template: any,
   user?: any 
@@ -170,6 +171,13 @@ export default function CourseCard({ href, template, user }: {
               <p>Type : <span className='capitalize'>{template.examType}</span></p>
               <p>Sem : <span className='capitalize'>{href ?  template.sem : template.semister}</span></p>
             </div>
+            {cardOf === 'assessment-plan' && (
+              <div className='absolute right-3 bottom-3 space-x-2'>
+                <Button variant='outline' size='sm' className='px-5 py-3 text-[11px] w-full h-fit font-bold'>
+                Generate Report
+                </Button>
+              </div>
+            )}
         </Link>
       ) : (
         <>

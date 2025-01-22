@@ -13,6 +13,23 @@ export interface IAssessment extends Document {
             date: Date;
         }[];
     }[];
+    assessments: {
+        id: string;
+        type: string;
+        clos: {
+            [key: string]: number[];  // e.g., clo1: [1, 2]
+        };
+        weight: number;
+    }[];
+    assessmentResults: {
+        type: string;
+        results: {
+            studentId: string;
+            clos: {
+                [key: string]: number;  // cloId: marks
+            };
+        }[];
+    }[];
 }
 
 export const assessmentSchema = new Schema<IAssessment>({
@@ -29,6 +46,26 @@ export const assessmentSchema = new Schema<IAssessment>({
             marks: { type: Number, required: true },
             totalMarks: { type: Number, required: true },
             date: { type: Date, default: Date.now }
+        }]
+    }],
+    assessments: [{
+        type: { type: String, required: true },
+        clos: {
+            type: Map,
+            of: [Number],
+            required: true
+        },
+        weight: { type: Number, required: true }
+    }],
+    assessmentResults: [{
+        type: { type: String, required: true },
+        results: [{
+            studentId: { type: String, required: true },
+            clos: {
+                type: Map,
+                of: Number,
+                required: true
+            }
         }]
     }]
 }, { timestamps: true }); 

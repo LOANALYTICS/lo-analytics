@@ -1,6 +1,6 @@
 'use server'
 
-import { Assessment } from "@/lib/models";
+import { Assessment, Course } from "@/lib/models";
 import { revalidatePath } from "next/cache";
 
 type Student = {
@@ -17,6 +17,11 @@ interface AssessmentDoc {
         studentName: string;
         examResults: any[];
     }[];
+}
+
+interface CourseDoc {
+    _id: string;
+    academic_year: string;
 }
 
 export async function updateAssessmentStudents(courseId: string, students: Student[]) {
@@ -109,10 +114,57 @@ export async function getAssessmentByCourse(courseId: string) {
         return {
             success: true,
             exists: !!assessment,
-            data: assessment
+            data: JSON.parse(JSON.stringify(assessment))
         };
     } catch (error) {
         console.error('Error checking assessment:', error);
         throw new Error('Failed to check assessment');
     }
 } 
+
+type AssessmentPlan = {
+    id: string;
+    type: string; 
+    clos: {
+        [key: string]: number[];
+    };
+    weight: number;
+}
+
+export async function updateAssessmentPlans(courseId: string, academicYear: string, assessments: AssessmentPlan[]) {
+    try {
+        console.log('Updating assessment plans:', assessments, academicYear,courseId);
+        const course = await Course.findOne({_id: courseId, academic_year: academicYear}).lean() as unknown as CourseDoc;
+        if (!course) {
+            throw new Error('Course not found or students not configured');
+        }
+
+    
+
+        // Update existing assessment
+        const assessment = await Assessment.findOneAndUpdate(
+            { course: courseId },
+            { $set: { assessments: assessments } },
+            { new: true }
+        ).lean();
+
+        if (!assessment) {
+            return {
+                success: false,
+                message: 'Assessment not found for this course',
+                data: null
+            };
+        }
+
+        return {
+            success: true,
+            message: 'Assessment plans updated successfully',
+            data: JSON.parse(JSON.stringify(assessment))
+        };
+
+    } catch (error) {
+        console.error('Error updating assessment plans:', error);
+        throw new Error('Failed to update assessment plans');
+    }
+} 
+
