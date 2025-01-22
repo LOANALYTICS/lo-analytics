@@ -25,9 +25,22 @@ export interface IAssessment extends Document {
         type: string;
         results: {
             studentId: string;
-            clos: {
-                [key: string]: number;  // cloId: marks
+            studentName: string;
+            totalScore: {
+                correct: number;
+                total: number;
+                percentage: number;
             };
+            cloResults: {
+                [key: string]: {
+                    totalQuestions: number;
+                    correctAnswers: number;
+                };
+            };
+        }[];
+        questionKeys: {
+            questionNumber: string;
+            correctAnswer: string;
         }[];
     }[];
 }
@@ -61,11 +74,23 @@ export const assessmentSchema = new Schema<IAssessment>({
         type: { type: String, required: true },
         results: [{
             studentId: { type: String, required: true },
-            clos: {
+            studentName: { type: String, required: true },
+            totalScore: {
+                correct: { type: Number, required: true },
+                total: { type: Number, required: true },
+                percentage: { type: Number, required: true }
+            },
+            cloResults: {
                 type: Map,
-                of: Number,
-                required: true
+                of: {
+                    totalQuestions: { type: Number, required: true },
+                    correctAnswers: { type: Number, required: true }
+                }
             }
+        }],
+        questionKeys: [{
+            questionNumber: { type: String, required: true },
+            correctAnswer: { type: String, required: true }
         }]
     }]
 }, { timestamps: true }); 

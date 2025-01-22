@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import * as XLSX from 'xlsx';
 import { connectToMongoDB } from '@/lib/db';
-import { Course } from '@/lib/models';
+import { Course, Assessment } from '@/lib/models';
 import { getAssessmentByCourse } from '@/services/assessment.action';
 
 // Configure API route settings
@@ -77,16 +77,46 @@ function mapQuestionsToCLOs(questionKeys: QuestionKey[], assessment: any, assess
 function calculateStudentResults(
   data: Array<Array<string | number>>, 
   questionKeys: QuestionKey[],
-  cloMap: Map<string, string[]>
+  cloMap: Map<string, string[]>,
+  assessment: any
 ): StudentResult[] {
   const results: StudentResult[] = [];
+
+  // Create a map of student IDs to names from the assessment model
+  // Note: studentName in model actually contains the ID, and studentId contains the name
+  const studentMap = new Map(
+    assessment.students.map((student: { studentId: string; studentName: string }) => 
+      [student.studentName.toLowerCase().trim(), student.studentId]  // Swap these since they're reversed in model
+    )
+  );
+
+  console.log('Debug Info:');
+  console.log('Student ID Map:', Object.fromEntries(studentMap));
 
   // Start from index 2 (3rd row) for student data
   for (let i = 2; i < data.length; i++) {
     const row = data[i];
+    if (!row || row.length === 0) continue; // Skip empty rows
+
+    // Get student ID from Excel (2nd column)
+    const excelStudentId = String(row[1] || '').trim();
+    
+    if (!excelStudentId) {
+      console.log(`Skipping row ${i + 1}: No student ID`);
+      continue;
+    }
+
+    // Try to find student in assessment model
+    const studentName = studentMap.get(excelStudentId.toLowerCase());
+
+    if (!studentName || typeof studentName !== 'string') {
+      console.warn(`Student not found for ID: ${excelStudentId}`);
+      continue;
+    }
+
     const studentResult: StudentResult = {
-      studentId: String(row[1]), // ID Number column
-      studentName: String(row[0]), // Student Name column
+      studentId: excelStudentId,
+      studentName: studentName,
       totalScore: {
         correct: 0,
         total: questionKeys.length,
@@ -105,7 +135,7 @@ function calculateStudentResults(
 
     // Check each answer starting from column 7
     for (let j = 6; j < row.length; j++) {
-      const studentAnswer = String(row[j]).toUpperCase();
+      const studentAnswer = String(row[j] || '').toUpperCase();
       const questionKey = questionKeys[j - 6];
       
       if (questionKey) {
@@ -128,29 +158,17 @@ function calculateStudentResults(
     results.push(studentResult);
   }
 
+  console.log('\nProcessing Summary:');
+  console.log('Total results processed:', results.length);
+  if (results.length > 0) {
+    console.log('First processed result:', results[0]);
+  }
+  
   return results;
 }
 
 export async function POST(request: Request) {
   try {
-    // Get the cookies from the request headers
-    // const cookieHeader = request.headers.get('cookie');
-    // const cookies = new Map(
-    //   cookieHeader?.split(';').map(cookie => {
-    //     const [key, value] = cookie.trim().split('=');
-    //     return [key, value];
-    //   }) || []
-    // );
-    
-    // const userInformationCookie = cookies.get('userInformation');
-    
-    
-    // if (!userInformationCookie) {
-    //   return NextResponse.json({ error: "User information not found" }, { status: 401 });
-    // }
-
-    // const userInformation = JSON.parse(decodeURIComponent(userInformationCookie));
-    
     await connectToMongoDB();
     const formData = await request.formData();
     const file = formData.get('file') as Blob;
@@ -176,7 +194,6 @@ export async function POST(request: Request) {
     const workbook = XLSX.read(buffer);
 
     const ResultsGridsheetName = 'Results Grid';
-
     if (!workbook.Sheets[ResultsGridsheetName]) {
       return NextResponse.json({ 
         message: 'Results Grid sheet not found' 
@@ -192,13 +209,122 @@ export async function POST(request: Request) {
       }, { status: 400 });
     }
 
-    // Process the data
+    // Get all student IDs from Excel (starting from row 3)
+    const excelStudentIds = data.slice(2)
+      .map(row => row && row[1])
+      .filter((id): id is string | number => id !== undefined && id !== null)
+      .map(id => String(id).trim());
+
+    // Get all student IDs from assessment model
+    const assessmentStudentIds = new Set(
+      assessmentResponse.data.students.map(
+        (student: { studentName: string }) => student.studentName.trim()
+      )
+    );
+
+    // Check if we have all required students
+    if (excelStudentIds.length === 0) {
+      return NextResponse.json({
+        message: 'No student IDs found in the Excel file',
+        status: 'error'
+      }, { status: 400 });
+    }
+
+    // Find missing students (IDs in Excel but not in assessment)
+    const missingStudents = excelStudentIds.filter(id => !assessmentStudentIds.has(id));
+    
+    // Find extra students (IDs in assessment but not in Excel)
+    const extraStudents = Array.from(assessmentStudentIds)
+      .filter((id): id is string => typeof id === 'string' && !excelStudentIds.includes(id));
+
+    if (missingStudents.length > 0) {
+      return NextResponse.json({
+        message: 'Some student IDs in Excel file are not found in the course',
+        status: 'error',
+        details: {
+          missingStudents,
+          totalInExcel: excelStudentIds.length,
+          totalInCourse: assessmentStudentIds.size
+        }
+      }, { status: 400 });
+    }
+
+    if (excelStudentIds.length < assessmentStudentIds.size) {
+      return NextResponse.json({
+        message: 'Excel file has fewer students than enrolled in the course',
+        status: 'error',
+        details: {
+          missingFromExcel: extraStudents,
+          totalInExcel: excelStudentIds.length,
+          totalInCourse: assessmentStudentIds.size
+        }
+      }, { status: 400 });
+    }
+
+    if (excelStudentIds.length > assessmentStudentIds.size) {
+      return NextResponse.json({
+        message: 'Excel file has more students than enrolled in the course',
+        status: 'error',
+        details: {
+          extraStudents: excelStudentIds.filter(id => !assessmentStudentIds.has(id)),
+          totalInExcel: excelStudentIds.length,
+          totalInCourse: assessmentStudentIds.size
+        }
+      }, { status: 400 });
+    }
+
+    // If counts match but IDs are different
+    if (extraStudents.length > 0) {
+      return NextResponse.json({
+        message: 'Student IDs in Excel do not match with enrolled students',
+        status: 'error',
+        details: {
+          unmatchedIds: {
+            missingFromExcel: extraStudents,
+            extraInExcel: excelStudentIds.filter(id => !assessmentStudentIds.has(id))
+          },
+          totalInExcel: excelStudentIds.length,
+          totalInCourse: assessmentStudentIds.size
+        }
+      }, { status: 400 });
+    }
+
+    // Continue with existing processing if all validations pass
     const questionKeys = extractQuestionKeys(data);
     const cloMap = mapQuestionsToCLOs(questionKeys, assessmentResponse.data, type);
-    const studentResults = calculateStudentResults(data, questionKeys, cloMap);
+    const studentResults = calculateStudentResults(data, questionKeys, cloMap, assessmentResponse.data);
+
+    // Update or create assessment results
+    const assessment = await Assessment.findOne({ course: courseId });
+    if (!assessment) {
+      return NextResponse.json({ 
+        message: 'Assessment not found' 
+      }, { status: 404 });
+    }
+
+    // Check if results for this type already exist
+    const existingResultIndex = assessment.assessmentResults.findIndex(
+      (result: { type: string }) => result.type === type
+    );
+
+    const newResult = {
+      type,
+      results: studentResults,
+      questionKeys
+    };
+
+    if (existingResultIndex !== -1) {
+      // Update existing results
+      assessment.assessmentResults[existingResultIndex] = newResult;
+    } else {
+      // Add new results
+      assessment.assessmentResults.push(newResult);
+    }
+
+    await assessment.save();
 
     return NextResponse.json({
-      message: "Successfully processed assessment data",
+      message: "Successfully processed and stored assessment data",
       data: {
         questionKeys,
         cloMapping: Object.fromEntries(cloMap),
