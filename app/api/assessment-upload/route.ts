@@ -23,11 +23,15 @@ interface StudentResult {
     correct: number;
     total: number;
     percentage: number;
+    marksScored: number;
+    totalMarks: number;
   };
   cloResults: {
     [cloId: string]: {
       totalQuestions: number;
       correctAnswers: number;
+      marksScored: number;
+      totalMarks: number;
     };
   };
 }
@@ -78,41 +82,47 @@ function calculateStudentResults(
   data: Array<Array<string | number>>, 
   questionKeys: QuestionKey[],
   cloMap: Map<string, string[]>,
-  assessment: any
+  assessment: any,
+  type: string
 ): StudentResult[] {
   const results: StudentResult[] = [];
 
-  // Create a map of student IDs to names from the assessment model
-  // Note: studentName in model actually contains the ID, and studentId contains the name
+  // Get the assessment type configuration
+  const assessmentConfig = assessment.assessments.find((a: any) => a.type === type);
+  if (!assessmentConfig) {
+    throw new Error('Assessment type configuration not found');
+  }
+
+  // Calculate marks per question based on total weight
+  const totalQuestions = questionKeys.length;
+  const marksPerQuestion = Number((assessmentConfig.weight / totalQuestions).toFixed(2));
+
   const studentMap = new Map(
     assessment.students.map((student: { studentId: string; studentName: string }) => 
-      [student.studentName.toLowerCase().trim(), student.studentId]  // Swap these since they're reversed in model
+      [student.studentName.toLowerCase().trim(), student.studentId]
     )
   );
 
   console.log('Debug Info:');
   console.log('Student ID Map:', Object.fromEntries(studentMap));
 
-  // Start from index 2 (3rd row) for student data
   for (let i = 2; i < data.length; i++) {
     const row = data[i];
-    if (!row || row.length === 0) continue; // Skip empty rows
+    if (!row || row.length === 0) continue;
 
-    // Get student ID from Excel (2nd column)
     const excelStudentId = String(row[1] || '').trim();
-    
     if (!excelStudentId) {
       console.log(`Skipping row ${i + 1}: No student ID`);
       continue;
     }
 
-    // Try to find student in assessment model
     const studentName = studentMap.get(excelStudentId.toLowerCase());
-
     if (!studentName || typeof studentName !== 'string') {
       console.warn(`Student not found for ID: ${excelStudentId}`);
       continue;
     }
+
+    const totalMarks = assessmentConfig.weight;
 
     const studentResult: StudentResult = {
       studentId: excelStudentId,
@@ -120,26 +130,30 @@ function calculateStudentResults(
       totalScore: {
         correct: 0,
         total: questionKeys.length,
-        percentage: 0
+        percentage: 0,
+        marksScored: 0,
+        totalMarks: totalMarks
       },
       cloResults: {}
     };
 
     // Initialize CLO results
     for (const [cloId, questions] of cloMap.entries()) {
+      const cloTotalMarks = Number(((questions.length / totalQuestions) * totalMarks).toFixed(2));
       studentResult.cloResults[cloId] = {
         totalQuestions: questions.length,
-        correctAnswers: 0
+        correctAnswers: 0,
+        marksScored: 0,
+        totalMarks: cloTotalMarks
       };
     }
 
-    // Check each answer starting from column 7
+    // Check answers
     for (let j = 6; j < row.length; j++) {
       const studentAnswer = String(row[j] || '').toUpperCase();
       const questionKey = questionKeys[j - 6];
       
       if (questionKey) {
-        // Find which CLO this question belongs to
         for (const [cloId, questions] of cloMap.entries()) {
           if (questions.includes(questionKey.questionNumber)) {
             if (studentAnswer === questionKey.correctAnswer) {
@@ -152,8 +166,14 @@ function calculateStudentResults(
       }
     }
 
-    // Calculate percentage
-    studentResult.totalScore.percentage = Number(((studentResult.totalScore.correct / studentResult.totalScore.total) * 100).toFixed(2));
+    // Calculate marks
+    studentResult.totalScore.marksScored = Number((studentResult.totalScore.correct * marksPerQuestion).toFixed(2));
+    studentResult.totalScore.percentage = Number(((studentResult.totalScore.marksScored / totalMarks) * 100).toFixed(2));
+
+    // Calculate CLO marks
+    for (const [cloId, cloResult] of Object.entries(studentResult.cloResults)) {
+      cloResult.marksScored = Number((cloResult.correctAnswers * marksPerQuestion).toFixed(2));
+    }
 
     results.push(studentResult);
   }
@@ -292,7 +312,37 @@ export async function POST(request: Request) {
     // Continue with existing processing if all validations pass
     const questionKeys = extractQuestionKeys(data);
     const cloMap = mapQuestionsToCLOs(questionKeys, assessmentResponse.data, type);
-    const studentResults = calculateStudentResults(data, questionKeys, cloMap, assessmentResponse.data);
+
+    // Get the assessment type configuration
+    const assessmentConfig = assessmentResponse.data.assessments.find((a: AssessmentType) => a.type === type);
+    if (!assessmentConfig) {
+      return NextResponse.json({ 
+        message: 'Assessment type configuration not found' 
+      }, { status: 404 });
+    }
+
+    // Count total questions from CLOs
+    let totalQuestionsInCLOs = 0;
+    for (const questions of Object.values(assessmentConfig.clos) as number[][]) {
+      totalQuestionsInCLOs += questions.length;
+    }
+
+    // Count questions from Excel
+    const totalQuestionsInExcel = questionKeys.length;
+
+    if (totalQuestionsInCLOs !== totalQuestionsInExcel) {
+      return NextResponse.json({
+        message: 'Number of questions mismatch',
+        status: 'error',
+        details: {
+          excelQuestions: totalQuestionsInExcel,
+          configuredQuestions: totalQuestionsInCLOs,
+          difference: Math.abs(totalQuestionsInExcel - totalQuestionsInCLOs)
+        }
+      }, { status: 400 });
+    }
+
+    const studentResults = calculateStudentResults(data, questionKeys, cloMap, assessmentResponse.data, type);
 
     // Update or create assessment results
     const assessment = await Assessment.findOne({ course: courseId });
