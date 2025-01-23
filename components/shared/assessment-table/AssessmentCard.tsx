@@ -43,8 +43,7 @@ const generatePDF = async (html: string, fileName: string) => {
       },
       pagebreak: {
         mode: ["css", "legacy"],
-        before: ".table-container",
-        avoid: [".row-pair", "thead"],
+        avoid: [".achievement-pair", "thead"],
       },
     };
 
