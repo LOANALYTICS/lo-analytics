@@ -64,17 +64,16 @@ export function generateAssessmentReportHTML(props: AssessmentReportProps): stri
           .header { text-align: center; margin-bottom: 30px; }
           .logo { max-width: 100%; height: auto; }
           .title { font-size: 24px; margin: 20px 0; }
-          table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-          th, td { 
-            border: 1px solid black; 
-            padding: 10px; 
-            font-size: 12px; 
-            text-align: center; 
+          table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-top: 20px;
           }
-          .achievement-pair {
-            page-break-inside: avoid;
-            break-inside: avoid;
-            display: table-row-group;
+          th, td { 
+            border: 1px solid black;
+            padding: 10px;
+            font-size: 12px;
+            text-align: center;
           }
           .achievement-row { 
             background-color: #8b6b9f; 
@@ -82,6 +81,18 @@ export function generateAssessmentReportHTML(props: AssessmentReportProps): stri
           }
           .achievement-row td {
             border: 1px solid black;
+          }
+          thead tr:first-child th:first-child {
+            border-top-left-radius: 8px;
+          }
+          thead tr:first-child th:last-child {
+            border-top-right-radius: 8px;
+          }
+          tbody:last-child tr:last-child td:first-child {
+            border-bottom-left-radius: 8px;
+          }
+          tbody:last-child tr:last-child td:last-child {
+            border-bottom-right-radius: 8px;
           }
           .achievement-pair tr:first-child td.achievement-label {
             border-bottom: none;
@@ -97,6 +108,7 @@ export function generateAssessmentReportHTML(props: AssessmentReportProps): stri
           }
           tr:not(.achievement-row):not(:last-child) td {
             border-bottom: 1px solid black;
+            
           }
           .serial-col { width: 50px; }
           .id-col { width: 100px; }
@@ -168,7 +180,7 @@ export function generateAssessmentReportHTML(props: AssessmentReportProps): stri
             </div>
           </div>
 
-          <table style="border: 1px solid black; border-radius: 5px; overflow: hidden;">
+          <table style="border-radius: 5px; overflow: hidden;">
             <thead>
               <tr>
                 <th rowspan="2" class="serial-col">S.No</th>
