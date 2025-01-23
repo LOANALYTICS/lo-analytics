@@ -82,6 +82,12 @@ export function generateAssessmentReportHTML(props: AssessmentReportProps): stri
           .achievement-row td {
             border: 1px solid black;
           }
+          .achievement-pair tr:first-child td.achievement-label {
+            border-bottom: 1px solid black;
+          }
+          .achievement-pair tr:last-child td.achievement-label {
+            border-top: 1px solid black;
+          }
           thead tr:first-child th:first-child {
             border-top-left-radius: 8px;
           }
@@ -93,22 +99,6 @@ export function generateAssessmentReportHTML(props: AssessmentReportProps): stri
           }
           tbody:last-child tr:last-child td:last-child {
             border-bottom-right-radius: 8px;
-          }
-          .achievement-pair tr:first-child td.achievement-label {
-            border-bottom: none;
-          }
-          .achievement-pair tr:last-child td.achievement-label {
-            border-top: none;
-          }
-          tr:not(.achievement-row) td {
-            border-left: 1px solid black;
-            border-right: 1px solid black;
-            border-top: none;
-            border-bottom: none;
-          }
-          tr:not(.achievement-row):not(:last-child) td {
-            border-bottom: 1px solid black;
-            
           }
           .serial-col { width: 50px; }
           .id-col { width: 100px; }
