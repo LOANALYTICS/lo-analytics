@@ -65,7 +65,7 @@ export function generateAssessmentReportHTML(props: AssessmentReportProps): stri
           .logo { max-width: 100%; height: auto; }
           .title { font-size: 24px; margin: 20px 0; }
           table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-          th, td { border: 1px solid black; padding: 8px; text-align: center; }
+          th, td { border: 1px solid black;  padding-left: 10px; font-size: 12px; padding-right: 10px; padding-top: 6px; padding-bottom: 16px; text-align: center; }
           th { background-color: #f0f0f0; }
           .serial-col { width: 50px; }
           .id-col { width: 100px; }
@@ -103,12 +103,26 @@ export function generateAssessmentReportHTML(props: AssessmentReportProps): stri
           }
           .achievement-row td:last-child {
             border-right: 1px solid black;
-          }
+            }
           tr.achievement-row:nth-child(odd) td {
             border-top: 1px solid black;
+            border-left: 1px solid black;
+            border-right: 1px solid black;
+            font-size: 12px;
+            padding-left: 10px;
+            padding-right: 10px;
+            padding-top: 6px;
+            padding-bottom: 16px;
           }
           tr.achievement-row:nth-child(even) td {
             border-bottom: 1px solid black;
+            border-left: 1px solid black;
+            border-right: 1px solid black;
+            font-size: 12px;
+            padding-left: 10px;
+            padding-right: 10px;
+            padding-top: 6px;
+            padding-bottom: 16px;
           }
           .course-details {
             display: grid;
@@ -127,6 +141,7 @@ export function generateAssessmentReportHTML(props: AssessmentReportProps): stri
           .detail-label {
             font-weight: bold;
           }
+       
         </style>
       </head>
       <body>
@@ -153,7 +168,7 @@ export function generateAssessmentReportHTML(props: AssessmentReportProps): stri
             </div>
           </div>
 
-          <table>
+          <table style="border: 1px solid black; border-radius: 5px; overflow: hidden;">
             <thead>
               <tr>
                 <th rowspan="2" class="serial-col">S.No</th>
