@@ -65,14 +65,12 @@ export function generateAssessmentReportHTML(props: AssessmentReportProps): stri
           .logo { max-width: 100%; height: auto; }
           .title { font-size: 24px; margin: 20px 0; }
           table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-          th, td { border: 1px solid black;  padding-left: 10px; font-size: 12px; padding-right: 10px; padding-top: 6px; padding-bottom: 16px; text-align: center; }
-          th { background-color: #f0f0f0; }
-          .serial-col { width: 50px; }
-          .id-col { width: 100px; }
-          .name-col { width: 200px; }
-          .marks-col { width: 80px; }
-          .clo-header { background-color: #e0e0e0; }
-          .total-header { background-color: #d0d0d0; }
+          th, td { 
+            border: 1px solid black; 
+            padding: 10px; 
+            font-size: 12px; 
+            text-align: center; 
+          }
           .achievement-pair {
             page-break-inside: avoid;
             break-inside: avoid;
@@ -82,6 +80,30 @@ export function generateAssessmentReportHTML(props: AssessmentReportProps): stri
             background-color: #8b6b9f; 
             color: white;
           }
+          .achievement-row td {
+            border: 1px solid black;
+          }
+          .achievement-pair tr:first-child td.achievement-label {
+            border-bottom: none;
+          }
+          .achievement-pair tr:last-child td.achievement-label {
+            border-top: none;
+          }
+          tr:not(.achievement-row) td {
+            border-left: 1px solid black;
+            border-right: 1px solid black;
+            border-top: none;
+            border-bottom: none;
+          }
+          tr:not(.achievement-row):not(:last-child) td {
+            border-bottom: 1px solid black;
+          }
+          .serial-col { width: 50px; }
+          .id-col { width: 100px; }
+          .name-col { width: 200px; }
+          .marks-col { width: 80px; }
+          .clo-header { background-color: #e0e0e0; }
+          .total-header { background-color: #d0d0d0; }
           .achievement-label { 
             font-weight: normal; 
             text-align: left;
@@ -90,30 +112,6 @@ export function generateAssessmentReportHTML(props: AssessmentReportProps): stri
             line-height: 1.5;
             padding: 20px;
             font-family: Arial, sans-serif;
-          }
-          .achievement-row td {
-            padding: 10px;
-            text-align: center;
-            border-left: 1px solid white;
-            border-right: 1px solid white;
-          }
-          .achievement-row:nth-child(odd) td {
-            border-bottom: none;
-          }
-          .achievement-row:nth-child(even) td {
-            border-top: none;
-          }
-          .achievement-row td:first-child {
-            border-left: 1px solid black;
-          }
-          .achievement-row td:last-child {
-            border-right: 1px solid black;
-          }
-          tr.achievement-row:nth-child(odd) td {
-            border-top: 1px solid black;
-          }
-          tr.achievement-row:nth-child(even) td {
-            border-bottom: 1px solid black;
           }
           .course-details {
             display: grid;
@@ -131,6 +129,18 @@ export function generateAssessmentReportHTML(props: AssessmentReportProps): stri
           }
           .detail-label {
             font-weight: bold;
+          }
+          .student-group {
+            page-break-inside: auto;
+            break-inside: auto;
+          }
+          .student-row {
+            page-break-inside: avoid;
+            break-inside: avoid;
+          }
+          tbody {
+            page-break-before: auto;
+            page-break-after: auto;
           }
         </style>
       </head>
@@ -176,17 +186,19 @@ export function generateAssessmentReportHTML(props: AssessmentReportProps): stri
               </tr>
             </thead>
             <tbody>
-              ${assessmentData.students.map((student, index) => `
-                <tr>
-                  <td>${index + 1}</td>
-                  <td>${student.studentId}</td>
-                  <td>${student.studentName}</td>
-                  ${sortedClos.map(clo => `<td>${student.cloScores[clo]?.marksScored.toFixed(2) || '0.00'}</td>`).join('')}
-                  <td>${student.totalMarksObtained.toFixed(2)}</td>
-                </tr>
-              `).join('')}
+              <tbody class="student-group">
+                ${assessmentData.students.map((student, index) => `
+                  <tr class="student-row">
+                    <td>${index + 1}</td>
+                    <td>${student.studentId}</td>
+                    <td>${student.studentName}</td>
+                    ${sortedClos.map(clo => `<td>${student.cloScores[clo]?.marksScored.toFixed(2) || '0.00'}</td>`).join('')}
+                    <td>${student.totalMarksObtained.toFixed(2)}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
 
-              <div class="achievement-pair">
+              <tbody class="achievement-pair">
                 <tr class="achievement-row">
                   <td colspan="3" class="achievement-label">Achievement Grades</td>
                   ${sortedClos.map(clo => {
@@ -208,9 +220,9 @@ export function generateAssessmentReportHTML(props: AssessmentReportProps): stri
                   }).join('')}
                   <td>-</td>
                 </tr>
-              </div>
+              </tbody>
 
-              <div class="achievement-pair">
+              <tbody class="achievement-pair">
                 <tr class="achievement-row">
                   <td colspan="3" class="achievement-label">Achievement Grades</td>
                   ${sortedClos.map(clo => {
@@ -232,9 +244,9 @@ export function generateAssessmentReportHTML(props: AssessmentReportProps): stri
                   }).join('')}
                   <td>-</td>
                 </tr>
-              </div>
+              </tbody>
 
-              <div class="achievement-pair">
+              <tbody class="achievement-pair">
                 <tr class="achievement-row">
                   <td colspan="3" class="achievement-label">Achievement Grades</td>
                   ${sortedClos.map(clo => {
@@ -256,9 +268,9 @@ export function generateAssessmentReportHTML(props: AssessmentReportProps): stri
                   }).join('')}
                   <td>-</td>
                 </tr>
-              </div>
+              </tbody>
 
-              <div class="achievement-pair">
+              <tbody class="achievement-pair">
                 <tr class="achievement-row">
                   <td colspan="3" class="achievement-label">Achievement Grades</td>
                   ${sortedClos.map(clo => {
@@ -280,7 +292,7 @@ export function generateAssessmentReportHTML(props: AssessmentReportProps): stri
                   }).join('')}
                   <td>-</td>
                 </tr>
-              </div>
+              </tbody>
             </tbody>
           </table>
         </div>
