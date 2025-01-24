@@ -14,10 +14,10 @@ export function createEmptyPLOMapping(columnCounts: { k: number; s: number; v: n
   };
 }
 
-export function createEmptyCLO(id: string, columnCounts: { k: number; s: number; v: number; }): CLO {
+export function createEmptyCLO(clo: string, columnCounts: { k: number; s: number; v: number; }): CLO {
   return {
-    id,
-    description: `CLO ${id}`,
+    clo,
+    description: `CLO ${clo}`,
     ploMapping: createEmptyPLOMapping(columnCounts)
   };
 }
