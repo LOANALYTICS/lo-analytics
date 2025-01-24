@@ -4,6 +4,7 @@ import AssessmentTable from '@/components/shared/assessment-table/AssessmentTabl
 import { Button } from '@/components/ui/button'
 import { getAssessmentByCourse, updateAssessmentPlans } from '@/services/assessment.action';
 import { getCourseById } from '@/services/courses.action';
+import { getCLOData } from '@/services/blueprint/learning-outcome.action';
 import { Loader2Icon, ThumbsUp } from 'lucide-react';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -19,6 +20,7 @@ export default function AssessmentPlanPage() {
   const [course, setCourse] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [numberOfClos, setNumberOfClos] = useState(0);
 
   const [uploadOpen, setUploadOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -31,25 +33,26 @@ export default function AssessmentPlanPage() {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const response = await getAssessmentByCourse(courseId);
-        const course = await getCourseById(courseId);
-
-      
-        console.log('API Response:', response);
+        const [assessmentResponse, courseResponse, cloData] = await Promise.all([
+          getAssessmentByCourse(courseId),
+          getCourseById(courseId),
+          getCLOData(courseId)
+        ]);
         
-        if (response.success && response.data?.assessments) {
-          const formattedData = response.data.assessments.map((item: { id?: string; _id?: string; type: string; clos: any; weight: number }) => ({
+        setNumberOfClos(cloData?.length || 3);
+        
+        if (assessmentResponse.success && assessmentResponse.data?.assessments) {
+          const formattedData = assessmentResponse.data.assessments.map((item: any) => ({
             id: item.id || item._id?.toString(),
             type: item.type,
             clos: item.clos || {},
             weight: item.weight
           }));
-          console.log('Formatted Data:', formattedData);
           setAssessmentData(formattedData);
-          setCourse(course);
+          setCourse(courseResponse);
         }
       } catch (error) {
-        console.error('Error fetching assessment:', error);
+        console.error('Error fetching data:', error);
       } finally {
         setLoading(false);
       }
@@ -189,6 +192,7 @@ export default function AssessmentPlanPage() {
           setSelectedType(type);
           setUploadOpen(true);
         }}
+        numberOfClos={numberOfClos}
       />
 
       

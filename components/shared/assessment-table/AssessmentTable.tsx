@@ -7,24 +7,11 @@ import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Trash, Upload, Plus, X, Loader2Icon } from 'lucide-react'
 
-const DEFAULT_ASSESSMENT = {
-  id: '1',
-  type: '',
-  clos: {
-    clo1: [],
-    clo2: [],
-    clo3: [],
-  },
-  weight: 0
-};
-
 interface Assessment {
   id: string;
   type: string;
   clos: {
-    clo1: number[];
-    clo2: number[];
-    clo3: number[];
+    [key: string]: number[];
   };
   weight: number;
 }
@@ -34,19 +21,52 @@ interface AssessmentTableProps {
   onSave: (data: Assessment[]) => void;
   saving: boolean;
   onUpload: (type: string) => void;
+  numberOfClos: number;
 }
 
-// Get CLO keys dynamically from the first assessment or default assessment
-const getCLOKeys = (assessments: Assessment[]): string[] => {
-  const firstAssessment = assessments[0];
-  return Object.keys(firstAssessment.clos).sort();
+// Modify the DEFAULT_ASSESSMENT to be a function that creates dynamic CLOs
+const createDefaultAssessment = (numberOfClos: number) => {
+  const clos = Array.from({ length: numberOfClos }, (_, i) => `clo${i + 1}`)
+    .reduce((acc, clo) => {
+      acc[clo] = [];
+      return acc;
+    }, {} as Record<string, number[]>);
+
+  return {
+    id: '1',
+    type: '',
+    clos,
+    weight: 0
+  };
 };
 
-export default function AssessmentTable({ initialData, onSave, saving, onUpload }: AssessmentTableProps) {
-  // Use initialData if it exists, otherwise use default empty assessment
-  const [assessments, setAssessments] = useState<Assessment[]>(
-    initialData.length > 0 ? initialData : [DEFAULT_ASSESSMENT]
-  );
+// Modify the getCLOKeys function
+const getCLOKeys = (assessments: Assessment[], numberOfClos: number): string[] => {
+  // Simply create CLO keys based on numberOfClos
+  return Array.from({ length: numberOfClos }, (_, i) => `clo${i + 1}`);
+};
+
+export default function AssessmentTable({ initialData, onSave, saving, onUpload, numberOfClos }: AssessmentTableProps) {
+  const [assessments, setAssessments] = useState<Assessment[]>(() => {
+    if (initialData.length > 0) {
+      // Add any missing CLO keys to each assessment
+      return initialData.map(assessment => {
+        const updatedClos = { ...assessment.clos };
+        // Ensure all CLOs up to numberOfClos exist
+        for (let i = 1; i <= numberOfClos; i++) {
+          const cloKey = `clo${i}`;
+          if (!updatedClos[cloKey]) {
+            updatedClos[cloKey] = []; // Initialize missing CLO with empty array
+          }
+        }
+        return {
+          ...assessment,
+          clos: updatedClos
+        };
+      });
+    }
+    return [createDefaultAssessment(numberOfClos)];
+  });
   console.log((assessments), ":skd");
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [tempInputs, setTempInputs] = useState<{ [key: string]: string }>({});
@@ -68,9 +88,9 @@ export default function AssessmentTable({ initialData, onSave, saving, onUpload 
     }));
   };
 
-  const cloKeys = getCLOKeys(assessments);
+  const cloKeys = getCLOKeys(assessments, numberOfClos);
 
-  const handleCLOInput = (id: string, clo: 'clo1' | 'clo2' | 'clo3', value: string) => {
+  const handleCLOInput = (id: string, clo: string, value: string) => {
 
     const number = parseInt(value.trim()); 
 
@@ -106,23 +126,8 @@ export default function AssessmentTable({ initialData, onSave, saving, onUpload 
 
   const addNewRow = () => {
     setAssessments(prev => {
-      const uniqueId = crypto.randomUUID(); 
-
-      if (prev.length === 0) {
-        return [...prev, { ...DEFAULT_ASSESSMENT, id: uniqueId }];
-      }
-
-      const newClos: Assessment['clos'] = Object.keys(prev[0].clos).reduce((acc, cloKey) => {
-        acc[cloKey as keyof Assessment['clos']] = [];
-        return acc;
-      }, {} as Assessment['clos']);
-
-      return [...prev, {
-        id: uniqueId, 
-        type: '',
-        clos: newClos,
-        weight: 0
-      }];
+      const uniqueId = crypto.randomUUID();
+      return [...prev, createDefaultAssessment(numberOfClos)];
     });
   };
 
@@ -130,7 +135,7 @@ export default function AssessmentTable({ initialData, onSave, saving, onUpload 
     setAssessments(prev => {
       const updatedAssessments = prev.filter(assessment => !selectedRows.includes(assessment.id));
       if (updatedAssessments.length === 0) {
-        return [DEFAULT_ASSESSMENT]; 
+        return [createDefaultAssessment(numberOfClos)]; 
       }
       return updatedAssessments;
     });
@@ -232,7 +237,7 @@ export default function AssessmentTable({ initialData, onSave, saving, onUpload 
                             if (!isNaN(number)) {
                               const result = handleCLOInput(
                                 assessment.id,
-                                clo as keyof Assessment['clos'],
+                                clo,
                                 trimmedInputValue
                               );
 
