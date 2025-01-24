@@ -4,40 +4,13 @@ import AssessmentTable from '@/components/shared/assessment-table/AssessmentTabl
 import { Button } from '@/components/ui/button'
 import { getAssessmentByCourse, updateAssessmentPlans } from '@/services/assessment.action';
 import { getCourseById } from '@/services/courses.action';
-import { Loader2Icon } from 'lucide-react';
+import { Loader2Icon, ThumbsUp } from 'lucide-react';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
-
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 // Dummy data with the same structure as your MongoDB model will have
-const dummyData = {
-  assessments: [
-    {
-      id: '1',
-      type: 'Quiz 1',
-      clos: {
-        clo1: [1, 2],
-        clo2: [3, 4],
-        clo3: [5],
-        clo4: [6],
-        clo5: [7],
-      },
-      weight: 10
-    },
-    {
-      id: '2',
-      type: 'Mid Term',
-      clos: {
-        clo1: [2, 3],
-        clo2: [4, 5],
-        clo3: [1, 6],
-        clo4: [7],
-        clo5: [8],
-      },
-      weight: 30
-    }
-  ]
-}
+
 
 export default function AssessmentPlanPage() {
   const params = useParams();
@@ -46,6 +19,13 @@ export default function AssessmentPlanPage() {
   const [course, setCourse] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+
+  const [uploadOpen, setUploadOpen] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [progress, setProgress] = useState(0);
+  const [loadingDialog, setLoadingDialog] = useState(false);
+
+  const [selectedType, setSelectedType] = useState<string>('');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -102,9 +82,102 @@ export default function AssessmentPlanPage() {
     }
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedFile(file);
+      setLoadingDialog(true);
+      setProgress(0);
+
+      const fakeProgressInterval = setInterval(() => {
+        setProgress((prevProgress) => {
+          if (prevProgress >= 100) {
+            clearInterval(fakeProgressInterval);
+            setLoadingDialog(false);
+            return 100;
+          }
+          return prevProgress + 10;
+        });
+      }, 50);
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLLabelElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLLabelElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    const file = e.dataTransfer.files?.[0];
+    if (file && (file.type === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" || 
+                 file.type === "application/vnd.ms-excel")) {
+      setSelectedFile(file);
+      setLoadingDialog(true);
+      setProgress(0);
+
+      const fakeProgressInterval = setInterval(() => {
+        setProgress((prevProgress) => {
+          if (prevProgress >= 100) {
+            clearInterval(fakeProgressInterval);
+            setLoadingDialog(false);
+            return 100;
+          }
+          return prevProgress + 10;
+        });
+      }, 50);
+    } else {
+      toast.error('Please upload only Excel files (.xlsx, .xls)');
+    }
+  };
+
+  const handleUpload = async () => {
+    if (!selectedFile || !course) return;
+    console.log({
+      courseId: course._id,
+      type: selectedType,
+      file: selectedFile
+    })
+
+
+    try {
+      setLoadingDialog(true);
+      const formData = new FormData();
+      formData.append('file', selectedFile);
+      formData.append('courseId', course._id);
+      formData.append('type', selectedType);
+
+      const response = await fetch('/api/assessment-upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to upload assessment');
+      }
+
+      toast.success('Assessment uploaded successfully');
+      setUploadOpen(false);
+      setSelectedFile(null);
+      setProgress(0);
+      // Optionally refresh the assessment data
+      window.location.reload();
+    } catch (error) {
+      console.error('Error uploading assessment:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to upload assessment');
+    } finally {
+      setLoadingDialog(false);
+    }
+  };
+
   if (loading) {
     return <div className='w-full h-1/3 flex justify-center items-center'><Loader2Icon className='animate-spin text-primary h-6 w-6'/></div>;
   }
+  
 
   return (
     <div className="space-y-4 p-4">
@@ -112,7 +185,65 @@ export default function AssessmentPlanPage() {
         saving={saving}
         initialData={assessmentData}
         onSave={handleSave}
+        onUpload={(type: string) => {
+          setSelectedType(type);
+          setUploadOpen(true);
+        }}
       />
+
+      
+    {/* //drawers */}
+    <Dialog open={uploadOpen} onOpenChange={setUploadOpen}>
+            <DialogContent onInteractOutside={(e) => e.preventDefault()}>
+              <DialogHeader>
+                <DialogTitle>Upload Assessment Report - {selectedType}</DialogTitle>
+              </DialogHeader>
+              
+              {selectedFile ? (
+                loadingDialog ? (
+                  <div className="w-full bg-gray-200 rounded-full h-2.5 mt-4">
+                    <div
+                      className="bg-blue-500 h-2.5 rounded-full transition-all duration-300"
+                      style={{ width: `${progress}%` }}
+                    />
+                  </div>
+                ) : (
+                  progress === 100 && (
+                    <div className='flex gap-1 items-center justify-center'>
+                      <ThumbsUp size={20} />
+                      <p className='font-semibold text-center'>File uploaded successfully</p>
+                    </div>
+                  )
+                )
+              ) : (
+                <div className="flex items-center justify-center w-full">
+                  <label 
+                    htmlFor={`dropzone-file-${course?._id}`} 
+                    className="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500"
+                    onDragOver={handleDragOver}
+                    onDrop={handleDrop}
+                  >
+                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                      <svg className="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
+                        <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
+                      </svg>
+                      <p className="mb-2 text-sm text-gray-500 dark:text-gray-400"><span className="font-semibold">Click to upload</span> or drag and drop</p>
+                    </div>
+                    <input id={`dropzone-file-${course?._id}`} type="file" accept=".xlsx, .xls" onChange={handleFileChange} className="hidden" />
+                  </label>
+                </div>
+              )}
+
+              <DialogFooter className='w-full'>
+                <Button className='w-full' variant={'outline'} onClick={() => {
+                  setUploadOpen(false);
+                  setSelectedFile(null);
+                  setProgress(0);
+                }}>Cancel</Button>
+                <Button className='w-full' disabled={!selectedFile} onClick={handleUpload}>Upload</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
     </div>
   )
 }

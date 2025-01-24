@@ -33,6 +33,7 @@ interface AssessmentTableProps {
   initialData: Assessment[];
   onSave: (data: Assessment[]) => void;
   saving: boolean;
+  onUpload: (type: string) => void;
 }
 
 // Get CLO keys dynamically from the first assessment or default assessment
@@ -41,7 +42,7 @@ const getCLOKeys = (assessments: Assessment[]): string[] => {
   return Object.keys(firstAssessment.clos).sort();
 };
 
-export default function AssessmentTable({ initialData, onSave, saving }: AssessmentTableProps) {
+export default function AssessmentTable({ initialData, onSave, saving, onUpload }: AssessmentTableProps) {
   // Use initialData if it exists, otherwise use default empty assessment
   const [assessments, setAssessments] = useState<Assessment[]>(
     initialData.length > 0 ? initialData : [DEFAULT_ASSESSMENT]
@@ -261,7 +262,7 @@ export default function AssessmentTable({ initialData, onSave, saving }: Assessm
                 </TableCell>
                 <TableCell className='py-1'>
                   <div className="flex gap-2">
-                    <Button variant="outline" size="sm">
+                    <Button variant="outline" size="sm" onClick={() => onUpload(assessment.type)}>
                       <Upload className="h-4 w-4" />
                     </Button>
                     <Button variant="outline" size="sm">

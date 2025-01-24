@@ -1,7 +1,9 @@
 "use client"
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { ThumbsUp } from 'lucide-react';
 import Link from 'next/link'
-import React from 'react'
+import React, { useState } from 'react'
 import { toast } from 'sonner'
 
 const generatePDF = async (html: string, fileName: string) => {
@@ -85,6 +87,7 @@ export default function AssessmentCard({ href, course }: {
   course: any,
 }) {
 
+
   const handleAssessmentPlan = async (e: any) => {
   
     try {
@@ -107,8 +110,10 @@ export default function AssessmentCard({ href, course }: {
       toast.error('Failed to download assessment report');
     }
   }
+ 
 
   return (
+    <>
     <main className='w-full h-full'>
         <Link
           href={href}
@@ -131,5 +136,7 @@ export default function AssessmentCard({ href, course }: {
             </div>
         </Link>
     </main>
+
+    </>
   )
 }
