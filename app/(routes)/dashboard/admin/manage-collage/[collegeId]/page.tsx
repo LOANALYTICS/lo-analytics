@@ -4,8 +4,8 @@ import React, { useEffect, useState } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { addDepartment, getCollegeById, editDepartment } from '@/services/collage.action';
-import { EditIcon, Loader2 } from 'lucide-react';
+import { addDepartment, getCollegeById, editDepartment, deleteDepartmentById } from '@/services/collage.action';
+import { EditIcon, Loader2, TrashIcon } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { FormField, FormItem, FormLabel, FormControl, Form } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
@@ -13,6 +13,7 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import AddCollegeForm from '@/components/shared/admin/AddCollegeForm';
 import EditCollegeForm from '@/components/shared/admin/EditCollegeForm';
+import { Separator } from '@/components/ui/separator';
 
 interface Props {
     params: {
@@ -43,13 +44,16 @@ const departmentSchema = z.object({
     shortName: z.string().min(1, "Short name is required"),
 });
 
-const ManageDepartments= ({ params }: any) => {
+const ManageDepartments = ({ params }: any) => {
     const [tab, setTab] = useState('add-department')
     const collegeParams = React.use<any>(params); // Unwrap the params Promise  
   
     const collegeId = collegeParams.collegeId;  
     const form = useForm<DepartmentFormData>({
         resolver: zodResolver(departmentSchema), // Integrate Zod with React Hook Form
+    });
+    const editForm = useForm<DepartmentFormData>({
+        resolver: zodResolver(departmentSchema),
     });
     const [college, setCollege] = useState<College | null>(null);
     const [editDialogOpen, setEditDialogOpen] = useState(false);
@@ -69,6 +73,15 @@ const ManageDepartments= ({ params }: any) => {
     useEffect(() => {
         fetchCollege();
     }, [collegeId]);
+
+    useEffect(() => {
+        if (currentDepartment && editDialogOpen) {
+            editForm.reset({
+                name: currentDepartment.name,
+                shortName: currentDepartment.shortName
+            });
+        }
+    }, [currentDepartment, editDialogOpen, editForm]);
 
     const onSubmit: SubmitHandler<DepartmentFormData> = async (data) => {
         try {
@@ -96,18 +109,27 @@ const ManageDepartments= ({ params }: any) => {
             }
         }
     };
+    const onDeleteDepartment = async (id: string) => {
+        await deleteDepartmentById(collegeId,id)
+        toast.success('Department deleted successfully')
+        fetchCollege()
+    }
 
     return (
         <main>
-            <div className='flex justify-between items-center'>
-            <h1 className="text-2xl font-bold mb-4">
-                Manage Departments - {college?.english}
+            <div className='flex justify-between items-center py-2'>
+            <h1 className="text-2xl font-bold ">
+               {
+                tab === 'edit-college' ? 'Edit College - '+ college?.english : 'Manage Departments - ' + college?.english
+               }
             </h1>
+          
             <div className='flex gap-2'>
                 <Button onClick={() => setTab('add-department')}>Add Department</Button>
                 <Button onClick={() => setTab('edit-college')}>Edit College</Button>
             </div>
             </div>
+            <Separator className='my-2 w-[80%] mx-auto'/>
 {
      tab === 'edit-college' ? (
                 <EditCollegeForm collegeId={collegeId} />
@@ -144,6 +166,7 @@ const ManageDepartments= ({ params }: any) => {
                                 <h3 className="font-medium">{dept.name}</h3>
                                 <p className="text-sm text-gray-600">{dept.shortName}</p>
                             </div>
+                            <div className='flex gap-2'>
                             <Button 
                                 variant="outline" 
                                 onClick={() => {
@@ -153,6 +176,15 @@ const ManageDepartments= ({ params }: any) => {
                             >
                                 <EditIcon className="w-4 h-4" />
                             </Button>
+                            <Button 
+                                variant="outline" 
+                                onClick={() => {
+                                    onDeleteDepartment(dept._id)
+                                }}
+                            >
+                                    <TrashIcon className="w-4 h-4" />
+                                </Button>
+                            </div>
                         </div>
                     ))
                 ) : (
@@ -166,41 +198,41 @@ const ManageDepartments= ({ params }: any) => {
                     <DialogHeader>
                         <DialogTitle>Edit Department</DialogTitle>
                     </DialogHeader>
-                    <Form {...form}>
-                        <form onSubmit={form.handleSubmit(onEditSubmit)} className="space-y-4">
+                    <Form {...editForm}>
+                        <form onSubmit={editForm.handleSubmit(onEditSubmit)} className="space-y-4">
                             <FormField
-                            control={form.control}
-                            name="name"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Department Name</FormLabel>
-                                    <FormControl>
-                                        <Input {...field} placeholder="Department Name" className="border p-2 rounded" required />
-                                    </FormControl>
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="shortName"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Short Name</FormLabel>
-                                    <FormControl>
-                                        <Input {...field} placeholder="Short Name" className="border p-2 rounded" required />
-                                    </FormControl>
-                                </FormItem>
-                            )}
-                        />
-                        <DialogFooter>
-                            <Button type="submit" disabled={isLoading}>
-                                {isLoading ? (
-                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                ) : (
-                                    'Update Department'
+                                control={editForm.control}
+                                name="name"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Department Name</FormLabel>
+                                        <FormControl>
+                                            <Input {...field} placeholder="Department Name" className="border p-2 rounded" required />
+                                        </FormControl>
+                                    </FormItem>
                                 )}
-                            </Button>
-                        </DialogFooter>
+                            />
+                            <FormField
+                                control={editForm.control}
+                                name="shortName"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Short Name</FormLabel>
+                                        <FormControl>
+                                            <Input {...field} placeholder="Short Name" className="border p-2 rounded" required />
+                                        </FormControl>
+                                    </FormItem>
+                                )}
+                            />
+                            <DialogFooter>
+                                <Button type="submit" disabled={isLoading}>
+                                    {isLoading ? (
+                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                    ) : (
+                                        'Update Department'
+                                    )}
+                                </Button>
+                            </DialogFooter>
                         </form>
                     </Form>
                 </DialogContent>

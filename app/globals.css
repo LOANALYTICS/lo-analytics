@@ -2,6 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
+
+::selection {
+  background-color: #212121;
+  color: white;
+  border-radius: 0.25rem;
+}
+
 body {
   font-family: Arial, Helvetica, sans-serif;
 }

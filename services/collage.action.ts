@@ -2,6 +2,7 @@
 
 import { Collage } from "@/lib/models"
 import { ICollage, IDepartment } from "@/server/models/collage.model"
+import { Types } from "mongoose"
 
 
 
@@ -91,6 +92,19 @@ export async function deleteCollageById(id: string) {
     } catch (error) {
         console.error('Error deleting collage:', error);
         return false
+    }
+}
+
+export async function deleteDepartmentById(collegeId: string, departmentId: string) {
+    try {
+        await Collage.updateOne(
+            { _id: collegeId },
+            { $pull: { departments: { _id: new Types.ObjectId(departmentId) } } }
+        );
+        return true;
+    } catch (error) {
+        console.error('Error deleting department:', error);
+        throw error;
     }
 }
 
