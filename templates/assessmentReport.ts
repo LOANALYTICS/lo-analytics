@@ -26,33 +26,34 @@ export interface AssessmentReportProps {
       totalMarksObtained: number;
     }>;
     cloScores: {
-      [cloId: string]: number;  // Total marks for each CLO
+      [cloId: string]: number;
     };
+    achievementData: {
+      [percentage: string]: Array<{
+        achievementGrade: string;
+        percentageAchieving: string;
+      }>;
+    };
+    sortedClos: string[];
   };
 }
 
 export function generateAssessmentReportHTML(props: AssessmentReportProps): string {
   const { course, college, assessmentData } = props;
+  const { sortedClos, achievementData } = assessmentData;
 
-  // Sort CLOs by their number
-  const sortedClos = Object.keys(assessmentData.cloScores).sort((a, b) => {
-    const aNum = parseInt(a.replace(/[^\d]/g, ''));
-    const bNum = parseInt(b.replace(/[^\d]/g, ''));
-    return aNum - bNum;
-  });
-
-  // Calculate percentage of students achieving ≥60% for each CLO
-  const cloAchievements = sortedClos.map(clo => {
-    const totalMarksForClo = assessmentData.cloScores[clo];
-    const studentsAchieving60Percent = assessmentData.students.filter(student => {
-      const studentScore = student.cloScores[clo]?.marksScored || 0;
-      const percentage = (studentScore / totalMarksForClo) * 100;
-      return percentage >= 60;
-    });
+  // // Calculate percentage of students achieving ≥60% for each CLO
+  // const cloAchievements = sortedClos.map(clo => {
+  //   const totalMarksForClo = assessmentData.cloScores[clo];
+  //   const studentsAchieving60Percent = assessmentData.students.filter(student => {
+  //     const studentScore = student.cloScores[clo]?.marksScored || 0;
+  //     const percentage = (studentScore / totalMarksForClo) * 100;
+  //     return percentage >= 60;
+  //   });
     
-    const percentageAchieving60 = (studentsAchieving60Percent.length / assessmentData.students.length) * 100;
-    return percentageAchieving60.toFixed(2);
-  });
+  //   const percentageAchieving60 = (studentsAchieving60Percent.length / assessmentData.students.length) * 100;
+  //   return percentageAchieving60.toFixed(2);
+  // });
 
   return `
     <!DOCTYPE html>
@@ -220,15 +221,9 @@ export function generateAssessmentReportHTML(props: AssessmentReportProps): stri
                 </tr>
                 <tr class="achievement-row">
                   <td colspan="3" class="achievement-label">% of students scoring ≥ 60%</td>
-                  ${sortedClos.map(clo => {
-                    const totalScore = assessmentData.cloScores[clo];
-                    const studentsAchieving = assessmentData.students.filter(student => {
-                      const studentScore = student.cloScores[clo]?.marksScored || 0;
-                      const percentage = (studentScore / totalScore) * 100;
-                      return percentage >= 60;
-                    });
-                    return `<td>${((studentsAchieving.length / assessmentData.students.length) * 100).toFixed(2)}%</td>`;
-                  }).join('')}
+                  ${sortedClos.map((clo, index) => {
+                    return `<td>${achievementData['60'][index].percentageAchieving}%</td>`;
+                  })}
                   <td>-</td>
                 </tr>
               </tbody>
@@ -244,15 +239,9 @@ export function generateAssessmentReportHTML(props: AssessmentReportProps): stri
                 </tr>
                 <tr class="achievement-row">
                   <td colspan="3" class="achievement-label">% of students scoring ≥ 70%</td>
-                  ${sortedClos.map(clo => {
-                    const totalScore = assessmentData.cloScores[clo];
-                    const studentsAchieving = assessmentData.students.filter(student => {
-                      const studentScore = student.cloScores[clo]?.marksScored || 0;
-                      const percentage = (studentScore / totalScore) * 100;
-                      return percentage >= 70;
-                    });
-                    return `<td>${((studentsAchieving.length / assessmentData.students.length) * 100).toFixed(2)}%</td>`;
-                  }).join('')}
+                  ${sortedClos.map((clo, index) => {
+                    return `<td>${achievementData['70'][index].percentageAchieving}%</td>`;
+                  })}
                   <td>-</td>
                 </tr>
               </tbody>
@@ -268,15 +257,9 @@ export function generateAssessmentReportHTML(props: AssessmentReportProps): stri
                 </tr>
                 <tr class="achievement-row">
                   <td colspan="3" class="achievement-label">% of students scoring ≥ 80%</td>
-                  ${sortedClos.map(clo => {
-                    const totalScore = assessmentData.cloScores[clo];
-                    const studentsAchieving = assessmentData.students.filter(student => {
-                      const studentScore = student.cloScores[clo]?.marksScored || 0;
-                      const percentage = (studentScore / totalScore) * 100;
-                      return percentage >= 80;
-                    });
-                    return `<td>${((studentsAchieving.length / assessmentData.students.length) * 100).toFixed(2)}%</td>`;
-                  }).join('')}
+                  ${sortedClos.map((clo, index) => {
+                    return `<td>${achievementData['80'][index].percentageAchieving}%</td>`;
+                  })}
                   <td>-</td>
                 </tr>
               </tbody>
@@ -292,15 +275,9 @@ export function generateAssessmentReportHTML(props: AssessmentReportProps): stri
                 </tr>
                 <tr class="achievement-row">
                   <td colspan="3" class="achievement-label">% of students scoring ≥ 90%</td>
-                  ${sortedClos.map(clo => {
-                    const totalScore = assessmentData.cloScores[clo];
-                    const studentsAchieving = assessmentData.students.filter(student => {
-                      const studentScore = student.cloScores[clo]?.marksScored || 0;
-                      const percentage = (studentScore / totalScore) * 100;
-                      return percentage >= 90;
-                    });
-                    return `<td>${((studentsAchieving.length / assessmentData.students.length) * 100).toFixed(2)}%</td>`;
-                  }).join('')}
+                  ${sortedClos.map((clo, index) => {
+                    return `<td>${achievementData['90'][index].percentageAchieving}%</td>`;
+                  })}
                   <td>-</td>
                 </tr>
               </tbody>

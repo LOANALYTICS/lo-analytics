@@ -149,10 +149,65 @@ export async function POST(request: Request) {
         .reduce((sum, score) => sum + score.marksScored, 0);
     });
 
-    // Prepare data for template
+    // Prepare data for template with all calculations
     const processedData = {
       students: Array.from(studentResults.values()),
-      cloScores: Object.fromEntries(cloTotalMarks)
+      cloScores: Object.fromEntries(cloTotalMarks),
+      achievementData: {
+        60: Array.from(uniqueClos).map(clo => {
+          const totalScore = cloTotalMarks.get(clo) || 0;
+          const studentsAchieving = Array.from(studentResults.values()).filter(student => {
+            const studentScore = student.cloScores[clo]?.marksScored || 0;
+            const percentage = (studentScore / totalScore) * 100;
+            return percentage >= 60;
+          });
+          return {
+            achievementGrade: (totalScore * 0.6).toFixed(2),
+            percentageAchieving: ((studentsAchieving.length / studentResults.size) * 100).toFixed(2)
+          };
+        }),
+        70: Array.from(uniqueClos).map(clo => {
+          const totalScore = cloTotalMarks.get(clo) || 0;
+          const studentsAchieving = Array.from(studentResults.values()).filter(student => {
+            const studentScore = student.cloScores[clo]?.marksScored || 0;
+            const percentage = (studentScore / totalScore) * 100;
+            return percentage >= 70;
+          });
+          return {
+            achievementGrade: (totalScore * 0.7).toFixed(2),
+            percentageAchieving: ((studentsAchieving.length / studentResults.size) * 100).toFixed(2)
+          };
+        }),
+        80: Array.from(uniqueClos).map(clo => {
+          const totalScore = cloTotalMarks.get(clo) || 0;
+          const studentsAchieving = Array.from(studentResults.values()).filter(student => {
+            const studentScore = student.cloScores[clo]?.marksScored || 0;
+            const percentage = (studentScore / totalScore) * 100;
+            return percentage >= 80;
+          });
+          return {
+            achievementGrade: (totalScore * 0.8).toFixed(2),
+            percentageAchieving: ((studentsAchieving.length / studentResults.size) * 100).toFixed(2)
+          };
+        }),
+        90: Array.from(uniqueClos).map(clo => {
+          const totalScore = cloTotalMarks.get(clo) || 0;
+          const studentsAchieving = Array.from(studentResults.values()).filter(student => {
+            const studentScore = student.cloScores[clo]?.marksScored || 0;
+            const percentage = (studentScore / totalScore) * 100;
+            return percentage >= 90;
+          });
+          return {
+            achievementGrade: (totalScore * 0.9).toFixed(2),
+            percentageAchieving: ((studentsAchieving.length / studentResults.size) * 100).toFixed(2)
+          };
+        })
+      },
+      sortedClos: Array.from(uniqueClos).sort((a, b) => {
+        const aNum = parseInt(a.replace(/[^\d]/g, ''));
+        const bNum = parseInt(b.replace(/[^\d]/g, ''));
+        return aNum - bNum;
+      })
     };
 
     // Generate HTML content
