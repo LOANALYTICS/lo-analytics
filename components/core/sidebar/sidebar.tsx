@@ -23,7 +23,7 @@ const adminSidebarLinks: SidebarItem[] = [
   { name: "Manage College", href: "/dashboard/admin/manage-collage", icon: Building },
   { name: "Create Course", href: "/dashboard/admin/create-course", icon: Plus },
   { name: "Manage Course", href: "/dashboard/admin/manage-courses", icon: BookDashed },
-  { name: "Manage", href: "/dashboard/admin/manage-coordinators", icon: User },
+  { name: "Manage ", href: "/dashboard/admin/manage-coordinators", icon: User },
 ];
 interface SidebarItem {
   name: string;

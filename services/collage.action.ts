@@ -69,3 +69,28 @@ export async function editDepartment(collegeId: string, departmentId: string, up
         { $set: { "departments.$": updatedDepartment } }
     );
 }
+
+export async function updateCollage(id: string, collage: any) {
+    const existingCollage = await Collage.findOne({ 
+        english: collage.english,
+        university: collage.university,
+        _id: { $ne: id } // Exclude current college from duplicate check
+    });
+
+    if (existingCollage) {
+        throw new Error('A college with this name already exists in the specified university');
+    }
+
+    const updatedCollage = await Collage.findByIdAndUpdate(id, collage, { new: true });
+    return updatedCollage ? true : false;
+}
+export async function deleteCollageById(id: string) {
+    try {
+        await Collage.findByIdAndDelete(id);
+        return true
+    } catch (error) {
+        console.error('Error deleting collage:', error);
+        return false
+    }
+}
+

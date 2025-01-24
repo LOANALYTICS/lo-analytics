@@ -30,7 +30,7 @@ const formSchema = z.object({
 })
 
 interface AddCollegeFormProps {
-    onClose: () => void;
+    onClose?: () => void;
 }
 
 export default function AddCollegeForm({ onClose }: AddCollegeFormProps) {
@@ -74,7 +74,7 @@ export default function AddCollegeForm({ onClose }: AddCollegeFormProps) {
           if (response) {
             toast.success('College added successfully');
             router.refresh(); 
-            onClose();
+            onClose &&onClose();
           }
         } catch (error) {
           console.error(error);

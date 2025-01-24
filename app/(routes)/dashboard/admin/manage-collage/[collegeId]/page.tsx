@@ -11,6 +11,8 @@ import { FormField, FormItem, FormLabel, FormControl, Form } from '@/components/
 import { Input } from '@/components/ui/input';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
+import AddCollegeForm from '@/components/shared/admin/AddCollegeForm';
+import EditCollegeForm from '@/components/shared/admin/EditCollegeForm';
 
 interface Props {
     params: {
@@ -42,6 +44,7 @@ const departmentSchema = z.object({
 });
 
 const ManageDepartments= ({ params }: any) => {
+    const [tab, setTab] = useState('add-department')
     const collegeParams = React.use<any>(params); // Unwrap the params Promise  
   
     const collegeId = collegeParams.collegeId;  
@@ -95,10 +98,22 @@ const ManageDepartments= ({ params }: any) => {
     };
 
     return (
-        <div className="p-4">
+        <main>
+            <div className='flex justify-between items-center'>
             <h1 className="text-2xl font-bold mb-4">
                 Manage Departments - {college?.english}
             </h1>
+            <div className='flex gap-2'>
+                <Button onClick={() => setTab('add-department')}>Add Department</Button>
+                <Button onClick={() => setTab('edit-college')}>Edit College</Button>
+            </div>
+            </div>
+{
+     tab === 'edit-college' ? (
+                <EditCollegeForm collegeId={collegeId} />
+            ): (
+                    <div className="p-4">
+          
             
             {/* Department Form */}
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 mb-8">
@@ -190,7 +205,13 @@ const ManageDepartments= ({ params }: any) => {
                     </Form>
                 </DialogContent>
             </Dialog>
-        </div>
+        </div>  
+            )
+       
+}
+           
+        </main>
+       
     );
 };
 
