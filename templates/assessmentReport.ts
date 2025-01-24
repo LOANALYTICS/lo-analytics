@@ -81,12 +81,17 @@ export function generateAssessmentReportHTML(props: AssessmentReportProps): stri
           }
           .achievement-row td {
             border: 1px solid black;
+            padding: 10px;
+                 padding-left: 10px;
+            padding-right: 10px;
+            padding-top: 10px;
+            padding-bottom: 20px;
           }
           .achievement-pair tr:first-child td.achievement-label {
-            border-bottom: 1px solid black;
+            border-bottom: 0px solid black;
           }
           .achievement-pair tr:last-child td.achievement-label {
-            border-top: 1px solid black;
+            border-top: 0px solid black;
           }
           thead tr:first-child th:first-child {
             border-top-left-radius: 8px;
@@ -104,15 +109,17 @@ export function generateAssessmentReportHTML(props: AssessmentReportProps): stri
           .id-col { width: 100px; }
           .name-col { width: 200px; }
           .marks-col { width: 80px; }
-          .clo-header { background-color: #e0e0e0; }
+          .clo-header { background-color: #e0e0e0;text-transform: capitalize; }
           .total-header { background-color: #d0d0d0; }
           .achievement-label { 
             font-weight: normal; 
             text-align: left;
             font-size: 16px;
             vertical-align: middle;
-            line-height: 1.5;
-            padding: 20px;
+            padding-left: 10px;
+            padding-right: 10px;
+            padding-top: 10px;
+            padding-bottom: 20px;
             font-family: Arial, sans-serif;
           }
           .course-details {
@@ -150,7 +157,7 @@ export function generateAssessmentReportHTML(props: AssessmentReportProps): stri
         <div class="container">
           <div class="header">
             <img src="${college.logo}" alt="College Logo" class="logo">
-            <h2>Course Learning Outcome (CLO) Achievement Report</h2>
+            
             <div class="course-details">
               <div class="detail-item">
                 <span class="detail-label">Department:</span> ${course.department}
@@ -169,6 +176,8 @@ export function generateAssessmentReportHTML(props: AssessmentReportProps): stri
               </div>
             </div>
           </div>
+
+          <h2 style="text-align: center; margin-bottom: 20px;">Course Learning Outcome (CLO) Achievement Report</h2>
 
           <table style="border-radius: 5px; overflow: hidden;">
             <thead>

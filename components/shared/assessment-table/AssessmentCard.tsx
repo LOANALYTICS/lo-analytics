@@ -121,8 +121,11 @@ export default function AssessmentCard({ href, course }: {
               <p>Type : <span className='capitalize'>{course.examType}</span></p>
               <p>Semester : <span className='capitalize'>{course.semister}</span></p>
             </div>
-            <div className='absolute right-3 bottom-3 space-x-2'>
-                <Button onClick={handleAssessmentPlan} variant='outline' size='sm' className='px-5 py-3 text-[11px] w-full h-fit font-bold'>
+            <div className='z-50 self-end bottom-3 space-x-2'>
+                <Button onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  handleAssessmentPlan(e)}} variant='outline' size='sm' className='px-5 py-3 text-[11px] w-full h-fit font-bold'>
                     Generate Report
                 </Button>
             </div>
