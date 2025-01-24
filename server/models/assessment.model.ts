@@ -54,6 +54,15 @@ export interface IAssessment extends Document {
             percentageAchieving: number;
         }>;
     };
+    cloData: {
+        clo: string;
+        description: string;
+        ploMapping: {
+            k: Array<{ [key: string]: boolean }>;
+            s: Array<{ [key: string]: boolean }>;
+            v: Array<{ [key: string]: boolean }>;
+        };
+    }[];
 }
 
 export const assessmentSchema = new Schema<IAssessment>({
@@ -109,5 +118,14 @@ export const assessmentSchema = new Schema<IAssessment>({
             percentageAchieving: { type: Number, required: true }
         }],
         default: undefined
-    }
+    },
+    cloData: [{
+        clo: { type: String, required: true },
+        description: { type: String, required: true },
+        ploMapping: {
+            k: [{ type: Object, required: true }],
+            s: [{ type: Object, required: true }],
+            v: [{ type: Object, required: true }]
+        }
+    }]
 }, { timestamps: true, strict: false }); 

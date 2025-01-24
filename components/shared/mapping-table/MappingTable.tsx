@@ -24,7 +24,7 @@ export type PLOMapping = {
 }
 
 export type CLO = {
-  id: string;
+  clo: string;
   description: string;
   ploMapping: PLOMapping;
 }
@@ -46,7 +46,6 @@ export default function MappingTable({ initialData, defaultColumnCounts, onUpdat
       const key = `${type}${index + 1}`;
       const currentValue = Object.values(newClos[cloIndex].ploMapping[type][index])[0];
       newClos[cloIndex].ploMapping[type][index] = { [key]: !currentValue };
-      onUpdate(newClos);
       return newClos;
     });
   };
@@ -55,7 +54,6 @@ export default function MappingTable({ initialData, defaultColumnCounts, onUpdat
     setClos(prev => {
       const newClos = [...prev];
       newClos[index].description = value;
-      onUpdate(newClos);
       return newClos;
     });
   };
@@ -74,7 +72,6 @@ export default function MappingTable({ initialData, defaultColumnCounts, onUpdat
       newClos.forEach(clo => {
         clo.ploMapping[type].push({ [`${type}${newCount}`]: false });
       });
-      onUpdate(newClos);
       return newClos;
     });
   };
@@ -89,7 +86,6 @@ export default function MappingTable({ initialData, defaultColumnCounts, onUpdat
       newClos.forEach(clo => {
         clo.ploMapping[type].splice(index, 1);
       });
-      onUpdate(newClos);
       return newClos;
     });
   };
@@ -104,7 +100,7 @@ export default function MappingTable({ initialData, defaultColumnCounts, onUpdat
                 <Checkbox 
                   checked={clos.length > 0 && selectedCLOs.length === clos.length}
                   onCheckedChange={(checked) => {
-                    setSelectedCLOs(checked ? clos.map(clo => clo.id) : []);
+                    setSelectedCLOs(checked ? clos.map(clo => clo.clo) : []);
                   }}
                 />
               </TableHead>
@@ -152,12 +148,12 @@ export default function MappingTable({ initialData, defaultColumnCounts, onUpdat
           </TableHeader>
           <TableBody>
             {clos.map((clo, rowIndex) => (
-              <TableRow key={clo.id}>
+              <TableRow key={clo.clo}>
                 <TableCell className="border">
                   <Checkbox 
-                    checked={selectedCLOs.includes(clo.id)}
+                    checked={selectedCLOs.includes(clo.clo)}
                     onCheckedChange={() => setSelectedCLOs(prev => 
-                      prev.includes(clo.id) ? prev.filter(id => id !== clo.id) : [...prev, clo.id]
+                      prev.includes(clo.clo) ? prev.filter(id => id !== clo.clo) : [...prev, clo.clo]
                     )}
                   />
                 </TableCell>
@@ -196,14 +192,15 @@ export default function MappingTable({ initialData, defaultColumnCounts, onUpdat
       <div className="mt-4 flex gap-2">
         {selectedCLOs.length > 0 && (
           <Button
+            type='button'
             variant="destructive"
             onClick={() => {
               setClos(prev => {
-                const newClos = prev.filter(clo => !selectedCLOs.includes(clo.id));
+                const newClos = prev.filter(clo => !selectedCLOs.includes(clo.clo));
                 
                 if (newClos.length === 0) {
                   const newClo = {
-                    id: Date.now().toString(),
+                    clo: Date.now().toString(),
                     description: 'CLO 1',
                     ploMapping: {
                       k: Array(columnCounts.k).fill(0).map((_, i) => ({ [`k${i + 1}`]: false })),
@@ -218,7 +215,6 @@ export default function MappingTable({ initialData, defaultColumnCounts, onUpdat
                   });
                 }
                 
-                onUpdate(newClos);
                 return newClos;
               });
               setSelectedCLOs([]);
@@ -230,9 +226,10 @@ export default function MappingTable({ initialData, defaultColumnCounts, onUpdat
           </Button>
         )}
         <Button
+          type='button'
           onClick={() => setClos(prev => {
             const newClo = {
-              id: Date.now().toString(),
+              clo: Date.now().toString(),
               description: `CLO ${prev.length + 1}`,
               ploMapping: {
                 k: Array(columnCounts.k).fill(0).map((_, i) => ({ [`k${i + 1}`]: false })),
@@ -241,7 +238,6 @@ export default function MappingTable({ initialData, defaultColumnCounts, onUpdat
               }
             };
             const newClos = [...prev, newClo];
-            onUpdate(newClos);
             if (selectedCLOs.length === prev.length) {
               setSelectedCLOs([]);
             }
@@ -249,6 +245,13 @@ export default function MappingTable({ initialData, defaultColumnCounts, onUpdat
           })}
         >
           Add CLO
+        </Button>
+        <Button
+          variant="default"
+          className="ml-auto"
+          onClick={() => onUpdate(clos)}
+        >
+          Save Changes
         </Button>
       </div>
     </div>
