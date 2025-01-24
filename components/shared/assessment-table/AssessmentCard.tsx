@@ -10,10 +10,18 @@ const generatePDF = async (html: string, fileName: string) => {
   try {
     const html2pdf = (await import("html2pdf.js")).default;
 
+    // Sanitize the HTML by removing any invisible characters (e.g., non-breaking spaces, zero-width spaces)
+    const sanitizedHTML = html
+      .replace(/[\u200B-\u200D\uFEFF]/g, "") // Remove zero-width characters
+      .replace(/&nbsp;/g, " ")  // Remove non-breaking spaces
+      .replace(/['"’]/g, "");   // Remove unwanted quotes if any
+    
+    // Create a container for the sanitized HTML
     const container = document.createElement("div");
-    container.innerHTML = html;
+    container.innerHTML = sanitizedHTML;
     document.body.appendChild(container);
 
+    // Add the logo to the container
     const logo = document.createElement("img");
     logo.src = "/pdf_logo.png";
     logo.style.position = "fixed";
@@ -25,6 +33,7 @@ const generatePDF = async (html: string, fileName: string) => {
     logo.style.zIndex = "1000";
     container.appendChild(logo);
 
+    // PDF options
     const opt = {
       margin: 0.5,
       filename: `${fileName}.pdf`,
@@ -49,6 +58,7 @@ const generatePDF = async (html: string, fileName: string) => {
       },
     };
 
+    // Generate the PDF
     await html2pdf()
       .set(opt)
       .from(container)
@@ -75,12 +85,15 @@ const generatePDF = async (html: string, fileName: string) => {
       })
       .save();
 
+    // Clean up the container after PDF generation
     document.body.removeChild(container);
   } catch (error) {
     console.error("Error generating PDF:", error);
     throw error;
   }
 };
+
+
 
 export default function AssessmentCard({ href, course }: { 
   href: string, 
