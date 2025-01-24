@@ -162,6 +162,7 @@ export async function POST(request: Request) {
             return percentage >= 60;
           });
           return {
+            clo,
             achievementGrade: (totalScore * 0.6).toFixed(2),
             percentageAchieving: ((studentsAchieving.length / studentResults.size) * 100).toFixed(2)
           };
@@ -174,6 +175,7 @@ export async function POST(request: Request) {
             return percentage >= 70;
           });
           return {
+            clo,
             achievementGrade: (totalScore * 0.7).toFixed(2),
             percentageAchieving: ((studentsAchieving.length / studentResults.size) * 100).toFixed(2)
           };
@@ -186,6 +188,7 @@ export async function POST(request: Request) {
             return percentage >= 80;
           });
           return {
+            clo,
             achievementGrade: (totalScore * 0.8).toFixed(2),
             percentageAchieving: ((studentsAchieving.length / studentResults.size) * 100).toFixed(2)
           };
@@ -198,6 +201,7 @@ export async function POST(request: Request) {
             return percentage >= 90;
           });
           return {
+            clo,
             achievementGrade: (totalScore * 0.9).toFixed(2),
             percentageAchieving: ((studentsAchieving.length / studentResults.size) * 100).toFixed(2)
           };
@@ -209,6 +213,18 @@ export async function POST(request: Request) {
         return aNum - bNum;
       })
     };
+
+    // Save achievement data to MongoDB
+    try {
+      await Assessment.findOneAndUpdate(
+        { course: courseId },
+        { $set: { achievementData: processedData.achievementData } },
+        { new: true }
+      );
+    } catch (error) {
+      console.error('Failed to save achievement data:', error);
+      // Continue with HTML generation even if save fails
+    }
 
     // Generate HTML content
     const htmlContent = generateAssessmentReportHTML({

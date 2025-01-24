@@ -47,6 +47,13 @@ export interface IAssessment extends Document {
             correctAnswer: string;
         }[];
     }[];
+    achievementData?: {
+        [threshold: string]: Array<{
+            clo: string;
+            achievementGrade: number;
+            percentageAchieving: number;
+        }>;
+    };
 }
 
 export const assessmentSchema = new Schema<IAssessment>({
@@ -93,5 +100,14 @@ export const assessmentSchema = new Schema<IAssessment>({
             questionNumber: { type: String, required: true },
             correctAnswer: { type: String, required: true }
         }]
-    }]
+    }],
+    achievementData: {
+        type: Map,
+        of: [{
+            clo: { type: String, required: true },
+            achievementGrade: { type: Number, required: true },
+            percentageAchieving: { type: Number, required: true }
+        }],
+        default: undefined
+    }
 }, { timestamps: true, strict: false }); 

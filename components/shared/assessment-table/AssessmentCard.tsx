@@ -124,7 +124,9 @@ export default function AssessmentCard({ href, course }: {
     }
   }
  
-
+const handleCloReport = async (e: any) => {
+  toast.success('It is under development');
+}
   return (
     <>
     <main className='w-full h-full'>
@@ -139,7 +141,13 @@ export default function AssessmentCard({ href, course }: {
               <p>Type : <span className='capitalize'>{course.examType}</span></p>
               <p>Semester : <span className='capitalize'>{course.semister}</span></p>
             </div>
-            <div className='z-50 self-end bottom-3 space-x-2'>
+            <div className='z-50 flex flex-col gap-2 self-end bottom-3 '>
+                <Button onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  handleCloReport(e)}} variant='outline' size='sm' className='px-5 py-3 text-[11px] w-full h-fit font-bold'>
+                   Dev-Testing 
+                </Button>
                 <Button onClick={(e) => {
                   e.preventDefault()
                   e.stopPropagation()

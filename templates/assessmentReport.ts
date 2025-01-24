@@ -30,6 +30,7 @@ export interface AssessmentReportProps {
     };
     achievementData: {
       [percentage: string]: Array<{
+        clo: string;
         achievementGrade: string;
         percentageAchieving: string;
       }>;
