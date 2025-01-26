@@ -11,7 +11,7 @@ export default async function StudentDetailsPage() {
   return (
 
     <main className="px-2">
-      <h1 className="font-semibold text-lg"> Course students - ( {courses.data.length} )</h1>
+      <h1 className="font-semibold text-lg"> Courses - ( {courses.data.length} )</h1>
       <section className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-2 mt-4">
         {courses.data.map((course: any) => (
           <CourseCard key={course._id} href={`/dashboard/blueprint/student-details/${course._id}`} template={course} />

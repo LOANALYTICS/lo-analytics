@@ -146,8 +146,13 @@ export function TopicManager({ courseId }: TopicManagerProps) {
     return (
         <>
             <div className="space-y-4 flex-1">
+                <div className="flex text-sm items-center gap-2.5 max-w-3xl ">
+                    <p className="w-[38px]"></p>
+                    <p className={`font-bold  ${editingIndex === null ? 'flex-[0.84] ' : 'flex-[3.8]'}`}>Topics</p>
+                    <p className={`font-bold  flex-1`}>Allowed Qs</p>
+                </div>
                 {topics.map((topic, index) => (
-                    <div key={index} className="flex items-center gap-2 max-w-2xl">
+                    <div key={index} className="flex items-center gap-2 max-w-3xl ">
                         <div
                             className={`aspect-square rounded-md h-[38px] border cursor-pointer flex items-center justify-center
                                 ${selectedTopics.find(t => t.name === topic.name) ? 'bg-black' : 'bg-white'}`}
@@ -221,7 +226,7 @@ export function TopicManager({ courseId }: TopicManagerProps) {
                     </div>
                 ))}
                 
-                <div className="flex items-center gap-2 max-w-2xl">
+                <div className="flex items-center gap-2 max-w-3xl">
                     <Input
                         value={newInput}
                         onChange={(e) => setNewInput(e.target.value)}
@@ -232,7 +237,7 @@ export function TopicManager({ courseId }: TopicManagerProps) {
                         value={newAllowedQuestion}
                         onChange={(e) => setNewAllowedQuestion(e.target.value)}
                         placeholder="Allowed Questions"
-                        className="w-28 min-w-28"
+                        className="w-48 min-w-48"
                     />
                     <Button size="icon" onClick={() => handleSave(newInput, newAllowedQuestion)}>
                         <Plus className="h-4 w-4" />

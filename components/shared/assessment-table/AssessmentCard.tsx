@@ -129,10 +129,10 @@ const handleCloReport = async (e: any) => {
 }
   return (
     <>
-    <main className='w-full h-full'>
+    <main className='w-full h-full hover:shadow-md transition-all duration-300 hover:translate-y-[-1px] group'>
         <Link
           href={href}
-          className='flex relative justify-between items-center border border-gray-300 shadow-sm p-3 rounded-md text-[13px]'
+          className='flex relative justify-between items-center border border-gray-300 group-hover:border-blue-400 shadow-sm p-3 rounded-md text-[13px]'
         >
             <div className='flex flex-col gap-1'>
               <h2>Course Name : <span className='capitalize'>{course.course_name}</span></h2>

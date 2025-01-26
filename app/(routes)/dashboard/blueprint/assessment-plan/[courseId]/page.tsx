@@ -10,6 +10,8 @@ import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import SimpleLoader from '@/components/core/SimpleLoader';
+import SectionHeader from '@/components/core/SectionHeader';
 // Dummy data with the same structure as your MongoDB model will have
 
 
@@ -49,8 +51,10 @@ export default function AssessmentPlanPage() {
             weight: item.weight
           }));
           setAssessmentData(formattedData);
-          setCourse(courseResponse);
+     
         }
+        console.log('ererererererer', courseResponse)
+        setCourse(courseResponse);
       } catch (error) {
         console.error('Error fetching data:', error);
       } finally {
@@ -178,12 +182,13 @@ export default function AssessmentPlanPage() {
   };
 
   if (loading) {
-    return <div className='w-full h-1/3 flex justify-center items-center'><Loader2Icon className='animate-spin text-primary h-6 w-6'/></div>;
+    return <SimpleLoader />;
   }
   
 
   return (
-    <div className="space-y-4 p-4">
+    <div className="space-y-2 p-2">
+      <SectionHeader courseDetails={course} />
       <AssessmentTable 
         saving={saving}
         initialData={assessmentData}

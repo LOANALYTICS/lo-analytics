@@ -197,7 +197,7 @@ export default function StudentTable({data, courseId} : {data: any, courseId: st
   };
 
   return (
-    <section className='p-2'>
+    <section className='pb-60'>
       <div className="container mx-auto border rounded-lg">
         {selectedStudents.length > 0 && (
           <div className="p-2 bg-gray-50 flex justify-between items-center">

@@ -143,15 +143,8 @@ export default function AssessmentTable({ initialData, onSave, saving, onUpload,
   };
 
   return (
-    <div className="space-y-4">
-      {selectedRows.length > 0 && (
-        <div className="flex justify-end">
-          <Button variant="destructive" onClick={deleteSelectedRows}>
-            <Trash className="h-4 w-4 mr-2" />
-            Delete Selected
-          </Button>
-        </div>
-      )}
+    <div className="">
+    
 
       <div className="border rounded-lg">
         <Table>
@@ -182,7 +175,7 @@ export default function AssessmentTable({ initialData, onSave, saving, onUpload,
           <TableBody>
             {assessments.map((assessment) => (
               <TableRow key={assessment.id}>
-                <TableCell className='w-10 py-1'>
+                <TableCell className='w-10 py-1 '>
                   <Checkbox
                     checked={selectedRows.includes(assessment.id)}
                     onCheckedChange={(checked) => {
@@ -196,7 +189,7 @@ export default function AssessmentTable({ initialData, onSave, saving, onUpload,
                 </TableCell>
                 <TableCell className='py-1'>
                   <Input
-                    className='border-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0'
+                    className='border-none bg-transparent focus-visible:ring-0  focus-visible:ring-offset-0'
                     value={assessment.type}
                     onChange={(e) => setAssessments(prev => prev.map(a =>
                       a.id === assessment.id ? { ...a, type: e.target.value } : a
@@ -204,8 +197,8 @@ export default function AssessmentTable({ initialData, onSave, saving, onUpload,
                   />
                 </TableCell>
                 {cloKeys.map((clo) => (
-                  <TableCell key={clo} className='py-1'>
-                    <div className="flex items-center flex-wrap gap-1 p-1 border-l border-r min-h-[40px]">
+                  <TableCell key={clo} className='py-1 border'>
+                    <div className="flex items-center flex-wrap gap-1 p-1  min-h-[40px]">
                       {assessment.clos[clo as keyof Assessment['clos']].map((num, idx) => (
                         <span key={idx} className="bg-blue-100 group relative h-5 w-5 rounded text-xs flex items-center justify-center gap-1">
                           {num}
@@ -256,7 +249,7 @@ export default function AssessmentTable({ initialData, onSave, saving, onUpload,
                     </div>
                   </TableCell>
                 ))}
-                <TableCell className='py-1'>
+                <TableCell className='py-1 border'>
                   <Input
                     type="number"
                     value={assessment.weight}
@@ -281,11 +274,26 @@ export default function AssessmentTable({ initialData, onSave, saving, onUpload,
         </Table>
       </div>
 
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center mt-4">
+        <div className='flex gap-4 items-center'>
         <Button onClick={addNewRow}>
           <Plus className="h-4 w-4 mr-2" />
           Add Row
         </Button>
+          
+              {selectedRows.length > 0 && (
+                <div className="flex justify-end">
+                  <Button variant="destructive" onClick={deleteSelectedRows}>
+                    <Trash className="h-4 w-4 mr-2" />
+                    Delete Selected
+                  </Button>
+                </div>
+              )}
+          
+
+        </div>
+     
+
 
         <Button
           variant="default"

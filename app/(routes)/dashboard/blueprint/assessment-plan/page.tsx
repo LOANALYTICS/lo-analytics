@@ -12,7 +12,7 @@ export default async function AssessmentPlanPage() {
   return (
 
     <main className="px-2">
-      <h1 className="font-semibold text-lg"> Assessment Plan - ( {courses.data.length} )</h1>
+      <h1 className="font-semibold text-lg"> Assessment Plans - ( {courses.data.length} )</h1>
       <section className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-2 mt-4">
         {courses.data.map((course: any) => (
           <AssessmentCard key={course._id} href={`/dashboard/blueprint/assessment-plan/${course._id}`} course={course}  />

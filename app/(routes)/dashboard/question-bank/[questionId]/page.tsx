@@ -18,7 +18,7 @@ export default async function QuestionBankPage({ params }: Props) {
   }
 
   return (
-    <div className="p-6 h-full  flex flex-col w-full">
+    <div className="p-2 h-full  flex flex-col w-full">
     
      
       <section className='flex-1 flex flex-col'>

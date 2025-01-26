@@ -91,7 +91,7 @@ export default function MappingTable({ initialData, defaultColumnCounts, onUpdat
   };
 
   return (
-    <div className="p-4 relative w-full">
+    <div className="relative w-full pb-40">
       <div className="border rounded-lg w-full overflow-auto max-w-[calc(100vw-2rem)]">
         <Table className="text-xs w-full">
           <TableHeader>

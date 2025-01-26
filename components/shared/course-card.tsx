@@ -18,11 +18,12 @@ import { compareKRValues } from '@/services/compareKRValues.action';
 import { generateComparisonHTML } from '@/services/CompareKRHTML';
 import axios from 'axios';
 
-export default function CourseCard({ cardOf, href, template, user }: { 
+export default function CourseCard({ cardOf, href, template, user, isQP }: { 
   cardOf?: string,
   href?: string, 
   template: any,
-  user?: any 
+  user?: any,
+  isQP?: boolean
 }) {
   const [uploadOpen, setUploadOpen] = useState(false);
   const [compareOpen, setCompareOpen] = useState(false);
@@ -32,6 +33,8 @@ export default function CourseCard({ cardOf, href, template, user }: {
   const [semesterCourses, setSemesterCourses] = useState<any[]>([]);
   const [selectedCourseId, setSelectedCourseId] = useState<string>('');
 
+
+  console.log(template)
   useEffect(() => {
     if (compareOpen && template.semister) {
       const fetchSemesterCourses = async () => {
@@ -159,18 +162,26 @@ export default function CourseCard({ cardOf, href, template, user }: {
 
 
   return (
-    <main className='w-full h-full'>
+    <main className='w-full h-full hover:shadow-md transition-all duration-300 hover:translate-y-[-1px] group'>
       {href ? (
         <Link
           href={href}
-          className='flex relative justify-between items-center border border-gray-300 shadow-sm p-3 rounded-md text-[13px]'
+          className='flex relative justify-between items-center border border-gray-300 group-hover:border-blue-400 shadow-sm p-3 rounded-md text-[13px]'
         >
             <div className='flex flex-col gap-1'>
-              <h2>Course Name : <span className='capitalize'>{template.course_name}</span></h2>
-              <p>Course Code : <span className='capitalize'>{template.course_code}</span></p>
-              <p>Section : <span className='capitalize'>{template.section}</span></p>
-              <p>Type : <span className='capitalize'>{template.examType}</span></p>
-              <p>Sem : <span className='capitalize'>{href ?  template.sem : template.semister}</span></p>
+              <h2><span className='font-semibold'>Course Name : </span><span className='capitalize'>{template.course_name}</span></h2>
+              <p><span className='font-semibold'>Course Code : </span><span className='capitalize'>{template.course_code}</span></p>
+              {
+                !isQP && (
+                 <>
+                    <p><span className='font-semibold'>Section : </span><span className='capitalize'>{template.section}</span></p>
+                    <p><span className='font-semibold'>Type : </span><span className='capitalize'>{template.examType}</span></p>
+                    <p><span className='font-semibold'>Semester : </span><span className='capitalize'>{href ?  template.semister
+ : template.semister}</span></p>
+                 </>
+                )
+              }
+           
             </div>
             {cardOf === 'assessment-plan' && (
               <div className='absolute right-3 bottom-3 space-x-2'>
@@ -188,7 +199,8 @@ export default function CourseCard({ cardOf, href, template, user }: {
               <p>Course Code : <span className='capitalize'>{template.course_code}</span></p>
               <p>Section : <span className='capitalize'>{template.section}</span></p>
               <p>Type : <span className='capitalize'>{template.examType}</span></p>
-              <p>Sem : <span className='capitalize'>{href ?  template.sem : template.semister}</span></p>
+              <p>Semester : <span className='capitalize'>{href ?  template.semister
+ : template.semister}</span></p>
               <p>Academic Year : <span className='capitalize'>{template.academic_year}</span></p>
             </div>
             <div className='absolute right-3 bottom-3 space-x-2'>
