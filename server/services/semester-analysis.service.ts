@@ -1,6 +1,7 @@
 import { Types } from "mongoose";
 import { Course } from "@/lib/models";
 import { formatPercentage } from "../utils/format.utils";
+import logger from "@/lib/logger";
 
 interface SemesterAnalysisParams {
   collegeId: string;
@@ -49,10 +50,51 @@ function calculateQuestionStats(course: any) {
     stats.veryDifficultQuestions + stats.poorQuestions + stats.veryEasyQuestions
   );
 
+  logger.info("Question Counts:", {
+    good: stats.goodQuestions,
+    easy: stats.easyQuestions,
+    difficult: stats.difficultQuestions,
+    veryDifficult: stats.veryDifficultQuestions,
+    poor: stats.poorQuestions,
+    veryEasy: stats.veryEasyQuestions,
+    totalAccepted,
+    totalRejected,
+  });
+
+  const percentages = {
+    goodQuestions:
+      totalAccepted > 0
+        ? Math.round((stats.goodQuestions / totalAccepted) * 100)
+        : 0,
+    easyQuestions:
+      totalAccepted > 0
+        ? Math.round((stats.easyQuestions / totalAccepted) * 100)
+        : 0,
+    difficultQuestions:
+      totalAccepted > 0
+        ? Math.round((stats.difficultQuestions / totalAccepted) * 100)
+        : 0,
+    veryDifficultQuestions:
+      totalRejected > 0
+        ? Math.round((stats.veryDifficultQuestions / totalRejected) * 100)
+        : 0,
+    poorQuestions:
+      totalRejected > 0
+        ? Math.round((stats.poorQuestions / totalRejected) * 100)
+        : 0,
+    veryEasyQuestions:
+      totalRejected > 0
+        ? Math.round((stats.veryEasyQuestions / totalRejected) * 100)
+        : 0,
+  };
+
+  logger.info("Calculated Percentages:", percentages);
+
   return {
     ...stats,
     totalAccepted,
     totalRejected,
+    percentages,
   };
 }
 
@@ -82,6 +124,7 @@ function calculateAverages(courses: any[]) {
     }
   );
 
+  // logger.info(totals);
   const count = courses.length || 1;
   const totalAccepted =
     totals.goodQuestions + totals.easyQuestions + totals.difficultQuestions;
@@ -90,6 +133,35 @@ function calculateAverages(courses: any[]) {
     totals.poorQuestions +
     totals.veryEasyQuestions;
   const total = totalAccepted + totalRejected;
+
+  logger.info({
+    goodQuestions: Math.round(totals.goodQuestions / count),
+    easyQuestions: Math.round(totals.easyQuestions / count),
+    difficultQuestions: Math.round(totals.difficultQuestions / count),
+    veryDifficultQuestions: Math.round(totals.veryDifficultQuestions / count),
+    poorQuestions: Math.round(totals.poorQuestions / count),
+    veryEasyQuestions: Math.round(totals.veryEasyQuestions / count),
+    totalAccepted: Math.round(totalAccepted / count),
+    totalRejected: Math.round(totalRejected / count),
+    kr20: Number((totals.kr20 / count).toFixed(2)),
+    percentages: {
+      goodQuestions: ((totals.goodQuestions / totalAccepted) * 100).toFixed(2),
+      easyQuestions: ((totals.easyQuestions / totalAccepted) * 100).toFixed(2),
+      difficultQuestions: (
+        (totals.difficultQuestions / totalAccepted) *
+        100
+      ).toFixed(2),
+      veryDifficultQuestions: (
+        (totals.veryDifficultQuestions / totalRejected) *
+        100
+      ).toFixed(2),
+      poorQuestions: ((totals.poorQuestions / totalRejected) * 100).toFixed(2),
+      veryEasyQuestions: (
+        (totals.veryEasyQuestions / totalRejected) *
+        100
+      ).toFixed(2),
+    },
+  });
 
   return {
     goodQuestions: Math.round(totals.goodQuestions / count),
@@ -102,17 +174,21 @@ function calculateAverages(courses: any[]) {
     totalRejected: Math.round(totalRejected / count),
     kr20: Number((totals.kr20 / count).toFixed(2)),
     percentages: {
-      goodQuestions: ((totals.goodQuestions / total) * 100).toFixed(2),
-      easyQuestions: ((totals.easyQuestions / total) * 100).toFixed(2),
-      difficultQuestions: ((totals.difficultQuestions / total) * 100).toFixed(
-        2
-      ),
-      veryDifficultQuestions: (
-        (totals.veryDifficultQuestions / total) *
+      goodQuestions: ((totals.goodQuestions / totalAccepted) * 100).toFixed(2),
+      easyQuestions: ((totals.easyQuestions / totalAccepted) * 100).toFixed(2),
+      difficultQuestions: (
+        (totals.difficultQuestions / totalAccepted) *
         100
       ).toFixed(2),
-      poorQuestions: ((totals.poorQuestions / total) * 100).toFixed(2),
-      veryEasyQuestions: ((totals.veryEasyQuestions / total) * 100).toFixed(2),
+      veryDifficultQuestions: (
+        (totals.veryDifficultQuestions / totalRejected) *
+        100
+      ).toFixed(2),
+      poorQuestions: ((totals.poorQuestions / totalRejected) * 100).toFixed(2),
+      veryEasyQuestions: (
+        (totals.veryEasyQuestions / totalRejected) *
+        100
+      ).toFixed(2),
     },
   };
 }
@@ -276,17 +352,17 @@ function generateTableHTML(
                   </td>
                   <td class="border border-gray-300 p-1">
                     <p style="text-align: center; margin: 0; margin-bottom: 10px;">${formatPercentage(
-                      (stats.veryDifficultQuestions / stats.totalAccepted) * 100
+                      (stats.veryDifficultQuestions / stats.totalRejected) * 100
                     )}</p>
                   </td>
                   <td class="border border-gray-300 p-1">
                     <p style="text-align: center; margin: 0; margin-bottom: 10px;">${formatPercentage(
-                      (stats.poorQuestions / stats.totalAccepted) * 100
+                      (stats.poorQuestions / stats.totalRejected) * 100
                     )}</p>
                   </td>
                   <td class="border border-gray-300 p-1">
                     <p style="text-align: center; margin: 0; margin-bottom: 10px;">${formatPercentage(
-                      (stats.veryEasyQuestions / stats.totalAccepted) * 100
+                      (stats.veryEasyQuestions / stats.totalRejected) * 100
                     )}</p>
                   </td>
                 </tr>
@@ -471,7 +547,7 @@ function generateKR20SegregationHTML(courses: any[]) {
   );
 
   return `
-    <div class="kr20-segregation" style="height: 500px; width: 100%; overflow-y: auto; margin-bottom: 40px; border: 1px solid #e2e8f0; border-radius: 8px;">
+    <div class="kr20-segregation" style="width: 100%; margin-bottom: 40px; border: 1px solid #e2e8f0; border-radius: 8px; page-break-inside: avoid;">
       <h2 style="text-align: center; font-size: 16px; font-weight: bold; padding: 24px; background-color: #f8fafc; border-bottom: 1px solid #e2e8f0; margin: 0; margin-top: -16px;">
         Observation of individual courses
       </h2>
@@ -792,6 +868,14 @@ export async function analyzeSemester({
         
         .exam-category:nth-child(3) h3::before {
           background-color: #dc2626;
+        }
+
+        .kr20-segregation {
+          page-break-inside: auto;
+        }
+        .exam-category {
+          page-break-inside: avoid;
+          page-break-after: auto;
         }
       </style>
     `,

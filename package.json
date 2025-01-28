@@ -60,6 +60,7 @@
     "tiptap-extension-resizable": "^1.1.1",
     "tiptap-extension-resize-image": "^1.2.1",
     "uuid": "^11.0.2",
+    "winston": "^3.17.0",
     "xlsx": "^0.18.5",
     "zod": "^3.23.8"
   },
