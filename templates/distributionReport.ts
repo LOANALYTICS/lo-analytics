@@ -41,78 +41,53 @@ export function generateDistributionReportHTML(data: {
             </thead>
             <tbody>
                 ${data.topics
+                  .filter((topic) => 
+                    data.papers.some((paper) =>
+                      paper.topicQuestions.some(
+                        (tq: any) => tq.topic === topic.name
+                      ) && paper.examName.trim() !== ""
+                    )
+                  )
                   .map((topic, index) => {
-                    const relevantPapers = data.papers.filter((paper) =>
+                    let relevantPapers = data.papers.filter((paper) =>
                       paper.topicQuestions.some(
                         (tq: any) => tq.topic === topic.name
                       )
                     );
+                    // Filter out papers without an exam name
+                    relevantPapers = relevantPapers.filter((paper) => paper.examName.trim() !== "")
 
-                    return `
-                    <tr>
-                        <td>${index + 1}</td>
-                        <td>${topic.name}</td>
-                        <td>${topic.allowedQuestion || "-"}</td>
-                        <td>
-                            ${relevantPapers
-                              .map(
-                                (paper) =>
-                                  `<div class="exam-name">${paper.examName}</div>`
-                              )
-                              .join("")}
-                        </td>
-                        ${clos
-                          .map(
-                            (clo) => `
-                            <td>
-                                ${relevantPapers
-                                  .map((paper) => {
-                                    const topicQ = paper.topicQuestions.find(
-                                      (tq: any) => tq.topic === topic.name
-                                    );
-                                    const cloCount = topicQ?.clos[clo] || 0;
+                    return relevantPapers.map((paper, paperIndex) => {
+                      const topicQ = paper.topicQuestions.find(
+                        (tq: any) => tq.topic === topic.name
+                      );
 
-                                    // Filter questions by both topic and CLO using the populated questionId
-                                    const topicQuestions =
-                                      paper.QuestionsOrder?.filter(
-                                        (q: any) =>
-                                          q.questionId.topic === topic.name &&
-                                          q.clo.toString() ===
-                                            clo.replace("clo", "")
-                                      )
-                                        ?.slice(0, cloCount)
-                                        ?.map((q: any) => q.orderNumber)
-                                        ?.join(", ") || "";
+                      return `
+                      <tr>
+                          ${paperIndex === 0 ? `<td rowspan="${relevantPapers.length}">${index + 1}</td>` : ''}
+                          ${paperIndex === 0 ? `<td rowspan="${relevantPapers.length}">${topic.name}</td>` : ''}
+                          ${paperIndex === 0 ? `<td rowspan="${relevantPapers.length}">${topic.allowedQuestion || "-"}</td>` : ''}
+                          <td>${paper.examName}</td>
+                          ${clos
+                            .map((clo) => {
+                              const cloCount = topicQ?.clos[clo] || 0;
+                              const topicQuestions =
+                                paper.QuestionsOrder?.filter(
+                                  (q: any) =>
+                                    q.questionId.topic === topic.name &&
+                                    q.clo.toString() === clo.replace("clo", "")
+                                )
+                                  ?.slice(0, cloCount)
+                                  ?.map((q: any) => q.orderNumber)
+                                  ?.join(", ") || "";
 
-                                    return `
-                                        <div class="clo-value">
-                                            ${
-                                              cloCount
-                                                ? `${cloCount} (${topicQuestions})`
-                                                : "-"
-                                            }
-                                        </div>
-                                    `;
-                                  })
-                                  .join("")}
-                            </td>
-                        `
-                          )
-                          .join("")}
-                        <td>
-                            ${relevantPapers
-                              .map((paper) => {
-                                const topicQ = paper.topicQuestions.find(
-                                  (tq: any) => tq.topic === topic.name
-                                );
-                                return `<div class="total-value">${
-                                  topicQ?.total || "-"
-                                }</div>`;
-                              })
-                              .join("")}
-                        </td>
-                    </tr>
-                `;
+                              return `<td>${cloCount ? `${cloCount} (${topicQuestions})` : "-"}</td>`;
+                            })
+                            .join("")}
+                          <td>${topicQ?.total || "-"}</td>
+                      </tr>
+                      `;
+                    }).join('');
                   })
                   .join("")}
             </tbody>
@@ -139,7 +114,7 @@ export function generateDistributionReportHTML(data: {
                 }
                 .header {
                     text-align: center;
-                    margin-bottom: 20px;
+                    margin-bottom: 25px !important;
                     padding-bottom: 10px;
                     border-bottom: 2px solid #000;
                 }
@@ -149,14 +124,21 @@ export function generateDistributionReportHTML(data: {
                     margin-bottom: 10px;
                 }
                 table {
+                    border: 1px solid #000;
                     width: 100%;
+                    border-radius: 10px !important;
+                    overflow: hidden;
                     border-collapse: collapse;
                     margin-top: 20px;
                     table-layout: fixed;
                 }
                 th, td {
                     border: 1px solid #000;
-                    padding: 8px 4px;
+                        padding-left: 10px !important;
+                    padding-right: 10px !important;
+                    padding-top: 10px !important;
+                    padding-bottom: 25px !important;
+
                     text-align: center;
                     vertical-align: middle;
                     word-wrap: break-word;
@@ -181,6 +163,7 @@ export function generateDistributionReportHTML(data: {
                 }
                 .exam-name {
                     font-weight: normal;
+                    margin-bottom: 10px !important;
                 }
                 .clo-value {
                     font-weight: normal;
