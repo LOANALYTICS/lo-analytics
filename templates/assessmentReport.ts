@@ -73,7 +73,7 @@ export function generateAssessmentReportHTML(props: AssessmentReportProps): stri
           .h2_class { text-align: center; margin-bottom: 30px;,margin:auto; }
           .header { text-align: center; margin-bottom: 30px; }
           .logo { max-width: 100%; height: auto; }
-          .title { font-size: 24px; margin: 20px 0; }
+          .title { font-size: 20px; margin: 20px 0; }
           table { 
             width: 100%; 
             border-collapse: collapse; 
@@ -82,7 +82,7 @@ export function generateAssessmentReportHTML(props: AssessmentReportProps): stri
           th, td { 
             border: 1px solid black;
             padding: 10px;
-            font-size: 12px;
+            font-size: 11px;
             text-align: center;
           }
           .achievement-row { 
@@ -91,11 +91,10 @@ export function generateAssessmentReportHTML(props: AssessmentReportProps): stri
           }
           .achievement-row td {
             border: 1px solid black;
-            padding: 10px;
-            padding-left: 10px;
-            padding-right: 10px;
-            padding-top: 10px;
-            padding-bottom: 20px;
+            padding-left: 8px;
+            padding-right: 8px;
+            padding-top: 8px;
+            padding-bottom: 16px;
           }
           .achievement-pair tr:first-child td.achievement-label {
             border-bottom: 0px solid black;
@@ -124,7 +123,7 @@ export function generateAssessmentReportHTML(props: AssessmentReportProps): stri
           .achievement-label { 
             font-weight: normal; 
             text-align: left;
-            font-size: 16px;
+            font-size: 14px;
             vertical-align: middle;
             padding-left: 10px;
             padding-right: 10px;
