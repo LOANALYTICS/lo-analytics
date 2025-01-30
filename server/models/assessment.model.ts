@@ -23,6 +23,7 @@ export interface IAssessment extends Document {
     }[];
     assessmentResults: {
         type: string;
+        mode: string;
         results: {
             studentId: string;
             studentName: string;
@@ -91,14 +92,17 @@ export const assessmentSchema = new Schema<IAssessment>({
     }],
     assessmentResults: [{
         type: { type: String, required: true },
+        mode: { type: String, default: 'general' },
         results: [{
             studentId: { type: String, required: true },
             studentName: { type: String, required: true },
-            "totalScore.correct": { type: Number, required: true },
-            "totalScore.total": { type: Number, required: true },
-            "totalScore.percentage": { type: Number, required: true },
-            "totalScore.marksScored": { type: Number, required: true },
-            "totalScore.totalMarks": { type: Number, required: true },
+            totalScore: {
+                correct: { type: Number, required: true },
+                total: { type: Number, required: true },
+                percentage: { type: Number, required: true },
+                marksScored: { type: Number, required: true },
+                totalMarks: { type: Number, required: true }
+            },
             cloResults: {
                 type: Object,
                 required: true,

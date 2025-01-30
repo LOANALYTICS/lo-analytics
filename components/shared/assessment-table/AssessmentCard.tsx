@@ -1,12 +1,18 @@
 "use client"
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { ThumbsUp } from 'lucide-react';
 import Link from 'next/link'
-import React, { useState } from 'react'
+import React from 'react'
 import { toast } from 'sonner'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import axios from 'axios';
 
-const generatePDF = async (html: string, fileName: string) => {
+const generatePDF = async (html: string, fileName: string, orientation: 'portrait' | 'landscape' = 'portrait') => {
   try {
     const html2pdf = (await import("html2pdf.js")).default;
 
@@ -14,7 +20,7 @@ const generatePDF = async (html: string, fileName: string) => {
     const sanitizedHTML = html
       .replace(/[\u200B-\u200D\uFEFF]/g, "") // Remove zero-width characters
       .replace(/&nbsp;/g, " ")  // Remove non-breaking spaces
-      .replace(/['"’]/g, "");   // Remove unwanted quotes if any
+      .replace(/['"']/g, "");   // Remove unwanted quotes if any
     
     // Create a container for the sanitized HTML
     const container = document.createElement("div");
@@ -33,7 +39,7 @@ const generatePDF = async (html: string, fileName: string) => {
     logo.style.zIndex = "1000";
     container.appendChild(logo);
 
-    // PDF options
+    // PDF options with landscape orientation
     const opt = {
       margin: 0.5,
       filename: `${fileName}.pdf`,
@@ -49,7 +55,7 @@ const generatePDF = async (html: string, fileName: string) => {
       jsPDF: {
         unit: "in",
         format: "a4",
-        orientation: "portrait",
+        orientation: orientation,
         compress: true,
       },
       pagebreak: {
@@ -113,20 +119,55 @@ export default function AssessmentCard({ href, course }: {
         }),
       });
 
-      if (!response.ok) throw new Error('Failed to generate report');
+      if (!response.ok) {
+        toast.warning('Something went wrong!')
+        return
+      };
 
       const html = await response.text();
       console.log('Generated HTML:', html); // For debugging
       await generatePDF(html, 'assessment_report');
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error generating report:", error);
-      toast.error('Failed to download assessment report');
+      if(error?.message === "Assessment data not found"){
+        toast.error('Assessment not found');
+      }else{
+        toast.error('Failed to download assessment report');
+      }
     }
   }
  
-const handleCloReport = async (e: any) => {
-  toast.success('It is under development');
+const handleCloReport = async (e: any, percentage: number, id: string, ace_year: string, section: string) => {
+  e.preventDefault()
+  e.stopPropagation()
+
+  if(!percentage || !id){
+    toast.error('Percentage and ID required');
+    return;
+  }
+
+  try {
+    const response = await fetch(`/api/generate-clo-report?perc=${percentage}&courseId=${id}&academicYear=${ace_year}&section=${section}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to generate report');
+    }
+
+    const html = await response.text();
+    await generatePDF(html, `clo_report_${percentage}`, 'landscape');
+    toast.success('Report generated successfully');
+
+  } catch (error: any) {
+    console.error("Error generating CLO report:", error);
+    toast.error(error.response?.data?.message || 'Failed to generate report');
+  }
 }
+
   return (
     <>
     <main className='w-full h-full hover:shadow-md transition-all duration-300 hover:translate-y-[-1px] group'>
@@ -142,12 +183,20 @@ const handleCloReport = async (e: any) => {
               <p>Semester : <span className='capitalize'>{course.semister}</span></p>
             </div>
             <div className='z-50 flex flex-col gap-2 self-end bottom-3 '>
-                <Button onClick={(e) => {
-                  e.preventDefault()
-                  e.stopPropagation()
-                  handleCloReport(e)}} variant='outline' size='sm' className='px-5 py-3 text-[11px] w-full h-fit font-bold'>
-                   Dev-Testing 
-                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant='outline' size='sm' className='px-5 py-3 text-[11px] w-full h-fit font-bold'>
+                      CLOs Report
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={(e) => handleCloReport(e, 60,course?._id, course?.academic_year, course?.section)}>Generate at 60%</DropdownMenuItem>
+                    <DropdownMenuItem onClick={(e) => handleCloReport(e, 70,course?._id, course?.academic_year, course?.section)}>Generate at 70%</DropdownMenuItem>
+                    <DropdownMenuItem onClick={(e) => handleCloReport(e, 80,course?._id, course?.academic_year, course?.section)}>Generate at 80%</DropdownMenuItem>
+                    <DropdownMenuItem onClick={(e) => handleCloReport(e, 90,course?._id, course?.academic_year, course?.section)}>Generate at 90%</DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
                 <Button onClick={(e) => {
                   e.preventDefault()
                   e.stopPropagation()
