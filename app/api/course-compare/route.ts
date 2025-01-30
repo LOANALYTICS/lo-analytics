@@ -1,34 +1,43 @@
-import { NextResponse } from 'next/server';
-import { connectToMongoDB } from '@/lib/db';
-import { compareCourses } from '@/server/services/course-compare.service';
-import { Collage } from '@/lib/models';
+import { NextResponse } from "next/server";
+import { connectToMongoDB } from "@/lib/db";
+import { compareCourses } from "@/server/services/course-compare.service";
+import { Collage } from "@/lib/models";
+import { convertNumberToWord } from "@/lib/utils/number-to-word";
 
 export async function GET(request: Request) {
   try {
     await connectToMongoDB();
 
     const { searchParams } = new URL(request.url);
-    const collegeId = searchParams.get('collegeId');
-    const semister = searchParams.get('semister');
-    const yearA = searchParams.get('yearA');
-    const yearB = searchParams.get('yearB');
-    const sectionA = searchParams.get('sectionA');
-    const sectionB = searchParams.get('sectionB');
+    const collegeId = searchParams.get("collegeId");
+    const semister = searchParams.get("semister");
+    const yearA = searchParams.get("yearA");
+    const yearB = searchParams.get("yearB");
+    const sectionA = searchParams.get("sectionA");
+    const sectionB = searchParams.get("sectionB");
 
     if (!collegeId || !semister || !yearA || !yearB || !sectionA || !sectionB) {
-      return NextResponse.json({
-        message: 'Missing required parameters'
-      }, { status: 400 });
+      return NextResponse.json(
+        {
+          message: "Missing required parameters",
+        },
+        { status: 400 }
+      );
     }
 
-    const college = await Collage.findById(collegeId).lean().exec() as unknown as {
+    const college = (await Collage.findById(collegeId)
+      .lean()
+      .exec()) as unknown as {
       logo?: string;
       english: string;
       regional?: string;
       university: string;
     };
     if (!college) {
-      return NextResponse.json({ message: 'College not found' }, { status: 404 });
+      return NextResponse.json(
+        { message: "College not found" },
+        { status: 404 }
+      );
     }
 
     const { tables, styles } = await compareCourses({
@@ -37,7 +46,7 @@ export async function GET(request: Request) {
       yearA,
       yearB,
       sectionA,
-      sectionB
+      sectionB,
     });
 
     const htmlContent = `
@@ -109,18 +118,28 @@ export async function GET(request: Request) {
         <body>
           <div class="header-container">
             <div class="header">
-              ${college.logo ? `<img src="${college.logo}" alt="College Logo" class="college-logo"/>` : ''}
+              ${
+                college.logo
+                  ? `<img src="${college.logo}" alt="College Logo" class="college-logo"/>`
+                  : ""
+              }
              
             </div>
             <hr style="margin-bottom: 40px;"/>
             <div class="header-description">
               <h2>Course Comparison Report</h2>
               <hr/>
-              <p>Sem-${semister} ${yearA} Section ${sectionA} vs ${yearB} Section ${sectionB}</p>
+              <p>${convertNumberToWord(
+                Number(semister)
+              )} Semester ${yearA} Section ${
+      sectionA.charAt(0).toUpperCase() + sectionA.slice(1).toLowerCase()
+    } vs ${yearB} Section ${
+      sectionB.charAt(0).toUpperCase() + sectionB.slice(1).toLowerCase()
+    }</p>
             </div>
           </div>
           <div class="tables-container">
-            ${tables.join('\n')}
+            ${tables.join("\n")}
           </div>
         </body>
       </html>
@@ -128,14 +147,17 @@ export async function GET(request: Request) {
 
     return new NextResponse(htmlContent, {
       headers: {
-        'Content-Type': 'text/html',
+        "Content-Type": "text/html",
       },
     });
-
-  } catch (error) {    console.error('Course comparison error:', error);
-    return NextResponse.json({
-      message: 'Error comparing courses',
-      error: error instanceof Error ? error.message : 'Unknown error'
-    }, { status: 500 });
+  } catch (error) {
+    console.error("Course comparison error:", error);
+    return NextResponse.json(
+      {
+        message: "Error comparing courses",
+        error: error instanceof Error ? error.message : "Unknown error",
+      },
+      { status: 500 }
+    );
   }
-} 
+}

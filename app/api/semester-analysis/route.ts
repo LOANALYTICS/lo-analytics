@@ -1,35 +1,38 @@
-import { NextResponse } from 'next/server';
-import { analyzeSemester } from '@/server/services/semester-analysis.service';
-import { Collage } from '@/lib/models';
-import { connectToMongoDB } from '@/lib/db';
+import { NextResponse } from "next/server";
+import { analyzeSemester } from "@/server/services/semester-analysis.service";
+import { Collage } from "@/lib/models";
+import { connectToMongoDB } from "@/lib/db";
+import { convertNumberToWord } from "@/lib/utils/number-to-word";
 
 export async function GET(request: Request) {
   try {
     await connectToMongoDB();
-    
+
     const { searchParams } = new URL(request.url);
-    const collegeId = searchParams.get('collegeId');
-    const semester = searchParams.get('semester');
-    const year = searchParams.get('year');
+    const collegeId = searchParams.get("collegeId");
+    const semester = searchParams.get("semester");
+    const year = searchParams.get("year");
 
     if (!collegeId || !semester || !year) {
-      return new NextResponse('Missing required parameters', { status: 400 });
+      return new NextResponse("Missing required parameters", { status: 400 });
     }
 
-    const college = await Collage.findById(collegeId).lean().exec() as unknown as {
+    const college = (await Collage.findById(collegeId)
+      .lean()
+      .exec()) as unknown as {
       logo?: string;
       english: string;
       regional?: string;
       university: string;
     };
     if (!college) {
-      return new NextResponse('College not found', { status: 404 });
+      return new NextResponse("College not found", { status: 404 });
     }
 
     const analysis = await analyzeSemester({
       collegeId,
       semester: parseInt(semester),
-      academicYear: year
+      academicYear: year,
     });
 
     const htmlContent = `
@@ -76,18 +79,22 @@ export async function GET(request: Request) {
         <body>
           <div class="header-container">
             <div class="header">
-              ${college.logo ? `<img src="${college.logo}" alt="College Logo" class="college-logo"/>` : ''}
+              ${
+                college.logo
+                  ? `<img src="${college.logo}" alt="College Logo" class="college-logo"/>`
+                  : ""
+              }
              
             </div>
             <hr style="margin-bottom: 40px;"/>
             <div class="header-description">
               <h2>Semester Analysis Report</h2>
               <hr/>
-              <p>Sem-${semester} ${year}</p>
+              <p>${convertNumberToWord(parseInt(semester))} Semester ${year}</p>
             </div>
           </div>
           <div class="tables-container">
-            ${analysis.tables.join('\n')}
+            ${analysis.tables.join("\n")}
           </div>
         </body>
       </html>
@@ -95,11 +102,11 @@ export async function GET(request: Request) {
 
     return new NextResponse(htmlContent, {
       headers: {
-        'Content-Type': 'text/html',
+        "Content-Type": "text/html",
       },
     });
   } catch (error) {
-    console.error('API Error:', error);
-    return new NextResponse('Error generating analysis', { status: 500 });
+    console.error("API Error:", error);
+    return new NextResponse("Error generating analysis", { status: 500 });
   }
-} 
+}
