@@ -1,21 +1,18 @@
 "use client"
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { ThumbsUp } from 'lucide-react';
 import Link from 'next/link'
-import React, { useState } from 'react'
+import React from 'react'
 import { toast } from 'sonner'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import axios from 'axios';
 
-const generatePDF = async (html: string, fileName: string) => {
+const generatePDF = async (html: string, fileName: string, orientation: 'portrait' | 'landscape' = 'portrait') => {
   try {
     const html2pdf = (await import("html2pdf.js")).default;
 
@@ -23,7 +20,7 @@ const generatePDF = async (html: string, fileName: string) => {
     const sanitizedHTML = html
       .replace(/[\u200B-\u200D\uFEFF]/g, "") // Remove zero-width characters
       .replace(/&nbsp;/g, " ")  // Remove non-breaking spaces
-      .replace(/['"’]/g, "");   // Remove unwanted quotes if any
+      .replace(/['"']/g, "");   // Remove unwanted quotes if any
     
     // Create a container for the sanitized HTML
     const container = document.createElement("div");
@@ -42,7 +39,7 @@ const generatePDF = async (html: string, fileName: string) => {
     logo.style.zIndex = "1000";
     container.appendChild(logo);
 
-    // PDF options
+    // PDF options with landscape orientation
     const opt = {
       margin: 0.5,
       filename: `${fileName}.pdf`,
@@ -58,7 +55,7 @@ const generatePDF = async (html: string, fileName: string) => {
       jsPDF: {
         unit: "in",
         format: "a4",
-        orientation: "portrait",
+        orientation: orientation,
         compress: true,
       },
       pagebreak: {
@@ -140,34 +137,31 @@ export default function AssessmentCard({ href, course }: {
     }
   }
  
-const handleCloReport = async (e: any, percentage: number, id: string) => {
+const handleCloReport = async (e: any, percentage: number, id: string, ace_year: string, section: string) => {
   e.preventDefault()
   e.stopPropagation()
+
   if(!percentage || !id){
     toast.error('Percentage and ID required');
     return;
   }
 
   try {
-    console.log('Making request with:', { percentage, id });
-    
-    // Add base URL if needed
-    const response = await axios.get(`/api/generate-clo-report`, {
-      params: {
-        perc: percentage,
-        assessmentId: id
-      },
+    const response = await fetch(`/api/generate-clo-report?perc=${percentage}&courseId=${id}&academicYear=${ace_year}&section=${section}`, {
+      method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        // Add any auth headers if required
-        // 'Authorization': `Bearer ${token}`
       }
     });
 
-    if (response.data) {
-      console.log('Response received:', response.data);
-      toast.success('Report generated successfully');
+    if (!response.ok) {
+      throw new Error('Failed to generate report');
     }
+
+    const html = await response.text();
+    await generatePDF(html, `clo_report_${percentage}`, 'landscape');
+    toast.success('Report generated successfully');
+
   } catch (error: any) {
     console.error("Error generating CLO report:", error);
     toast.error(error.response?.data?.message || 'Failed to generate report');
@@ -197,10 +191,10 @@ const handleCloReport = async (e: any, percentage: number, id: string) => {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={(e) => handleCloReport(e, 60,course?._id)}>Generate at 60%</DropdownMenuItem>
-                    <DropdownMenuItem onClick={(e) => handleCloReport(e, 70,course?._id)}>Generate at 70%</DropdownMenuItem>
-                    <DropdownMenuItem onClick={(e) => handleCloReport(e, 80,course?._id)}>Generate at 80%</DropdownMenuItem>
-                    <DropdownMenuItem onClick={(e) => handleCloReport(e, 90,course?._id)}>Generate at 90%</DropdownMenuItem>
+                    <DropdownMenuItem onClick={(e) => handleCloReport(e, 60,course?._id, course?.academic_year, course?.section)}>Generate at 60%</DropdownMenuItem>
+                    <DropdownMenuItem onClick={(e) => handleCloReport(e, 70,course?._id, course?.academic_year, course?.section)}>Generate at 70%</DropdownMenuItem>
+                    <DropdownMenuItem onClick={(e) => handleCloReport(e, 80,course?._id, course?.academic_year, course?.section)}>Generate at 80%</DropdownMenuItem>
+                    <DropdownMenuItem onClick={(e) => handleCloReport(e, 90,course?._id, course?.academic_year, course?.section)}>Generate at 90%</DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
                 <Button onClick={(e) => {
