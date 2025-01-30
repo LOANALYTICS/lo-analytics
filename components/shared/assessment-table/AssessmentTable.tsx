@@ -33,7 +33,7 @@ const createDefaultAssessment = (numberOfClos: number) => {
     }, {} as Record<string, number[]>);
 
   return {
-    id: '1',
+    id: crypto.randomUUID(),
     type: '',
     clos,
     weight: 0
