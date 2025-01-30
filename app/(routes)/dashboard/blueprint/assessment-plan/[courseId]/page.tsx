@@ -70,17 +70,33 @@ export default function AssessmentPlanPage() {
   const handleSave = async (data: any) => {
     setSaving(true);
     try {
-      if (!course?.academic_year || !course?.academic_year) {
+      if (!course?.academic_year) {
         toast.error('Academic year not found');
         return;
-    }
-      const response = await updateAssessmentPlans(courseId,course.academic_year, data);
+      }
+
+      // Strict validation for CLOs
+      const invalidAssessments = data.filter((assessment: any) => {
+        // Check if clos exists and has at least one CLO with numbers
+        return !assessment.clos || 
+               Object.keys(assessment.clos).length === 0 || 
+               Object.values(assessment.clos).every((numbers: any) => numbers.length === 0);
+      });
+
+      if (invalidAssessments.length > 0) {
+        setSaving(false);
+        toast.error(
+          `Please configure CLOs with question numbers for: ${invalidAssessments.map((a: any) => a.type).join(', ')}`
+        );
+        return;
+      }
+
+      const response = await updateAssessmentPlans(courseId, course.academic_year, data);
       if (response.success) {
         toast.success('Assessment plans updated successfully');
       } else {
         toast.error(response.message || 'Failed to update assessment plans');
       }
-        setSaving(false);
     } catch (error: any) {
       console.error('Error saving:', error.message);
       toast.error(error.message || 'Failed to save changes');
@@ -190,6 +206,7 @@ export default function AssessmentPlanPage() {
     <div className="space-y-2 p-2">
       <SectionHeader courseDetails={course} />
       <AssessmentTable 
+        courseId={courseId}
         saving={saving}
         initialData={assessmentData}
         onSave={handleSave}

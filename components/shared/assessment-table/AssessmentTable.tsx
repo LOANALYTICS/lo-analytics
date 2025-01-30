@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Trash, Upload, Plus, X, Loader2Icon } from 'lucide-react'
+import { AssessmentSpreadsheet } from './AssessmentSpreadsheet'
 
 interface Assessment {
   id: string;
@@ -22,6 +23,7 @@ interface AssessmentTableProps {
   saving: boolean;
   onUpload: (type: string) => void;
   numberOfClos: number;
+  courseId: string;
 }
 
 // Modify the DEFAULT_ASSESSMENT to be a function that creates dynamic CLOs
@@ -46,7 +48,8 @@ const getCLOKeys = (assessments: Assessment[], numberOfClos: number): string[] =
   return Array.from({ length: numberOfClos }, (_, i) => `clo${i + 1}`);
 };
 
-export default function AssessmentTable({ initialData, onSave, saving, onUpload, numberOfClos }: AssessmentTableProps) {
+export default function AssessmentTable({ initialData, onSave, saving, onUpload, numberOfClos, courseId }: AssessmentTableProps) {
+  const [spreadsheetType, setSpreadsheetType] = useState<string | null>(null);
   const [assessments, setAssessments] = useState<Assessment[]>(() => {
     if (initialData.length > 0) {
       // Add any missing CLO keys to each assessment
@@ -70,6 +73,7 @@ export default function AssessmentTable({ initialData, onSave, saving, onUpload,
   console.log((assessments), ":skd");
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [tempInputs, setTempInputs] = useState<{ [key: string]: string }>({});
+  const [spreadsheetOpen, setSpreadsheetOpen] = useState(false);
 
   const removeCLONumber = (id: string, clo: string, index: number) => {
     setAssessments(prev => prev.map(assessment => {
@@ -263,7 +267,14 @@ export default function AssessmentTable({ initialData, onSave, saving, onUpload,
                     <Button variant="outline" size="sm" onClick={() => onUpload(assessment.type)}>
                       <Upload className="h-4 w-4" />
                     </Button>
-                    <Button variant="outline" size="sm">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => {
+                        setSpreadsheetOpen(true)
+                        setSpreadsheetType(assessment.type)
+                      }}
+                    >
                       <Plus className="h-4 w-4" />
                     </Button>
                   </div>
@@ -303,6 +314,18 @@ export default function AssessmentTable({ initialData, onSave, saving, onUpload,
           {saving ? <Loader2Icon className='animate-spin text-white h-6 w-6' /> : 'Save Changes'}
         </Button>
       </div>
+
+      <AssessmentSpreadsheet
+        open={spreadsheetOpen}
+        onOpenChange={setSpreadsheetOpen}
+        onSave={(data) => {
+          console.log('Spreadsheet data:', data)
+          setSpreadsheetOpen(false)
+        }}
+        courseId={courseId}
+        type={spreadsheetType || ''}
+        numberOfQuestions={Object.values(assessments[0].clos).flat().length}
+      />
     </div>
   );
 } 
