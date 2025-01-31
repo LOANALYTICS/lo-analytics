@@ -2,6 +2,7 @@ import { Types } from "mongoose";
 import { Course } from "@/lib/models";
 import { formatPercentage } from "../utils/format.utils";
 import logger from "@/lib/logger";
+import { convertNumberToWord } from "@/lib/utils/number-to-word";
 
 interface SemesterAnalysisParams {
   collegeId: string;
@@ -143,23 +144,20 @@ function calculateAverages(courses: any[]) {
     veryEasyQuestions: Math.round(totals.veryEasyQuestions / count),
     totalAccepted: Math.round(totalAccepted / count),
     totalRejected: Math.round(totalRejected / count),
-    kr20: Number((totals.kr20 / count).toFixed(2)),
+    kr20: Math.round(totals.kr20 / count),
     percentages: {
-      goodQuestions: ((totals.goodQuestions / totalAccepted) * 100).toFixed(2),
-      easyQuestions: ((totals.easyQuestions / totalAccepted) * 100).toFixed(2),
-      difficultQuestions: (
-        (totals.difficultQuestions / totalAccepted) *
-        100
-      ).toFixed(2),
-      veryDifficultQuestions: (
-        (totals.veryDifficultQuestions / totalRejected) *
-        100
-      ).toFixed(2),
-      poorQuestions: ((totals.poorQuestions / totalRejected) * 100).toFixed(2),
-      veryEasyQuestions: (
-        (totals.veryEasyQuestions / totalRejected) *
-        100
-      ).toFixed(2),
+      goodQuestions: Math.round((totals.goodQuestions / totalAccepted) * 100),
+      easyQuestions: Math.round((totals.easyQuestions / totalAccepted) * 100),
+      difficultQuestions: Math.round(
+        (totals.difficultQuestions / totalAccepted) * 100
+      ),
+      veryDifficultQuestions: Math.round(
+        (totals.veryDifficultQuestions / totalRejected) * 100
+      ),
+      poorQuestions: Math.round((totals.poorQuestions / totalRejected) * 100),
+      veryEasyQuestions: Math.round(
+        (totals.veryEasyQuestions / totalRejected) * 100
+      ),
     },
   });
 
@@ -172,23 +170,20 @@ function calculateAverages(courses: any[]) {
     veryEasyQuestions: Math.round(totals.veryEasyQuestions / count),
     totalAccepted: Math.round(totalAccepted / count),
     totalRejected: Math.round(totalRejected / count),
-    kr20: Number((totals.kr20 / count).toFixed(2)),
+    kr20: Math.round(totals.kr20 / count),
     percentages: {
-      goodQuestions: ((totals.goodQuestions / totalAccepted) * 100).toFixed(2),
-      easyQuestions: ((totals.easyQuestions / totalAccepted) * 100).toFixed(2),
-      difficultQuestions: (
-        (totals.difficultQuestions / totalAccepted) *
-        100
-      ).toFixed(2),
-      veryDifficultQuestions: (
-        (totals.veryDifficultQuestions / totalRejected) *
-        100
-      ).toFixed(2),
-      poorQuestions: ((totals.poorQuestions / totalRejected) * 100).toFixed(2),
-      veryEasyQuestions: (
-        (totals.veryEasyQuestions / totalRejected) *
-        100
-      ).toFixed(2),
+      goodQuestions: Math.round((totals.goodQuestions / totalAccepted) * 100),
+      easyQuestions: Math.round((totals.easyQuestions / totalAccepted) * 100),
+      difficultQuestions: Math.round(
+        (totals.difficultQuestions / totalAccepted) * 100
+      ),
+      veryDifficultQuestions: Math.round(
+        (totals.veryDifficultQuestions / totalRejected) * 100
+      ),
+      poorQuestions: Math.round((totals.poorQuestions / totalRejected) * 100),
+      veryEasyQuestions: Math.round(
+        (totals.veryEasyQuestions / totalRejected) * 100
+      ),
     },
   };
 }
@@ -226,7 +221,9 @@ function generateTableHTML(
               }</p>
             </th>
             <th colspan="9" class="border border-gray-300 p-1">
-              <p style="text-align: center; margin: 0; margin-bottom: 10px;">Semester ${semester}, ${year}</p>
+              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${convertNumberToWord(
+                semester
+              )} Semester, ${year}</p>
             </th>
           </tr>
           <tr>
@@ -329,8 +326,8 @@ function generateTableHTML(
                     }</p>
                   </td>
                   <td rowspan="2" class="border border-gray-300 p-1">
-                    <p style="text-align: center; margin: 0; margin-bottom: 10px;">${stats.kr20.toFixed(
-                      2
+                    <p style="text-align: center; margin: 0; margin-bottom: 10px;">${Math.round(
+                      stats.kr20
                     )}</p>
                   </td>
                 </tr>
@@ -415,9 +412,9 @@ function generateTableHTML(
               }</p>
             </td>
             <td rowspan="2" class="border border-gray-300 p-1 font-bold">
-              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
+              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${Math.round(
                 averages.kr20
-              }</p>
+              )}</p>
             </td>
           </tr>
           <tr>
@@ -571,7 +568,11 @@ function generateKR20SegregationHTML(courses: any[]) {
                       }`
                     : ""
                 } 
-                - KR20: ${course.krValues?.KR_20?.toFixed(2) || "N/A"}
+                - KR20: ${
+                  course.krValues?.KR_20
+                    ? Math.round(course.krValues.KR_20)
+                    : "N/A"
+                }
               </li>
             `
               )
@@ -602,7 +603,11 @@ function generateKR20SegregationHTML(courses: any[]) {
                       }`
                     : ""
                 } 
-                - KR20: ${course.krValues?.KR_20?.toFixed(2) || "N/A"}
+                - KR20: ${
+                  course.krValues?.KR_20
+                    ? Math.round(course.krValues.KR_20)
+                    : "N/A"
+                }
               </li>
             `
               )
@@ -633,7 +638,11 @@ function generateKR20SegregationHTML(courses: any[]) {
                       }`
                     : ""
                 } 
-                - KR20: ${course.krValues?.KR_20?.toFixed(2) || "N/A"}
+                - KR20: ${
+                  course.krValues?.KR_20
+                    ? Math.round(course.krValues.KR_20)
+                    : "N/A"
+                }
               </li>
             `
               )
@@ -928,7 +937,7 @@ function generateSummaryTableHTML(
     veryEasyQuestions: Math.round(overallAverages.veryEasyQuestions / count),
     totalAccepted: Math.round(overallAverages.totalAccepted / count),
     totalRejected: Math.round(overallAverages.totalRejected / count),
-    kr20: Number((overallAverages.kr20 / count).toFixed(2)),
+    kr20: Math.round(overallAverages.kr20 / count),
   };
 
   const total = finalAverages.totalAccepted + finalAverages.totalRejected;
@@ -1019,7 +1028,9 @@ function generateSummaryTableHTML(
             </td>
             <td rowspan="2" style="width: 270px !important;" class="border border-gray-300 p-1">
               <p style="text-align: left; margin: 0; margin-bottom: 10px;">${
-                isLevel ? `Level ${summary.name}` : summary.name
+                isLevel
+                  ? `Level ${summary.name}`
+                  : `DEPARTMENT: ${summary.name}`
               }</p>
             </td>
             <td class="border border-gray-300 p-1">
@@ -1063,9 +1074,9 @@ function generateSummaryTableHTML(
               }</p>
             </td>
             <td rowspan="2" class="border border-gray-300 p-1">
-              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
+              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${Math.round(
                 summary.averages.kr20
-              }</p>
+              )}</p>
             </td>
           </tr>
           <tr>
@@ -1149,9 +1160,9 @@ function generateSummaryTableHTML(
             }</p>
           </td>
           <td rowspan="2" class="border border-gray-300 p-1 font-bold">
-            <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
+            <p style="text-align: center; margin: 0; margin-bottom: 10px;">${Math.round(
               finalAverages.kr20
-            }</p>
+            )}</p>
           </td>
         </tr>
         <tr>

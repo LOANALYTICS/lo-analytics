@@ -1,33 +1,42 @@
-import { NextResponse } from 'next/server';
-import { connectToMongoDB } from '@/lib/db';
-import { compareYears } from '@/server/services/year-compare.service';
-import { Collage } from '@/lib/models';
+import { NextResponse } from "next/server";
+import { connectToMongoDB } from "@/lib/db";
+import { compareYears } from "@/server/services/year-compare.service";
+import { Collage } from "@/lib/models";
+import { convertNumberToWord } from "@/lib/utils/number-to-word";
 
 export async function GET(request: Request) {
   try {
     await connectToMongoDB();
 
     const { searchParams } = new URL(request.url);
-    const collegeId = searchParams.get('collegeId');
-    const semisterA = searchParams.get('semisterA');
-    const semisterB = searchParams.get('semisterB');
-    const yearA = searchParams.get('yearA');
-    const yearB = searchParams.get('yearB');
+    const collegeId = searchParams.get("collegeId");
+    const semisterA = searchParams.get("semisterA");
+    const semisterB = searchParams.get("semisterB");
+    const yearA = searchParams.get("yearA");
+    const yearB = searchParams.get("yearB");
 
     if (!collegeId || !semisterA || !semisterB || !yearA || !yearB) {
-      return NextResponse.json({
-        message: 'Missing required parameters'
-      }, { status: 400 });
+      return NextResponse.json(
+        {
+          message: "Missing required parameters",
+        },
+        { status: 400 }
+      );
     }
 
-    const college = await Collage.findById(collegeId).lean().exec() as unknown as {
+    const college = (await Collage.findById(collegeId)
+      .lean()
+      .exec()) as unknown as {
       logo?: string;
       english: string;
       regional?: string;
       university: string;
     };
     if (!college) {
-      return NextResponse.json({ message: 'College not found' }, { status: 404 });
+      return NextResponse.json(
+        { message: "College not found" },
+        { status: 404 }
+      );
     }
 
     const { tables, styles } = await compareYears({
@@ -35,7 +44,7 @@ export async function GET(request: Request) {
       semisterA: Number(semisterA),
       semisterB: Number(semisterB),
       yearA,
-      yearB
+      yearB,
     });
 
     const htmlContent = `
@@ -109,18 +118,26 @@ export async function GET(request: Request) {
         <body>
           <div class="header-container">
             <div class="header">
-              ${college.logo ? `<img src="${college.logo}" alt="College Logo" class="college-logo"/>` : ''}
+              ${
+                college.logo
+                  ? `<img src="${college.logo}" alt="College Logo" class="college-logo"/>`
+                  : ""
+              }
            
             </div>
             <hr style="margin-bottom: 40px;"/>
             <div class="header-description">
               <h2>Year Comparison Report</h2>
               <hr/>
-              <p>Sem-${semisterA} ${yearA} vs Sem-${semisterB} ${yearB}</p>
+              <p>${convertNumberToWord(
+                Number(semisterA)
+              )} Semester ${yearA} vs ${convertNumberToWord(
+      Number(semisterB)
+    )} Semester ${yearB}</p>
             </div>
           </div>
           <div class="tables-container">
-            ${tables.join('\n')}
+            ${tables.join("\n")}
           </div>
         </body>
       </html>
@@ -128,15 +145,17 @@ export async function GET(request: Request) {
 
     return new NextResponse(htmlContent, {
       headers: {
-        'Content-Type': 'text/html',
+        "Content-Type": "text/html",
       },
     });
-
   } catch (error) {
-    console.error('Year comparison error:', error);
-    return NextResponse.json({
-      message: 'Error comparing years',
-      error: error instanceof Error ? error.message : 'Unknown error'
-    }, { status: 500 });
+    console.error("Year comparison error:", error);
+    return NextResponse.json(
+      {
+        message: "Error comparing years",
+        error: error instanceof Error ? error.message : "Unknown error",
+      },
+      { status: 500 }
+    );
   }
-} 
+}
