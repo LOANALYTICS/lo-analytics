@@ -189,30 +189,30 @@ function generateTableHTML(
             .join("")}
           <tr>
             <td rowspan="2" colspan="2"   style="border-color: #000000 !important;" class="border border-black p-1">
-              <p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px;">Average</p>
+              <p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px;font-weight: bold;">Average</p>
             </td>
-            <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px;">${formatNumber(
+            <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px;font-weight: bold;">${formatNumber(
               averages.accepted
             )}</p></td>
-            <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px;">${formatNumber(
+            <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px;font-weight: bold;">${formatNumber(
               averages.rejected
             )}</p></td>
-            <td rowspan="2" class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px;">${
+            <td rowspan="2" class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px; font-weight: bold;">${
               averages.kr20A ? Math.round(Number(averages.kr20A)) : "-"
             }</p></td>
-            <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px;">${formatNumber(
+            <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px; font-weight: bold;">${formatNumber(
               averages.acceptedB
             )}</p></td>
-            <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px;">${formatNumber(
+            <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px; font-weight: bold;">${formatNumber(
               averages.rejectedB
             )}</p></td>
-            <td rowspan="2" class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px;">${
+            <td rowspan="2" class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px; font-weight: bold;">${
               averages.kr20B ? Math.round(Number(averages.kr20B)) : "-"
             }</p></td>
           </tr>
           <tr>
             <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;">
-              <p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px;">
+              <p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px; font-weight: bold;">
                 ${
                   averages.acceptedPercentageA
                     ? averages.acceptedPercentageA + "%"
@@ -221,7 +221,7 @@ function generateTableHTML(
               </p>
             </td>
             <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;">
-              <p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px;">
+              <p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px; font-weight: bold;">
                 ${
                   averages.rejectedPercentageA
                     ? averages.rejectedPercentageA + "%"
@@ -230,7 +230,7 @@ function generateTableHTML(
               </p>
             </td>
             <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;">
-              <p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px;">
+              <p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px; font-weight: bold;">
                 ${
                   averages.acceptedPercentageB
                     ? averages.acceptedPercentageB + "%"
@@ -239,7 +239,7 @@ function generateTableHTML(
               </p>
             </td>
             <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;">
-              <p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px;">
+              <p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px; font-weight: bold;">
                 ${
                   averages.rejectedPercentageB
                     ? averages.rejectedPercentageB + "%"
@@ -462,50 +462,50 @@ function generateSummaryTableHTML(
           )
           .join("")}
         <tr>
-          <td rowspan="2" colspan="2" style="border-color: #000000 !important;" class="border border-black p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px;">Average</p></td>
-          <td class="border style="border-color: #000000 !important;" border-black p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${Math.round(
+          <td rowspan="2" colspan="2" style="border-color: #000000 !important;" class="border border-black p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">Average</p></td>
+          <td class="border style="border-color: #000000 !important;" border-black p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${Math.round(
             summaries.reduce((acc, curr) => acc + curr.averages.accepted, 0) /
               summaries.length
           )}</p></td>
-          <td class="border style="border-color: #000000 !important;" border-black p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${Math.round(
+          <td class="border style="border-color: #000000 !important;" border-black p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${Math.round(
             summaries.reduce((acc, curr) => acc + curr.averages.rejected, 0) /
               summaries.length
           )}</p></td>
-          <td rowspan="2" style="border-color: #000000 !important;" class="border border-black p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${Math.round(
+          <td rowspan="2" style="border-color: #000000 !important;" class=" border-black p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${Math.round(
             summaries.reduce((acc, curr) => acc + curr.averages.kr20A, 0) /
               summaries.length
           )}</p></td>
-          <td class="border style="border-color: #000000 !important;" border-black p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${Math.round(
+          <td class="border style="border-color: #000000 !important;" border-black p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${Math.round(
             summaries.reduce((acc, curr) => acc + curr.averages.acceptedB, 0) /
               summaries.length
           )}</p></td>
-          <td class="border style="border-color: #000000 !important;" border-black p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${Math.round(
+          <td class="border style="border-color: #000000 !important;" border-black p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${Math.round(
             summaries.reduce((acc, curr) => acc + curr.averages.rejectedB, 0) /
               summaries.length
           )}</p></td>
-          <td rowspan="2" style="border-color: #000000 !important;" class="border border-black p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${Math.round(
+          <td rowspan="2" style="border-color: #000000 !important;" class=" border-black p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${Math.round(
             summaries.reduce((acc, curr) => acc + curr.averages.kr20B, 0) /
               summaries.length
           )}</p></td>
         </tr>
         <tr>
           <td class="border border-black p-1 font-bold" style="border-color: #000000 !important;">
-            <p style="text-align: center; margin: 0; margin-bottom: 10px;">${avgAcceptedPercentageA}${
+            <p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${avgAcceptedPercentageA}${
     avgAcceptedPercentageA ? "%" : ""
   }</p>
           </td>
           <td class="border border-black p-1 font-bold" style="border-color: #000000 !important;">
-            <p style="text-align: center; margin: 0; margin-bottom: 10px;">${avgRejectedPercentageA}${
+            <p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${avgRejectedPercentageA}${
     avgRejectedPercentageA ? "%" : ""
   }</p>
           </td>
           <td class="border border-black p-1 font-bold" style="border-color: #000000 !important;">
-            <p style="text-align: center; margin: 0; margin-bottom: 10px;">${avgAcceptedPercentageB}${
+            <p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${avgAcceptedPercentageB}${
     avgAcceptedPercentageB ? "%" : ""
   }</p>
           </td>
           <td class="border border-black p-1 font-bold" style="border-color: #000000 !important;">
-            <p style="text-align: center; margin: 0; margin-bottom: 10px;">${avgRejectedPercentageB}${
+            <p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${avgRejectedPercentageB}${
     avgRejectedPercentageB ? "%" : ""
   }</p>
           </td>

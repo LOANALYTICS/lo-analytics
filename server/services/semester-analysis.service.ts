@@ -215,49 +215,49 @@ function generateTableHTML(
         </colgroup>
         <thead>
           <tr>
-            <th colspan="2" style="width: 300px !important;" class="border border-gray-300 bg-yellow-200 p-1">
+            <th colspan="2" style="width: 300px !important;" class="border border-black bg-yellow-200 p-1">
               <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
                 isLevel ? `LEVEL ${title}` : `DEPARTMENT: ${title}`
               }</p>
             </th>
-            <th colspan="9" class="border border-gray-300 p-1">
+            <th colspan="9" class="border border-black p-1">
               <p style="text-align: center; margin: 0; margin-bottom: 10px;">${convertNumberToWord(
                 semester
               )} Semester, ${year}</p>
             </th>
           </tr>
           <tr>
-            <th style="width: 30px !important;" class="border border-gray-300 p-1">
+            <th style="width: 30px !important;" class="border border-black p-1">
               <p style="text-align: center; margin: 0; margin-bottom: 10px;">S.No</p>
             </th>
-            <th style="width: 270px !important;" class="border border-gray-300 p-1">
+            <th style="width: 270px !important;" class="border border-black p-1">
               <p style="text-align: left; margin: 0; margin-bottom: 10px;">Course Title & Code</p>
             </th>
-            <th class="border border-gray-300" style="padding: 2px 4px;">
+            <th class="border border-black" style="padding: 2px 4px;">
               <p style="text-align: center; margin: 0; margin-bottom: 10px;">Good Questions</p>
             </th>
-            <th class="border border-gray-300" style="padding: 2px 4px;">
+            <th class="border border-black" style="padding: 2px 4px;">
               <p style="text-align: center; margin: 0; margin-bottom: 10px;">Easy Questions</p>
             </th>
-            <th class="border border-gray-300" style="padding: 2px 4px;">
+            <th class="border border-black" style="padding: 2px 4px;">
               <p style="text-align: center; margin: 0; margin-bottom: 10px;">Difficult Questions</p>
             </th>
-            <th class="border border-gray-300" style="padding: 2px 4px;">
+            <th class="border border-black" style="padding: 2px 4px;">
               <p style="text-align: center; margin: 0; margin-bottom: 10px;">Total Accepted</p>
             </th>
-            <th class="border border-gray-300" style="padding: 2px 4px;">
+            <th class="border border-black" style="padding: 2px 4px;">
               <p style="text-align: center; margin: 0; margin-bottom: 10px;">Very Difficult Questions</p>
             </th>
-            <th class="border border-gray-300" style="padding: 2px 4px;">
+            <th class="border border-black" style="padding: 2px 4px;">
               <p style="text-align: center; margin: 0; margin-bottom: 10px;">Poor (Bad) Questions</p>
             </th>
-            <th class="border border-gray-300" style="padding: 2px 4px;">
+            <th class="border border-black" style="padding: 2px 4px;">
               <p style="text-align: center; margin: 0; margin-bottom: 10px;">Very Easy Questions</p>
             </th>
-            <th class="border border-gray-300" style="padding: 2px 4px;">
+            <th class="border border-black" style="padding: 2px 4px;">
               <p style="text-align: center; margin: 0; margin-bottom: 10px;">Total Rejected</p>
             </th>
-            <th class="border border-gray-300" style="padding: 2px 4px;">
+            <th class="border border-black" style="padding: 2px 4px;">
               <p style="text-align: center; margin: 0; margin-bottom: 10px;">KR20</p>
             </th>
           </tr>
@@ -275,89 +275,89 @@ function generateTableHTML(
               return `
               <tbody class="row-pair">
                 <tr>
-                  <td rowspan="2" style="width: 30px !important;" class="border border-gray-300 p-1">
+                  <td rowspan="2" style="width: 30px !important;" class="border border-black p-1">
                     <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
                       index + 1
                     }</p>
                   </td>
-                  <td rowspan="2" style="width: 270px !important;" class="border border-gray-300 p-1">
+                  <td rowspan="2" style="width: 270px !important;" class="border border-black p-1">
                     <p style="text-align: left; margin: 0; margin-bottom: 10px;">${
                       course.course_name
                     } (${course.course_code})${sectionText}</p>
                   </td>
-                  <td class="border border-gray-300 p-1">
+                  <td class="border border-black p-1">
                     <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
                       stats.goodQuestions
                     }</p>
                   </td>
-                  <td class="border border-gray-300 p-1">
+                  <td class="border border-black p-1">
                     <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
                       stats.easyQuestions
                     }</p>
                   </td>
-                  <td class="border border-gray-300 p-1">
+                  <td class="border border-black p-1">
                     <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
                       stats.difficultQuestions
                     }</p>
                   </td>
-                  <td rowspan="2" class="border border-gray-300 p-1">
+                  <td rowspan="2" class="border border-black p-1">
                     <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
                       stats.totalAccepted
                     }</p>
                   </td>
-                  <td class="border border-gray-300 p-1">
+                  <td class="border border-black p-1">
                     <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
                       stats.veryDifficultQuestions
                     }</p>
                   </td>
-                  <td class="border border-gray-300 p-1">
+                  <td class="border border-black p-1">
                     <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
                       stats.poorQuestions
                     }</p>
                   </td>
-                  <td class="border border-gray-300 p-1">
+                  <td class="border border-black p-1">
                     <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
                       stats.veryEasyQuestions
                     }</p>
                   </td>
-                  <td rowspan="2" class="border border-gray-300 p-1">
+                  <td rowspan="2" class="border border-black p-1">
                     <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
                       stats.totalRejected
                     }</p>
                   </td>
-                  <td rowspan="2" class="border border-gray-300 p-1">
+                  <td rowspan="2" class="border border-black p-1">
                     <p style="text-align: center; margin: 0; margin-bottom: 10px;">${Math.round(
                       stats.kr20
                     )}</p>
                   </td>
                 </tr>
                 <tr>
-                  <td class="border border-gray-300 p-1">
+                  <td class="border border-black p-1">
                     <p style="text-align: center; margin: 0; margin-bottom: 10px;">${formatPercentage(
                       (stats.goodQuestions / stats.totalAccepted) * 100
                     )}</p>
                   </td>
-                  <td class="border border-gray-300 p-1">
+                  <td class="border border-black p-1">
                     <p style="text-align: center; margin: 0; margin-bottom: 10px;">${formatPercentage(
                       (stats.easyQuestions / stats.totalAccepted) * 100
                     )}</p>
                   </td>
-                  <td class="border border-gray-300 p-1">
+                  <td class="border border-black p-1">
                     <p style="text-align: center; margin: 0; margin-bottom: 10px;">${formatPercentage(
                       (stats.difficultQuestions / stats.totalAccepted) * 100
                     )}</p>
                   </td>
-                  <td class="border border-gray-300 p-1">
+                  <td class="border border-black p-1">
                     <p style="text-align: center; margin: 0; margin-bottom: 10px;">${formatPercentage(
                       (stats.veryDifficultQuestions / stats.totalRejected) * 100
                     )}</p>
                   </td>
-                  <td class="border border-gray-300 p-1">
+                  <td class="border border-black p-1">
                     <p style="text-align: center; margin: 0; margin-bottom: 10px;">${formatPercentage(
                       (stats.poorQuestions / stats.totalRejected) * 100
                     )}</p>
                   </td>
-                  <td class="border border-gray-300 p-1">
+                  <td class="border border-black p-1">
                     <p style="text-align: center; margin: 0; margin-bottom: 10px;">${formatPercentage(
                       (stats.veryEasyQuestions / stats.totalRejected) * 100
                     )}</p>
@@ -368,83 +368,83 @@ function generateTableHTML(
             })
             .join("")}
           <tr>
-            <td rowspan="2" colspan="2" class="border border-gray-300 p-1 font-bold" style="width: 30px !important; max-width: 30px !important;">
+            <td rowspan="2" colspan="2" class="border border-black p-1 font-bold" style="width: 30px !important; max-width: 30px !important;">
               <p style="text-align: center; margin: 0; margin-bottom: 10px;">Average</p>
             </td>
-            <td class="border border-gray-300 p-1 font-bold">
-              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
+            <td class="border border-black p-1 font-bold">
+              <p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${
                 averages.goodQuestions
               }</p>
             </td>
-            <td class="border border-gray-300 p-1 font-bold">
-              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
+            <td class="border border-black p-1 font-bold">
+              <p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${
                 averages.easyQuestions
               }</p>
             </td>
-            <td class="border border-gray-300 p-1 font-bold">
-              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
+            <td class="border border-black p-1 font-bold">
+              <p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${
                 averages.difficultQuestions
               }</p>
             </td>
-            <td rowspan="2" class="border border-gray-300 p-1 font-bold">
-              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
+            <td rowspan="2" class="border border-black p-1 font-bold">
+              <p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${
                 averages.totalAccepted
               }</p>
             </td>
-            <td class="border border-gray-300 p-1 font-bold">
-              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
+            <td class="border border-black p-1 font-bold">
+              <p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${
                 averages.veryDifficultQuestions
               }</p>
             </td>
-            <td class="border border-gray-300 p-1 font-bold">
-              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
+            <td class="border border-black p-1 font-bold">
+              <p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${
                 averages.poorQuestions
               }</p>
             </td>
-            <td class="border border-gray-300 p-1 font-bold">
-              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
+            <td class="border border-black p-1 font-bold">
+              <p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${
                 averages.veryEasyQuestions
               }</p>
             </td>
-            <td rowspan="2" class="border border-gray-300 p-1 font-bold">
-              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
+            <td rowspan="2" class="border border-black p-1 font-bold">
+              <p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${
                 averages.totalRejected
               }</p>
             </td>
-            <td rowspan="2" class="border border-gray-300 p-1 font-bold">
-              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${Math.round(
+            <td rowspan="2" class="border border-black p-1 font-bold">
+              <p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${Math.round(
                 averages.kr20
               )}</p>
             </td>
           </tr>
           <tr>
-            <td class="border border-gray-300 p-1 font-bold">
-              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
+            <td class="border border-black p-1 font-bold">
+              <p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${
                 averages.percentages.goodQuestions
               }%</p>
             </td>
-            <td class="border border-gray-300 p-1 font-bold">
-              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
+            <td class="border border-black p-1 font-bold">
+              <p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${
                 averages.percentages.easyQuestions
               }%</p>
             </td>
-            <td class="border border-gray-300 p-1 font-bold">
-              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
+            <td class="border border-black p-1 font-bold">
+              <p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${
                 averages.percentages.difficultQuestions
               }%</p>
             </td>
-            <td class="border border-gray-300 p-1 font-bold">
-              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
+            <td class="border border-black p-1 font-bold">
+              <p style="text-align: center; margin: 0; margin-bottom: 10px;font-weight: bold;">${
                 averages.percentages.veryDifficultQuestions
               }%</p>
             </td>
-            <td class="border border-gray-300 p-1 font-bold">
-              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
+            <td class="border border-black p-1 font-bold">
+              <p style="text-align: center; margin: 0; margin-bottom: 10px;font-weight: bold;">${
                 averages.percentages.poorQuestions
               }%</p>
             </td>
-            <td class="border border-gray-300 p-1 font-bold">
-              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
+            <td class="border border-black p-1 font-bold">
+              <p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${
                 averages.percentages.veryEasyQuestions
               }%</p>
             </td>
@@ -465,7 +465,7 @@ function generateTableHTML(
         
         .data-table th,
         .data-table td {
-          border: 1px solid #e5e7eb;
+          border: 1px solid #000;
           padding: 4px;
           text-align: center;
           vertical-align: middle;
@@ -544,7 +544,7 @@ function generateKR20SegregationHTML(courses: any[]) {
   );
 
   return `
-    <div class="kr20-segregation" style="width: 100%; margin-bottom: 40px; border: 1px solid #e2e8f0; border-radius: 8px; page-break-inside: avoid;">
+    <div class="kr20-segregation" style="width: 100%; margin-bottom: 40px; border: 1px solid #000;overflow:hidden; border-radius: 8px; page-break-inside: avoid;">
       <h2 style="text-align: center; font-size: 16px; font-weight: bold; padding: 24px; background-color: #f8fafc; border-bottom: 1px solid #e2e8f0; margin: 0; margin-top: -16px;">
         Observation of individual courses
       </h2>
@@ -963,7 +963,7 @@ function generateSummaryTableHTML(
   };
 
   return `
-    <table class="table-container mt-3 min-w-full border-collapse border rounded-md overflow-hidden border-gray-300">
+    <table class="table-container mt-3 min-w-full border-collapse border rounded-md overflow-hidden border-black">
       <colgroup>
         <col style="width: 40px;">
         <col style="width: 200px;">
@@ -971,47 +971,47 @@ function generateSummaryTableHTML(
       </colgroup>
       <thead class="row-pair">
         <tr>
-          <th colspan="2" style="width: 300px !important;" class="border border-gray-300 bg-yellow-200 p-1">
+          <th colspan="2" style="width: 300px !important;" class="border border-black bg-yellow-200 p-1">
             <p style="text-align: center; margin: 0; margin-bottom: 10px;">${title}</p>
           </th>
-          <th colspan="9" class="border border-gray-300 p-1">
+          <th colspan="9" class="border border-black p-1">
             <p style="text-align: center; margin: 0; margin-bottom: 10px;">Summary</p>
           </th>
         </tr>
         <tr>
-          <th style="width: 30px !important;" class="border border-gray-300 p-1">
+          <th style="width: 30px !important;" class="border border-black p-1">
             <p style="text-align: center; margin: 0; margin-bottom: 10px;">S.No</p>
           </th>
-          <th style="width: 270px !important;" class="border border-gray-300 p-1">
+          <th style="width: 270px !important;" class="border border-black p-1">
             <p style="text-align: left; margin: 0; margin-bottom: 10px;">${
               isLevel ? "Level" : "Department"
             }</p>
           </th>
-          <th class="border border-gray-300" style="padding: 2px 4px;">
+          <th class="border border-black" style="padding: 2px 4px;">
             <p style="text-align: center; margin: 0; margin-bottom: 10px;">Good Questions</p>
           </th>
-          <th class="border border-gray-300" style="padding: 2px 4px;">
+          <th class="border border-black" style="padding: 2px 4px;">
             <p style="text-align: center; margin: 0; margin-bottom: 10px;">Easy Questions</p>
           </th>
-          <th class="border border-gray-300" style="padding: 2px 4px;">
+          <th class="border border-black" style="padding: 2px 4px;">
             <p style="text-align: center; margin: 0; margin-bottom: 10px;">Difficult Questions</p>
           </th>
-          <th class="border border-gray-300" style="padding: 2px 4px;">
+          <th class="border border-black" style="padding: 2px 4px;">
             <p style="text-align: center; margin: 0; margin-bottom: 10px;">Total Accepted</p>
           </th>
-          <th class="border border-gray-300" style="padding: 2px 4px;">
+          <th class="border border-black" style="padding: 2px 4px;">
             <p style="text-align: center; margin: 0; margin-bottom: 10px;">Very Difficult Questions</p>
           </th>
-          <th class="border border-gray-300" style="padding: 2px 4px;">
+          <th class="border border-black" style="padding: 2px 4px;">
             <p style="text-align: center; margin: 0; margin-bottom: 10px;">Poor (Bad) Questions</p>
           </th>
-          <th class="border border-gray-300" style="padding: 2px 4px;">
+          <th class="border border-black" style="padding: 2px 4px;">
             <p style="text-align: center; margin: 0; margin-bottom: 10px;">Very Easy Questions</p>
           </th>
-          <th class="border border-gray-300" style="padding: 2px 4px;">
+          <th class="border border-black" style="padding: 2px 4px;">
             <p style="text-align: center; margin: 0; margin-bottom: 10px;">Total Rejected</p>
           </th>
-          <th class="border border-gray-300" style="padding: 2px 4px;">
+          <th class="border border-black" style="padding: 2px 4px;">
             <p style="text-align: center; margin: 0; margin-bottom: 10px;">KR20</p>
           </th>
         </tr>
@@ -1021,91 +1021,91 @@ function generateSummaryTableHTML(
           .map(
             (summary, index) => `
           <tr>
-            <td rowspan="2" style="width: 30px !important;" class="border border-gray-300 p-1">
+            <td rowspan="2" style="width: 30px !important;" class="border border-black p-1">
               <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
                 index + 1
               }</p>
             </td>
-            <td rowspan="2" style="width: 270px !important;" class="border border-gray-300 p-1">
+            <td rowspan="2" style="width: 270px !important;" class="border border-black p-1">
               <p style="text-align: left; margin: 0; margin-bottom: 10px;">${
                 isLevel
                   ? `Level ${summary.name}`
                   : `DEPARTMENT: ${summary.name}`
               }</p>
             </td>
-            <td class="border border-gray-300 p-1">
+            <td class="border border-black p-1">
               <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
                 summary.averages.goodQuestions
               }</p>
             </td>
-            <td class="border border-gray-300 p-1">
+            <td class="border border-black p-1">
               <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
                 summary.averages.easyQuestions
               }</p>
             </td>
-            <td class="border border-gray-300 p-1">
+            <td class="border border-black p-1">
               <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
                 summary.averages.difficultQuestions
               }</p>
             </td>
-            <td rowspan="2" class="border border-gray-300 p-1">
+            <td rowspan="2" class="border border-black p-1">
               <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
                 summary.averages.totalAccepted
               }</p>
             </td>
-            <td class="border border-gray-300 p-1">
+            <td class="border border-black p-1">
               <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
                 summary.averages.veryDifficultQuestions
               }</p>
             </td>
-            <td class="border border-gray-300 p-1">
+            <td class="border border-black p-1">
               <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
                 summary.averages.poorQuestions
               }</p>
             </td>
-            <td class="border border-gray-300 p-1">
+            <td class="border border-black p-1">
               <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
                 summary.averages.veryEasyQuestions
               }</p>
             </td>
-            <td rowspan="2" class="border border-gray-300 p-1">
+            <td rowspan="2" class="border border-black p-1">
               <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
                 summary.averages.totalRejected
               }</p>
             </td>
-            <td rowspan="2" class="border border-gray-300 p-1">
+            <td rowspan="2" class="border border-black p-1">
               <p style="text-align: center; margin: 0; margin-bottom: 10px;">${Math.round(
                 summary.averages.kr20
               )}</p>
             </td>
           </tr>
           <tr>
-            <td class="border border-gray-300 p-1">
+            <td class="border border-black p-1">
               <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
                 summary.averages.percentages.goodQuestions
               }%</p>
             </td>
-            <td class="border border-gray-300 p-1">
+            <td class="border border-black p-1">
               <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
                 summary.averages.percentages.easyQuestions
               }%</p>
             </td>
-            <td class="border border-gray-300 p-1">
+            <td class="border border-black p-1">
               <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
                 summary.averages.percentages.difficultQuestions
               }%</p>
             </td>
-            <td class="border border-gray-300 p-1">
+            <td class="border border-black p-1">
               <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
                 summary.averages.percentages.veryDifficultQuestions
               }%</p>
             </td>
-            <td class="border border-gray-300 p-1">
+            <td class="border border-black p-1">
               <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
                 summary.averages.percentages.poorQuestions
               }%</p>
             </td>
-            <td class="border border-gray-300 p-1">
+            <td class="border border-black p-1">
               <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
                 summary.averages.percentages.veryEasyQuestions
               }%</p>
@@ -1116,82 +1116,82 @@ function generateSummaryTableHTML(
           .join("")}
         
         <tr>
-          <td rowspan="2" colspan="2" class="border border-gray-300 p-1 font-bold" style="text-align: center;">
+          <td rowspan="2" colspan="2" class="border border-black p-1 font-bold" style="text-align: center;">
             <p style="text-align: center; margin: 0; margin-bottom: 10px;">Average</p>
           </td>
-          <td class="border border-gray-300 p-1 font-bold">
+          <td class="border border-black p-1 font-bold">
             <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
               finalAverages.goodQuestions
             }</p>
           </td>
-          <td class="border border-gray-300 p-1 font-bold">
+          <td class="border border-black p-1 font-bold">
             <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
               finalAverages.easyQuestions
             }</p>
           </td>
-          <td class="border border-gray-300 p-1 font-bold">
+          <td class="border border-black p-1 font-bold">
             <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
               finalAverages.difficultQuestions
             }</p>
           </td>
-          <td rowspan="2" class="border border-gray-300 p-1 font-bold">
+          <td rowspan="2" class="border border-black p-1 font-bold">
             <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
               finalAverages.totalAccepted
             }</p>
           </td>
-          <td class="border border-gray-300 p-1 font-bold">
+          <td class="border border-black p-1 font-bold">
             <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
               finalAverages.veryDifficultQuestions
             }</p>
           </td>
-          <td class="border border-gray-300 p-1 font-bold">
+          <td class="border border-black p-1 font-bold">
             <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
               finalAverages.poorQuestions
             }</p>
           </td>
-          <td class="border border-gray-300 p-1 font-bold">
+          <td class="border border-black p-1 font-bold">
             <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
               finalAverages.veryEasyQuestions
             }</p>
           </td>
-          <td rowspan="2" class="border border-gray-300 p-1 font-bold">
+          <td rowspan="2" class="border border-black p-1 font-bold">
             <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
               finalAverages.totalRejected
             }</p>
           </td>
-          <td rowspan="2" class="border border-gray-300 p-1 font-bold">
+          <td rowspan="2" class="border border-black p-1 font-bold">
             <p style="text-align: center; margin: 0; margin-bottom: 10px;">${Math.round(
               finalAverages.kr20
             )}</p>
           </td>
         </tr>
         <tr>
-          <td class="border border-gray-300 p-1 font-bold">
+          <td class="border border-black p-1 font-bold">
             <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
               percentages.goodQuestions
             }%</p>
           </td>
-          <td class="border border-gray-300 p-1 font-bold">
+          <td class="border border-black p-1 font-bold">
             <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
               percentages.easyQuestions
             }%</p>
           </td>
-          <td class="border border-gray-300 p-1 font-bold">
+          <td class="border border-black p-1 font-bold">
             <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
               percentages.difficultQuestions
             }%</p>
           </td>
-          <td class="border border-gray-300 p-1 font-bold">
+          <td class="border border-black p-1 font-bold">
             <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
               percentages.veryDifficultQuestions
             }%</p>
           </td>
-          <td class="border border-gray-300 p-1 font-bold">
+          <td class="border border-black p-1 font-bold">
             <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
               percentages.poorQuestions
             }%</p>
           </td>
-          <td class="border border-gray-300 p-1 font-bold">
+          <td class="border border-black p-1 font-bold">
             <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
               percentages.veryEasyQuestions
             }%</p>
