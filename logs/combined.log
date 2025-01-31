@@ -2578,3 +2578,863 @@
     "veryEasyQuestions": "25.85"
   }
 }
+2025-01-31T07:05:14.820Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.823Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.824Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.825Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.825Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.826Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.827Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.828Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.829Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.830Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.831Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.832Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.832Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.833Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.833Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.834Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.834Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.835Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.835Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.836Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.836Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.837Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.837Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.837Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.837Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.838Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.838Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.839Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.839Z [[32minfo[39m]: {
+  "goodQuestions": 22,
+  "easyQuestions": 6,
+  "difficultQuestions": 2,
+  "veryDifficultQuestions": 3,
+  "poorQuestions": 26,
+  "veryEasyQuestions": 8,
+  "totalAccepted": 29,
+  "totalRejected": 37,
+  "kr20": 0.89,
+  "percentages": {
+    "goodQuestions": "74.21",
+    "easyQuestions": "20.68",
+    "difficultQuestions": "5.11",
+    "veryDifficultQuestions": "6.94",
+    "poorQuestions": "71.29",
+    "veryEasyQuestions": "21.77"
+  }
+}
+2025-01-31T07:05:14.842Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.843Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.844Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.844Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.845Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.845Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.846Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.846Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.847Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.848Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.848Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.849Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.849Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.849Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.850Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.850Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.851Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.851Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.852Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.852Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.852Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.853Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.853Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.854Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.854Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.854Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.855Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.855Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.856Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.856Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.856Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.857Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.857Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.857Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.858Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.858Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.858Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.859Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.859Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.859Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.860Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.860Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.861Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.862Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.862Z [[32minfo[39m]: {
+  "goodQuestions": 23,
+  "easyQuestions": 9,
+  "difficultQuestions": 2,
+  "veryDifficultQuestions": 2,
+  "poorQuestions": 19,
+  "veryEasyQuestions": 10,
+  "totalAccepted": 33,
+  "totalRejected": 32,
+  "kr20": 0.83,
+  "percentages": {
+    "goodQuestions": "68.42",
+    "easyQuestions": "25.94",
+    "difficultQuestions": "5.64",
+    "veryDifficultQuestions": "7.48",
+    "poorQuestions": "61.02",
+    "veryEasyQuestions": "31.50"
+  }
+}
+2025-01-31T07:05:14.866Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.866Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.867Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.867Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.868Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.868Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.868Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.869Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.869Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.869Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.870Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.871Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.871Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.872Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.872Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.873Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.873Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.874Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.874Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.875Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.875Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.876Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.876Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.877Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.877Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.878Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.878Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.879Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.880Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.880Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.881Z [[32minfo[39m]: {
+  "goodQuestions": 15,
+  "easyQuestions": 10,
+  "difficultQuestions": 1,
+  "veryDifficultQuestions": 3,
+  "poorQuestions": 23,
+  "veryEasyQuestions": 13,
+  "totalAccepted": 26,
+  "totalRejected": 40,
+  "kr20": 0.84,
+  "percentages": {
+    "goodQuestions": "58.47",
+    "easyQuestions": "38.80",
+    "difficultQuestions": "2.73",
+    "veryDifficultQuestions": "8.30",
+    "poorQuestions": "58.48",
+    "veryEasyQuestions": "33.21"
+  }
+}
+2025-01-31T07:05:14.884Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.884Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.885Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.885Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.885Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.886Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.886Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.886Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.886Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.887Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.887Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.887Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.887Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.888Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.888Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.889Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.889Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.890Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.890Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.891Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.891Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.891Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.892Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.892Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.893Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.894Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.894Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.895Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.896Z [[32minfo[39m]: {
+  "goodQuestions": 10,
+  "easyQuestions": 6,
+  "difficultQuestions": 1,
+  "veryDifficultQuestions": 3,
+  "poorQuestions": 27,
+  "veryEasyQuestions": 13,
+  "totalAccepted": 17,
+  "totalRejected": 43,
+  "kr20": 0.79,
+  "percentages": {
+    "goodQuestions": "59.50",
+    "easyQuestions": "32.23",
+    "difficultQuestions": "8.26",
+    "veryDifficultQuestions": "6.35",
+    "poorQuestions": "63.55",
+    "veryEasyQuestions": "30.10"
+  }
+}
+2025-01-31T07:05:14.900Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.900Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.901Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.901Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.902Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.902Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.902Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.903Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.903Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.903Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.904Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.904Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.905Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.905Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.906Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.907Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.907Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.908Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.908Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.908Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.909Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.909Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.910Z [[32minfo[39m]: {
+  "goodQuestions": 12,
+  "easyQuestions": 4,
+  "difficultQuestions": 1,
+  "veryDifficultQuestions": 3,
+  "poorQuestions": 32,
+  "veryEasyQuestions": 9,
+  "totalAccepted": 16,
+  "totalRejected": 44,
+  "kr20": 0.77,
+  "percentages": {
+    "goodQuestions": "72.31",
+    "easyQuestions": "21.54",
+    "difficultQuestions": "6.15",
+    "veryDifficultQuestions": "6.86",
+    "poorQuestions": "73.71",
+    "veryEasyQuestions": "19.43"
+  }
+}
+2025-01-31T07:05:14.914Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.915Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.915Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.916Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.916Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.917Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.917Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.917Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.918Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.918Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.919Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.919Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.919Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.919Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.919Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.920Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.920Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.920Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.921Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.921Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.922Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.922Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.923Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.923Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.924Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.924Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.924Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.925Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.925Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.925Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.926Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.926Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.927Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.927Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.928Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.929Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.930Z [[32minfo[39m]: {
+  "goodQuestions": 20,
+  "easyQuestions": 7,
+  "difficultQuestions": 2,
+  "veryDifficultQuestions": 4,
+  "poorQuestions": 28,
+  "veryEasyQuestions": 9,
+  "totalAccepted": 29,
+  "totalRejected": 40,
+  "kr20": 0.86,
+  "percentages": {
+    "goodQuestions": "68.56",
+    "easyQuestions": "25.74",
+    "difficultQuestions": "5.69",
+    "veryDifficultQuestions": "8.83",
+    "poorQuestions": "68.73",
+    "veryEasyQuestions": "22.44"
+  }
+}
+2025-01-31T07:05:14.936Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.936Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.937Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.937Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.938Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.938Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.939Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.939Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.940Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.940Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.941Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.941Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.942Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.942Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.943Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.944Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.945Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.945Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.946Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.947Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.948Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.949Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.957Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.965Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.969Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.971Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.972Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.973Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.974Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.975Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.976Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.977Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.978Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.980Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.981Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.983Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.983Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.984Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.985Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.987Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:14.990Z [[32minfo[39m]: {
+  "goodQuestions": 17,
+  "easyQuestions": 11,
+  "difficultQuestions": 1,
+  "veryDifficultQuestions": 2,
+  "poorQuestions": 18,
+  "veryEasyQuestions": 12,
+  "totalAccepted": 29,
+  "totalRejected": 31,
+  "kr20": 0.83,
+  "percentages": {
+    "goodQuestions": "58.29",
+    "easyQuestions": "37.14",
+    "difficultQuestions": "4.57",
+    "veryDifficultQuestions": "5.41",
+    "poorQuestions": "56.76",
+    "veryEasyQuestions": "37.84"
+  }
+}
+2025-01-31T07:05:14.997Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:14.998Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.000Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.001Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.002Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.002Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.003Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.003Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.004Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.005Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.006Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.007Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.008Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.009Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.014Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.016Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.018Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.020Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.021Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.022Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.023Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.025Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.028Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.032Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.033Z [[32minfo[39m]: {
+  "goodQuestions": 14,
+  "easyQuestions": 3,
+  "difficultQuestions": 1,
+  "veryDifficultQuestions": 2,
+  "poorQuestions": 30,
+  "veryEasyQuestions": 11,
+  "totalAccepted": 18,
+  "totalRejected": 42,
+  "kr20": 0.83,
+  "percentages": {
+    "goodQuestions": "77.06",
+    "easyQuestions": "15.60",
+    "difficultQuestions": "7.34",
+    "veryDifficultQuestions": "3.98",
+    "poorQuestions": "70.52",
+    "veryEasyQuestions": "25.50"
+  }
+}
+2025-01-31T07:05:15.038Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.040Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.041Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.048Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.050Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.052Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.055Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.059Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.065Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.066Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.067Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.068Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.068Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.069Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.085Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.086Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.087Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.088Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.089Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.090Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.090Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.091Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.097Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.098Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.099Z [[32minfo[39m]: {
+  "goodQuestions": 16,
+  "easyQuestions": 6,
+  "difficultQuestions": 0,
+  "veryDifficultQuestions": 3,
+  "poorQuestions": 23,
+  "veryEasyQuestions": 12,
+  "totalAccepted": 22,
+  "totalRejected": 38,
+  "kr20": 0.8,
+  "percentages": {
+    "goodQuestions": "72.73",
+    "easyQuestions": "25.76",
+    "difficultQuestions": "1.52",
+    "veryDifficultQuestions": "8.33",
+    "poorQuestions": "60.09",
+    "veryEasyQuestions": "31.58"
+  }
+}
+2025-01-31T07:05:15.104Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.104Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.105Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.105Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.106Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.106Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.107Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.107Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.108Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.108Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.109Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.110Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.112Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.113Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.114Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.116Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.117Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.120Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.122Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.124Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.125Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.127Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.130Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.134Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.135Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.137Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.138Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.138Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.139Z [[32minfo[39m]: {
+  "goodQuestions": 19,
+  "easyQuestions": 7,
+  "difficultQuestions": 2,
+  "veryDifficultQuestions": 3,
+  "poorQuestions": 25,
+  "veryEasyQuestions": 10,
+  "totalAccepted": 28,
+  "totalRejected": 37,
+  "kr20": 0.83,
+  "percentages": {
+    "goodQuestions": "68.14",
+    "easyQuestions": "25.66",
+    "difficultQuestions": "6.19",
+    "veryDifficultQuestions": "6.80",
+    "poorQuestions": "67.35",
+    "veryEasyQuestions": "25.85"
+  }
+}
+2025-01-31T07:05:15.145Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.146Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.148Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.148Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.149Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.150Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.150Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.151Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.152Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.153Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.155Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.156Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.157Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.157Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.158Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.159Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.160Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.163Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.165Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.166Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.167Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.168Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.168Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.169Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.170Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.170Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.171Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.171Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.172Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.172Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.173Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.173Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.174Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.174Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.175Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.176Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.177Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.179Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.180Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.181Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.182Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.182Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.183Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.184Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.184Z [[32minfo[39m]: {
+  "goodQuestions": 22,
+  "easyQuestions": 6,
+  "difficultQuestions": 2,
+  "veryDifficultQuestions": 3,
+  "poorQuestions": 26,
+  "veryEasyQuestions": 8,
+  "totalAccepted": 29,
+  "totalRejected": 37,
+  "kr20": 0.89,
+  "percentages": {
+    "goodQuestions": "74.21",
+    "easyQuestions": "20.68",
+    "difficultQuestions": "5.11",
+    "veryDifficultQuestions": "6.94",
+    "poorQuestions": "71.29",
+    "veryEasyQuestions": "21.77"
+  }
+}
+2025-01-31T07:05:15.189Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.189Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.190Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.190Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.191Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.199Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.199Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.200Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.201Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.201Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.202Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.203Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.203Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.204Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.204Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.205Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.205Z [[32minfo[39m]: {
+  "goodQuestions": 23,
+  "easyQuestions": 9,
+  "difficultQuestions": 2,
+  "veryDifficultQuestions": 2,
+  "poorQuestions": 19,
+  "veryEasyQuestions": 10,
+  "totalAccepted": 33,
+  "totalRejected": 32,
+  "kr20": 0.83,
+  "percentages": {
+    "goodQuestions": "68.42",
+    "easyQuestions": "25.94",
+    "difficultQuestions": "5.64",
+    "veryDifficultQuestions": "7.48",
+    "poorQuestions": "61.02",
+    "veryEasyQuestions": "31.50"
+  }
+}
+2025-01-31T07:05:15.209Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.211Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.213Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.214Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.215Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.216Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.216Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.216Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.217Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.217Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.218Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.218Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.219Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.219Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.220Z [[32minfo[39m]: {
+  "goodQuestions": 15,
+  "easyQuestions": 10,
+  "difficultQuestions": 1,
+  "veryDifficultQuestions": 3,
+  "poorQuestions": 23,
+  "veryEasyQuestions": 13,
+  "totalAccepted": 26,
+  "totalRejected": 40,
+  "kr20": 0.84,
+  "percentages": {
+    "goodQuestions": "58.47",
+    "easyQuestions": "38.80",
+    "difficultQuestions": "2.73",
+    "veryDifficultQuestions": "8.30",
+    "poorQuestions": "58.48",
+    "veryEasyQuestions": "33.21"
+  }
+}
+2025-01-31T07:05:15.222Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.223Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.223Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.224Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.224Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.224Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.225Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.225Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.225Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.225Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.226Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.226Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.227Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.228Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.228Z [[32minfo[39m]: {
+  "goodQuestions": 10,
+  "easyQuestions": 6,
+  "difficultQuestions": 1,
+  "veryDifficultQuestions": 3,
+  "poorQuestions": 27,
+  "veryEasyQuestions": 13,
+  "totalAccepted": 17,
+  "totalRejected": 43,
+  "kr20": 0.79,
+  "percentages": {
+    "goodQuestions": "59.50",
+    "easyQuestions": "32.23",
+    "difficultQuestions": "8.26",
+    "veryDifficultQuestions": "6.35",
+    "poorQuestions": "63.55",
+    "veryEasyQuestions": "30.10"
+  }
+}
+2025-01-31T07:05:15.232Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.233Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.234Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.235Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.235Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.236Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.236Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.236Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.237Z [[32minfo[39m]: {
+  "goodQuestions": 12,
+  "easyQuestions": 4,
+  "difficultQuestions": 1,
+  "veryDifficultQuestions": 3,
+  "poorQuestions": 32,
+  "veryEasyQuestions": 9,
+  "totalAccepted": 16,
+  "totalRejected": 44,
+  "kr20": 0.77,
+  "percentages": {
+    "goodQuestions": "72.31",
+    "easyQuestions": "21.54",
+    "difficultQuestions": "6.15",
+    "veryDifficultQuestions": "6.86",
+    "poorQuestions": "73.71",
+    "veryEasyQuestions": "19.43"
+  }
+}
+2025-01-31T07:05:15.240Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.240Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.240Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.241Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.241Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.241Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.241Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.241Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.242Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.242Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.242Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.243Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.243Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.244Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.244Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.245Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.245Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.246Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.246Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.247Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.247Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.248Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.248Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.248Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.249Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.249Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.249Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.249Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.250Z [[32minfo[39m]: {
+  "goodQuestions": 20,
+  "easyQuestions": 7,
+  "difficultQuestions": 2,
+  "veryDifficultQuestions": 4,
+  "poorQuestions": 28,
+  "veryEasyQuestions": 9,
+  "totalAccepted": 29,
+  "totalRejected": 40,
+  "kr20": 0.86,
+  "percentages": {
+    "goodQuestions": "68.56",
+    "easyQuestions": "25.74",
+    "difficultQuestions": "5.69",
+    "veryDifficultQuestions": "8.83",
+    "poorQuestions": "68.73",
+    "veryEasyQuestions": "22.44"
+  }
+}
+2025-01-31T07:05:15.252Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.252Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.252Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.253Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.253Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.253Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.253Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.254Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.254Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.254Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.254Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.255Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.255Z [[32minfo[39m]: {
+  "goodQuestions": 17,
+  "easyQuestions": 11,
+  "difficultQuestions": 1,
+  "veryDifficultQuestions": 2,
+  "poorQuestions": 18,
+  "veryEasyQuestions": 12,
+  "totalAccepted": 29,
+  "totalRejected": 31,
+  "kr20": 0.83,
+  "percentages": {
+    "goodQuestions": "58.29",
+    "easyQuestions": "37.14",
+    "difficultQuestions": "4.57",
+    "veryDifficultQuestions": "5.41",
+    "poorQuestions": "56.76",
+    "veryEasyQuestions": "37.84"
+  }
+}
+2025-01-31T07:05:15.257Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.257Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.257Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.258Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.258Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.258Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.258Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.259Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.259Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.259Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.260Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.260Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.260Z [[32minfo[39m]: {
+  "goodQuestions": 14,
+  "easyQuestions": 3,
+  "difficultQuestions": 1,
+  "veryDifficultQuestions": 2,
+  "poorQuestions": 30,
+  "veryEasyQuestions": 11,
+  "totalAccepted": 18,
+  "totalRejected": 42,
+  "kr20": 0.83,
+  "percentages": {
+    "goodQuestions": "77.06",
+    "easyQuestions": "15.60",
+    "difficultQuestions": "7.34",
+    "veryDifficultQuestions": "3.98",
+    "poorQuestions": "70.52",
+    "veryEasyQuestions": "25.50"
+  }
+}
+2025-01-31T07:05:15.263Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.264Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.264Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.265Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.265Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.265Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.266Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.266Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.266Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.267Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.267Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.268Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.268Z [[32minfo[39m]: {
+  "goodQuestions": 16,
+  "easyQuestions": 6,
+  "difficultQuestions": 0,
+  "veryDifficultQuestions": 3,
+  "poorQuestions": 23,
+  "veryEasyQuestions": 12,
+  "totalAccepted": 22,
+  "totalRejected": 38,
+  "kr20": 0.8,
+  "percentages": {
+    "goodQuestions": "72.73",
+    "easyQuestions": "25.76",
+    "difficultQuestions": "1.52",
+    "veryDifficultQuestions": "8.33",
+    "poorQuestions": "60.09",
+    "veryEasyQuestions": "31.58"
+  }
+}
+2025-01-31T07:05:15.270Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.271Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.271Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.271Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.272Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.272Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.272Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.272Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.273Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.273Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.273Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.274Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.274Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.275Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.275Z [[32minfo[39m]: Question Counts:
+2025-01-31T07:05:15.275Z [[32minfo[39m]: Calculated Percentages:
+2025-01-31T07:05:15.275Z [[32minfo[39m]: {
+  "goodQuestions": 19,
+  "easyQuestions": 7,
+  "difficultQuestions": 2,
+  "veryDifficultQuestions": 3,
+  "poorQuestions": 25,
+  "veryEasyQuestions": 10,
+  "totalAccepted": 28,
+  "totalRejected": 37,
+  "kr20": 0.83,
+  "percentages": {
+    "goodQuestions": "68.14",
+    "easyQuestions": "25.66",
+    "difficultQuestions": "6.19",
+    "veryDifficultQuestions": "6.80",
+    "poorQuestions": "67.35",
+    "veryEasyQuestions": "25.85"
+  }
+}
