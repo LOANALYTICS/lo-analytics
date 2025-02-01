@@ -19,7 +19,7 @@ interface AssessmentDoc {
 
 export async function getCLOData(courseId: string) {
     try {
-        const assessment = await Assessment.findOne({ course: courseId }).lean() as AssessmentDoc;
+        const assessment = await Assessment.findOne({ course: courseId }).lean() as unknown as AssessmentDoc;
 
         if (!assessment) {
             return null;
