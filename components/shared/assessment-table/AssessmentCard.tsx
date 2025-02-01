@@ -100,16 +100,14 @@ const generatePDF = async (html: string, fileName: string, orientation: 'portrai
 };
 
 
-
 export default function AssessmentCard({ href, course }: { 
   href: string, 
   course: any,
 }) {
 
-
   const handleAssessmentPlan = async (e: any) => {
-  
     try {
+      toast.loading("Generating report")
       const response = await fetch('/api/generate-assessment-report', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -118,15 +116,46 @@ export default function AssessmentCard({ href, course }: {
           academicYear: course.academic_year 
         }),
       });
-
+  
       if (!response.ok) {
         toast.warning('Something went wrong!')
         return
       };
-
+  
       const html = await response.text();
-      console.log('Generated HTML:', html); // For debugging
-      await generatePDF(html, 'assessment_report');
+   
+      
+      // Create temporary container
+      const tempContainer = document.createElement('div');
+      tempContainer.innerHTML = html;
+      document.body.appendChild(tempContainer);
+  
+      // Wait for Plotly chart to render
+      await new Promise((resolve) => {
+        const checkChart = setInterval(() => {
+          const chartDiv = tempContainer.querySelector('#achievementChart');
+          if (chartDiv && chartDiv.querySelector('.main-svg')) {
+            clearInterval(checkChart);
+            resolve(true);
+          }
+        }, 100);
+        // Timeout after 5 seconds
+        setTimeout(() => {
+          clearInterval(checkChart);
+          resolve(false);
+        }, 5000);
+      });
+      
+console.log(tempContainer.innerHTML)  
+      // Generate PDF with the rendered content
+
+      await generatePDF(tempContainer.innerHTML, 'assessment_report');
+      toast.dismiss();
+      toast.success('Report generated successfully');
+      
+      // Cleanup
+      document.body.removeChild(tempContainer);
+  
     } catch (error: any) {
       console.error("Error generating report:", error);
       if(error?.message === "Assessment data not found"){
@@ -136,6 +165,7 @@ export default function AssessmentCard({ href, course }: {
       }
     }
   }
+  
  
 const handleCloReport = async (e: any, percentage: number, id: string, ace_year: string, section: string) => {
   e.preventDefault()
@@ -147,6 +177,7 @@ const handleCloReport = async (e: any, percentage: number, id: string, ace_year:
   }
 
   try {
+    toast.loading("Generating report")
     const response = await fetch(`/api/generate-clo-report?perc=${percentage}&courseId=${id}&academicYear=${ace_year}&section=${section}`, {
       method: 'GET',
       headers: {
@@ -159,7 +190,9 @@ const handleCloReport = async (e: any, percentage: number, id: string, ace_year:
     }
 
     const html = await response.text();
+    toast.loading("Generating report")
     await generatePDF(html, `clo_report_${percentage}`, 'landscape');
+    toast.dismiss();
     toast.success('Report generated successfully');
 
   } catch (error: any) {

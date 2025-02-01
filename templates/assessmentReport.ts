@@ -1,3 +1,125 @@
+import { Chart, registerables } from 'chart.js';
+import { createCanvas } from 'canvas';
+
+// Register Chart.js components
+Chart.register(...registerables);
+
+function generateAchievementChartHTML(achievementData: any, sortedClos: string[]): string {
+  const chartData = sortedClos.map(clo => {
+    const achievement = achievementData[60].find((a: any) => a.clo === clo);
+    return {
+      clo,
+      percentageAchieving: achievement ? parseFloat(achievement.percentageAchieving) : 0
+    };
+  });
+
+  // Create canvas
+  const canvas = createCanvas(600, 300);
+  const ctx = canvas.getContext('2d');
+
+  // Create chart
+  const chart = new Chart(canvas as unknown as HTMLCanvasElement, {
+    type: 'bar',
+    data: {
+      labels: chartData.map(d => d.clo.toUpperCase()),
+      datasets: [
+        {
+          // Bars for achievement percentages
+          label: 'Achievement Percentage',
+          data: chartData.map(d => d.percentageAchieving),
+          backgroundColor: 'rgb(65, 105, 225)',
+          barThickness: 40
+        },
+        {
+          // Horizontal line for 60% threshold
+          label: 'Threshold',
+          data: Array(sortedClos.length).fill(60), // Changed to 60% threshold line
+          type: 'line',
+          borderColor: 'red',
+          borderWidth: 2,
+          pointRadius: 0,
+          fill: false
+        }
+      ]
+    },
+    options: {
+      responsive: false,
+      plugins: {
+        legend: {
+          display: false
+        },
+        tooltip: {
+          enabled: false
+        }
+      },
+      scales: {
+        y: {
+          min: 40, // Start from 40%
+          max: 100,
+          ticks: {
+            callback: function(value) {
+              return value + '%';
+            },
+            stepSize: 10,
+            font: {
+              size: 10
+            }
+          },
+          grid: {
+            display: true,
+            color: 'rgba(0, 0, 0, 0.1)',
+            drawTicks: false
+          }
+        },
+        x: {
+          grid: {
+            display: false
+          },
+          ticks: {
+            font: {
+              size: 10
+            }
+          }
+        }
+      },
+      layout: {
+        padding: {
+          top: 30,
+          right: 20,
+          bottom: 10,
+          left: 20
+        }
+      }
+    }
+  });
+
+  // Add percentage labels on top of bars
+  chartData.forEach((data, index) => {
+    const percentage = data.percentageAchieving;
+    ctx.fillStyle = 'black';
+    ctx.font = 'bold 12px Arial';
+    ctx.textAlign = 'center';
+    const xPos = chart.getDatasetMeta(0).data[index].x;
+    const yPos = chart.getDatasetMeta(0).data[index].y - 10;
+    ctx.fillText(`${percentage}%`, xPos, yPos);
+  });
+
+  // Convert to base64 image
+  const chartImage = canvas.toDataURL('image/png');
+
+  // Clean up
+  chart.destroy();
+
+  return `
+  <div style="break-inside: avoid; page-break-inside: avoid;">
+    <h2 class="h2_class">CLO Achievement Chart (≥ 60%)</h2>
+    <div style="text-align: center;">
+      <img src="${chartImage}" alt="CLO Achievement Chart" style="max-width:600px; height:auto; border: 1px solid #ccc;"/>
+    </div>
+  </div>
+`;
+}
+
 export interface AssessmentReportProps {
   course: {
     course_name: string;
@@ -49,19 +171,6 @@ export function generateAssessmentReportHTML(props: AssessmentReportProps): stri
               .replace(/"/g, "&quot;")
               .replace(/'/g, "&#039;");
   }
-
-  // // Calculate percentage of students achieving ≥60% for each CLO
-  // const cloAchievements = sortedClos.map(clo => {
-  //   const totalMarksForClo = assessmentData.cloScores[clo];
-  //   const studentsAchieving60Percent = assessmentData.students.filter(student => {
-  //     const studentScore = student.cloScores[clo]?.marksScored || 0;
-  //     const percentage = (studentScore / totalMarksForClo) * 100;
-  //     return percentage >= 60;
-  //   });
-    
-  //   const percentageAchieving60 = (studentsAchieving60Percent.length / assessmentData.students.length) * 100;
-  //   return percentageAchieving60.toFixed(2);
-  // });
 
   return `
     <!DOCTYPE html>
@@ -160,139 +269,160 @@ export function generateAssessmentReportHTML(props: AssessmentReportProps): stri
             page-break-before: auto;
             page-break-after: auto;
           }
+          .chart-container {
+            width: 100%;
+            height: 400px;
+          }
+          /* Add these new styles */
+          .report-section {
+            page-break-inside: avoid;
+            break-inside: avoid;
+          }
+          .chart-section {
+            page-break-before: always;
+            margin-top: 20px;
+            page-break-inside: avoid;
+            break-inside: avoid;
+          }
         </style>
+           <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+           <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
       </head>
       <body>
         <div class="container">
-          <div class="header">
-            <img src="${college.logo}" alt="College Logo" class="logo">
-            
-            <div class="course-details">
-             <div class="detail-item">
-                <span class="detail-label">Course Title:</span> ${course.course_name}
+          <div class="report-section">
+            <div class="header">
+              <img src="${college.logo}" alt="College Logo" class="logo">
+              <div class="course-details">
+                <div class="detail-item">
+                  <span class="detail-label">Course Title:</span> ${course.course_name}
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Semester:</span> ${course.semister === 1 ? "First Semester" : "Second Semester"}
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Course Code:</span> ${course.course_code}
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Department:</span> ${course.department}
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Credit Hours:</span> ${course.credit_hours + 'Hours'}
+                </div>
               </div>
-              <div class="detail-item">
-                <span class="detail-label">Semester:</span> ${course.semister === 1 ? "First Semester" : "Second Semester"}
-              </div>
-               <div class="detail-item">
-                <span class="detail-label">Course Code:</span> ${course.course_code}
-              </div>
-               <div class="detail-item">
-                <span class="detail-label">Department:</span> ${course.department}
-              </div>
-              <div class="detail-item">
-                <span class="detail-label">Credit Hours:</span> ${course.credit_hours + 'Hours'}
-              </div>
-             
             </div>
+
+            <h2 class="h2_class">Course Learning Outcome (CLO) Achievement Report</h2>
+
+            <table style="border-radius: 5px; overflow: hidden;">
+              <thead>
+                <tr>
+                  <th rowspan="2" class="serial-col">S.No</th>
+                  <th rowspan="2" class="id-col">ID</th>
+                  <th rowspan="2" class="name-col">Name</th>
+                  ${sortedClos.map(clo => `
+                    <th class="clo-header">${clo}</th>
+                  `).join('')}
+                  <th rowspan="2" class="total-header">MARKS OBTAINED</th>
+                </tr>
+                <tr>
+                  ${sortedClos.map(clo => `
+                    <th class="marks-col">${assessmentData.cloScores[clo]}</th>
+                  `).join('')}
+                </tr>
+              </thead>
+              <tbody>
+                <tbody class="student-group">
+                  ${assessmentData.students.map((student, index) => `
+                    <tr class="student-row">
+                      <td>${index + 1}</td>
+                      <td>${escapeHTML(student.studentId)}</td>
+                      <td>${escapeHTML(student.studentName)}</td>
+                      ${sortedClos.map(clo => `<td>${student.cloScores[clo]?.marksScored.toFixed(2) || '0.00'}</td>`).join('')}
+                      <td>${student.totalMarksObtained.toFixed(2)}</td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+
+                <tbody class="achievement-pair">
+                  <tr class="achievement-row">
+                    <td colspan="3" class="achievement-label">Achievement Grades</td>
+                    ${sortedClos.map(clo => {
+                      const totalScore = assessmentData.cloScores[clo];
+                      return `<td>${(totalScore * 0.6).toFixed(2)}</td>`;
+                    }).join('')}
+                    <td>-</td>
+                  </tr>
+                  <tr class="achievement-row">
+                    <td colspan="3" class="achievement-label">% of students scoring ≥ 60%</td>
+                    ${sortedClos.map((clo, index) => {
+                      return `<td>${achievementData['60'][index].percentageAchieving}%</td>`;
+                    }).join('')}
+                    <td>-</td>
+                  </tr>
+                </tbody>
+
+                <tbody class="achievement-pair">
+                  <tr class="achievement-row">
+                    <td colspan="3" class="achievement-label">Achievement Grades</td>
+                    ${sortedClos.map(clo => {
+                      const totalScore = assessmentData.cloScores[clo];
+                      return `<td>${(totalScore * 0.7).toFixed(2)}</td>`;
+                    }).join('')}
+                    <td>-</td>
+                  </tr>
+                  <tr class="achievement-row">
+                    <td colspan="3" class="achievement-label">% of students scoring ≥ 70%</td>
+                    ${sortedClos.map((clo, index) => {
+                      return `<td>${achievementData['70'][index].percentageAchieving}%</td>`;
+                    }).join('')}
+                    <td>-</td>
+                  </tr>
+                </tbody>
+
+                <tbody class="achievement-pair">
+                  <tr class="achievement-row">
+                    <td colspan="3" class="achievement-label">Achievement Grades</td>
+                    ${sortedClos.map(clo => {
+                      const totalScore = assessmentData.cloScores[clo];
+                      return `<td>${(totalScore * 0.8).toFixed(2)}</td>`;
+                    }).join('')}
+                    <td>-</td>
+                  </tr>
+                  <tr class="achievement-row">
+                    <td colspan="3" class="achievement-label">% of students scoring ≥ 80%</td>
+                    ${sortedClos.map((clo, index) => {
+                      return `<td>${achievementData['80'][index].percentageAchieving}%</td>`;
+                    }).join('')}
+                    <td>-</td>
+                  </tr>
+                </tbody>
+
+                <tbody class="achievement-pair">
+                  <tr class="achievement-row">
+                    <td colspan="3" class="achievement-label">Achievement Grades</td>
+                    ${sortedClos.map(clo => {
+                      const totalScore = assessmentData.cloScores[clo];
+                      return `<td>${(totalScore * 0.9).toFixed(2)}</td>`;
+                    }).join('')}
+                    <td>-</td>
+                  </tr>
+                  <tr class="achievement-row">
+                    <td colspan="3" class="achievement-label">% of students scoring ≥ 90%</td>
+                    ${sortedClos.map((clo, index) => {
+                      return `<td>${achievementData['90'][index].percentageAchieving}%</td>`;
+                    }).join('')}
+                    <td>-</td>
+                  </tr>
+                </tbody>
+
+              </tbody>
+            </table>
           </div>
 
-          <h2 class="h2_class">Course Learning Outcome (CLO) Achievement Report</h2>
-
-          <table style="border-radius: 5px; overflow: hidden;">
-            <thead>
-              <tr>
-                <th rowspan="2" class="serial-col">S.No</th>
-                <th rowspan="2" class="id-col">ID</th>
-                <th rowspan="2" class="name-col">Name</th>
-                ${sortedClos.map(clo => `
-                  <th class="clo-header">${clo}</th>
-                `).join('')}
-                <th rowspan="2" class="total-header">MARKS OBTAINED</th>
-              </tr>
-              <tr>
-                ${sortedClos.map(clo => `
-                  <th class="marks-col">${assessmentData.cloScores[clo]}</th>
-                `).join('')}
-              </tr>
-            </thead>
-            <tbody>
-              <tbody class="student-group">
-                ${assessmentData.students.map((student, index) => `
-                  <tr class="student-row">
-                    <td>${index + 1}</td>
-                    <td>${escapeHTML(student.studentId)}</td>
-                    <td>${escapeHTML(student.studentName)}</td>
-                    ${sortedClos.map(clo => `<td>${student.cloScores[clo]?.marksScored.toFixed(2) || '0.00'}</td>`).join('')}
-                    <td>${student.totalMarksObtained.toFixed(2)}</td>
-                  </tr>
-                `).join('')}
-              </tbody>
-
-            <tbody class="achievement-pair">
-  <tr class="achievement-row">
-    <td colspan="3" class="achievement-label">Achievement Grades</td>
-    ${sortedClos.map(clo => {
-      const totalScore = assessmentData.cloScores[clo];
-      return `<td>${(totalScore * 0.6).toFixed(2)}</td>`;
-    }).join('')}
-    <td>-</td>
-  </tr>
-  <tr class="achievement-row">
-    <td colspan="3" class="achievement-label">% of students scoring ≥ 60%</td>
-    ${sortedClos.map((clo, index) => {
-      return `<td>${achievementData['60'][index].percentageAchieving}%</td>`;
-    }).join('')}
-    <td>-</td>
-  </tr>
-</tbody>
-
-<tbody class="achievement-pair">
-  <tr class="achievement-row">
-    <td colspan="3" class="achievement-label">Achievement Grades</td>
-    ${sortedClos.map(clo => {
-      const totalScore = assessmentData.cloScores[clo];
-      return `<td>${(totalScore * 0.7).toFixed(2)}</td>`;
-    }).join('')}
-    <td>-</td>
-  </tr>
-  <tr class="achievement-row">
-    <td colspan="3" class="achievement-label">% of students scoring ≥ 70%</td>
-    ${sortedClos.map((clo, index) => {
-      return `<td>${achievementData['70'][index].percentageAchieving}%</td>`;
-    }).join('')}
-    <td>-</td>
-  </tr>
-</tbody>
-
-<tbody class="achievement-pair">
-  <tr class="achievement-row">
-    <td colspan="3" class="achievement-label">Achievement Grades</td>
-    ${sortedClos.map(clo => {
-      const totalScore = assessmentData.cloScores[clo];
-      return `<td>${(totalScore * 0.8).toFixed(2)}</td>`;
-    }).join('')}
-    <td>-</td>
-  </tr>
-  <tr class="achievement-row">
-    <td colspan="3" class="achievement-label">% of students scoring ≥ 80%</td>
-    ${sortedClos.map((clo, index) => {
-      return `<td>${achievementData['80'][index].percentageAchieving}%</td>`;
-    }).join('')}
-    <td>-</td>
-  </tr>
-</tbody>
-
-<tbody class="achievement-pair">
-  <tr class="achievement-row">
-    <td colspan="3" class="achievement-label">Achievement Grades</td>
-    ${sortedClos.map(clo => {
-      const totalScore = assessmentData.cloScores[clo];
-      return `<td>${(totalScore * 0.9).toFixed(2)}</td>`;
-    }).join('')}
-    <td>-</td>
-  </tr>
-  <tr class="achievement-row" >
-    <td colspan="3" class="achievement-label">% of students scoring ≥ 90%</td>
-    ${sortedClos.map((clo, index) => {
-      return `<td>${achievementData['90'][index].percentageAchieving}%</td>`;
-    }).join('')}
-    <td>-</td>
-  </tr>
-</tbody>
-
-            </tbody>
-          </table>
+          <div class="chart-section">
+            ${generateAchievementChartHTML(achievementData, sortedClos)}
+          </div>
         </div>
       </body>
     </html>
