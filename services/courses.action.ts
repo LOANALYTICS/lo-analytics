@@ -6,7 +6,7 @@ import { NextResponse } from 'next/server';
 
 export async function getCourses(): Promise<any[]> {
     // Fetch courses and populate the coordinators
-    const courses = await Course.find().populate('coordinator').lean() as ICourse[];
+    const courses = await Course.find().populate('coordinator').lean() as unknown as ICourse[];
 
     return courses.map((course) => {
         const serializedCourse: any = {
@@ -141,7 +141,7 @@ export async function getCoursesByCreator(userId: string): Promise<any> {
         const courses = await Course.find({ 
             createdBy: new Types.ObjectId(userId) 
         })
-        .lean() as ICourse[];
+        .lean() as unknown as ICourse[];
 
         // Serialize the courses similar to getCourses
         // return courses.map((course) => ({
@@ -211,7 +211,7 @@ export async function getCourseById(courseId: string) {
     try {
         const course = await Course.findById(courseId)
             .populate('coordinator')
-            .lean() as ICourse;
+            .lean() as unknown as ICourse;
 
         if (!course) {
             return null;
@@ -263,7 +263,7 @@ export async function getCoursesBySemester(
             semister: semester,
             course_name: courseName, // Add course name filter
             _id: { $ne: currentCourseId } // Exclude the current course
-        }).lean() as ICourse[];
+        }).lean() as unknown as ICourse[];
 
         return {
             success: true,

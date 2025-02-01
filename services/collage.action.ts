@@ -43,7 +43,7 @@ export async function getCollegeById(id: string): Promise<any> {
     try {
         const college = await Collage.findById(id)
             .populate('departments')
-            .lean() as ICollage;
+            .lean() as unknown as ICollage;
 
         if (!college) {
             throw new Error('College not found');
