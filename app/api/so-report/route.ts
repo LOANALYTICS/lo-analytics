@@ -43,7 +43,7 @@ export async function GET(request: Request) {
 
         const assessment = await Assessment.findOne({ course: courseId })
             .select('assessmentResults')
-            .lean() as IAssessment;
+            .lean() as unknown as IAssessment;
 
         if (!assessment) {
             return NextResponse.json({ message: 'Assessment not found' }, { status: 404 });
