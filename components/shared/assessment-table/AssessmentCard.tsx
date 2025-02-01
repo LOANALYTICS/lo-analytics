@@ -201,6 +201,39 @@ const handleCloReport = async (e: any, percentage: number, id: string, ace_year:
   }
 }
 
+const handleStudentOutcome = async(e: any, id: string, ace_year: string, section: string) => {
+  e.preventDefault()
+  e.stopPropagation()
+
+  if(!id || !ace_year || !section) {
+    toast.error('Required parameters missing');
+    return;
+  }
+
+  try {
+    toast.loading("Generating report")
+    const response = await fetch(`/api/so-report?courseId=${id}&academicYear=${ace_year}&section=${section}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to generate report');
+    }
+
+    const html = await response.text();
+    await generatePDF(html, 'student_outcome_report', 'landscape');
+    toast.dismiss();
+    toast.success('Report generated successfully');
+
+  } catch (error: any) {
+    console.error("Error generating SO report:", error);
+    toast.error(error.message || 'Failed to generate report');
+  }
+}
+
   return (
     <>
     <main className='w-full h-full hover:shadow-md transition-all duration-300 hover:translate-y-[-1px] group'>
@@ -216,10 +249,16 @@ const handleCloReport = async (e: any, percentage: number, id: string, ace_year:
               <p>Semester : <span className='capitalize'>{course.semister}</span></p>
             </div>
             <div className='z-50 flex flex-col gap-2 self-end bottom-3 '>
+            <Button onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  handleStudentOutcome(e,course?._id, course?.academic_year, course?.section)}} variant='outline' size='sm' className='px-5 py-3 text-[11px] w-full h-fit font-bold'>
+                    S.O - Report
+                </Button>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant='outline' size='sm' className='px-5 py-3 text-[11px] w-full h-fit font-bold'>
-                      CLOs Report
+                      CLOs - Report
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
