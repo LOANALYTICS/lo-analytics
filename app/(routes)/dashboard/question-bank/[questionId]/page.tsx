@@ -18,10 +18,10 @@ export default async function QuestionBankPage({ params }: Props) {
   }
 
   return (
-    <div className="p-2 h-full  flex flex-col w-full">
+    <div className="p-2 h-full  flex flex-col w-full relative">
     
      
-      <section className='flex-1 flex flex-col'>
+      <section className='flex-1 flex flex-col '>
       <div className="text-sm text-muted-foreground mb-6">
       <h1 className="text-2xl font-bold ">
         Question Bank - {courseTemplate.course_name}

@@ -121,20 +121,10 @@ export function QuestionUpload({ courseId, topic, onUploadSuccess }: QuestionUpl
                     <DialogHeader>
                         <DialogTitle>Upload Questions</DialogTitle>
                         <p className="text-sm text-gray-500 mt-2">
-                            Upload a text file (.txt) with questions in the following format:
+                            Upload a doc file (.docx) with questions in the following format:
                         </p>
                         <pre className="bg-gray-100 p-2 rounded-md text-sm mt-2 dark:bg-gray-800">
-                            {`Q:How long is the progress of caries?
-First option
-*Correct option (marked with *)
-Third option
-Fourth option
-
-Q:Next question...
-Option 1
-Option 2
-*Correct answer
-Option 4`}
+                            {``}
                         </pre>
                     </DialogHeader>
                     {selectedFile ? (

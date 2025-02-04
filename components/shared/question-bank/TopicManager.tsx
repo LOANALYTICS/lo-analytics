@@ -88,17 +88,28 @@ export function TopicManager({ courseId }: TopicManagerProps) {
 
     const handleEdit = async (oldTopic: string, index: number) => {
         if (!editValue.trim()) return
-        const allowedQuestion = editAllowedQuestion ? parseInt(editAllowedQuestion) : 0
-        const success = await updateTopic(courseId, oldTopic, editValue, allowedQuestion)
-        if (success) {
-            const updatedTopics = await getTopics(courseId)
-            setTopics(updatedTopics)
-            setEditingIndex(null)
-            setEditValue("")
-            setEditAllowedQuestion('')
+        
+        try {
+            toast.loading("saving changes..")
+            const allowedQuestion = editAllowedQuestion ? parseInt(editAllowedQuestion) : 0
+            const success = await updateTopic(courseId, oldTopic, editValue, allowedQuestion)
+            
+            if (success) {
+                const updatedTopics = await getTopics(courseId)
+                setTopics(updatedTopics)
+                setEditingIndex(null)
+                setEditValue("")
+                setEditAllowedQuestion('')
+                toast.success('Saved changes')
+            }
+        } catch (error) {
+            console.error('Failed to edit topic:', error)
+            toast.error('Failed to save changes')
+        } finally {
+            toast.dismiss()
         }
     }
-
+    
     const handleDeleteTopic = async (topic: string) => {
         const success = await deleteTopic(courseId, topic)
         if (success) {
@@ -145,8 +156,9 @@ export function TopicManager({ courseId }: TopicManagerProps) {
 
     return (
         <>
-            <div className="space-y-4 flex-1">
-                <div className="flex text-sm items-center gap-2.5 max-w-3xl ">
+        <section className="flex gap-4">
+        <div className="space-y-4 flex-1 pb-32 overflow-x-hidden overflow-y-scroll max-h-[530px] relative">
+                <div className="flex text-sm items-center gap-2.5 max-w-3xl sticky top-0 z-50 bg-white">
                     <p className="w-[38px]"></p>
                     <p className={`font-bold  ${editingIndex === null ? 'flex-[0.84] ' : 'flex-[3.8]'}`}>Topics</p>
                     <p className={`font-bold  flex-1`}>Allowed Qs</p>
@@ -164,13 +176,14 @@ export function TopicManager({ courseId }: TopicManagerProps) {
                                     value={editValue}
                                     onChange={(e) => setEditValue(e.target.value)}
                                     placeholder="Edit topic"
+                                    className="border-neutral-600 border-2 disabled:text-neutral-900 disabled:opacity-80"
                                 />
                                 <Input
                                     type="number"
                                     value={editAllowedQuestion}
                                     onChange={(e) => setEditAllowedQuestion(e.target.value)}
                                     placeholder="Allowed Questions"
-                                    className="w-28 min-w-28"
+                                    className="w-28 min-w-28 border-neutral-600 border-2 disabled:text-neutral-900 disabled:opacity-80"
                                 />
                                 <Button
                                     size="icon"
@@ -182,13 +195,13 @@ export function TopicManager({ courseId }: TopicManagerProps) {
                         ) : (
                             <div className="flex items-center gap-2 w-full group">
                                 <div className="flex-1 flex gap-2">
-                                    <Input value={topic.name} disabled />
+                                    <Input value={topic.name} disabled className="border-neutral-600 border-2 disabled:text-neutral-900 disabled:opacity-80"/>
                                     <Input 
                                         value={topic.allowedQuestion ?? 0} 
                                         disabled 
-                                        className="w-24" 
+                                        className="w-24 border-neutral-600 border-2 disabled:text-neutral-900 disabled:opacity-80" 
                                     />
-                                    <div className="w-24 flex items-center justify-center border rounded-md bg-muted">
+                                    <div className="w-24 border-neutral-600 border-2 disabled:text-neutral-900 disabled:opacity-80 flex items-center justify-center rounded-md bg-muted">
                                         {topic.questionCount} Q
                                     </div>
                                 </div>
@@ -231,34 +244,39 @@ export function TopicManager({ courseId }: TopicManagerProps) {
                         value={newInput}
                         onChange={(e) => setNewInput(e.target.value)}
                         placeholder="Add new topic"
+                        className="border-neutral-600 border-2 disabled:text-neutral-900 disabled:opacity-80"
                     />
                     <Input
                         type="number"
                         value={newAllowedQuestion}
                         onChange={(e) => setNewAllowedQuestion(e.target.value)}
                         placeholder="Allowed Questions"
-                        className="w-48 min-w-48"
+                        className="w-48 min-w-48 border-neutral-600 border-2 disabled:text-neutral-900 disabled:opacity-80"
                     />
                     <Button size="icon" onClick={() => handleSave(newInput, newAllowedQuestion)}>
                         <Plus className="h-4 w-4" />
                     </Button>
                 </div>
             </div>
-            <section className='w-full h-fit flex justify-center gap-4'>
+            <section className='w-fit h-fit flex flex-col justify-end gap-4  '>
                 <QuestionPaperDropdown topicsData={topicsData} open={dialogOpen} userId={user?.id} setOpen={setDialogOpen} />
                 <Button
                     onClick={handleGenerateQuestionPaperClick}
                     className='bg-primary text-white self-end px-4 py-2 rounded-md'
                 >
-                    Generate Question paper
+                    <p className="text-sm">Generate Question paper</p> 
                 </Button>
                 <Link
                     href={`/dashboard/question-bank/qps`}
-                    className='bg-primary text-white self-end px-4 py-2 rounded-md'
+                    className='bg-primary text-white self-end text-center px-4 py-2 rounded-md'
                 >
-                    Previous Question Papers
+                          
+                    <span className="text-sm">Previous Question paper</span> 
                 </Link>
             </section>
+            
+        </section>
+           
         </>
     )
 } 

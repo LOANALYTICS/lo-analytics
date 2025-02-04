@@ -22,9 +22,9 @@ const QuestionsListing = memo(({
                     >
                         <div 
                             dangerouslySetInnerHTML={{ __html: question.question}}
-                            className="prose prose-sm max-w-none line-clamp-1"
+                            className={`prose prose-sm  ${selectedQuestion?._id === question._id ? "text-white" : "text-gray-500"} max-w-none line-clamp-1`}
                         />
-                        <p className='text-xs text-gray-500 min-w-10'>
+                        <p className={`text-xs ${selectedQuestion?._id === question._id ? "text-white" : "text-gray-500"}  min-w-10`}>
                            CLO: {question.clos}
                         </p>
                         {selectedQuestion?._id === question._id && (

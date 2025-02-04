@@ -14,6 +14,7 @@ export default function Home() {
       <span className="font-bold text-xl">Sign in</span>
     </Link>
     </div>
+    
    
     </main>
   );
