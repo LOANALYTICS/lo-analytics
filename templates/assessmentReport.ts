@@ -362,59 +362,10 @@ export function generateAssessmentReportHTML(props: AssessmentReportProps): stri
                   </tr>
                 </tbody>
 
-                <tbody class="achievement-pair">
-                  <tr class="achievement-row">
-                    <td colspan="3" class="achievement-label">Achievement Grades</td>
-                    ${sortedClos.map(clo => {
-                      const totalScore = assessmentData.cloScores[clo];
-                      return `<td>${(totalScore * 0.7).toFixed(2)}</td>`;
-                    }).join('')}
-                    <td>-</td>
-                  </tr>
-                  <tr class="achievement-row">
-                    <td colspan="3" class="achievement-label">% of students scoring ≥ 70%</td>
-                    ${sortedClos.map((clo, index) => {
-                      return `<td>${achievementData['70'][index].percentageAchieving}%</td>`;
-                    }).join('')}
-                    <td>-</td>
-                  </tr>
-                </tbody>
+             
 
-                <tbody class="achievement-pair">
-                  <tr class="achievement-row">
-                    <td colspan="3" class="achievement-label">Achievement Grades</td>
-                    ${sortedClos.map(clo => {
-                      const totalScore = assessmentData.cloScores[clo];
-                      return `<td>${(totalScore * 0.8).toFixed(2)}</td>`;
-                    }).join('')}
-                    <td>-</td>
-                  </tr>
-                  <tr class="achievement-row">
-                    <td colspan="3" class="achievement-label">% of students scoring ≥ 80%</td>
-                    ${sortedClos.map((clo, index) => {
-                      return `<td>${achievementData['80'][index].percentageAchieving}%</td>`;
-                    }).join('')}
-                    <td>-</td>
-                  </tr>
-                </tbody>
-
-                <tbody class="achievement-pair">
-                  <tr class="achievement-row">
-                    <td colspan="3" class="achievement-label">Achievement Grades</td>
-                    ${sortedClos.map(clo => {
-                      const totalScore = assessmentData.cloScores[clo];
-                      return `<td>${(totalScore * 0.9).toFixed(2)}</td>`;
-                    }).join('')}
-                    <td>-</td>
-                  </tr>
-                  <tr class="achievement-row">
-                    <td colspan="3" class="achievement-label">% of students scoring ≥ 90%</td>
-                    ${sortedClos.map((clo, index) => {
-                      return `<td>${achievementData['90'][index].percentageAchieving}%</td>`;
-                    }).join('')}
-                    <td>-</td>
-                  </tr>
-                </tbody>
+              
+ 
 
               </tbody>
             </table>
