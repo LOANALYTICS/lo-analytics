@@ -59,6 +59,19 @@ export function generateSOHTML(
                     break-inside: avoid;
                     page-break-inside: avoid;
                 }
+                .chart-grid {
+                    display: flex;
+                    flex-wrap: wrap;
+                    justify-content: space-between;
+                    gap: 20px;
+                }
+                .chart-container {
+                    flex: 0 1 calc(50% - 20px);
+                    min-height: 300px;
+                    break-inside: avoid;
+                    page-break-inside: avoid;
+                    page-break-after: auto;
+                }
             </style>
         </head>
         <body>
@@ -136,118 +149,134 @@ export function generateSOHTML(
                         <td>${((overallGrades['F'] / totalStudents) * 100).toFixed(0)}%</td>
                     </tr>
                 </table>
-                ${generateGradeDistributionChartHTML(assessmentData)}
+                <div class="chart-grid">
+                    ${Object.keys(assessmentData).map(examType => `
+                        <div class="chart-container">
+                            ${generateGradeDistributionChartHTML(assessmentData, examType)}
+                        </div>
+                    `).join('')}
+                </div>
             </div>
         </body>
     </html>`;
 }
 
-function generateGradeDistributionChartHTML(assessmentData: Record<string, GradeCount>): string {
-  const gradeColors = {
-    'A+': 'rgb(0, 102, 204)',     // Strong Blue
-    'A': 'rgb(51, 153, 255)',     // Light Blue
-    'B+': 'rgb(102, 51, 153)',    // Deep Purple
-    'B': 'rgb(153, 102, 255)',    // Medium Purple
-    'C+': 'rgb(255, 128, 0)',     // Orange
-    'C': 'rgb(255, 178, 102)',    // Light Orange
-    'D+': 'rgb(255, 51, 51)',     // Red
-    'D': 'rgb(255, 102, 102)',    // Light Red
-    'F': 'rgb(128, 128, 128)'     // Gray
-  };
+function generateGradeDistributionChartHTML(assessmentData: Record<string, GradeCount>, examType: string): string {
+    const filteredData = assessmentData[examType]; // Get data for the specific exam
 
-  const labels = Object.keys(assessmentData);
-  const grades = ['A+', 'A', 'B+', 'B', 'C+', 'C', 'D+', 'D', 'F'];
-  
-  const datasets = grades.map(grade => ({
-    label: grade,
-    data: labels.map(type => {
-      const total = Object.values(assessmentData[type]).reduce<number>((sum, count) => sum + count, 0);
-      return ((assessmentData[type][grade as keyof GradeCount] / total) * 100).toFixed(1);
-    }),
-    backgroundColor: gradeColors[grade as keyof typeof gradeColors],
-    barPercentage: 0.8,
-    categoryPercentage: 0.9
-  }));
+    // Define colors for each grade
+    const gradeColors = {
+        'A+': 'rgb(0, 102, 204)',
+        'A': 'rgb(51, 153, 255)',
+        'B+': 'rgb(102, 51, 153)',
+        'B': 'rgb(153, 102, 255)',
+        'C+': 'rgb(255, 128, 0)',
+        'C': 'rgb(255, 178, 102)',
+        'D+': 'rgb(255, 51, 51)',
+        'D': 'rgb(255, 102, 102)',
+        'F': 'rgb(128, 128, 128)'
+    };
 
-  const canvas = createCanvas(1000, 500);
-  const ctx = canvas.getContext('2d');
+    const labels = [examType]; // Use the exam type as the label
+    const grades = ['A+', 'A', 'B+', 'B', 'C+', 'C', 'D+', 'D', 'F'];
 
-  const chart = new Chart(ctx as unknown as CanvasRenderingContext2D, {
-    type: 'bar',
-    data: {
-      labels: labels,
-      datasets: datasets
-    },
-    options: {
-      responsive: false,
-      scales: {
-        x: {
-          grid: {
-            display: false
-          },
-          ticks: {
-            font: {
-              size: 12
-            }
-          }
+    const total = Object.values(filteredData).reduce<number>((sum, count) => sum + count, 0); // Calculate total
+
+    const datasets = grades.map(grade => ({
+        label: grade,
+        data: [((filteredData[grade as keyof GradeCount] / total) * 100).toFixed(1)], // Calculate percentage
+        backgroundColor: gradeColors[grade as keyof typeof gradeColors],
+        barPercentage: 0.8,
+        categoryPercentage: 0.9
+    }));
+
+    const canvas = createCanvas(1000, 500);
+    const ctx = canvas.getContext('2d');
+
+    const chart = new Chart(ctx as unknown as CanvasRenderingContext2D, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: datasets
         },
-        y: {
-          beginAtZero: true,
-          max: 100,
-          grid: {
-            color: 'rgba(0, 0, 0, 0.1)'
-          },
-          ticks: {
-            callback: function(value) {
-              return value + '%';
+        options: {
+            responsive: false,
+            scales: {
+                x: {
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        font: {
+                            size: 20
+                        }
+                    }
+                },
+                y: {
+                    beginAtZero: true,
+                    max: 100,
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.1)'
+                    },
+                    ticks: {
+                        callback: function(value) {
+                            return value + '%';
+                        },
+                        stepSize: 10,
+                        font: {
+                            size: 20
+                        }
+                    }
+                }
             },
-            stepSize: 10,
-            font: {
-              size: 12
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'bottom',
+                    labels: {
+                        font: {
+                            size: 20
+                        }
+                    }
+                },
+                title: {
+                    display: true,
+                    text: 'Grade Distribution Chart',
+                    font: {
+                        size: 24
+                    }
+                }
             }
-          }
         }
-      },
-      plugins: {
-        legend: {
-          display: true,
-          position: 'bottom',
-          labels: {
-            font: {
-              size: 12
-            }
-          }
-        }
-      }
-    }
-  });
-
-  // Add percentage labels on top of the bars
-  datasets.forEach((dataset, datasetIndex) => {
-    dataset.data.forEach((value, index) => {
-      const numValue = parseFloat(value as string);
-      const meta = chart.getDatasetMeta(datasetIndex);
-      const bar = meta.data[index];
-      ctx.fillStyle = 'black';
-      ctx.font = 'bold 12px Arial';
-      ctx.textAlign = 'center';
-      ctx.fillText(
-        `${numValue}%`,
-        bar.x,
-        bar.y - 5  // Position above the bar
-      );
     });
-  });
 
-  const chartImage = canvas.toDataURL('image/png');
-  chart.destroy();
+    // Add percentage labels on top of the bars
+    datasets.forEach((dataset, datasetIndex) => {
+        dataset.data.forEach((value, index) => {
+            const numValue = parseFloat(value as string);
+            const meta = chart.getDatasetMeta(datasetIndex);
+            const bar = meta.data[index];
+            ctx.fillStyle = 'black';
+            ctx.font = 'bold 20px Arial';
+            ctx.textAlign = 'center';
+            
+            ctx.fillText(
+                `${numValue}%`,
+                bar.x,
+                bar.y - 15
+            );
+        });
+    });
 
-  return `
-    <div style="break-inside: avoid; page-break-inside: avoid;">
-      <h2 style="text-align: center;">Grade Distribution Chart</h2>
-      <div style="text-align: center;">
-        <img src="${chartImage}" alt="Grade Distribution Chart" style="max-width:1000px; height:auto; border: 1px solid #ccc;"/>
-      </div>
-    </div>
-  `;
+    const chartImage = canvas.toDataURL('image/png');
+    chart.destroy();
+
+    return `
+        <div class="chart-container">
+            <h2 style="text-align: center;">${examType} Grade Distribution Chart</h2>
+            <div style="text-align: center;">
+                <img src="${chartImage}" alt="${examType} Grade Distribution Chart" style="max-width:100%; height:auto; border: 1px solid #ccc;"/>
+            </div>
+        </div>
+    `;
 }
