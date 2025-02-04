@@ -16,10 +16,29 @@ interface GradeCount {
     'F': number;
 }
 
-export function generateSOHTML(
-    assessmentData: Record<string, GradeCount>,
-    overallGrades: GradeCount
-) {
+export function generateSOHTML({
+    assessmentData,          // Assessment data for each type
+    overallGrades,          // Overall grades across all assessments
+    course,                 // Course details
+    college                 // College details
+}: {
+    assessmentData: Record<string, GradeCount>;
+    overallGrades: GradeCount;
+    course: {
+        course_name: string;
+        level: number;
+        semister: number;
+        department: string;
+        course_code: string;
+        credit_hours: string;
+    };
+    college: {
+        logo: string;
+        english: string;
+        regional: string;
+        university: string;
+    };
+}) {
     // Calculate overall totals
     const totalStudents: number = Object.values(overallGrades).reduce<number>((sum, count) => sum + count, 0);
 
@@ -30,10 +49,14 @@ export function generateSOHTML(
             <style>
                 body { font-family: Arial, sans-serif; }
                 .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+                .h2_class { text-align: center; margin-bottom: 30px;,margin:auto; }
+          .header { text-align: center; margin-bottom: 30px; }
+          .logo { max-width: 100%; height: auto; }
                 table { 
                     width: 100%;
                     border-collapse: collapse;
                     margin-top: 20px;
+                    margin-bottom: 60px;
                     border: 1px solid black;
                     border-radius: 10px;
                     overflow: hidden;
@@ -72,10 +95,47 @@ export function generateSOHTML(
                     page-break-inside: avoid;
                     page-break-after: auto;
                 }
+                    .course-details {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 5px;
+          }
+          .detail-item {
+            display: flex;
+            gap: 5px;
+            font-size: 14px;
+          }
+          .detail-label {
+            font-weight: bold;
+          }
             </style>
         </head>
         <body>
             <div class="container">
+             <div class="header">
+              <img src="${college.logo}" alt="College Logo" class="logo">
+              <div class="course-details">
+                <div class="detail-item">
+                  <span class="detail-label">Course Title:</span> ${course.course_name}
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Semester:</span> ${course.semister === 1 ? "First Semester" : "Second Semester"}
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Course Code:</span> ${course.course_code}
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Department:</span> ${course.department}
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Credit Hours:</span> ${course.credit_hours + 'Hours'}
+                </div>
+              </div>
+            </div>
                 <h2 style="text-align: center;">Student Grade Distribution Report</h2>
                 <table>
                     <tr>

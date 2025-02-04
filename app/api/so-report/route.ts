@@ -34,12 +34,27 @@ interface GradeCount {
 export async function GET(request: Request) {
     try {
         await connectToMongoDB();
-        
         const { searchParams } = new URL(request.url);
         const courseId = searchParams.get('courseId');
+        const academicYear = searchParams.get('academicYear');
         if (!courseId) {
             return NextResponse.json({ message: 'Course ID is required' }, { status: 400 });
         }
+        const courseData = await Course.findOne({
+            _id: courseId,
+            academic_year: academicYear
+          })
+          .populate('collage')
+          .select('course_name level semister department course_code credit_hours collage')
+          .lean() as unknown as CourseData;
+      
+          if (!courseData) {
+            return NextResponse.json({
+              message: 'Course not found',
+              status: 'error'
+            }, { status: 404 });
+          }
+      
 
         const assessment = await Assessment.findOne({ course: courseId })
             .select('assessmentResults')
@@ -104,7 +119,19 @@ export async function GET(request: Request) {
         });
 
         // Generate HTML using the template
-        const htmlContent = generateSOHTML(assessmentData, overallStudentGrades);
+        const htmlContent = generateSOHTML({
+            assessmentData,
+            overallGrades: overallStudentGrades,
+            course: {
+                course_name: courseData.course_name,
+                level: courseData.level,
+                semister: courseData.semister,
+                department: courseData.department,
+                course_code: courseData.course_code,
+                credit_hours: courseData.credit_hours
+              },
+              college: courseData.collage,}
+        );
 
         return new NextResponse(htmlContent, {
             headers: {
