@@ -42,6 +42,9 @@ export function generateSOHTML({
     // Calculate overall totals
     const totalStudents: number = Object.values(overallGrades).reduce<number>((sum, count) => sum + count, 0);
 
+    // Wrap overallGrades in an object to match the expected structure
+    const overallData = { Overall: overallGrades };
+
     return `
     <!DOCTYPE html>
     <html>
@@ -215,6 +218,10 @@ export function generateSOHTML({
                             ${generateGradeDistributionChartHTML(assessmentData, examType)}
                         </div>
                     `).join('')}
+                    <!-- New Overall Grade Distribution Chart -->
+                    <div class="chart-container">
+                        ${generateGradeDistributionChartHTML(overallData, 'Overall')}
+                    </div>
                 </div>
             </div>
         </body>
