@@ -166,7 +166,7 @@ export function TopicManager({ courseId }: TopicManagerProps) {
                 {topics.map((topic, index) => (
                     <div key={index} className="flex items-center gap-2 max-w-3xl ">
                         <div
-                            className={`aspect-square rounded-md h-[38px] border cursor-pointer flex items-center justify-center
+                            className={`aspect-square rounded-md h-[38px] border-2 border-neutral-800 cursor-pointer flex items-center justify-center
                                 ${selectedTopics.find(t => t.name === topic.name) ? 'bg-black' : 'bg-white'}`}
                             onClick={() => toggleTopicSelection(topic)}
                         />
@@ -176,14 +176,14 @@ export function TopicManager({ courseId }: TopicManagerProps) {
                                     value={editValue}
                                     onChange={(e) => setEditValue(e.target.value)}
                                     placeholder="Edit topic"
-                                    className="border-neutral-600 border-2 disabled:text-neutral-900 disabled:opacity-80"
+                                    className="border-neutral-800 border-2"
                                 />
                                 <Input
                                     type="number"
                                     value={editAllowedQuestion}
                                     onChange={(e) => setEditAllowedQuestion(e.target.value)}
                                     placeholder="Allowed Questions"
-                                    className="w-28 min-w-28 border-neutral-600 border-2 disabled:text-neutral-900 disabled:opacity-80"
+                                    className="w-28 min-w-28 border-neutral-800 border-2"
                                 />
                                 <Button
                                     size="icon"
@@ -195,15 +195,13 @@ export function TopicManager({ courseId }: TopicManagerProps) {
                         ) : (
                             <div className="flex items-center gap-2 w-full group">
                                 <div className="flex-1 flex gap-2">
-                                    <Input value={topic.name} disabled className="border-neutral-600 border-2 disabled:text-neutral-900 disabled:opacity-80"/>
+                                    <Input value={topic.name} disabled className="border-neutral-700 border-2  disabled:opacity-90"/>
                                     <Input 
                                         value={topic.allowedQuestion ?? 0} 
                                         disabled 
-                                        className="w-24 border-neutral-600 border-2 disabled:text-neutral-900 disabled:opacity-80" 
+                                        className="w-24 border-neutral-700 border-2 disabled:text-neutral-900 disabled:opacity-90" 
                                     />
-                                    <div className="w-24 border-neutral-600 border-2 disabled:text-neutral-900 disabled:opacity-80 flex items-center justify-center rounded-md bg-muted">
-                                        {topic.questionCount} Q
-                                    </div>
+                                    
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <Button
@@ -233,6 +231,9 @@ export function TopicManager({ courseId }: TopicManagerProps) {
                                         <File className="h-4 w-4" />
                                         <span>Add Questions</span>
                                     </Button> 
+                                    <div className=" w-24 py-1.5 border-neutral-700 border-2 disabled:text-neutral-900 disabled:opacity-90 flex items-center justify-center rounded-md bg-muted">
+                                        {topic.questionCount} Q
+                                    </div>
                                 </div>
                             </div>
                         )}
@@ -244,14 +245,14 @@ export function TopicManager({ courseId }: TopicManagerProps) {
                         value={newInput}
                         onChange={(e) => setNewInput(e.target.value)}
                         placeholder="Add new topic"
-                        className="border-neutral-600 border-2 disabled:text-neutral-900 disabled:opacity-80"
+                        className="border-neutral-600 border-2 disabled:text-neutral-900 disabled:opacity-90"
                     />
                     <Input
                         type="number"
                         value={newAllowedQuestion}
                         onChange={(e) => setNewAllowedQuestion(e.target.value)}
                         placeholder="Allowed Questions"
-                        className="w-48 min-w-48 border-neutral-600 border-2 disabled:text-neutral-900 disabled:opacity-80"
+                        className="w-48 min-w-48 border-neutral-600 border-2 disabled:text-neutral-900 disabled:opacity-90"
                     />
                     <Button size="icon" onClick={() => handleSave(newInput, newAllowedQuestion)}>
                         <Plus className="h-4 w-4" />

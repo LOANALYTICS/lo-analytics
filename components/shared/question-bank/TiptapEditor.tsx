@@ -100,7 +100,7 @@ export function TiptapEditor({ content, onChange, placeholder, isQuestion = fals
     }
 
     return (
-        <div className="border rounded-md">
+        <div className="border-2 border-neutral-800 rounded-md">
             <input 
                 type="file"
                 ref={fileInputRef}
@@ -108,7 +108,7 @@ export function TiptapEditor({ content, onChange, placeholder, isQuestion = fals
                 accept="image/*"
                 className="hidden"
             />
-            <div className="border-b p-2 flex gap-1">
+            <div className="border-b-2  border-neutral-800 p-2 flex gap-1">
                 <Button
                     type="button"
                     variant="ghost"
@@ -219,7 +219,7 @@ export function TiptapEditor({ content, onChange, placeholder, isQuestion = fals
                     </Button>
                 )}
             </div>
-            <EditorContent editor={editor} className="p-2" />
+            <EditorContent editor={editor} className="p-2 " />
         </div>
     )
 } 

@@ -22,7 +22,7 @@ export default async function QuestionBankPage({ params }: Props) {
     
      
       <section className='flex-1 flex flex-col '>
-      <div className="text-sm text-muted-foreground mb-6">
+      <div className="text-sm text-black mb-6">
       <h1 className="text-2xl font-bold ">
         Question Bank - {courseTemplate.course_name}
       </h1>

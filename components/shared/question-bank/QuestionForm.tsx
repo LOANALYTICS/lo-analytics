@@ -136,7 +136,7 @@ export function QuestionForm({ courseId, topic, refreshTrigger }: QuestionFormPr
     return (
         <main className="flex gap-2 w-full">
             <form onSubmit={handleSubmit} className="w-full flex-1">
-            <Card className="bg-background">
+            <Card className="bg-background border-2 border-neutral-800">
                 <CardContent className="space-y-4 pt-6">
                     <div className="space-y-2">
                         <div className="flex items-center justify-between gap-2">
@@ -146,8 +146,9 @@ export function QuestionForm({ courseId, topic, refreshTrigger }: QuestionFormPr
                         <Select
                             value={selectedClo}
                             onValueChange={setSelectedClo}
+                    
                         >
-                            <SelectTrigger>
+                            <SelectTrigger         className="border-2 border-neutral-800">
                                 <SelectValue placeholder="Select CLO" />
                             </SelectTrigger>
                             <SelectContent>
@@ -174,7 +175,7 @@ export function QuestionForm({ courseId, topic, refreshTrigger }: QuestionFormPr
                         {options.map((option, index) => (
                             <div key={index} className="flex items-center gap-2">
                                 <div
-                                    className={`w-3.5 h-full min-h-[40px] self-start cursor-pointer rounded-sm border ${
+                                    className={`w-3.5 h-full min-h-[40px] self-start cursor-pointer rounded-sm border-2 border-neutral-800 ${
                                         correctAnswer && correctAnswer === option 
                                             ? 'bg-green-500 border-green-500' 
                                             : 'bg-white hover:bg-muted'
