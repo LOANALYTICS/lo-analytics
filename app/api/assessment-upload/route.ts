@@ -95,7 +95,7 @@ export async function POST(request: Request) {
     // Get all student IDs from assessment model
     const assessmentStudentIds = new Set(
       assessmentResponse.data.students.map(
-        (student: { studentName: string }) => student.studentName.trim()
+        (student: { studentId: string }) => student.studentId.trim()
       )
     );
 
@@ -351,7 +351,7 @@ function extractQuestionKeys(data: Array<Array<string | number>>): QuestionKey[]
   
     const studentMap = new Map(
       assessment.students.map((student: { studentId: string; studentName: string }) => 
-        [student.studentName.toLowerCase().trim(), student.studentId]
+        [student.studentId.trim(), student.studentName]  // Now using studentId as key, studentName as value
       )
     );
   
@@ -368,7 +368,7 @@ function extractQuestionKeys(data: Array<Array<string | number>>): QuestionKey[]
         continue;
       }
   
-      const studentName = studentMap.get(excelStudentId.toLowerCase());
+      const studentName = studentMap.get(excelStudentId);  // Now correctly looking up by ID
       if (!studentName || typeof studentName !== 'string') {
         console.warn(`Student not found for ID: ${excelStudentId}`);
         continue;

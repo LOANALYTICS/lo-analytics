@@ -275,6 +275,7 @@ function generateGradeDistributionChartHTML(assessmentData: Record<string, Grade
                     },
                     ticks: {
                         font: {
+                            family: "'Helvetica Neue', 'Helvetica', 'Arial', sans-serif",
                             size: 20
                         }
                     }
@@ -291,6 +292,7 @@ function generateGradeDistributionChartHTML(assessmentData: Record<string, Grade
                         },
                         stepSize: 10,
                         font: {
+                            family: "'Helvetica Neue', 'Helvetica', 'Arial', sans-serif",
                             size: 20
                         }
                     }
@@ -302,6 +304,7 @@ function generateGradeDistributionChartHTML(assessmentData: Record<string, Grade
                     position: 'bottom',
                     labels: {
                         font: {
+                            family: "'Helvetica Neue', 'Helvetica', 'Arial', sans-serif",
                             size: 20
                         }
                     }
@@ -310,6 +313,7 @@ function generateGradeDistributionChartHTML(assessmentData: Record<string, Grade
                     display: true,
                     text: 'Grade Distribution Chart',
                     font: {
+                        family: "'Helvetica Neue', 'Helvetica', 'Arial', sans-serif",
                         size: 24
                     }
                 }
@@ -317,14 +321,14 @@ function generateGradeDistributionChartHTML(assessmentData: Record<string, Grade
         }
     });
 
-    // Add percentage labels on top of the bars
+    // Update the percentage labels font
     datasets.forEach((dataset, datasetIndex) => {
         dataset.data.forEach((value, index) => {
             const numValue = parseFloat(value as string);
             const meta = chart.getDatasetMeta(datasetIndex);
             const bar = meta.data[index];
             ctx.fillStyle = 'black';
-            ctx.font = 'bold 20px Arial';
+            ctx.font = "bold 20px 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif";
             ctx.textAlign = 'center';
             
             ctx.fillText(

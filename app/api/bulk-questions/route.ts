@@ -140,7 +140,6 @@ export async function POST(request: NextRequest) {
             }, { status: 400 });
         }
 
-        // Get the last index before bulk upload
         const Question = mongoose.model('Question');
         const lastQuestion = await Question.findOne({
             courseId,
@@ -149,39 +148,25 @@ export async function POST(request: NextRequest) {
 
         let currentIndex = lastQuestion ? lastQuestion.index : 0;
 
-        const successfulQuestions = [];
+        // Sequential creation to ensure reliability
+        const createdQuestions = [];
         for (const q of parsedQuestions) {
-            try {
-                currentIndex++; // Increment for each new question
-                const created = await createQuestion({
-                    courseId,
-                    topic,
-                    question: q.question,
-                    options: q.options,
-                    correctAnswer: q.correctAnswer,
-                    clos: q.clos,
-                    index: currentIndex // Add the index to the creation
-                });
-                
-                if (created) {
-                    successfulQuestions.push(created);
-                }
-            } catch (error) {
-                console.error('Error creating question:', error);
-            }
-        }
-
-        if (successfulQuestions.length === 0) {
-            return NextResponse.json({
-                error: 'Failed to create any questions'
-            }, { status: 500 });
+            const created = await createQuestion({
+                courseId,
+                topic,
+                question: q.question,
+                options: q.options,
+                correctAnswer: q.correctAnswer,
+                clos: q.clos,
+                index: currentIndex + createdQuestions.length + 1
+            });
+            createdQuestions.push(created);
         }
 
         return NextResponse.json({
-            message: `Successfully created ${successfulQuestions.length} questions`,
+            message: `Successfully created ${createdQuestions.length} questions`,
             totalParsed: parsedQuestions.length,
-            successfullyCreated: successfulQuestions.length,
-            questions: successfulQuestions
+            successfullyCreated: createdQuestions.length
         });
 
     } catch (error) {

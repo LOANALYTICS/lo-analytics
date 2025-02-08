@@ -158,25 +158,25 @@ export default function AssessmentPlanPage() {
 
   const handleUpload = async () => {
     if (!selectedFile || !course) return;
-    console.log({
-      courseId: course._id,
-      type: selectedType,
-      file: selectedFile
-    })
-
-
+    
     try {
+      console.log('Starting upload...');
       setLoadingDialog(true);
       const formData = new FormData();
       formData.append('file', selectedFile);
       formData.append('courseId', course._id);
       formData.append('type', selectedType);
 
+      console.log('Making fetch request to:', '/api/assessment-upload');
       const response = await fetch('/api/assessment-upload', {
         method: 'POST',
+        headers: {
+          Accept: 'application/json',
+        },
         body: formData,
       });
 
+      console.log('Response received:', response.status);
       const data = await response.json();
 
       if (!response.ok) {
