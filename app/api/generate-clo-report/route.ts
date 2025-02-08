@@ -83,6 +83,7 @@ console.log(percentage,courseId, 'itis')
             assessment.achievementData[percentage]?.map(item => [item.clo, item.percentageAchieving]) || []
         );
 
+        console.log(achievementMap, 'achievementMap')
         // Generate HTML using the template with achievement data
         const htmlContent = generateCloReportHTML({
             cloData: assessment.cloData,

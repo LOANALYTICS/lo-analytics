@@ -225,7 +225,7 @@ export async function POST(request: Request) {
       console.error('Failed to save achievement data:', error);
       // Continue with HTML generation even if save fails
     }
-
+console.log(processedData.students[0].studentId,'strt')
     // Generate HTML content
     const htmlContent = generateAssessmentReportHTML({
       course: {

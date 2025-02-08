@@ -33,9 +33,19 @@ export function generateCloReportHTML(data: {
             const isChecked = Object.values(item)[0];
             if (!isChecked) return `<td class="plo-cell"></td>`;
             
-            const achievementPercentage = achievementMap.get(cloId);
-            // Show checkmark if no achievement data exists for this CLO
-            return `<td class="plo-cell checked">${achievementPercentage ? `${achievementPercentage.toFixed(1)}%` : '✓'}</td>`;
+            const achievementValue = achievementMap.get(cloId);
+            
+            // Handle different cases for achievement value
+            let displayValue = '✓';  // default checkmark
+            if (achievementValue !== undefined && achievementValue !== null) {
+                // Convert to number and check if it's valid
+                const numValue = Number(achievementValue);
+                if (!isNaN(numValue)) {
+                    displayValue = `${numValue.toFixed(1)}%`;
+                }
+            }
+            
+            return `<td class="plo-cell checked">${displayValue}</td>`;
         }).join('');
     };
 

@@ -10,7 +10,6 @@ const BaseLayout = async ({ children }: { children: React.ReactNode }) => {
   const role = await getRole("token");
   const user = await getCurrentUser();
   
-  console.log('User Cokie:', role,user);
 
   const topbarLinks = [
     { name: "Add Course", href: "/dashboard/new-course", icon: Plus },
