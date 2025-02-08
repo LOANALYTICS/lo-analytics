@@ -188,7 +188,7 @@ export default function AssessmentPlanPage() {
       setSelectedFile(null);
       setProgress(0);
       // Optionally refresh the assessment data
-      window.location.reload();
+      // window.location.reload();
     } catch (error) {
       console.error('Error uploading assessment:', error);
       toast.error(error instanceof Error ? error.message : 'Failed to upload assessment');

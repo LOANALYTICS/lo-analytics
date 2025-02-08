@@ -115,12 +115,7 @@ export const assessmentSchema = new Schema<IAssessment>({
         }]
     }],
     achievementData: {
-        type: Map,
-        of: [{
-            clo: { type: String, required: true },
-            achievementGrade: { type: Number, required: true },
-            percentageAchieving: { type: Number, required: true }
-        }],
+        type: Object,
         default: undefined
     },
     cloData: [{
