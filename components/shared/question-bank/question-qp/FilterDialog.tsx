@@ -148,7 +148,7 @@ export function FilterDialog({ courseTemplates }: FilterDialogProps) {
           },
           pagebreak: {
             mode: ["css", "legacy"],
-            avoid: ["tr", "td[rowspan]", "thead"],
+            avoid: ["tr", "td[rowspan]", "thead"]
           },
         };
 
@@ -211,8 +211,8 @@ export function FilterDialog({ courseTemplates }: FilterDialogProps) {
     <>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
-          <Button variant="outline" size="icon">
-            <Filter className="h-4 w-4" />
+          <Button variant="outline" size="icon" className="w-fit px-8">
+            BLUEPRINT<Filter className="h-4 w-4" />
           </Button>
         </DialogTrigger>
         <DialogContent>

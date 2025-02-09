@@ -57,37 +57,41 @@ export function generateDistributionReportHTML(data: {
                     // Filter out papers without an exam name
                     relevantPapers = relevantPapers.filter((paper) => paper.examName.trim() !== "")
 
-                    return relevantPapers.map((paper, paperIndex) => {
-                      const topicQ = paper.topicQuestions.find(
-                        (tq: any) => tq.topic === topic.name
-                      );
+                    return `
+                    <tbody style="page-break-inside: avoid !important;">
+                      ${relevantPapers.map((paper, paperIndex) => {
+                        const topicQ = paper.topicQuestions.find(
+                          (tq: any) => tq.topic === topic.name
+                        );
 
-                      return `
-                      <tr style="page-break-inside: avoid !important; page-break-before: avoid !important;">
-                          ${paperIndex === 0 ? `<td rowspan="${relevantPapers.length}">${index + 1}</td>` : ''}
-                          ${paperIndex === 0 ? `<td rowspan="${relevantPapers.length}">${topic.name}</td>` : ''}
-                          ${paperIndex === 0 ? `<td rowspan="${relevantPapers.length}">${topic.allowedQuestion || "-"}</td>` : ''}
-                          <td>${paper.examName}</td>
-                          ${clos
-                            .map((clo) => {
-                              const cloCount = topicQ?.clos[clo] || 0;
-                              const topicQuestions =
-                                paper.QuestionsOrder?.filter(
-                                  (q: any) =>
-                                    q.questionId.topic === topic.name &&
-                                    q.clo.toString() === clo.replace("clo", "")
-                                )
-                                  ?.slice(0, cloCount)
-                                  ?.map((q: any) => q.orderNumber)
-                                  ?.join(", ") || "";
+                        return `
+                        <tr>
+                            ${paperIndex === 0 ? `<td rowspan="${relevantPapers.length}">${index + 1}</td>` : ''}
+                            ${paperIndex === 0 ? `<td rowspan="${relevantPapers.length}">${topic.name}</td>` : ''}
+                            ${paperIndex === 0 ? `<td rowspan="${relevantPapers.length}">${topic.allowedQuestion || "-"}</td>` : ''}
+                            <td>${paper.examName}</td>
+                            ${clos
+                              .map((clo) => {
+                                const cloCount = topicQ?.clos[clo] || 0;
+                                const topicQuestions =
+                                  paper.QuestionsOrder?.filter(
+                                    (q: any) =>
+                                      q.questionId.topic === topic.name &&
+                                      q.clo.toString() === clo.replace("clo", "")
+                                  )
+                                    ?.slice(0, cloCount)
+                                    ?.map((q: any) => q.orderNumber)
+                                    ?.join(", ") || "";
 
-                              return `<td>${cloCount ? `${cloCount} (${topicQuestions})` : "-"}</td>`;
-                            })
-                            .join("")}
-                          <td>${topicQ?.total || "-"}</td>
-                      </tr>
-                      `;
-                    }).join('');
+                                return `<td>${cloCount ? `${cloCount} (${topicQuestions})` : "-"}</td>`;
+                              })
+                              .join("")}
+                            <td>${topicQ?.total || "-"}</td>
+                        </tr>
+                        `;
+                      }).join('')}
+                    </tbody>
+                    `;
                   })
                   .join("")}
             </tbody>
@@ -125,10 +129,17 @@ export function generateDistributionReportHTML(data: {
                     page-break-inside: avoid;
                 }
                 tr {
-                    page-break-inside: avoid;
+                    page-break-inside: avoid !important;
+                }
+                tr[data-topic-start="true"] {
+                    break-before: auto;
+                    break-after: avoid;
+                }
+                .topic-group {
+                    break-inside: avoid;
                 }
                 td[rowspan] {
-                    page-break-inside: avoid;
+                    page-break-inside: avoid !important;
                 }
                 th, td {
                     border: 1px solid #000;
