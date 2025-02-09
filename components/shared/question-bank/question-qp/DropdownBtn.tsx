@@ -11,13 +11,14 @@ import { MoreVertical } from "lucide-react";
 
 interface DropdownBtnProps {
   questionPaperId: string;
+  courseId: string;
 }
 
-export default function DropdownBtn({ questionPaperId }: DropdownBtnProps) {
+export default function DropdownBtn({ questionPaperId, courseId }: DropdownBtnProps) {
   const generateQuestionPaper = async (withAnswers: boolean) => {
     try {
       const response = await fetch(
-        `/api/question-paper/${questionPaperId}?withAnswers=${withAnswers}`
+        `/api/question-paper/${questionPaperId}?withAnswers=${withAnswers}&courseId=${courseId}`
       );
       if (!response.ok) throw new Error("Failed to generate question paper");
 
@@ -98,7 +99,7 @@ export default function DropdownBtn({ questionPaperId }: DropdownBtnProps) {
         },
         pagebreak: {
           mode: ["css", "legacy"],
-          avoid: ".question, .answer, .no-break-class",
+          avoid: ".question, .answer, .no-break-class,.question-container, .option,.options",
         },
       };
 

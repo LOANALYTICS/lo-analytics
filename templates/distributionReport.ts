@@ -106,6 +106,7 @@ export function generateDistributionReportHTML(data: {
                           sum + paper.topicQuestions.reduce((tSum: number, tq: any) => 
                             tSum + (tq.clos[clo] || 0), 0), 0)}</td>
                       `).join('')}
+                      
                       <td>${data.papers.reduce((sum: number, paper) => 
                         sum + paper.topicQuestions.reduce((tSum: number, tq: any) => tSum + (tq.total || 0), 0), 0)}</td>
                     </tr>

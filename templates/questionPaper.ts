@@ -1,12 +1,32 @@
+import dayjs from "dayjs";
+
 export function generateQuestionPaperHTML(data: {
-  examName: string;
-  courseCode: string;
-  questions: any[];
-  withAnswers?: boolean;
+    examName: string;
+    courseCode: string;
+    questions: any[];
+    withAnswers?: boolean;
+    course: {
+        course_name: string;
+        level: number;
+        semister: number;
+        department: string;
+        course_code: string;
+        credit_hours: string;
+        academic_year: string
+    };
+    college: {
+        logo: string;
+
+        english: string;
+        regional: string;
+        university: string;
+    };
+    examDate?: string;
 }) {
-  const questionsHTML = data.questions
-    .map(
-      (q, index) => `
+    const questionsHTML = data.questions
+        .map(
+            (q, index) => `
+
     <div class="question-container">
         <div class="question">
             <span style="margin-right: 8px;">Q${index + 1}.</span>
@@ -15,34 +35,34 @@ export function generateQuestionPaperHTML(data: {
     <span class="marks" style="font-size: 0;">.</span>
 </div>
         </div>
-        <div class="options">
+        <div class="options" style="margin-top: -10px;">
             ${q.options
-              .map(
-                (opt: string, idx: number) => `
+                    .map(
+                        (opt: string, idx: number) => `
                 <div class="option" data-letter="${String.fromCharCode(
-                  65 + idx
-                )})">
+                            65 + idx
+                        )})">
                     ${opt}
                 </div>
             `
-              )
-              .join("")}
+                    )
+                    .join("")}
         </div>
-        ${
-          data.withAnswers
-            ? `
+        ${data.withAnswers
+                    ? `
             <div class="answer">
                 Answer: ${q.correctAnswer}
             </div>
         `
-            : ""
-        }
+                    : ""
+                }
     </div>
 `
-    )
-    .join("");
+        )
+        .join("");
+    let date = new Date()
 
-  return `
+    return `
         <!DOCTYPE html>
         <html>
         <head>
@@ -59,12 +79,7 @@ export function generateQuestionPaperHTML(data: {
                     font-size: 12px;
                     margin: 0;
                 }
-                .header {
-                    text-align: center;
-                    margin-bottom: 20px;
-                    border-bottom: 2px solid #000;
-                    padding-bottom: 20px;
-                }
+            .header { text-align: center; margin-bottom: 30px; }
                 .title {
                     font-size: 24px;
                     font-weight: bold;
@@ -75,10 +90,12 @@ export function generateQuestionPaperHTML(data: {
                     margin-bottom: 10px;
                 }
                 .question-container {
-                    margin-bottom: 25px;
+                line-height: 1.2;
+             
                     // page-break-inside: avoid !important;
                     // break-inside: avoid !important;
                 }
+
                 .question-container:first-of-type {
                 margin-top: 0;
                 padding-top: 0;
@@ -88,7 +105,6 @@ export function generateQuestionPaperHTML(data: {
                     padding-top: 0;
                 }
                 .question {
-                    margin-bottom: 5px;
                     font-weight: bold;
                     display: flex;
                     align-items: flex-start;
@@ -100,9 +116,10 @@ export function generateQuestionPaperHTML(data: {
                 .options {
                     padding-left: 25px;
                     page-break-inside: avoid !important;
+                    color: #444343;
+                    font-weight: 400;
                 }
                 .option {
-                    margin-bottom: 8px;
                     page-break-inside: avoid !important;
                     display: flex;
                 }
@@ -169,18 +186,77 @@ export function generateQuestionPaperHTML(data: {
                 table td:first-child {
                     white-space: normal;
                 }
+                .course-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 5px;
+          }
+          .detail-item {
+            display: flex;
+            gap: 5px;
+            font-size: 12px;
+          }
+          .detail-label {
+            font-weight: bold;
+            white-space: nowrap;
+          }
+        .logo { max-width: 100%; height: auto; }
+
+       
             </style>
         </head>
+
+
+
         <body>
-            <div class="header">
-                <div class="title">${data.examName}</div>
-                <div class="course-code">Course Code: ${data.courseCode}</div>
-                ${
-                  data.withAnswers
-                    ? '<div class="answer-key">(Answer Key)</div>'
-                    : ""
-                }
+
+           
+
+
+           
+             <div class="header">
+              <img src="${data.college.logo}" alt="College Logo" class="logo">
+
+            
+             <div class="student_name" style="display: flex; gap: 10px;margin-bottom: 20px;">
+                <span class="detail-label" style="width: 100px; text-align: start;">Student Name:</span> <div class="student_name_space" style="height: 30px; width: 100%; border: 1px solid #ddd;"></div>
+             </div>
+               <div class="student_name" style="display: flex; gap: 10px; margin-bottom: 30px;">
+                <span class="detail-label" style="width: 100px; text-align: start;">Student ID:</span> <div class="student_name_space" style="height: 30px; width: 100%; border: 1px solid #ddd;"></div>
+             </div>
+
+
+
+              <div class="course-details">
+                <div class="detail-item">
+                  <span class="detail-label">Date:</span> ${dayjs(date).format('DD-MM-YYYY')}
+                </div>
+
+                
+                <div class="detail-item">
+                  <span class="detail-label">Course Code:</span> ${data.course.course_code}
+                </div>
+         
+                <div class="detail-item">
+                  <span class="detail-label">Academic Year:</span> ${data.course.academic_year}
+                </div>
+
+                   <div class="detail-item">
+                  <span class="detail-label">Level:</span> ${data.course.level}
+                </div>
+ 
+                <div class="detail-item">
+                  <span class="detail-label">Credit Hours:</span> ${data.course.credit_hours + 'Hours'}
+                </div>
+              </div>
             </div>
+
+
+            
             <div class="questions no-break-class">
                 ${questionsHTML}
             </div>

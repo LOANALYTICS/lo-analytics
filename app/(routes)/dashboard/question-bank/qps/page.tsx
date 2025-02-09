@@ -12,7 +12,7 @@ export default async function page() {
   }
   const questionPapers = await getQuestionPapers(user?.id)
   const coursesTemplate = await getCoordinatorCourseTemplates(user?.id!) 
-
+console.log(questionPapers)
   return (
     <div className="space-y-4">
       <div className="flex justify-end">
@@ -27,7 +27,7 @@ export default async function page() {
               <p className='text-sm text-gray-500'> <span className='font-bold'>Created At:</span> {dayjs(questionPaper.createdAt).format('DD-MM-YYYY')}</p>
             </div>
             <div className='flex flex-col gap-2'>
-              <DropdownBtn questionPaperId={questionPaper._id} />
+              <DropdownBtn questionPaperId={questionPaper._id} courseId={questionPaper?.course?._id}/>
             </div>
           </div>
         ))}
