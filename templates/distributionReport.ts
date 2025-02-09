@@ -63,7 +63,7 @@ export function generateDistributionReportHTML(data: {
                       );
 
                       return `
-                      <tr>
+                      <tr style="page-break-inside: avoid !important; page-break-before: avoid !important;">
                           ${paperIndex === 0 ? `<td rowspan="${relevantPapers.length}">${index + 1}</td>` : ''}
                           ${paperIndex === 0 ? `<td rowspan="${relevantPapers.length}">${topic.name}</td>` : ''}
                           ${paperIndex === 0 ? `<td rowspan="${relevantPapers.length}">${topic.allowedQuestion || "-"}</td>` : ''}
@@ -112,9 +112,38 @@ export function generateDistributionReportHTML(data: {
                     margin: 0;
                     padding: 20px;
                 }
+                table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin-top: 20px;
+                    table-layout: fixed;
+                }
+                thead {
+                    display: table-header-group;
+                }
+                tbody {
+                    page-break-inside: avoid;
+                }
+                tr {
+                    page-break-inside: avoid;
+                }
+                td[rowspan] {
+                    page-break-inside: avoid;
+                }
+                th, td {
+                    border: 1px solid #000;
+                    padding: 10px;
+                    text-align: center;
+                    vertical-align: middle;
+                    word-wrap: break-word;
+                }
+                th {
+                    background-color: #f3f4f6;
+                    font-weight: bold;
+                }
                 .header {
                     text-align: center;
-                    margin-bottom: 25px !important;
+                    margin-bottom: 25px;
                     padding-bottom: 10px;
                     border-bottom: 2px solid #000;
                 }
@@ -122,54 +151,6 @@ export function generateDistributionReportHTML(data: {
                     font-size: 18px;
                     font-weight: bold;
                     margin-bottom: 10px;
-                }
-                table {
-                    border: 1px solid #000;
-                    width: 100%;
-                    border-radius: 10px !important;
-                    overflow: hidden;
-                    border-collapse: collapse;
-                    margin-top: 20px;
-                    table-layout: fixed;
-                }
-                th, td {
-                    border: 1px solid #000;
-                        padding-left: 10px !important;
-                    padding-right: 10px !important;
-                    padding-top: 10px !important;
-                    padding-bottom: 25px !important;
-
-                    text-align: center;
-                    vertical-align: middle;
-                    word-wrap: break-word;
-                    height: 30px;
-                    line-height: 1.2;
-                }
-                th {
-                    background-color: #f3f4f6;
-                    font-weight: bold;
-                }
-                td div {
-                    margin: 4px 0;
-                    padding: 4px 0;
-                    border-bottom: 1px solid #eee;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    min-height: 24px;
-                }
-                td div:last-child {
-                    border-bottom: none;
-                }
-                .exam-name {
-                    font-weight: normal;
-                    margin-bottom: 10px !important;
-                }
-                .clo-value {
-                    font-weight: normal;
-                }
-                .total-value {
-                    font-weight: bold;
                 }
             </style>
         </head>

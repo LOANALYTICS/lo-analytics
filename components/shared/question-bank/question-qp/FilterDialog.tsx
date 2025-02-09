@@ -72,11 +72,10 @@ export function FilterDialog({ courseTemplates }: FilterDialogProps) {
         selectedYear
       );
 
-      // Add header with larger text
       const headerHtml = `
         <style>
           * {
-            font-size: 16pt !important;
+            font-size: 12pt !important;
           }
           table {
             width: 100%;
@@ -85,17 +84,17 @@ export function FilterDialog({ courseTemplates }: FilterDialogProps) {
           }
           th, td {
             border: 1px solid black;
-            padding: 12px;
-            text-align: left;
-          }
-          th {
-            font-weight: bold;
-            background-color: #f5f5f5;
-          }
-          h1 {
-            font-size: 24pt !important;
+            padding: 8px;
             text-align: center;
-            margin-bottom: 30px;
+          }
+          thead {
+            display: table-header-group;
+          }
+          tr {
+            page-break-inside: avoid;
+          }
+          td[rowspan] {
+            page-break-inside: avoid;
           }
         </style>
       `;
@@ -108,83 +107,89 @@ export function FilterDialog({ courseTemplates }: FilterDialogProps) {
           selectedYear
         ));
 
-      const container = document.createElement("div");
-      container.innerHTML = html;
-      document.body.appendChild(container);
+      try {
+        const html2pdf = (await import("html2pdf.js")).default;
+        
+        // Create container
+        const container = document.createElement("div");
+        container.innerHTML = html;
+        document.body.appendChild(container);
 
-      // Create PDF instance with larger dimensions
-      const pdf = new jsPDF({
-        orientation: "landscape",
-        unit: "mm",
-        format: [297, 210], // A4 landscape dimensions
-      }) as jsPDF & {
-        GState: new (options: { opacity: number }) => any;
-      };
+        // Add logo
+        const logo = document.createElement("img");
+        logo.src = "/pdf_logo.png";
+        logo.style.position = "fixed";
+        logo.style.bottom = "20px";
+        logo.style.right = "5px";
+        logo.style.width = "50px";
+        logo.style.height = "50px";
+        logo.style.opacity = "0.5";
+        logo.style.zIndex = "1000";
+        container.appendChild(logo);
 
-      // Convert HTML to canvas with increased scale
-      const canvas = await html2canvas(container, {
-        scale: 4, // Increased from 3 to 4 for even better quality
-        useCORS: true,
-        logging: false,
-      });
+        // PDF options
+        const opt = {
+          margin: 0.5,
+          filename: 'distribution_report.pdf',
+          image: { type: "jpeg", quality: 0.98 },
+          html2canvas: {
+            scale: 2,
+            useCORS: true,
+            scrollY: -window.scrollY,
+            removeContainer: true,
+            allowTaint: true,
+            imageTimeout: 0,
+          },
+          jsPDF: {
+            unit: "in",
+            format: "a4",
+            orientation: "landscape",
+            compress: true,
+          },
+          pagebreak: {
+            mode: ["css", "legacy"],
+            avoid: ["tr", "td[rowspan]", "thead"],
+          },
+        };
 
-      // Calculate dimensions with adjusted scaling
-      const imgWidth = 287; // Increased from 277 to use more page width
-      const pageHeight = 200; // Increased from 190 to use more page height
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      let heightLeft = imgHeight;
-      let position = 5;
-      let page = 1;
+        // Generate PDF
+        await html2pdf()
+          .set(opt)
+          .from(container)
+          .toPdf()
+          .get("pdf")
+          .then((pdf: any) => {
+            const totalPages = pdf.internal.getNumberOfPages();
+            for (let i = 1; i <= totalPages; i++) {
+              pdf.setPage(i);
+              pdf.saveGraphicsState();
+              pdf.setGState(new pdf.GState({ opacity: 0.7 }));
+              pdf.addImage(
+                "/pdf_logo.png",
+                "PNG",
+                pdf.internal.pageSize.width - 0.8,
+                pdf.internal.pageSize.height - 0.7,
+                0.5,
+                0.5
+              );
+              pdf.restoreGraphicsState();
+            }
+          })
+          .save();
 
-      // Add content to PDF with adjusted positioning
-      while (heightLeft >= 0) {
-        pdf.addImage(
-          canvas.toDataURL("image/jpeg", 1.0), // Increased quality from 0.98 to 1.0
-          "JPEG",
-          5, // Reduced margin from 10 to 5
-          position,
-          imgWidth,
-          imgHeight
-        );
-
-        // Add logo to bottom right of each page
-        pdf.saveGraphicsState();
-        pdf.setGState(new pdf.GState({ opacity: 0.5 }));
-
-        // Add logo to bottom right corner
-        pdf.addImage(
-          "/pdf_logo.png",
-          "PNG",
-          pdf.internal.pageSize.width - 25, // 25mm from right
-          pdf.internal.pageSize.height - 25, // 25mm from bottom
-          15, // width in mm
-          15 // height in mm
-        );
-
-        pdf.restoreGraphicsState();
-
-        heightLeft -= pageHeight;
-
-        if (heightLeft > 0) {
-          pdf.addPage();
-          position = 10 - (imgHeight - pageHeight * page);
-          page++;
-        }
+        // Cleanup
+        document.body.removeChild(container);
+        
+        setOpen(false);
+        setTopics(topicsData);
+        setPapers(result.data);
+        setShowDistribution(true);
+        toast.dismiss();
+        toast.success("Report Generated Successfully");
+      } catch (error) {
+        toast.error("Failed to generate PDF");
+        console.error(error);
       }
-
-      // Save PDF
-      pdf.save("distribution_report.pdf");
-      document.body.removeChild(container);
-
-      setOpen(false);
-
-      console.log(result.data);
-      setTopics(topicsData);
-      setPapers(result.data);
-      setOpen(false);
-      setShowDistribution(true);
-      toast.dismiss();
-      toast.success("Report Generated Successfully");
     } catch (error) {
       toast.error("Failed to fetch data");
       console.error(error);
