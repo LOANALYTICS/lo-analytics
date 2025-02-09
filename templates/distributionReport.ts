@@ -94,6 +94,36 @@ export function generateDistributionReportHTML(data: {
                     `;
                   })
                   .join("")}
+                  
+                  <tbody style="page-break-inside: avoid !important;">
+                    <tr>
+                      <td colspan="2">Total</td>
+                      <td>${data.topics.reduce((sum, topic) => sum + (parseInt(topic.allowedQuestion) || 0), 0)}</td>
+                      <td>${data.papers.reduce((sum: number, paper) => 
+                        sum + paper.topicQuestions.reduce((tSum: number, tq: any) => tSum + (tq.total || 0), 0), 0)}</td>
+                      ${clos.map(clo => `
+                        <td>${data.papers.reduce((sum: number, paper) => 
+                          sum + paper.topicQuestions.reduce((tSum: number, tq: any) => 
+                            tSum + (tq.clos[clo] || 0), 0), 0)}</td>
+                      `).join('')}
+                      <td>${data.papers.reduce((sum: number, paper) => 
+                        sum + paper.topicQuestions.reduce((tSum: number, tq: any) => tSum + (tq.total || 0), 0), 0)}</td>
+                    </tr>
+                    <tr>
+                      <td colspan="3">Total</td>
+                      <td>% of Each CLOs</td>
+                      ${clos.map(clo => {
+                        const cloTotal = data.papers.reduce((sum: number, paper) => 
+                          sum + paper.topicQuestions.reduce((tSum: number, tq: any) => 
+                            tSum + (tq.clos[clo] || 0), 0), 0);
+                        const totalQuestions = data.papers.reduce((sum: number, paper) => 
+                          sum + paper.topicQuestions.reduce((tSum: number, tq: any) => 
+                            tSum + (tq.total || 0), 0), 0);
+                        return `<td>${totalQuestions ? Math.round((cloTotal / totalQuestions) * 100) : 0}%</td>`;
+                      }).join('')}
+                      <td>100%</td>
+                    </tr>
+                  </tbody>
             </tbody>
         </table>
     `;
