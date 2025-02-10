@@ -130,7 +130,7 @@ export function FilterDialog({ courseTemplates }: FilterDialogProps) {
         // PDF options
         const opt = {
           margin: 0.5,
-          filename: 'distribution_report.pdf',
+          filename: `${selectedCourse?.course_code}-${selectedYear}-BLUEPRINT`,
           image: { type: "jpeg", quality: 0.98 },
           html2canvas: {
             scale: 2,

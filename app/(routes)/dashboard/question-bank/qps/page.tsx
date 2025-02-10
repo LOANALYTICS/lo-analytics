@@ -27,7 +27,7 @@ console.log(questionPapers)
               <p className='text-sm text-gray-500'> <span className='font-bold'>Created At:</span> {dayjs(questionPaper.createdAt).format('DD-MM-YYYY')}</p>
             </div>
             <div className='flex flex-col gap-2'>
-              <DropdownBtn questionPaperId={questionPaper._id} courseId={questionPaper?.course?._id}/>
+              <DropdownBtn questionPaperId={questionPaper._id} courseCode={questionPaper?.course?.course_code} examName={questionPaper?.examName} academicYear={questionPaper?.academicYear} courseId={questionPaper?.course?._id}/>
             </div>
           </div>
         ))}

@@ -305,27 +305,30 @@ export default function ItemAnalysisPage() {
         <div className="flex gap-2">
           <Button
             variant="outline"
-            className="flex items-center gap-2 p-0 w-20 h-9"
+            className="flex items-center gap-2 p-0 w-fit h-9 px-4"
             onClick={() => setFilterOpen(true)}
           >
-            <DockIcon className="w-4 h-4" />
+            <span className="font-bold">Semester Analysis</span> <DockIcon className="w-4 h-4" />
           </Button>
           <Button
             variant="outline"
-            className="flex items-center gap-2 p-0 w-20 h-9"
+
+            className="flex items-center gap-2 p-0  w-fit h-9 px-4"
             onClick={() => setCompareOpen(true)}
           >
-            <SplitIcon className="w-4 h-4" />
+             <span className="font-bold">Semester Comparison </span>  <SplitIcon className="w-4 h-4" />
           </Button>
           <Button
             variant="outline"
-            className="flex items-center gap-2 p-0 w-20 h-9"
+
+            className="flex items-center gap-2 p-0  w-fit h-9 px-4"
             onClick={() => setYearCompareOpen(true)}
           >
-            <CalendarIcon className="w-4 h-4" />
+            <span className="font-bold">Year Comparison</span>   <CalendarIcon className="w-4 h-4" />
           </Button>
         </div>
       </div>
+
 
       <section className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-2 mt-4">
         {courses.data.map((template: any) => (

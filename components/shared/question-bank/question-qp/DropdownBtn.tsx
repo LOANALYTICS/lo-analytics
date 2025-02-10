@@ -12,9 +12,13 @@ import { MoreVertical } from "lucide-react";
 interface DropdownBtnProps {
   questionPaperId: string;
   courseId: string;
+  academicYear: string;
+  courseCode: string;
+  examName: string;
 }
 
-export default function DropdownBtn({ questionPaperId, courseId }: DropdownBtnProps) {
+
+export default function DropdownBtn({ questionPaperId, courseId, academicYear, courseCode, examName }: DropdownBtnProps) {
   const generateQuestionPaper = async (withAnswers: boolean) => {
     try {
       const response = await fetch(
@@ -23,7 +27,7 @@ export default function DropdownBtn({ questionPaperId, courseId }: DropdownBtnPr
       if (!response.ok) throw new Error("Failed to generate question paper");
 
       const html = await response.text();
-      const fileName = withAnswers ? "answer_key" : "question_paper";
+      const fileName = withAnswers ? `${examName}-${courseCode}-${academicYear}-QPWA`: `${examName}-${courseCode}-${academicYear}-QP`;
 
       const html2pdf = (await import("html2pdf.js")).default;
 

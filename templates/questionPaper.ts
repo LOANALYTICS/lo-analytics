@@ -50,8 +50,8 @@ export function generateQuestionPaperHTML(data: {
         </div>
         ${data.withAnswers
                     ? `
-            <div class="answer">
-                Answer: ${q.correctAnswer}
+            <div class="answer" style="margin-bottom: 10px;">
+                Answer: ${String.fromCharCode(65 + q.options.findIndex((opt: string) => opt === q.correctAnswer))}
             </div>
         `
                     : ""
@@ -129,7 +129,7 @@ export function generateQuestionPaperHTML(data: {
                     flex-shrink: 0;
                 }
                 .answer {
-                    margin-top: 5px;
+                  margin-top: -5px;
                     padding-left: 30px;
                     color: #22c55e;
                     font-weight: bold;
