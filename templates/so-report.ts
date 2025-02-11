@@ -155,7 +155,7 @@ export function generateSOHTML({
                
               </div>
             </div>
-                <h2 style="text-align: center;">Student Grade Distribution Report</h2>
+                <h2 style="text-align: center; font-weight: 600; font-size: 16px;">Students Outcome (SO) Report</h2>
                 <table>
                     <tr>
                         <th>S.No</th>

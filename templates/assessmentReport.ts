@@ -112,7 +112,7 @@ function generateAchievementChartHTML(achievementData: any, sortedClos: string[]
 
   return `
   <div style="break-inside: avoid; page-break-inside: avoid;">
-    <h2 class="h2_class">CLO Achievement Chart (≥ 60%)</h2>
+    <h2 class="h2_class">CLO Achievement Chart</h2>
     <div style="text-align: center;">
       <img src="${chartImage}" alt="CLO Achievement Chart" style="max-width:600px; height:auto; border: 1px solid #ccc;"/>
     </div>
