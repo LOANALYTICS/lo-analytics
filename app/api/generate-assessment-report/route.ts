@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { connectToMongoDB } from '@/lib/db';
 import { Course, Assessment } from '@/lib/models';
 import { generateAssessmentReportHTML } from '@/templates/assessmentReport';
+import courseTemplateModel from '@/server/models/courseTemplate.model';
 
 interface CourseData {
   course_name: string;
@@ -10,6 +11,9 @@ interface CourseData {
   department: string;
   course_code: string;
   credit_hours: string;
+  coordinator: {
+    name: string;
+  };
   collage: {
     logo: string;
     english: string;
@@ -52,7 +56,7 @@ export async function POST(request: Request) {
     await connectToMongoDB();
     
     const body = await request.json();
-    const { courseId, academicYear } = body;
+    const { courseId, academicYear, coordinator } = body;
 
     if (!courseId || !academicYear) {
       return NextResponse.json({
@@ -66,7 +70,7 @@ export async function POST(request: Request) {
       _id: courseId,
       academic_year: academicYear
     })
-    .populate('collage')
+    .populate(['collage'])
     .select('course_name level semister department course_code credit_hours collage')
     .lean() as unknown as CourseData;
 
@@ -225,7 +229,7 @@ export async function POST(request: Request) {
       console.error('Failed to save achievement data:', error);
       // Continue with HTML generation even if save fails
     }
-console.log(processedData.students[0].studentId,'strt')
+console.log(courseData,'strt')
     // Generate HTML content
     const htmlContent = generateAssessmentReportHTML({
       course: {
@@ -234,7 +238,8 @@ console.log(processedData.students[0].studentId,'strt')
         semister: courseData.semister,
         department: courseData.department,
         course_code: courseData.course_code,
-        credit_hours: courseData.credit_hours
+        credit_hours: courseData.credit_hours,
+        coordinator: coordinator
       },
       college: courseData.collage,
       assessmentData: processedData

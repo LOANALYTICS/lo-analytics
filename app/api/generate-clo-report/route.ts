@@ -26,6 +26,7 @@ export async function GET(request: Request) {
         const courseId = searchParams.get('courseId');
         const academicYear = searchParams.get('academicYear');
         const section = searchParams.get('section');
+        const coordinator = searchParams.get('coordinator');
 console.log(percentage,courseId, 'itis')
         if (!courseId) {
             return NextResponse.json({ message: 'Assessment ID is required' }, { status: 400 });
@@ -95,7 +96,8 @@ console.log(percentage,courseId, 'itis')
               semister: courseData.semister,
               department: courseData.department,
               course_code: courseData.course_code,
-              credit_hours: courseData.credit_hours
+              credit_hours: courseData.credit_hours,
+              coordinator: coordinator!
             },
             college: courseData.collage,
 

@@ -92,11 +92,11 @@ export default function MappingTable({ initialData, defaultColumnCounts, onUpdat
 
   return (
     <div className="relative w-full pb-40">
-      <div className="border rounded-lg w-full overflow-auto max-w-[calc(100vw-2rem)]">
+      <div className="border-2 border-black rounded-lg w-full overflow-auto max-w-[calc(100vw-2rem)]">
         <Table className="text-xs w-full">
           <TableHeader>
             <TableRow>
-              <TableHead rowSpan={3} className="border w-[50px]">
+              <TableHead rowSpan={3} className="border border-black w-[50px]">
                 <Checkbox 
                   checked={clos.length > 0 && selectedCLOs.length === clos.length}
                   onCheckedChange={(checked) => {
@@ -104,15 +104,15 @@ export default function MappingTable({ initialData, defaultColumnCounts, onUpdat
                   }}
                 />
               </TableHead>
-              <TableHead rowSpan={3} className="border w-[50px]">S.No</TableHead>
-              <TableHead rowSpan={3} className="border min-w-[200px]">CLOs</TableHead>
-              <TableHead colSpan={columnCounts.k + columnCounts.s + columnCounts.v} className="text-center border">
+              <TableHead rowSpan={3} className="border border-black w-[50px] font-bold text-black">S.No</TableHead>
+              <TableHead rowSpan={3} className="border border-black min-w-[200px] font-bold text-black">Couse Learning Outcome (CLO) Description</TableHead>
+              <TableHead colSpan={columnCounts.k + columnCounts.s + columnCounts.v} className="text-center border border-black font-bold text-black">
                 PLOs
               </TableHead>
             </TableRow>
             <TableRow>
-              {['Knowledge', 'Skills', 'Values'].map((title, idx) => (
-                <TableHead key={title}  colSpan={columnCounts[['k', 's', 'v'][idx] as keyof ColumnCounts]} className="text-center border relative group">
+              {['Knowledge & Understanding', 'Skills', 'Values'].map((title, idx) => (
+                <TableHead key={title}  colSpan={columnCounts[['k', 's', 'v'][idx] as keyof ColumnCounts]} className="text-center border border-black relative group font-bold text-black">
                   {title}
                   <Button 
                     variant="ghost" 
@@ -130,7 +130,7 @@ export default function MappingTable({ initialData, defaultColumnCounts, onUpdat
                 Array(columnCounts[type as keyof ColumnCounts]).fill(0).map((_, i) => (
                   <TableHead 
                     key={`${type}${i + 1}`} 
-                    className="p-2 text-center border w-12 uppercase relative"
+                    className="p-2 text-center border border-black w-12 uppercase relative font-bold text-black"
                   >
                     {type}{i + 1}
                     <Button
@@ -149,7 +149,7 @@ export default function MappingTable({ initialData, defaultColumnCounts, onUpdat
           <TableBody>
             {clos.map((clo, rowIndex) => (
               <TableRow key={clo.clo}>
-                <TableCell className="border">
+                <TableCell className="border border-black">
                   <Checkbox 
                     checked={selectedCLOs.includes(clo.clo)}
                     onCheckedChange={() => setSelectedCLOs(prev => 
@@ -157,8 +157,8 @@ export default function MappingTable({ initialData, defaultColumnCounts, onUpdat
                     )}
                   />
                 </TableCell>
-                <TableCell className="border text-center">{rowIndex + 1}</TableCell>
-                <TableCell className="border p-0">
+                <TableCell className="border text-center border-black">{rowIndex + 1}</TableCell>
+                <TableCell className="border p-0 border-black">
                   <Input
                     value={clo.description}
                     onChange={(e) => updateCLODescription(rowIndex, e.target.value)}
@@ -169,14 +169,14 @@ export default function MappingTable({ initialData, defaultColumnCounts, onUpdat
                   Array(columnCounts[type as keyof ColumnCounts]).fill(0).map((_, i) => (
                     <TableCell 
                       key={`${type}${i}`} 
-                      className="p-2 text-center border cursor-pointer"
+                      className="p-2 text-center border border-black cursor-pointer"
                       onClick={() => togglePLO(rowIndex, type as 'k' | 's' | 'v', i)}
                     >
                       <div 
                         className={cn(
                           "w-6 h-6 rounded-full mx-auto transition-colors duration-200",
                           isPLOSelected(clo, type as 'k' | 's' | 'v', i)
-                            ? "bg-green-500" 
+                            ? "bg-green-800" 
                             : "bg-gray-200"
                         )}
                       />

@@ -57,7 +57,7 @@ function generateAchievementChartHTML(achievementData: any, sortedClos: string[]
           min: 40, // Start from 40%
           max: 100,
           ticks: {
-            callback: function(value) {
+            callback: function (value) {
               return value + '%';
             },
             stepSize: 10,
@@ -128,6 +128,7 @@ export interface AssessmentReportProps {
     department: string;
     course_code: string;
     credit_hours: string;
+    coordinator: string;
   };
   college: {
     logo: string;
@@ -166,10 +167,10 @@ export function generateAssessmentReportHTML(props: AssessmentReportProps): stri
   const { sortedClos, achievementData } = assessmentData;
   function escapeHTML(str: string): string {
     return str.replace(/&/g, "&amp;")
-              .replace(/</g, "&lt;")
-              .replace(/>/g, "&gt;")
-              .replace(/"/g, "&quot;")
-              .replace(/'/g, "&#039;");
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
   }
 
   return `
@@ -227,7 +228,7 @@ export function generateAssessmentReportHTML(props: AssessmentReportProps): stri
           .id-col { width: 100px; }
           .name-col { width: 200px; }
           .marks-col { width: 80px; }
-          .clo-header { background-color: #e0e0e0;text-transform: capitalize; }
+          .clo-header { background-color: #e0e0e0;text-transform: uppercase; }
           .total-header { background-color: #d0d0d0; }
           .achievement-label { 
             font-weight: normal; 
@@ -241,9 +242,11 @@ export function generateAssessmentReportHTML(props: AssessmentReportProps): stri
             font-family: Arial, sans-serif;
           }
           .course-details {
+            width: 100%;
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(2, 1fr);
             gap: 15px;
+            justify-content: space-between;
             margin-bottom: 30px;
             border: 1px solid #ddd;
             padding: 15px;
@@ -252,10 +255,11 @@ export function generateAssessmentReportHTML(props: AssessmentReportProps): stri
           .detail-item {
             display: flex;
             gap: 5px;
-            font-size: 14px;
+            font-size: 12px;
           }
           .detail-label {
             font-weight: bold;
+            white-space: nowrap;
           }
           .student-group {
             page-break-inside: auto;
@@ -294,21 +298,35 @@ export function generateAssessmentReportHTML(props: AssessmentReportProps): stri
             <div class="header">
               <img src="${college.logo}" alt="College Logo" class="logo">
               <div class="course-details">
-                <div class="detail-item">
-                  <span class="detail-label">Course Title:</span> ${course.course_name}
-                </div>
-                <div class="detail-item">
-                  <span class="detail-label">Semester:</span> ${course.semister === 1 ? "First Semester" : "Second Semester"}
-                </div>
-                <div class="detail-item">
-                  <span class="detail-label">Course Code:</span> ${course.course_code}
-                </div>
+
                 <div class="detail-item">
                   <span class="detail-label">Department:</span> ${course.department}
                 </div>
+
                 <div class="detail-item">
+                  <span class="detail-label">Course Code:</span> ${course.course_code}
+                </div>
+
+                <div class="detail-item">
+                  <span class="detail-label">Course Name:</span> ${course.course_name}
+                </div>
+                 <div class="detail-item">
                   <span class="detail-label">Credit Hours:</span> ${course.credit_hours + 'Hours'}
                 </div>
+
+                  <div class="detail-item">
+                  <span class="detail-label">Level:</span> ${course.level || 'NA'}
+                </div>
+
+                <div class="detail-item">
+                  <span class="detail-label">Semester:</span> ${course.semister === 1 ? "First Semester" : "Second Semester"}
+                </div>
+                       <div class="detail-item">
+                  <span class="detail-label">Course Co-ordinator:</span> ${course.coordinator}
+                </div>
+                
+                
+               
               </div>
             </div>
 
@@ -321,7 +339,7 @@ export function generateAssessmentReportHTML(props: AssessmentReportProps): stri
                   <th rowspan="2" class="id-col">ID</th>
                   <th rowspan="2" class="name-col">Name</th>
                   ${sortedClos.map(clo => `
-                    <th class="clo-header">${clo}</th>
+                    <th class="clo-header">${clo.replace(/([a-zA-Z]+)(\d+)/, '$1 $2')}</th>
                   `).join('')}
                   <th rowspan="2" class="total-header">MARKS OBTAINED</th>
                 </tr>
@@ -348,16 +366,16 @@ export function generateAssessmentReportHTML(props: AssessmentReportProps): stri
                   <tr class="achievement-row">
                     <td colspan="3" class="achievement-label">Achievement Grades</td>
                     ${sortedClos.map(clo => {
-                      const totalScore = assessmentData.cloScores[clo];
-                      return `<td>${(totalScore * 0.6).toFixed(2)}</td>`;
-                    }).join('')}
+    const totalScore = assessmentData.cloScores[clo];
+    return `<td>${(totalScore * 0.6).toFixed(2)}</td>`;
+  }).join('')}
                     <td>-</td>
                   </tr>
                   <tr class="achievement-row">
                     <td colspan="3" class="achievement-label">% of students scoring ≥ 60%</td>
                     ${sortedClos.map((clo, index) => {
-                      return `<td>${achievementData['60'][index].percentageAchieving}%</td>`;
-                    }).join('')}
+    return `<td>${achievementData['60'][index].percentageAchieving}%</td>`;
+  }).join('')}
                     <td>-</td>
                   </tr>
                 </tbody>

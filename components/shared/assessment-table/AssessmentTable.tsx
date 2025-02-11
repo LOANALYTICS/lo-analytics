@@ -150,11 +150,11 @@ export default function AssessmentTable({ initialData, onSave, saving, onUpload,
     <div className="">
     
 
-      <div className="border rounded-lg">
+      <div className="border-2 border-black rounded-lg">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[50px]">
+              <TableHead className="w-[50px] border-b border-black">
                 <Checkbox
                   checked={selectedRows.length === assessments.length}
                   onCheckedChange={(checked) => {
@@ -166,19 +166,19 @@ export default function AssessmentTable({ initialData, onSave, saving, onUpload,
                   }}
                 />
               </TableHead>
-              <TableHead>Assessment Type</TableHead>
+              <TableHead className='border-b border-black'>Assessment Type</TableHead>
               {cloKeys.map((clo) => (
-                <TableHead key={clo}>
+                <TableHead key={clo} className='border-b border-black'>
                   {clo.toUpperCase()}
                 </TableHead>
               ))}
-              <TableHead>Weight (%)</TableHead>
-              <TableHead>Actions</TableHead>
+              <TableHead className='border-b border-black'>Weight (%)</TableHead>
+              <TableHead className='border-b border-black'>Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {assessments.map((assessment) => (
-              <TableRow key={assessment.id}>
+              <TableRow key={assessment.id} className='border-b border-black'>
                 <TableCell className='w-10 py-1 '>
                   <Checkbox
                     checked={selectedRows.includes(assessment.id)}
@@ -195,13 +195,14 @@ export default function AssessmentTable({ initialData, onSave, saving, onUpload,
                   <Input
                     className='border-none bg-transparent focus-visible:ring-0  focus-visible:ring-offset-0'
                     value={assessment.type}
+                    placeholder='Enter Assessment Type'
                     onChange={(e) => setAssessments(prev => prev.map(a =>
                       a.id === assessment.id ? { ...a, type: e.target.value } : a
                     ))}
                   />
                 </TableCell>
                 {cloKeys.map((clo) => (
-                  <TableCell key={clo} className='py-1 border'>
+                  <TableCell key={clo} className='py-1 '>
                     <div className="flex items-center flex-wrap gap-1 p-1  min-h-[40px]">
                       {assessment.clos[clo as keyof Assessment['clos']].map((num, idx) => (
                         <span key={idx} className="bg-blue-100 group relative h-5 w-5 rounded text-xs flex items-center justify-center gap-1">
@@ -253,7 +254,7 @@ export default function AssessmentTable({ initialData, onSave, saving, onUpload,
                     </div>
                   </TableCell>
                 ))}
-                <TableCell className='py-1 border'>
+                <TableCell className='py-1 '>
                   <Input
                     type="number"
                     value={assessment.weight}

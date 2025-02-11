@@ -1,7 +1,7 @@
 "use client"
 import { Button } from '@/components/ui/button';
 import Link from 'next/link'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import {
   DropdownMenu,
@@ -11,6 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import axios from 'axios';
+import { getCurrentUser } from '@/server/utils/helper';
 
 const generatePDF = async (html: string, fileName: string, orientation: 'portrait' | 'landscape' = 'portrait') => {
   try {
@@ -104,6 +105,14 @@ export default function AssessmentCard({ href, course }: {
   href: string, 
   course: any,
 }) {
+  const [coordinator, setCoordinator] = useState<any>();
+  useEffect(() => {
+    const fetchCoordinator = async () => {
+      const user = await getCurrentUser()
+      setCoordinator(user)
+    };
+    fetchCoordinator()
+  }, [course._id]);
 
   const handleAssessmentPlan = async (e: any) => {
     try {
@@ -113,7 +122,8 @@ export default function AssessmentCard({ href, course }: {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           courseId: course._id, 
-          academicYear: course.academic_year 
+          academicYear: course.academic_year,
+          coordinator:coordinator?.name
         }),
       });
   
@@ -178,7 +188,7 @@ const handleCloReport = async (e: any, percentage: number, id: string, ace_year:
 
   try {
     toast.loading("Generating report")
-    const response = await fetch(`/api/generate-clo-report?perc=${percentage}&courseId=${id}&academicYear=${ace_year}&section=${section}`, {
+    const response = await fetch(`/api/generate-clo-report?perc=${percentage}&courseId=${id}&academicYear=${ace_year}&section=${section}&coordinator=${coordinator?.name}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -212,7 +222,7 @@ const handleStudentOutcome = async(e: any, id: string, ace_year: string, section
 
   try {
     toast.loading("Generating report")
-    const response = await fetch(`/api/so-report?courseId=${id}&academicYear=${ace_year}&section=${section}`, {
+    const response = await fetch(`/api/so-report?courseId=${id}&academicYear=${ace_year}&section=${section}&coordinator=${coordinator?.name}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -246,7 +256,7 @@ const handleStudentOutcome = async(e: any, id: string, ace_year: string, section
               <p>Course Code : <span className='capitalize'>{course.course_code}</span></p>
               <p>Section : <span className='capitalize'>{course.section}</span></p>
               <p>Type : <span className='capitalize'>{course.examType}</span></p>
-              <p>Semester : <span className='capitalize'>{course.semister}</span></p>
+              <p>Semester : <span className='capitalize'>{course.semister  == 1 ? 'First Semester' : 'Second Semester'}</span></p>
             </div>
             <div className='z-50 flex flex-col gap-2 self-end bottom-3 '>
             <Button onClick={(e) => {
@@ -255,10 +265,16 @@ const handleStudentOutcome = async(e: any, id: string, ace_year: string, section
                   handleStudentOutcome(e,course?._id, course?.academic_year, course?.section)}} variant='outline' size='sm' className='px-5 py-3 text-[11px] w-full h-fit font-bold'>
                     S.O - Report
                 </Button>
+                <Button onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  handleAssessmentPlan(e)}} variant='outline' size='sm' className='px-5 py-3 text-[11px] w-full h-fit font-bold'>
+                    CLO - Report
+                </Button>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant='outline' size='sm' className='px-5 py-3 text-[11px] w-full h-fit font-bold'>
-                      CLOs - Report
+                      PLO - Report
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
@@ -269,12 +285,7 @@ const handleStudentOutcome = async(e: any, id: string, ace_year: string, section
                     <DropdownMenuItem onClick={(e) => handleCloReport(e, 90,course?._id, course?.academic_year, course?.section)}>Generate at 90%</DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
-                <Button onClick={(e) => {
-                  e.preventDefault()
-                  e.stopPropagation()
-                  handleAssessmentPlan(e)}} variant='outline' size='sm' className='px-5 py-3 text-[11px] w-full h-fit font-bold'>
-                    Generate Report
-                </Button>
+          
             </div>
         </Link>
     </main>

@@ -37,6 +37,7 @@ export async function GET(request: Request) {
         const { searchParams } = new URL(request.url);
         const courseId = searchParams.get('courseId');
         const academicYear = searchParams.get('academicYear');
+        const coordinator = searchParams.get('coordinator');
         if (!courseId) {
             return NextResponse.json({ message: 'Course ID is required' }, { status: 400 });
         }
@@ -128,7 +129,8 @@ export async function GET(request: Request) {
                 semister: courseData.semister,
                 department: courseData.department,
                 course_code: courseData.course_code,
-                credit_hours: courseData.credit_hours
+                credit_hours: courseData.credit_hours,
+                coordinator: coordinator!
               },
               college: courseData.collage,}
         );

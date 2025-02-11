@@ -31,6 +31,7 @@ export function generateSOHTML({
         department: string;
         course_code: string;
         credit_hours: string;
+        coordinator: string;
     };
     college: {
         logo: string;
@@ -52,7 +53,7 @@ export function generateSOHTML({
             <style>
                 body { font-family: Arial, sans-serif; }
                 .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
-                .h2_class { text-align: center; margin-bottom: 30px;,margin:auto; }
+                .h2_class { text-align: center; margin-bottom: 30px;,margin:auto; font-size:16px, font-weight:600 }
           .header { text-align: center; margin-bottom: 30px; }
           .logo { max-width: 100%; height: auto; }
                 table { 
@@ -100,7 +101,7 @@ export function generateSOHTML({
                 }
                     .course-details {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(2, 1fr);
             gap: 15px;
             margin-bottom: 30px;
             border: 1px solid #ddd;
@@ -114,6 +115,7 @@ export function generateSOHTML({
           }
           .detail-label {
             font-weight: bold;
+            white-space: nowrap;
           }
             </style>
         </head>
@@ -121,22 +123,36 @@ export function generateSOHTML({
             <div class="container">
              <div class="header">
               <img src="${college.logo}" alt="College Logo" class="logo">
-              <div class="course-details">
-                <div class="detail-item">
-                  <span class="detail-label">Course Title:</span> ${course.course_name}
-                </div>
-                <div class="detail-item">
-                  <span class="detail-label">Semester:</span> ${course.semister === 1 ? "First Semester" : "Second Semester"}
-                </div>
-                <div class="detail-item">
-                  <span class="detail-label">Course Code:</span> ${course.course_code}
-                </div>
+               <div class="course-details">
+
                 <div class="detail-item">
                   <span class="detail-label">Department:</span> ${course.department}
                 </div>
+
                 <div class="detail-item">
+                  <span class="detail-label">Course Code:</span> ${course.course_code}
+                </div>
+
+                <div class="detail-item">
+                  <span class="detail-label">Course Name:</span> ${course.course_name}
+                </div>
+                 <div class="detail-item">
                   <span class="detail-label">Credit Hours:</span> ${course.credit_hours + 'Hours'}
                 </div>
+
+                  <div class="detail-item">
+                  <span class="detail-label">Level:</span> ${course.level || 'NA'}
+                </div>
+
+                <div class="detail-item">
+                  <span class="detail-label">Semester:</span> ${course.semister === 1 ? "First Semester" : "Second Semester"}
+                </div>
+                       <div class="detail-item">
+                  <span class="detail-label">Course Co-ordinator:</span> ${course.coordinator}
+                </div>
+                
+                
+               
               </div>
             </div>
                 <h2 style="text-align: center;">Student Grade Distribution Report</h2>
@@ -156,8 +172,8 @@ export function generateSOHTML({
                         <th class="total-col">Total Students</th>
                     </tr>
                     ${Object.entries(assessmentData).map(([type, grades], index) => {
-                        const total: number = Object.values(grades).reduce<number>((sum, count) => sum + count, 0);
-                        return `
+        const total: number = Object.values(grades).reduce<number>((sum, count) => sum + count, 0);
+        return `
                             <tbody class="grade-row-group">
                                 <tr>
                                     <td rowspan="2">${index + 1}</td>
@@ -185,7 +201,7 @@ export function generateSOHTML({
                                     <td>${((grades['F'] / total) * 100).toFixed(0)}%</td>
                                 </tr>
                             </tbody>`;
-                    }).join('')}
+    }).join('')}
                     <tr>
                         <td colspan="2" rowspan="2" style="text-align: right; font-weight: bold;">Overall Total</td>
                         <td>${overallGrades['A+']}</td>
@@ -287,7 +303,7 @@ function generateGradeDistributionChartHTML(assessmentData: Record<string, Grade
                         color: 'rgba(0, 0, 0, 0.1)'
                     },
                     ticks: {
-                        callback: function(value) {
+                        callback: function (value) {
                             return value + '%';
                         },
                         stepSize: 10,
@@ -330,7 +346,7 @@ function generateGradeDistributionChartHTML(assessmentData: Record<string, Grade
             ctx.fillStyle = 'black';
             ctx.font = "bold 20px 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif";
             ctx.textAlign = 'center';
-            
+
             ctx.fillText(
                 `${numValue}%`,
                 bar.x,

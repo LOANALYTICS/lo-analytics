@@ -17,6 +17,7 @@ export function generateCloReportHTML(data: {
         department: string;
         course_code: string;
         credit_hours: string;
+        coordinator: string;
       };
       college: {
         logo: string;
@@ -51,7 +52,7 @@ export function generateCloReportHTML(data: {
 
     const tableRows = cloData.map((clo, index) => `
         <tr>
-            <td class="index-cell">${index + 1}</td>
+            <td class="index-cell">CLO ${index + 1}</td>
             <td class="clo-cell">${clo.description}</td>
             ${generatePloCells(clo.ploMapping.k, `clo${index + 1}`)}
             ${generatePloCells(clo.ploMapping.s, `clo${index + 1}`)}
@@ -78,13 +79,12 @@ export function generateCloReportHTML(data: {
                     font-weight: 400;
                 }
                 .container { max-width: 1200px; margin: 0 auto; padding: 10px; }
-                .h2_class { text-align: center; margin-bottom: 30px;,margin:auto; }
                 .header { text-align: center; margin-bottom: 30px; }
                 .logo { max-width: 100%; height: auto; }
                 .title { font-size: 24px; margin: 20px 0; }
                 .course-details {
                 display: grid;
-                grid-template-columns: repeat(3, 1fr);
+                grid-template-columns: repeat(2, 1fr);
                 gap: 15px;
                 margin-bottom: 10px;
                 border: 1px solid #ddd;
@@ -166,7 +166,7 @@ export function generateCloReportHTML(data: {
                     font-weight: normal;
                     text-transform: uppercase;
                 }
-                .h2_class { text-align: center; margin-bottom: 30px;,margin:auto; font-size:15px }
+                .h2_class {font-weight: 600; text-align: center; margin-bottom: 30px;,margin:auto; font-size:16px }
             </style>
         </head>
         <body>
@@ -174,30 +174,44 @@ export function generateCloReportHTML(data: {
           <div class="header">
             <img src="${college.logo}" alt="College Logo" class="logo">
             <div class="course-details">
-             <div class="detail-item">
-                <span class="detail-label">Course Title:</span> ${course.course_name}
+
+                <div class="detail-item">
+                  <span class="detail-label">Department:</span> ${course.department}
+                </div>
+
+                <div class="detail-item">
+                  <span class="detail-label">Course Code:</span> ${course.course_code}
+                </div>
+
+                <div class="detail-item">
+                  <span class="detail-label">Course Name:</span> ${course.course_name}
+                </div>
+                 <div class="detail-item">
+                  <span class="detail-label">Credit Hours:</span> ${course.credit_hours + 'Hours'}
+                </div>
+
+                  <div class="detail-item">
+                  <span class="detail-label">Level:</span> ${course.level || 'NA'}
+                </div>
+
+                <div class="detail-item">
+                  <span class="detail-label">Semester:</span> ${course.semister === 1 ? "First Semester" : "Second Semester"}
+                </div>
+                       <div class="detail-item">
+                  <span class="detail-label">Course Co-ordinator:</span> ${course.coordinator}
+                </div>
+                
+                
+               
               </div>
-              <div class="detail-item">
-                <span class="detail-label">Semester:</span> ${course.semister === 1 ? "First Semester" : "Second Semester"}
-              </div>
-               <div class="detail-item">
-                <span class="detail-label">Course Code:</span> ${course.course_code}
-              </div>
-               <div class="detail-item">
-                <span class="detail-label">Department:</span> ${course.department}
-              </div>
-              <div class="detail-item">
-                <span class="detail-label">Credit Hours:</span> ${course.credit_hours + 'Hours'}
-              </div>
-            </div>
           </div>
-             <h2 class="h2_class">Program Learning Outcome (PLO) Acheivement Report : ${percentage}%</h2>
+             <h2 class="h2_class">Program Learning Outcome (PLO) Acheivement Report </h2>
             <table>
                 <thead>
                     <tr>
-                        <th rowspan="3">S.No</th>
                         <th rowspan="3">CLOs</th>
-                        <th colspan="${cloData[0].ploMapping.k.length + cloData[0].ploMapping.s.length + cloData[0].ploMapping.v.length}">PLOs</th>
+                        <th rowspan="3">Course Learning Outcome (CLO) Description</th>
+                        <th colspan="${cloData[0].ploMapping.k.length + cloData[0].ploMapping.s.length + cloData[0].ploMapping.v.length}">Alignement of CLO with Program Learning Outcome (PLO)</th>
                     </tr>
                     <tr>
                         <th colspan="${cloData[0].ploMapping.k.length}" class="plo-header">Knowledge</th>

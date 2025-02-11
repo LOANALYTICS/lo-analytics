@@ -176,8 +176,7 @@ export default function CourseCard({ cardOf, href, template, user, isQP }: {
                  <>
                     <p><span className='font-semibold'>Section : </span><span className='capitalize'>{template.section}</span></p>
                     <p><span className='font-semibold'>Type : </span><span className='capitalize'>{template.examType}</span></p>
-                    <p><span className='font-semibold'>Semester : </span><span className='capitalize'>{href ?  template.semister
- : template.semister}</span></p>
+                    <p><span className='font-semibold'>Semester : </span><span className='capitalize'>{template.semister == 1 ? 'First Semester' : 'Second Semester'}</span></p>
                  </>
                 )
               }
@@ -199,8 +198,7 @@ export default function CourseCard({ cardOf, href, template, user, isQP }: {
               <p>Course Code : <span className='capitalize'>{template.course_code}</span></p>
               <p>Section : <span className='capitalize'>{template.section}</span></p>
               <p>Type : <span className='capitalize'>{template.examType}</span></p>
-              <p>Semester : <span className='capitalize'>{href ?  template.semister
- : template.semister}</span></p>
+              <p>Semester : <span className='capitalize'>{template.semister == 1 ? 'First Semester' : 'Second Semester'}</span></p>
               <p>Academic Year : <span className='capitalize'>{template.academic_year}</span></p>
             </div>
             <div className='absolute right-3 bottom-3 space-x-2'>

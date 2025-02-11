@@ -198,7 +198,7 @@ export default function StudentTable({data, courseId} : {data: any, courseId: st
 
   return (
     <section className='pb-60'>
-      <div className="container mx-auto border rounded-lg">
+      <div className="container mx-auto border-2 border-black rounded-lg">
         {selectedStudents.length > 0 && (
           <div className="p-2 bg-gray-50 flex justify-between items-center">
             <span>{selectedStudents.length} selected</span>
@@ -213,9 +213,9 @@ export default function StudentTable({data, courseId} : {data: any, courseId: st
           </div>
         )}
 
-        <Table className='text-xs'>
+        <Table className='text-xs '>
           <TableHeader>
-            <TableRow className='p-0'>
+            <TableRow className='p-0 border-b border-black'>
               <TableHead className='w-10 py-2'>
                 {students.length === 1 && !students[0].studentId && !students[0].studentName ? (
                   <span></span>
@@ -227,15 +227,15 @@ export default function StudentTable({data, courseId} : {data: any, courseId: st
                   />
                 )}
               </TableHead>
-              <TableHead className='w-16 py-2'>S.No</TableHead>
-              <TableHead className='w-[300px] max-w-[300px] min-[300px] py-2'>Student ID</TableHead>
-              <TableHead className='w-[300px] max-w-[300px] min-[300px] py-2'>Student Name</TableHead>
-              <TableHead className="text-right py-2">Actions</TableHead>
+              <TableHead className='w-16 py-2 text-black font-bold'>S.No</TableHead>
+              <TableHead className='w-[300px] max-w-[300px] min-[300px] py-2 text-black font-bold'>Student ID</TableHead>
+              <TableHead className='w-[300px] max-w-[300px] min-[300px] py-2 text-black font-bold'>Student Name</TableHead>
+              <TableHead className="text-right py-2 text-black font-bold">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {students.map((student, index) => (
-              <TableRow key={student.id}>
+              <TableRow key={student.id} className='border-t border-b border-black'>
                 <TableCell className='w-10 py-2'>
                   {!(students.length === 1 && !student.studentId && !student.studentName) && (
                     <Checkbox 
