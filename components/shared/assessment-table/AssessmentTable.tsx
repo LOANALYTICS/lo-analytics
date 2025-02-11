@@ -166,13 +166,13 @@ export default function AssessmentTable({ initialData, onSave, saving, onUpload,
                   }}
                 />
               </TableHead>
-              <TableHead className='border-b border-black'>Assessment Type</TableHead>
+              <TableHead className='border-b border-r border-black'>Assessment Type</TableHead>
               {cloKeys.map((clo) => (
                 <TableHead key={clo} className='border-b border-black'>
                   {clo.toUpperCase()}
                 </TableHead>
               ))}
-              <TableHead className='border-b border-black'>Weight (%)</TableHead>
+              <TableHead className='border-b border-r border-black'>Weight (%)</TableHead>
               <TableHead className='border-b border-black'>Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -191,7 +191,7 @@ export default function AssessmentTable({ initialData, onSave, saving, onUpload,
                     }}
                   />
                 </TableCell>
-                <TableCell className='py-1'>
+                <TableCell className='py-1  border-r border-black'>
                   <Input
                     className='border-none bg-transparent focus-visible:ring-0  focus-visible:ring-offset-0'
                     value={assessment.type}
@@ -202,7 +202,7 @@ export default function AssessmentTable({ initialData, onSave, saving, onUpload,
                   />
                 </TableCell>
                 {cloKeys.map((clo) => (
-                  <TableCell key={clo} className='py-1 '>
+                  <TableCell key={clo} className='py-1 border-b border-r border-black'>
                     <div className="flex items-center flex-wrap gap-1 p-1  min-h-[40px]">
                       {assessment.clos[clo as keyof Assessment['clos']].map((num, idx) => (
                         <span key={idx} className="bg-blue-100 group relative h-5 w-5 rounded text-xs flex items-center justify-center gap-1">

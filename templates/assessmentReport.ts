@@ -351,15 +351,22 @@ export function generateAssessmentReportHTML(props: AssessmentReportProps): stri
               </thead>
               <tbody>
                 <tbody class="student-group">
-                  ${assessmentData.students.map((student, index) => `
+                  ${assessmentData.students.map((student, index) => {
+                    return `
                     <tr class="student-row">
                       <td>${index + 1}</td>
                       <td>${escapeHTML(student.studentId)}</td>
                       <td>${escapeHTML(student.studentName)}</td>
-                      ${sortedClos.map(clo => `<td>${student.cloScores[clo]?.marksScored.toFixed(2) || '0.00'}</td>`).join('')}
+                      ${sortedClos.map(clo => {
+                        const totalScore = assessmentData.cloScores[clo];
+                        const threshold = totalScore * 0.6;
+                        const studentScore = student.cloScores[clo]?.marksScored || 0;
+                        const isBelow = studentScore < threshold;
+                        return `<td  style="background-color:${isBelow ? '#FD5D5F': 'white'} !important;">${isBelow ? `<p style="color:white">${studentScore.toFixed(2)}</p>` : `<p>${studentScore.toFixed(2)}</p>`}</td>`;
+                      }).join('')}
                       <td>${student.totalMarksObtained.toFixed(2)}</td>
                     </tr>
-                  `).join('')}
+                  `}).join('')}
                 </tbody>
 
                 <tbody class="achievement-pair">
