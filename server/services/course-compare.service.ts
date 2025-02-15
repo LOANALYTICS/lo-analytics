@@ -30,8 +30,14 @@ function calculateAverages(courses: any[]) {
       (sum, course) => sum + (course.yearB?.rejected || 0),
       0
     ),
-    kr20A: courses.reduce((sum, course) => sum + (course.yearA?.kr20 || 0), 0),
-    kr20B: courses.reduce((sum, course) => sum + (course.yearB?.kr20 || 0), 0),
+    kr20A: courses.reduce((sum, course) => {
+      const kr20 = course.yearA?.kr20 ? Number(course.yearA.kr20) : 0;
+      return sum + kr20;
+    }, 0),
+    kr20B: courses.reduce((sum, course) => {
+      const kr20 = course.yearB?.kr20 ? Number(course.yearB.kr20) : 0;
+      return sum + kr20;
+    }, 0),
   };
 
   const count = courses.length || 1;
@@ -55,8 +61,8 @@ function calculateAverages(courses: any[]) {
     rejectedPercentageB: totalB
       ? Math.round((totals.rejectedB / totalB) * 100)
       : "",
-    kr20A: totals.kr20A ? Math.round(totals.kr20A / count) : "",
-    kr20B: totals.kr20B ? Math.round(totals.kr20B / count) : "",
+    kr20A: totals.kr20A ? (totals.kr20A / count).toFixed(2) : "-",
+    kr20B: totals.kr20B ? (totals.kr20B / count).toFixed(2) : "-",
   };
 }
 
@@ -87,13 +93,13 @@ function generateTableHTML(
               }</p>
             </th>
             <th colspan="3" class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;">
-              <p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 14px;">Section ${
+              <p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 14px;"> ${
                 sectionA?.charAt(0).toUpperCase() +
                 sectionA?.slice(1).toLowerCase()
               }, ${yearA}</p>
             </th>
             <th colspan="3" class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;">
-              <p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 14px;">Section ${
+              <p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 14px;"> ${
                 sectionB?.charAt(0).toUpperCase() +
                 sectionB?.slice(1).toLowerCase()
               }, ${yearB}</p>
@@ -128,22 +134,22 @@ function generateTableHTML(
                 <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">${formatNumber(
                   course.yearA?.rejected
                 )}</p></td>
-                <td rowspan="2" class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold">${
-                  course.yearA?.kr20
-                    ? Math.round(Number(course.yearA.kr20))
-                    : "-"
-                }</p></td>
+                <td rowspan="2" class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;">
+                  <p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold">${
+                    course.yearA?.kr20 ? Number(course.yearA.kr20).toFixed(2) : "-"
+                  }</p>
+                </td>
                 <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">${formatNumber(
                   course.yearB?.accepted
                 )}</p></td>
                 <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">${formatNumber(
                   course.yearB?.rejected
                 )}</p></td>
-                <td rowspan="2" class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold">${
-                  course.yearB?.kr20
-                    ? Math.round(Number(course.yearB.kr20))
-                    : "-"
-                }</p></td>
+                <td rowspan="2" class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;">
+                  <p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold">${
+                    course.yearB?.kr20 ? Number(course.yearB.kr20).toFixed(2) : "-"
+                  }</p>
+                </td>
               </tr>
               <tr>
                 <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;">
@@ -197,18 +203,22 @@ function generateTableHTML(
             <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px;font-weight: bold;">${formatNumber(
               averages.rejected
             )}</p></td>
-            <td rowspan="2" class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px; font-weight: bold;">${
-              averages.kr20A ? Math.round(Number(averages.kr20A)) : "-"
-            }</p></td>
+            <td rowspan="2" class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;">
+              <p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px; font-weight: bold;">${
+                averages.kr20A ? Number(averages.kr20A).toFixed(2) : "-"
+              }</p>
+            </td>
             <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px; font-weight: bold;">${formatNumber(
               averages.acceptedB
             )}</p></td>
             <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px; font-weight: bold;">${formatNumber(
               averages.rejectedB
             )}</p></td>
-            <td rowspan="2" class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px; font-weight: bold;">${
-              averages.kr20B ? Math.round(Number(averages.kr20B)) : "-"
-            }</p></td>
+            <td rowspan="2" class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;">
+              <p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px; font-weight: bold;">${
+                averages.kr20B ? Number(averages.kr20B).toFixed(2) : "-"
+              }</p>
+            </td>
           </tr>
           <tr>
             <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;">
@@ -389,13 +399,13 @@ function generateSummaryTableHTML(
             <p style="text-align: center; margin: 0; margin-bottom: 10px;">${title}</p>
           </th>
           <th colspan="3" class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;">
-            <p style="text-align: center; margin: 0; margin-bottom: 10px;">Section ${
+            <p style="text-align: center; margin: 0; margin-bottom: 10px;"> ${
               sectionA?.charAt(0).toUpperCase() +
               sectionA?.slice(1).toLowerCase()
             }, ${yearA}</p>
           </th>
           <th colspan="3" class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;">
-            <p style="text-align: center; margin: 0; margin-bottom: 10px;">Section ${
+            <p style="text-align: center; margin: 0; margin-bottom: 10px;"> ${
               sectionB?.charAt(0).toUpperCase() +
               sectionB?.slice(1).toLowerCase()
             }, ${yearB}</p>
@@ -471,10 +481,12 @@ function generateSummaryTableHTML(
             summaries.reduce((acc, curr) => acc + curr.averages.rejected, 0) /
               summaries.length
           )}</p></td>
-          <td rowspan="2" style="border-color: #000000 !important;" class=" border-black p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${Math.round(
-            summaries.reduce((acc, curr) => acc + curr.averages.kr20A, 0) /
-              summaries.length
-          )}</p></td>
+          <td rowspan="2" style="border-color: #000000 !important;" class=" border-black p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${(
+            summaries.reduce((acc, curr) => {
+              const kr20 = curr.averages.kr20A ? Number(curr.averages.kr20A) : 0;
+              return acc + kr20;
+            }, 0) / (summaries.length || 1)
+          ).toFixed(2)}</p></td>
           <td class="border style="border-color: #000000 !important;" border-black p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${Math.round(
             summaries.reduce((acc, curr) => acc + curr.averages.acceptedB, 0) /
               summaries.length
@@ -483,10 +495,12 @@ function generateSummaryTableHTML(
             summaries.reduce((acc, curr) => acc + curr.averages.rejectedB, 0) /
               summaries.length
           )}</p></td>
-          <td rowspan="2" style="border-color: #000000 !important;" class=" border-black p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${Math.round(
-            summaries.reduce((acc, curr) => acc + curr.averages.kr20B, 0) /
-              summaries.length
-          )}</p></td>
+          <td rowspan="2" style="border-color: #000000 !important;" class=" border-black p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${(
+            summaries.reduce((acc, curr) => {
+              const kr20 = curr.averages.kr20B ? Number(curr.averages.kr20B) : 0;
+              return acc + kr20;
+            }, 0) / (summaries.length || 1)
+          ).toFixed(2)}</p></td>
         </tr>
         <tr>
           <td class="border border-black p-1 font-bold" style="border-color: #000000 !important;">

@@ -18,8 +18,10 @@ function calculateQuestionStats(course: any) {
     poorQuestions: 0,
     difficultQuestions: 0,
     veryDifficultQuestions: 0,
-    kr20: course.krValues?.KR_20 || 0,
+    kr20: Number(course.krValues?.KR_20) || 0,
   };
+  console.log("Original KR20:", course.krValues?.KR_20);
+  console.log("Stats KR20:", stats.kr20);
 
   course.krValues?.groupedItemAnalysisResults?.forEach((group: any) => {
     switch (group.classification) {
@@ -51,16 +53,7 @@ function calculateQuestionStats(course: any) {
     stats.veryDifficultQuestions + stats.poorQuestions + stats.veryEasyQuestions
   );
 
-  logger.info("Question Counts:", {
-    good: stats.goodQuestions,
-    easy: stats.easyQuestions,
-    difficult: stats.difficultQuestions,
-    veryDifficult: stats.veryDifficultQuestions,
-    poor: stats.poorQuestions,
-    veryEasy: stats.veryEasyQuestions,
-    totalAccepted,
-    totalRejected,
-  });
+
 
   const percentages = {
     goodQuestions:
@@ -89,7 +82,6 @@ function calculateQuestionStats(course: any) {
         : 0,
   };
 
-  logger.info("Calculated Percentages:", percentages);
 
   return {
     ...stats,
@@ -103,6 +95,7 @@ function calculateAverages(courses: any[]) {
   const totals = courses.reduce(
     (acc, course) => {
       const stats = calculateQuestionStats(course);
+      console.log("Individual course KR20:", stats.kr20);
       return {
         goodQuestions: acc.goodQuestions + stats.goodQuestions,
         easyQuestions: acc.easyQuestions + stats.easyQuestions,
@@ -135,6 +128,8 @@ function calculateAverages(courses: any[]) {
     totals.veryEasyQuestions;
   const total = totalAccepted + totalRejected;
 
+  const kr20Value = totals.kr20 / count;
+
   logger.info({
     goodQuestions: Math.round(totals.goodQuestions / count),
     easyQuestions: Math.round(totals.easyQuestions / count),
@@ -144,7 +139,7 @@ function calculateAverages(courses: any[]) {
     veryEasyQuestions: Math.round(totals.veryEasyQuestions / count),
     totalAccepted: Math.round(totalAccepted / count),
     totalRejected: Math.round(totalRejected / count),
-    kr20: Math.round(totals.kr20 / count),
+    kr20: kr20Value.toFixed(2),
     percentages: {
       goodQuestions: Math.round((totals.goodQuestions / totalAccepted) * 100),
       easyQuestions: Math.round((totals.easyQuestions / totalAccepted) * 100),
@@ -170,7 +165,7 @@ function calculateAverages(courses: any[]) {
     veryEasyQuestions: Math.round(totals.veryEasyQuestions / count),
     totalAccepted: Math.round(totalAccepted / count),
     totalRejected: Math.round(totalRejected / count),
-    kr20: Math.round(totals.kr20 / count),
+    kr20: kr20Value.toFixed(2),
     percentages: {
       goodQuestions: Math.round((totals.goodQuestions / totalAccepted) * 100),
       easyQuestions: Math.round((totals.easyQuestions / totalAccepted) * 100),
@@ -326,9 +321,9 @@ function generateTableHTML(
                     }</p>
                   </td>
                   <td rowspan="2" class="border border-black p-1">
-                    <p style="text-align: center; margin: 0; margin-bottom: 10px;">${Math.round(
-                      stats.kr20
-                    )}</p>
+                    <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
+                      Number(stats.kr20).toFixed(2)
+                    }</p>
                   </td>
                 </tr>
                 <tr>
@@ -412,9 +407,9 @@ function generateTableHTML(
               }</p>
             </td>
             <td rowspan="2" class="border border-black p-1 font-bold">
-              <p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${Math.round(
+              <p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${
                 averages.kr20
-              )}</p>
+              }</p>
             </td>
           </tr>
           <tr>
@@ -1074,9 +1069,9 @@ function generateSummaryTableHTML(
               }</p>
             </td>
             <td rowspan="2" class="border border-black p-1">
-              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${Math.round(
-                summary.averages.kr20
-              )}</p>
+              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
+                Number(summary.averages.kr20).toFixed(2)
+              }</p>
             </td>
           </tr>
           <tr>
@@ -1160,9 +1155,9 @@ function generateSummaryTableHTML(
             }</p>
           </td>
           <td rowspan="2" class="border border-black p-1 font-bold">
-            <p style="text-align: center; margin: 0; margin-bottom: 10px;">${Math.round(
-              finalAverages.kr20
-            )}</p>
+            <p style="text-align: center; margin: 0; margin-bottom: 10px;">${(
+              summaries.reduce((acc, curr) => acc + Number(curr.averages.kr20 || 0), 0) / summaries.length
+            ).toFixed(2)}</p>
           </td>
         </tr>
         <tr>

@@ -215,7 +215,7 @@ export default function ItemAnalysisPage() {
 
       const htmlContent = await response.text();
       try {
-        await generatePDF(htmlContent, "item-analysis");
+        await generatePDF(htmlContent, "course-comparison");
       } catch (error) {
         console.error("Failed to generate PDF:", error);
       }
@@ -316,7 +316,7 @@ export default function ItemAnalysisPage() {
             className="flex items-center gap-2 p-0  w-fit h-9 px-4"
             onClick={() => setCompareOpen(true)}
           >
-             <span className="font-bold">Semester Comparison </span>  <SplitIcon className="w-4 h-4" />
+             <span className="font-bold">Course Comparison </span>  <SplitIcon className="w-4 h-4" />
           </Button>
           <Button
             variant="outline"

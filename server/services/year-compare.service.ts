@@ -36,6 +36,9 @@ function calculateAverages(courses: any[]) {
   const totalA = totals.accepted + totals.rejected;
   const totalB = totals.acceptedB + totals.rejectedB;
 
+  const kr20ValueA = totals.kr20A / count;
+  const kr20ValueB = totals.kr20B / count;
+
   return {
     accepted: Math.round(totals.accepted / count),
     rejected: Math.round(totals.rejected / count),
@@ -53,8 +56,8 @@ function calculateAverages(courses: any[]) {
     rejectedPercentageB: totalB
       ? Math.round((totals.rejectedB / totalB) * 100)
       : "0",
-    kr20A: Math.round(totals.kr20A / count),
-    kr20B: Math.round(totals.kr20B / count),
+    kr20A: kr20ValueA.toFixed(2),
+    kr20B: kr20ValueB.toFixed(2),
   };
 }
 
@@ -127,18 +130,22 @@ function generateTableHTML(
                 <td class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${
                   course.yearA?.rejected || 0
                 }</p></td>
-                <td rowspan="2" class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${
-                  course.yearA?.kr20 ? Math.round(course.yearA.kr20) : "-"
-                }</p></td>
+                <td rowspan="2" class="border border-gray-300 p-1">
+                  <p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${
+                    course.yearA?.kr20 ? Number(course.yearA.kr20).toFixed(2) : "-"
+                  }</p>
+                </td>
                 <td class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${
                   course.yearB?.accepted || 0
                 }</p></td>
                 <td class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${
                   course.yearB?.rejected || 0
                 }</p></td>
-                <td rowspan="2" class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${
-                  course.yearB?.kr20 ? Math.round(course.yearB.kr20) : "-"
-                }</p></td>
+                <td rowspan="2" class="border border-gray-300 p-1">
+                  <p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${
+                    course.yearB?.kr20 ? Number(course.yearB.kr20).toFixed(2) : "-"
+                  }</p>
+                </td>
               </tr>
               <tr>
                 <td class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${
@@ -765,7 +772,7 @@ function generateSummaryTableHTML(
         `
           )
           .join("")}
-        <tr>
+        <tr class="row-pair">
           <td rowspan="2" colspan="2" class="border border-gray-300 p-1 font-bold" style="border-color: #000000 !important;"><p style="text-align: center; margin: 0; margin-bottom: 10px;">Average</p></td>
           <td class="border border-gray-300 p-1 font-bold" style="border-color: #000000 !important;"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${Math.round(
             summaries.reduce((acc, curr) => acc + curr.averages.accepted, 0) /
@@ -775,10 +782,9 @@ function generateSummaryTableHTML(
             summaries.reduce((acc, curr) => acc + curr.averages.rejected, 0) /
               summaries.length
           )}</p></td>
-          <td rowspan="2" class="border border-gray-300 p-1 font-bold" style="border-color: #000000 !important;"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${Math.round(
-            summaries.reduce((acc, curr) => acc + curr.averages.kr20A, 0) /
-              summaries.length
-          )}</p></td>
+          <td rowspan="2" class="border border-gray-300 p-1 font-bold" style="border-color: #000000 !important;"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${(
+            summaries.reduce((acc, curr) => acc + Number(curr.averages.kr20A || 0), 0) / summaries.length
+          ).toFixed(2)}</p></td>
           <td class="border border-gray-300 p-1 font-bold" style="border-color: #000000 !important;"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${Math.round(
             summaries.reduce((acc, curr) => acc + curr.averages.acceptedB, 0) /
               summaries.length
@@ -787,10 +793,9 @@ function generateSummaryTableHTML(
             summaries.reduce((acc, curr) => acc + curr.averages.rejectedB, 0) /
               summaries.length
           )}</p></td>
-          <td rowspan="2" class="border border-gray-300 p-1 font-bold" style="border-color: #000000 !important;"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${Math.round(
-            summaries.reduce((acc, curr) => acc + curr.averages.kr20B, 0) /
-              summaries.length
-          )}</p></td>
+          <td rowspan="2" class="border border-gray-300 p-1 font-bold" style="border-color: #000000 !important;"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${(
+            summaries.reduce((acc, curr) => acc + Number(curr.averages.kr20B || 0), 0) / summaries.length
+          ).toFixed(2)}</p></td>
         </tr>
         <tr>
           <td class="border border-gray-300 p-1 font-bold" style="border-color: #000000 !important;">

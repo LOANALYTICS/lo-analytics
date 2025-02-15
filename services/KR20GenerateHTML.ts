@@ -27,13 +27,13 @@ export function generateHTML(data: any): string {
 
     switch (classification) {
       case "Poor (Bad) Questions":
-        return "• All the questions should be rejected.";
+        return "• Discrimination value of there items range is low. <br> • All the items should be either rejected or revised.";
       case "Very Difficult Questions":
-        return "• Keys of these items are needed to be checked.";
+        return "• Keys of these items are needed to be checked. <br> • Items should be rejected.";
       case "Difficult Questions":
-        return "• Items should be rejected.";
+        return "• Key of these items are needed to be checked. ";
       case "Good Questions":
-        return "• Key of this item is also needed to be checked.";
+        return "• Key of these items are needed to be checked.";
       case "Easy Questions":
         return "• Items could be stored in question bank for further use.";
       case "Very Easy Questions":
@@ -44,10 +44,8 @@ export function generateHTML(data: any): string {
     }
   };
 
-  // Add this helper function before the return statement
   const formatQuestions = (questions: any[]): string => {
     const questionNumbers = questions.map((q) => {
-      // Remove 'Q' prefix and return just the number
       const questionNum = q?.question || "";
       return questionNum.replace(/^Q/i, "");
     });
@@ -237,7 +235,7 @@ export function generateHTML(data: any): string {
       <div class="course-grid">
         <div class="grid-item">
           <p><span style="font-weight: bold;">Course Name:</span> ${
-            course?.course_name || ""
+            course?.course_name + " (" + course?.section + ")" || ""
           }</p>
         </div>
         <div class="grid-item">
@@ -256,7 +254,7 @@ export function generateHTML(data: any): string {
           }</p>
         </div>
         <div class="grid-item">
-          <p><span style="font-weight: bold;">Semister:</span> ${
+          <p><span style="font-weight: bold;">Semester:</span> ${
             course?.semister === 1 ? "First Semester" : "Second Semester"
           }</p>
         </div>
@@ -297,11 +295,11 @@ export function generateHTML(data: any): string {
                 item?.questions || []
               )}</p></td>
               <td style="vertical-align: middle; text-align: center;"><p style="text-align: center; margin-bottom: 10px;">${
-                (item?.questions || []).length
+                (item?.questions || []).length < 1 ? "" : (item?.questions || []).length
               }</p></td>
-              <td style="vertical-align: middle; text-align: center;"><p style="text-align: center; margin-bottom: 10px;">${Number(
-                Math.round(item?.perc || 0).toFixed(1)
-              )}%</p></td>
+              <td style="vertical-align: middle; text-align: center;"><p style="text-align: center; margin-bottom: 10px;">${
+                Math.round(item?.perc || 0) === 0 ? "" : Math.round(item?.perc || 0) + "%"
+              }</p></td>
             `
           }
           <td class="comments-cell">
@@ -309,7 +307,7 @@ export function generateHTML(data: any): string {
               item?.classification === "Reliability"
                 ? " font-weight: bold;"
                 : ""
-            }">${getCommentByClassification(item?.classification || "")}</p>
+            }">${(item?.questions || []).length < 1 ? "" : getCommentByClassification(item?.classification || "")}</p>
           </td>
         </tr>
       `
