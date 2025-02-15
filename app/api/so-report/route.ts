@@ -67,24 +67,17 @@ export async function GET(request: Request) {
 
         // Prepare data for HTML generation
         const assessmentData: Record<string, GradeCount> = {};
-        const overallStudentGrades: GradeCount = {
-            'A+': 0, 'A': 0, 'B+': 0, 'B': 0, 'C+': 0, 'C': 0, 'D+': 0, 'D': 0, 'F': 0
-        };
 
-        // Create a map to store total marks for each student across all types
-        const studentTotalMarks: Map<string, { scored: number, total: number }> = new Map();
-
-        assessment.assessmentResults.forEach((result: IAssessment['assessmentResults'][0]) => {
+        // For individual assessment grades - keep as is
+        assessment.assessmentResults.forEach((result) => {
             const { type, results } = result;
             assessmentData[type] = {
                 'A+': 0, 'A': 0, 'B+': 0, 'B': 0, 'C+': 0, 'C': 0, 'D+': 0, 'D': 0, 'F': 0
             };
 
-            results.forEach((student: IAssessment['assessmentResults'][0]['results'][0]) => {
-                const { totalScore, studentId } = student;
-                const percentage = totalScore.percentage;
-
-                // Update individual assessment grades
+            results.forEach((student) => {
+                const percentage = (student.totalScore.marksScored / student.totalScore.totalMarks) * 100;
+                
                 if (percentage >= 95) assessmentData[type]['A+']++;
                 else if (percentage >= 90) assessmentData[type]['A']++;
                 else if (percentage >= 85) assessmentData[type]['B+']++;
@@ -94,28 +87,49 @@ export async function GET(request: Request) {
                 else if (percentage >= 65) assessmentData[type]['D+']++;
                 else if (percentage >= 60) assessmentData[type]['D']++;
                 else assessmentData[type]['F']++;
+            });
+        });
 
-                // Accumulate total marks for each student
-                const currentTotal = studentTotalMarks.get(studentId) || { scored: 0, total: 0 };
-                studentTotalMarks.set(studentId, {
-                    scored: currentTotal.scored + totalScore.marksScored,
-                    total: currentTotal.total + totalScore.totalMarks
+        // For overall grades - track by studentId only, but validate it's a number
+        const overallScores = new Map<string, { scored: number, total: number }>();
+
+        assessment.assessmentResults.forEach(result => {
+            result.results.forEach(({ studentId, studentName, totalScore }) => {
+                // Use the field that's actually a numeric ID
+                const actualStudentId = /^\d+$/.test(studentId) ? studentId : studentName;
+                
+                const current = overallScores.get(actualStudentId) || { scored: 0, total: 0 };
+                overallScores.set(actualStudentId, {
+                    scored: current.scored + totalScore.marksScored,
+                    total: current.total + totalScore.totalMarks
                 });
             });
         });
 
-        // Calculate overall grades based on accumulated marks
-        studentTotalMarks.forEach(({ scored, total }) => {
-            const overallPercentage = (scored / total) * 100;
+        // console.log("Student Scores:", Array.from(overallScores.entries()).map(([id, scores]) => ({
+        //     studentId: id,
+        //     totalScored: scores.scored,
+        //     totalPossible: scores.total,
+        //     percentage: ((scores.scored / scores.total) * 100).toFixed(2) + '%'
+        // })));
+
+        // Calculate overall grade distribution
+        const overallStudentGrades = {
+            'A+': 0, 'A': 0, 'B+': 0, 'B': 0, 'C+': 0, 'C': 0, 'D+': 0, 'D': 0, 'F': 0
+        };
+
+        overallScores.forEach((scores) => {
+            const percentage = (scores.scored / scores.total) * 100;
+          
             
-            if (overallPercentage >= 95) overallStudentGrades['A+']++;
-            else if (overallPercentage >= 90) overallStudentGrades['A']++;
-            else if (overallPercentage >= 85) overallStudentGrades['B+']++;
-            else if (overallPercentage >= 80) overallStudentGrades['B']++;
-            else if (overallPercentage >= 75) overallStudentGrades['C+']++;
-            else if (overallPercentage >= 70) overallStudentGrades['C']++;
-            else if (overallPercentage >= 65) overallStudentGrades['D+']++;
-            else if (overallPercentage >= 60) overallStudentGrades['D']++;
+            if (percentage >= 95) overallStudentGrades['A+']++;
+            else if (percentage >= 90) overallStudentGrades['A']++;
+            else if (percentage >= 85) overallStudentGrades['B+']++;
+            else if (percentage >= 80) overallStudentGrades['B']++;
+            else if (percentage >= 75) overallStudentGrades['C+']++;
+            else if (percentage >= 70) overallStudentGrades['C']++;
+            else if (percentage >= 65) overallStudentGrades['D+']++;
+            else if (percentage >= 60) overallStudentGrades['D']++;
             else overallStudentGrades['F']++;
         });
 
