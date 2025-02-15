@@ -121,17 +121,22 @@ export async function POST(request: Request) {
     // Process each assessment result directly
     assessmentData.assessmentResults.forEach(result => {
       result.results.forEach(studentResult => {
-        let student = studentResults.get(studentResult.studentId);
+        // Use the field that's actually a numeric ID
+        const actualStudentId = /^\d+$/.test(studentResult.studentId) ? 
+          studentResult.studentId : studentResult.studentName;
+        
+        let student = studentResults.get(actualStudentId);
         
         // If this is the first time seeing this student, create their entry
         if (!student) {
           student = {
-            studentId: studentResult.studentId,
-            studentName: studentResult.studentName,
+            studentId: actualStudentId,
+            studentName: /^\d+$/.test(studentResult.studentId) ? 
+              studentResult.studentName : studentResult.studentId,
             cloScores: {},
             totalMarksObtained: 0
           };
-          studentResults.set(studentResult.studentId, student);
+          studentResults.set(actualStudentId, student);
         }
 
         // Add scores from this assessment
