@@ -114,6 +114,13 @@ export default function StudentTable({data, courseId} : {data: any, courseId: st
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>, field: keyof Student) => {
     if (editingStudent) {
+      if (field === 'studentId') {
+        // Only allow numeric input for studentId
+        if (!/^\d*$/.test(e.target.value)) {
+          toast.error("Student ID must contain only numbers");
+          return;
+        }
+      }
       setEditingStudent({ ...editingStudent, [field]: e.target.value })
     }
   }
@@ -126,33 +133,38 @@ export default function StudentTable({data, courseId} : {data: any, courseId: st
 
     if (rows.length === 0) return;
 
-    const newStudents: Student[] = rows.map(row => {
+    const newStudents: Student[] = [];
+    
+    for (const row of rows) {
       const [studentId, studentName] = row.split('\t').map(cell => cell.trim());
-      return {
+      
+      // Validate studentId is numeric
+      if (!/^\d+$/.test(studentId)) {
+        toast.error(`Invalid Student ID: ${studentId}. Student IDs must contain only numbers`);
+        return;
+      }
+
+      newStudents.push({
         id: uuidv4(),
         studentId: studentId || '',
         studentName: studentName || ''
-      };
-    });
+      });
+    }
 
-    const validStudents = newStudents.filter(
-      student => student.studentId || student.studentName
-    );
-
-    if (validStudents.length === 0) return;
+    if (newStudents.length === 0) return;
 
     try {
       const currentStudents = students.filter(student => 
         student.studentId.trim() !== '' || student.studentName.trim() !== ''
       );
 
-      const updatedStudents = [...currentStudents, ...validStudents];
+      const updatedStudents = [...currentStudents, ...newStudents];
       setStudents(updatedStudents);
       setEditingId(null);
       setEditingStudent(null);
       
       await saveToDatabase(updatedStudents);
-      toast.success(`${validStudents.length} students added successfully`);
+      toast.success(`${newStudents.length} students added successfully`);
     } catch (error) {
       toast.error('Failed to add pasted students');
     }
