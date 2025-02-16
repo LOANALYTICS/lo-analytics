@@ -53,8 +53,8 @@ export function generateHTML(data: any): string {
     });
 
     const chunks: string[] = [];
-    for (let i = 0; i < questionNumbers.length; i += 20) {
-      chunks.push(questionNumbers.slice(i, i + 20).join(", "));
+    for (let i = 0; i < questionNumbers.length; i += 19) {
+      chunks.push(questionNumbers.slice(i, i + 19).join(", "));
     }
 
     return chunks.join("<br>");
@@ -258,6 +258,11 @@ export function generateHTML(data: any): string {
         <div class="grid-item">
           <p><span style="font-weight: bold;">Semester:</span> ${
             course?.semister === 1 ? "First Semester" : "Second Semester"
+          }</p>
+        </div>
+        <div class="grid-item">
+          <p><span style="font-weight: bold;">Academic Year:</span> ${
+            course?.academicYear || ""
           }</p>
         </div>
         <div class="grid-item">

@@ -145,6 +145,7 @@ export async function POST(request: Request) {
 
     const course = {
       course_name: courseData.course_name,
+      academicYear: courseData.academic_year,
       level: courseData.level,
       semister: courseData.semister,
       coordinator: userInformation.name,
