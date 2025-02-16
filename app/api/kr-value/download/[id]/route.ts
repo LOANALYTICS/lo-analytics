@@ -37,7 +37,7 @@ export async function GET(request: NextRequest, { params }: any) {
       .populate("collage")
       .populate(
         "krValues",
-        "groupedItemAnalysisResults KR_20 gradeDistribution collegeInfo"
+        "groupedItemAnalysisResults KR_20 gradeDistribution collegeInfo studentsAttended studentsPassed"
       );
 
     if (!courseData || !courseData.krValues) {
@@ -62,11 +62,8 @@ export async function GET(request: NextRequest, { params }: any) {
       course_code: courseData.course_code,
       credit_hours: courseData.credit_hours,
       studentsNumber: courseData.students?.length || 0,
-      studentsWithdrawn: courseData.students_withdrawn,
-      studentsAbsent: courseData.student_absent || 0,
-      studentsAttended:
-        (courseData.students?.length || 0) -
-          (courseData.students_withdrawn + courseData.student_absent) || 0,
+     
+      
       studentsPassed: courseData.passedStudents,
     };
 
@@ -76,6 +73,8 @@ export async function GET(request: NextRequest, { params }: any) {
       KR_20: courseData.krValues.KR_20,
       segregatedGradedStudents: courseData.krValues.gradeDistribution,
       course: course,
+      studentsAttended: courseData.krValues.studentsAttended,
+      studentsPassed: courseData.krValues.studentsPassed,
       collegeInfo,
     });
 

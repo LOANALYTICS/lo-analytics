@@ -4,6 +4,8 @@ export function generateHTML(data: any): string {
     KR_20 = 0,
     segregatedGradedStudents = [],
     course = {},
+    studentsAttended = 0,
+    studentsPassed = 0,
     collegeInfo = {},
   } = data || {};
 
@@ -329,7 +331,9 @@ export function generateHTML(data: any): string {
         <col style="width: 100px;">
       </colgroup>
       <tr>
-        <th><p style="text-align: center; margin-bottom: 10px;">Students Number</p></th>
+        <th><p style="text-align: center; margin-bottom: 10px;">Students Attended</p></th>
+
+        <th><p style="text-align: center; margin-bottom: 10px;">Students Passed</p></th>
         <th><p style="text-align: center; margin-bottom: 10px;">A+</p></th>
         <th><p style="text-align: center; margin-bottom: 10px;">A</p></th>
         <th><p style="text-align: center; margin-bottom: 10px;">B+</p></th>
@@ -342,7 +346,10 @@ export function generateHTML(data: any): string {
       </tr>
       <tr>
         <td><p style="text-align: center; margin-bottom: 10px;">${
-          course?.studentsNumber || ""
+          studentsAttended || ""
+        }</p></td>
+         <td><p style="text-align: center; margin-bottom: 10px;">${
+          studentsPassed || ""
         }</p></td>
        
         ${(segregatedGradedStudents || [])

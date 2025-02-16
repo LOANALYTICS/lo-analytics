@@ -138,13 +138,10 @@ export async function POST(request: Request) {
       university: courseData.collage.university
     };
 
-    // Calculate passed students
-    const totalStudents = gradeDistribution.reduce((sum, grade) => sum + grade.count, 0);
+    // Calculate total and passed students from grade distribution
+    const totalStudentsFromExcel = gradeDistribution.reduce((sum, grade) => sum + grade.count, 0);
     const failedCount = gradeDistribution.find(g => g.grade === 'F')?.count || 0;
-    const passedStudents = {
-      number: totalStudents - failedCount,
-      percentage: ((totalStudents - failedCount) / totalStudents * 100).toFixed(2)
-    };
+    const passedStudentsCount = totalStudentsFromExcel - failedCount;
 
     const course = {
       course_name: courseData.course_name,
@@ -157,7 +154,10 @@ export async function POST(request: Request) {
       studentsWithdrawn: courseData.students_withdrawn || 0,
       studentsAbsent: courseData.student_absent || 0,
       studentsAttended: courseData.no_of_student - (courseData.students_withdrawn + courseData.student_absent) || 0,
-      studentsPassed: passedStudents
+      studentsPassed: {
+        number: passedStudentsCount,
+        percentage: ((passedStudentsCount / totalStudentsFromExcel) * 100).toFixed(2)
+      }
     };
 
     console.log(course, "krs")
@@ -173,17 +173,28 @@ export async function POST(request: Request) {
           questions: [{ question: "KR20" }]
         }
       ],
-      gradeDistribution: gradeDistribution
+      gradeDistribution: gradeDistribution,
+      studentsAttended: totalStudentsFromExcel,
+      studentsAttendedPercentage: 100,
+      studentsPassed: passedStudentsCount,
+      studentsPassedPercentage: Number(((passedStudentsCount / totalStudentsFromExcel) * 100).toFixed(2))
     });
 
-    // Update course with KR value reference
+    console.log(krValueDoc, "krValueDoc")
+    // Update course to only keep the latest KR value
     await Course.findByIdAndUpdate(
       courseData._id,
       {
-        krValues: krValueDoc._id
+        $set: { krValues: krValueDoc._id }  // Using $set to ensure we replace any existing value
       },
       { new: true }
     ).exec();
+
+    // Delete older KR values for this course except the latest one
+    await KRValue.deleteMany({
+      courseId: courseData._id,
+      _id: { $ne: krValueDoc._id }
+    });
 
     // Add error handling
     console.log('KR Value Document:', krValueDoc);
@@ -201,6 +212,8 @@ export async function POST(request: Request) {
       KR_20,
       segregatedGradedStudents: gradeDistribution,
       course,
+      studentsAttended: krValueDoc.studentsAttended,
+      studentsPassed: krValueDoc.studentsPassed,
       collegeInfo
     });
 //  return  Response.json({

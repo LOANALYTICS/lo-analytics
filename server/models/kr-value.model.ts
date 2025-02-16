@@ -23,6 +23,10 @@ export interface IKRValue extends Document {
   KR_20: number;
   groupedItemAnalysisResults: IGroupedItemAnalysis[];
   gradeDistribution: IGradeDistribution[];
+  studentsAttended: number;
+  studentsAttendedPercentage: number;
+  studentsPassed: number;
+  studentsPassedPercentage: number;
   createdAt: Date;
 }
 
@@ -48,6 +52,22 @@ export const krValueSchema = new Schema<IKRValue>({
     count: Number,
     studentPercentage: Number
   }],
+  studentsAttended: {
+    type: Number,
+    required: false
+  },
+  studentsAttendedPercentage: {
+    type: Number,
+    required: false
+  },
+  studentsPassed: {
+    type: Number,
+    required: false
+  },
+  studentsPassedPercentage: {
+    type: Number,
+    required: false
+  },
   createdAt: {
     type: Date,
     default: Date.now
