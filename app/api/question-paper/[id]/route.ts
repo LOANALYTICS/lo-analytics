@@ -35,7 +35,7 @@ export async function GET(
         _id: courseId,
       })
       .populate('collage')
-      .select('course_name level semister department course_code credit_hours collage,academic_year')
+      .select('course_name level semister department course_code credit_hours collage academic_year')
       .lean() as unknown as CourseData;
   
       if (!courseData) {

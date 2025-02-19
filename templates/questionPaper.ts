@@ -190,7 +190,7 @@ export function generateQuestionPaperHTML(data: {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 15px;
-            margin-bottom: 30px;
+            margin-bottom: 10px;
             border: 1px solid #ddd;
             padding: 15px;
             border-radius: 5px;
@@ -205,8 +205,49 @@ export function generateQuestionPaperHTML(data: {
             white-space: nowrap;
           }
         .logo { max-width: 100%; height: auto; }
+        .course_title_container{
+        text-align: center;
+        
+        }
+        .course_title_container h2{
+        font-size: 24px;
+        font-weight: bold;
+        }
+        .course_title_container p{
+        font-size: 20px;
+        }
+        .marks_container_container{
+        height: 60px;
 
-       
+        width: fit-content;
+        margin-left: auto;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        font-size: 16px;
+        font-weight: bold;
+    
+        
+        }
+        .marks_container{
+        height: 40px;
+        width: 90px;
+        text-align: center;
+        font-size: 12px;
+        font-weight: bold;
+        padding: 10px;
+        border-radius: 5px;
+        margin-bottom: 30px;
+        border: 1px solid #ddd;
+        }
+        .student_info{
+        display: flex; 
+        gap: 10px; 
+        margin-bottom: 30px; 
+        border-radius: 5px; 
+        border: 1px solid #ddd;
+        padding-left: 10px;
+        }
             </style>
         </head>
 
@@ -219,15 +260,20 @@ export function generateQuestionPaperHTML(data: {
 
            
              <div class="header">
-              <img src="${data.college.logo}" alt="College Logo" class="logo">
+                <img src="${data.college.logo}" alt="College Logo" class="logo">
 
+                <div class="course_title_container" >
+                    <h2>${data.course.course_name}</h2>
+                    <p>${data.examName} ${data.course.academic_year}</p>
+                </div>
             
-             <div class="student_name" style="display: flex; gap: 10px;margin-bottom: 20px;">
-                <span class="detail-label" style="width: 100px; text-align: start;">Student Name:</span> <div class="student_name_space" style="height: 30px; width: 100%; border: 1px solid #ddd;"></div>
-             </div>
-               <div class="student_name" style="display: flex; gap: 10px; margin-bottom: 30px;">
-                <span class="detail-label" style="width: 100px; text-align: start;">Student ID:</span> <div class="student_name_space" style="height: 30px; width: 100%; border: 1px solid #ddd;"></div>
-             </div>
+                <div class="student_info"">
+                    <span class="detail-label" style="width: 100px; text-align: start;">Student Name:</span> <div class="student_name_space" style="height: 30px; width: 100%; "></div>
+                </div>
+                <div class="student_info" >
+                    <span class="detail-label" style="width: 100px; text-align: start;">Student ID:</span> <div class="student_name_space" style="height: 30px; width: 100%; "></div>
+                </div>
+             
 
 
 
@@ -253,6 +299,16 @@ export function generateQuestionPaperHTML(data: {
                   <span class="detail-label">Credit Hours:</span> ${data.course.credit_hours + 'Hours'}
                 </div>
               </div>
+              <div class="marks_container_container">
+                <p style="margin-left: auto; margin-top: -16px;">Marks:</p>
+                <div class="marks_container">
+               
+                </div>
+              </div>
+
+
+              
+            
             </div>
 
 
