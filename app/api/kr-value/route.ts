@@ -122,7 +122,7 @@ export async function POST(request: Request) {
     // Fetch course and college data
     const courseData: any = await Course.findById(courseId)
       .populate('collage')
-      .select('course_name level semister department course_code credit_hours no_of_student students_withdrawn student_absent coordinator')
+      .select('course_name section level semister department course_code credit_hours no_of_student students_withdrawn student_absent coordinator')
       .lean();
 
     if (!courseData || !courseData.collage) {
@@ -147,6 +147,7 @@ export async function POST(request: Request) {
       course_name: courseData.course_name,
       academicYear: courseData.academic_year,
       level: courseData.level,
+      section: courseData.section,
       semister: courseData.semister,
       coordinator: userInformation.name,
       course_code: courseData.course_code,
@@ -163,7 +164,6 @@ export async function POST(request: Request) {
 
     console.log(course, "krs")
 
-    // Create KR value document
     const krValueDoc = await KRValue.create({
       courseId: courseData._id,
       KR_20: KR_20,

@@ -37,7 +37,7 @@ export async function GET(request: NextRequest, { params }: any) {
       .populate("collage")
       .populate(
         "krValues",
-        "groupedItemAnalysisResults KR_20 gradeDistribution collegeInfo studentsAttended studentsPassed"
+        "groupedItemAnalysisResults section KR_20 gradeDistribution collegeInfo studentsAttended studentsPassed"
       );
 
     if (!courseData || !courseData.krValues) {
@@ -58,6 +58,7 @@ export async function GET(request: NextRequest, { params }: any) {
       course_name: courseData.course_name,
       academicYear: courseData.academic_year,
       level: courseData.level,
+      section: courseData.section,
       semister: courseData.semister,
       coordinator: userInformation.name,
       course_code: courseData.course_code,

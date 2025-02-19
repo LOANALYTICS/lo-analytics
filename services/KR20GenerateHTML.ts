@@ -29,17 +29,17 @@ export function generateHTML(data: any): string {
 
     switch (classification) {
       case "Poor (Bad) Questions":
-        return "• Discrimination value of there items range is low. <br> • All the items should be either rejected or revised.";
+        return "• Discrimination value of there items range is < 0.20. <br> • All the items should be either rejected or revised before re-use.";
       case "Very Difficult Questions":
         return "• Keys of these items are needed to be checked. <br> • Items should be rejected.";
       case "Difficult Questions":
         return "• Key of these items are needed to be checked. ";
       case "Good Questions":
-        return "• Key of these items are needed to be checked.";
+        return "• Items could be stored in question Bank for further use.";
       case "Easy Questions":
-        return "• Items could be stored in question bank for further use.";
-      case "Very Easy Questions":
         return "• Item should be revised before re-use.";
+      case "Very Easy Questions":
+        return "• Item should be either rejected or revised before re-use.";
 
       default:
         return "";
@@ -149,9 +149,9 @@ export function generateHTML(data: any): string {
         grid-template-rows: repeat(3, auto);  /* Creates 3 rows */
       }
       .grid-item {
-        padding: 2px;
+        padding: 1px;
         text-align: start;
-        font-size: 20px;
+        font-size: 23px;
       }
       .header-container {
         margin-bottom: 80px;
@@ -166,23 +166,13 @@ export function generateHTML(data: any): string {
         max-width: fit-content;
         margin: 0 auto;
       }
-      .header-description h2 {
-        font-size: 28px;
-        text-align: center;
-      }
-      .header-description hr {
-        margin-top: 10px;
-      }
-      .header-description p {
-        font-size: 24px;
-        margin-top: -8px;
-        text-align: center;
-        font-weight: 500;
-      }
+    
+  
       .college-logo {
-        // max-width: 200px;
         margin: 0 auto;
-        // aspect-ratio: 16/9;
+        height: 100%;
+        min-width: 100%;
+        min-height: 100%;
       }
       .college-name {
         font-size: 40px;
@@ -192,10 +182,10 @@ export function generateHTML(data: any): string {
         font-size: 16px;
       }
       .table td p {
-        font-size: 20px;
+        font-size: 23px;
       }
       .table th p {
-        font-size: 20px;
+        font-size: 23px;
       }
       .comments-cell {
         max-width: 500px;
@@ -226,7 +216,7 @@ export function generateHTML(data: any): string {
       </div>
       <hr style="margin-bottom: 40px;"/>
       <div class="header-description">
-        <h2>Item Analysis Report</h2>
+        <h2 style="font-size: 30px;">Item Analysis Report</h2>
        
       </div>
     </div>
@@ -237,7 +227,7 @@ export function generateHTML(data: any): string {
       <div class="course-grid">
         <div class="grid-item">
           <p><span style="font-weight: bold;">Course Name:</span> ${
-            course?.course_name + " (" + course?.section + ")" || ""
+            course?.course_name + " (" + course?.section.slice(0, 1).toUpperCase() + course?.section.slice(1) + ")" || ""
           }</p>
         </div>
         <div class="grid-item">
@@ -257,14 +247,10 @@ export function generateHTML(data: any): string {
         </div>
         <div class="grid-item">
           <p><span style="font-weight: bold;">Semester:</span> ${
-            course?.semister === 1 ? "First Semester" : "Second Semester"
-          }</p>
+            course?.semister === 1 ? "First Semester" : "Second Semester" 
+          } ${course?.academicYear ? "(" + course?.academicYear + ")" : ""}</p>
         </div>
-        <div class="grid-item">
-          <p><span style="font-weight: bold;">Academic Year:</span> ${
-            course?.academicYear || ""
-          }</p>
-        </div>
+      
         <div class="grid-item">
           <p><span style="font-weight: bold;">Course Coordinator:</span> ${
             course?.coordinator || ""
@@ -278,7 +264,7 @@ export function generateHTML(data: any): string {
         <th><p style="text-align: center; margin-bottom: 10px;">S.No</p></th>
         <th><p style="text-align: center; margin-bottom: 10px;">Item Category</p></th>
         <th><p style="text-align: center; margin-bottom: 10px;">Question No</p></th>
-        <th><p style="text-align: center; margin-bottom: 10px;">Total Questions</p></th>
+        <th><p style="text-align: center; margin-bottom: 10px; max-width: 120px;">Total </br> Questions</p></th>
         <th><p style="text-align: center; margin-bottom: 10px;">%</p></th>
         <th><p style="text-align: center; margin-bottom: 10px;">Comments/Recommendations</p></th>
       </tr>
@@ -301,7 +287,7 @@ export function generateHTML(data: any): string {
               <td class="question-no-cell"><p style="text-align: center; margin-bottom: 10px;">${formatQuestions(
                 item?.questions || []
               )}</p></td>
-              <td style="vertical-align: middle; text-align: center;"><p style="text-align: center; margin-bottom: 10px;">${
+              <td style="vertical-align: middle; text-align: center; max-width: 120px;"><p style="text-align: center; margin-bottom: 10px;">${
                 (item?.questions || []).length < 1 ? "" : (item?.questions || []).length
               }</p></td>
               <td style="vertical-align: middle; text-align: center;"><p style="text-align: center; margin-bottom: 10px;">${
@@ -350,10 +336,10 @@ export function generateHTML(data: any): string {
         <th><p style="text-align: center; margin-bottom: 10px;">F</p></th>
       </tr>
       <tr>
-        <td><p style="text-align: center; margin-bottom: 10px;">${
+        <td><p style="text-align: center; margin-bottom: 10px; font-size: 23px;">${
           studentsAttended || ""
         }</p></td>
-         <td><p style="text-align: center; margin-bottom: 10px;">${
+         <td><p style="text-align: center; margin-bottom: 10px; font-size: 23px;">${
           studentsPassed || ""
         }</p></td>
        
@@ -361,10 +347,10 @@ export function generateHTML(data: any): string {
           .map(
             (grade: any) => `
           <td class="split-cell">
-            <div class="cell-row"><p style="text-align: center; margin-bottom: 10px;">${
+            <div class="cell-row"><p style="text-align: center; margin-bottom: 10px; font-size: 23px;">${
               grade?.count === 0 ? "" : grade?.count
             }</p></div>
-            <div class="cell-row"><p style="text-align: center; margin-bottom: 10px;">${
+            <div class="cell-row"><p style="text-align: center; margin-bottom: 10px; font-size: 23px;">${
               Number(Math.round(grade?.studentPercentage || 0).toFixed(1)) === 0
                 ? ""
                 : Number(Math.round(grade?.studentPercentage || 0).toFixed(1)) +
