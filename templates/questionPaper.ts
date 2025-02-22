@@ -39,9 +39,10 @@ export function generateQuestionPaperHTML(data: {
             ${q.options
                     .map(
                         (opt: string, idx: number) => `
-                        <div class="option-container" style="page-break-inside: avoid !important;">
-                <div class="option" >
-                    ${opt}
+                        <div class="option-container" style="page-break-inside: avoid !important; margin-left: -16px;">
+                <div class="option" style="display: flex; align-items: flex-start; gap: 4px;">
+                    <span style="min-width: 20px;">${String.fromCharCode(65 + idx)}.</span>
+                    <span>${opt}</span>
                 </div>
                 </div>
             `
@@ -127,10 +128,12 @@ export function generateQuestionPaperHTML(data: {
         width: 100%; /* Ensure it takes full width to avoid breaking within */
     }
                 .option {
-            
+          
                     line-height: 0.7 !important;
                 }
-            
+       
+
+        
                 .answer {
                   margin-top: -5px;
                     padding-left: 30px;
