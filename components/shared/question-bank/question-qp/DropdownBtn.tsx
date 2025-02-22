@@ -103,7 +103,7 @@ export default function DropdownBtn({ questionPaperId, courseId, academicYear, c
         },
         pagebreak: {
           mode: ["css", "legacy"],
-          avoid: ".question, .answer, .no-break-class,.question-container, .option,.options",
+          avoid: "",
         },
       };
 

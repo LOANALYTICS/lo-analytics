@@ -14978,3 +14978,383 @@
     "veryEasyQuestions": 26
   }
 }
+2025-02-22T12:58:33.922Z [[32minfo[39m]: {
+  "goodQuestions": 20,
+  "easyQuestions": 6,
+  "difficultQuestions": 1,
+  "veryDifficultQuestions": 3,
+  "poorQuestions": 26,
+  "veryEasyQuestions": 8,
+  "totalAccepted": 26,
+  "totalRejected": 37,
+  "kr20": "0.86",
+  "percentages": {
+    "goodQuestions": 74,
+    "easyQuestions": 21,
+    "difficultQuestions": 5,
+    "veryDifficultQuestions": 7,
+    "poorQuestions": 71,
+    "veryEasyQuestions": 22
+  }
+}
+2025-02-22T12:58:33.939Z [[32minfo[39m]: {
+  "goodQuestions": 23,
+  "easyQuestions": 9,
+  "difficultQuestions": 2,
+  "veryDifficultQuestions": 2,
+  "poorQuestions": 19,
+  "veryEasyQuestions": 10,
+  "totalAccepted": 33,
+  "totalRejected": 32,
+  "kr20": "0.83",
+  "percentages": {
+    "goodQuestions": 68,
+    "easyQuestions": 26,
+    "difficultQuestions": 6,
+    "veryDifficultQuestions": 7,
+    "poorQuestions": 61,
+    "veryEasyQuestions": 31
+  }
+}
+2025-02-22T12:58:33.950Z [[32minfo[39m]: {
+  "goodQuestions": 15,
+  "easyQuestions": 9,
+  "difficultQuestions": 1,
+  "veryDifficultQuestions": 3,
+  "poorQuestions": 21,
+  "veryEasyQuestions": 13,
+  "totalAccepted": 25,
+  "totalRejected": 38,
+  "kr20": "0.80",
+  "percentages": {
+    "goodQuestions": 61,
+    "easyQuestions": 37,
+    "difficultQuestions": 2,
+    "veryDifficultQuestions": 9,
+    "poorQuestions": 56,
+    "veryEasyQuestions": 35
+  }
+}
+2025-02-22T12:58:33.966Z [[32minfo[39m]: {
+  "goodQuestions": 10,
+  "easyQuestions": 6,
+  "difficultQuestions": 1,
+  "veryDifficultQuestions": 3,
+  "poorQuestions": 27,
+  "veryEasyQuestions": 13,
+  "totalAccepted": 17,
+  "totalRejected": 43,
+  "kr20": "0.79",
+  "percentages": {
+    "goodQuestions": 60,
+    "easyQuestions": 32,
+    "difficultQuestions": 8,
+    "veryDifficultQuestions": 6,
+    "poorQuestions": 64,
+    "veryEasyQuestions": 30
+  }
+}
+2025-02-22T12:58:33.972Z [[32minfo[39m]: {
+  "goodQuestions": 12,
+  "easyQuestions": 4,
+  "difficultQuestions": 1,
+  "veryDifficultQuestions": 3,
+  "poorQuestions": 32,
+  "veryEasyQuestions": 9,
+  "totalAccepted": 16,
+  "totalRejected": 44,
+  "kr20": "0.77",
+  "percentages": {
+    "goodQuestions": 72,
+    "easyQuestions": 22,
+    "difficultQuestions": 6,
+    "veryDifficultQuestions": 7,
+    "poorQuestions": 74,
+    "veryEasyQuestions": 19
+  }
+}
+2025-02-22T12:58:33.985Z [[32minfo[39m]: {
+  "goodQuestions": 18,
+  "easyQuestions": 7,
+  "difficultQuestions": 2,
+  "veryDifficultQuestions": 4,
+  "poorQuestions": 28,
+  "veryEasyQuestions": 9,
+  "totalAccepted": 26,
+  "totalRejected": 41,
+  "kr20": "0.83",
+  "percentages": {
+    "goodQuestions": 67,
+    "easyQuestions": 26,
+    "difficultQuestions": 6,
+    "veryDifficultQuestions": 9,
+    "poorQuestions": 68,
+    "veryEasyQuestions": 23
+  }
+}
+2025-02-22T12:58:33.997Z [[32minfo[39m]: {
+  "goodQuestions": 17,
+  "easyQuestions": 11,
+  "difficultQuestions": 1,
+  "veryDifficultQuestions": 2,
+  "poorQuestions": 18,
+  "veryEasyQuestions": 12,
+  "totalAccepted": 29,
+  "totalRejected": 31,
+  "kr20": "0.83",
+  "percentages": {
+    "goodQuestions": 58,
+    "easyQuestions": 37,
+    "difficultQuestions": 5,
+    "veryDifficultQuestions": 5,
+    "poorQuestions": 57,
+    "veryEasyQuestions": 38
+  }
+}
+2025-02-22T12:58:34.004Z [[32minfo[39m]: {
+  "goodQuestions": 14,
+  "easyQuestions": 3,
+  "difficultQuestions": 1,
+  "veryDifficultQuestions": 2,
+  "poorQuestions": 30,
+  "veryEasyQuestions": 11,
+  "totalAccepted": 18,
+  "totalRejected": 42,
+  "kr20": "0.83",
+  "percentages": {
+    "goodQuestions": 77,
+    "easyQuestions": 16,
+    "difficultQuestions": 7,
+    "veryDifficultQuestions": 4,
+    "poorQuestions": 71,
+    "veryEasyQuestions": 25
+  }
+}
+2025-02-22T12:58:34.014Z [[32minfo[39m]: {
+  "goodQuestions": 16,
+  "easyQuestions": 6,
+  "difficultQuestions": 0,
+  "veryDifficultQuestions": 3,
+  "poorQuestions": 23,
+  "veryEasyQuestions": 12,
+  "totalAccepted": 22,
+  "totalRejected": 38,
+  "kr20": "0.80",
+  "percentages": {
+    "goodQuestions": 73,
+    "easyQuestions": 26,
+    "difficultQuestions": 2,
+    "veryDifficultQuestions": 8,
+    "poorQuestions": 60,
+    "veryEasyQuestions": 32
+  }
+}
+2025-02-22T12:58:34.022Z [[32minfo[39m]: {
+  "goodQuestions": 19,
+  "easyQuestions": 6,
+  "difficultQuestions": 2,
+  "veryDifficultQuestions": 3,
+  "poorQuestions": 23,
+  "veryEasyQuestions": 10,
+  "totalAccepted": 27,
+  "totalRejected": 35,
+  "kr20": "0.80",
+  "percentages": {
+    "goodQuestions": 71,
+    "easyQuestions": 24,
+    "difficultQuestions": 6,
+    "veryDifficultQuestions": 7,
+    "poorQuestions": 65,
+    "veryEasyQuestions": 28
+  }
+}
+2025-02-22T12:58:34.036Z [[32minfo[39m]: {
+  "goodQuestions": 20,
+  "easyQuestions": 6,
+  "difficultQuestions": 1,
+  "veryDifficultQuestions": 3,
+  "poorQuestions": 26,
+  "veryEasyQuestions": 8,
+  "totalAccepted": 26,
+  "totalRejected": 37,
+  "kr20": "0.86",
+  "percentages": {
+    "goodQuestions": 74,
+    "easyQuestions": 21,
+    "difficultQuestions": 5,
+    "veryDifficultQuestions": 7,
+    "poorQuestions": 71,
+    "veryEasyQuestions": 22
+  }
+}
+2025-02-22T12:58:34.043Z [[32minfo[39m]: {
+  "goodQuestions": 23,
+  "easyQuestions": 9,
+  "difficultQuestions": 2,
+  "veryDifficultQuestions": 2,
+  "poorQuestions": 19,
+  "veryEasyQuestions": 10,
+  "totalAccepted": 33,
+  "totalRejected": 32,
+  "kr20": "0.83",
+  "percentages": {
+    "goodQuestions": 68,
+    "easyQuestions": 26,
+    "difficultQuestions": 6,
+    "veryDifficultQuestions": 7,
+    "poorQuestions": 61,
+    "veryEasyQuestions": 31
+  }
+}
+2025-02-22T12:58:34.049Z [[32minfo[39m]: {
+  "goodQuestions": 15,
+  "easyQuestions": 9,
+  "difficultQuestions": 1,
+  "veryDifficultQuestions": 3,
+  "poorQuestions": 21,
+  "veryEasyQuestions": 13,
+  "totalAccepted": 25,
+  "totalRejected": 38,
+  "kr20": "0.80",
+  "percentages": {
+    "goodQuestions": 61,
+    "easyQuestions": 37,
+    "difficultQuestions": 2,
+    "veryDifficultQuestions": 9,
+    "poorQuestions": 56,
+    "veryEasyQuestions": 35
+  }
+}
+2025-02-22T12:58:34.054Z [[32minfo[39m]: {
+  "goodQuestions": 10,
+  "easyQuestions": 6,
+  "difficultQuestions": 1,
+  "veryDifficultQuestions": 3,
+  "poorQuestions": 27,
+  "veryEasyQuestions": 13,
+  "totalAccepted": 17,
+  "totalRejected": 43,
+  "kr20": "0.79",
+  "percentages": {
+    "goodQuestions": 60,
+    "easyQuestions": 32,
+    "difficultQuestions": 8,
+    "veryDifficultQuestions": 6,
+    "poorQuestions": 64,
+    "veryEasyQuestions": 30
+  }
+}
+2025-02-22T12:58:34.059Z [[32minfo[39m]: {
+  "goodQuestions": 12,
+  "easyQuestions": 4,
+  "difficultQuestions": 1,
+  "veryDifficultQuestions": 3,
+  "poorQuestions": 32,
+  "veryEasyQuestions": 9,
+  "totalAccepted": 16,
+  "totalRejected": 44,
+  "kr20": "0.77",
+  "percentages": {
+    "goodQuestions": 72,
+    "easyQuestions": 22,
+    "difficultQuestions": 6,
+    "veryDifficultQuestions": 7,
+    "poorQuestions": 74,
+    "veryEasyQuestions": 19
+  }
+}
+2025-02-22T12:58:34.069Z [[32minfo[39m]: {
+  "goodQuestions": 18,
+  "easyQuestions": 7,
+  "difficultQuestions": 2,
+  "veryDifficultQuestions": 4,
+  "poorQuestions": 28,
+  "veryEasyQuestions": 9,
+  "totalAccepted": 26,
+  "totalRejected": 41,
+  "kr20": "0.83",
+  "percentages": {
+    "goodQuestions": 67,
+    "easyQuestions": 26,
+    "difficultQuestions": 6,
+    "veryDifficultQuestions": 9,
+    "poorQuestions": 68,
+    "veryEasyQuestions": 23
+  }
+}
+2025-02-22T12:58:34.075Z [[32minfo[39m]: {
+  "goodQuestions": 17,
+  "easyQuestions": 11,
+  "difficultQuestions": 1,
+  "veryDifficultQuestions": 2,
+  "poorQuestions": 18,
+  "veryEasyQuestions": 12,
+  "totalAccepted": 29,
+  "totalRejected": 31,
+  "kr20": "0.83",
+  "percentages": {
+    "goodQuestions": 58,
+    "easyQuestions": 37,
+    "difficultQuestions": 5,
+    "veryDifficultQuestions": 5,
+    "poorQuestions": 57,
+    "veryEasyQuestions": 38
+  }
+}
+2025-02-22T12:58:34.080Z [[32minfo[39m]: {
+  "goodQuestions": 14,
+  "easyQuestions": 3,
+  "difficultQuestions": 1,
+  "veryDifficultQuestions": 2,
+  "poorQuestions": 30,
+  "veryEasyQuestions": 11,
+  "totalAccepted": 18,
+  "totalRejected": 42,
+  "kr20": "0.83",
+  "percentages": {
+    "goodQuestions": 77,
+    "easyQuestions": 16,
+    "difficultQuestions": 7,
+    "veryDifficultQuestions": 4,
+    "poorQuestions": 71,
+    "veryEasyQuestions": 25
+  }
+}
+2025-02-22T12:58:34.085Z [[32minfo[39m]: {
+  "goodQuestions": 16,
+  "easyQuestions": 6,
+  "difficultQuestions": 0,
+  "veryDifficultQuestions": 3,
+  "poorQuestions": 23,
+  "veryEasyQuestions": 12,
+  "totalAccepted": 22,
+  "totalRejected": 38,
+  "kr20": "0.80",
+  "percentages": {
+    "goodQuestions": 73,
+    "easyQuestions": 26,
+    "difficultQuestions": 2,
+    "veryDifficultQuestions": 8,
+    "poorQuestions": 60,
+    "veryEasyQuestions": 32
+  }
+}
+2025-02-22T12:58:34.090Z [[32minfo[39m]: {
+  "goodQuestions": 19,
+  "easyQuestions": 6,
+  "difficultQuestions": 2,
+  "veryDifficultQuestions": 3,
+  "poorQuestions": 23,
+  "veryEasyQuestions": 10,
+  "totalAccepted": 27,
+  "totalRejected": 35,
+  "kr20": "0.80",
+  "percentages": {
+    "goodQuestions": 71,
+    "easyQuestions": 24,
+    "difficultQuestions": 6,
+    "veryDifficultQuestions": 7,
+    "poorQuestions": 65,
+    "veryEasyQuestions": 28
+  }
+}

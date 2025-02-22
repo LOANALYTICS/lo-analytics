@@ -27,7 +27,7 @@ export function generateQuestionPaperHTML(data: {
         .map(
             (q, index) => `
 
-    <div class="question-container">
+    <div class="question-container" style="page-break-inside: avoid !important;">
         <div class="question">
             <span style="margin-right: 8px;">Q${index + 1}.</span>
          <div>
@@ -35,14 +35,14 @@ export function generateQuestionPaperHTML(data: {
     <span class="marks" style="font-size: 0;">.</span>
 </div>
         </div>
-        <div class="options" style="margin-top: -10px;">
+        <div class="options" style="margin-top: -20px;">
             ${q.options
                     .map(
                         (opt: string, idx: number) => `
-                <div class="option" data-letter="${String.fromCharCode(
-                            65 + idx
-                        )})">
+                        <div class="option-container" style="page-break-inside: avoid !important;">
+                <div class="option" >
                     ${opt}
+                </div>
                 </div>
             `
                     )
@@ -76,7 +76,7 @@ export function generateQuestionPaperHTML(data: {
                 body {
                     font-family: Arial, sans-serif;
                     line-height: 1.4;
-                    font-size: 12px;
+                    font-size: 14px;
                     margin: 0;
                 }
             .header { text-align: center; margin-bottom: 30px; }
@@ -115,19 +115,22 @@ export function generateQuestionPaperHTML(data: {
           
                 .options {
                     padding-left: 25px;
-                    page-break-inside: avoid !important;
                     color: #444343;
                     font-weight: 400;
-                }
-                .option {
-                    page-break-inside: avoid !important;
                     display: flex;
+        flex-direction: column;
                 }
-                .option::before {
-                    content: attr(data-letter);
-                    margin-right: 8px;
-                    flex-shrink: 0;
+                         .option-container {
+        display: inline-block;
+        break-inside: avoid;
+        page-break-inside: avoid; /* Fallback for older browsers */
+        width: 100%; /* Ensure it takes full width to avoid breaking within */
+    }
+                .option {
+            
+                    line-height: 0.7 !important;
                 }
+            
                 .answer {
                   margin-top: -5px;
                     padding-left: 30px;
@@ -218,7 +221,6 @@ export function generateQuestionPaperHTML(data: {
         }
         .marks_container_container{
         height: 60px;
-
         width: fit-content;
         margin-left: auto;
         display: flex;
@@ -315,6 +317,9 @@ export function generateQuestionPaperHTML(data: {
             
             <div class="questions no-break-class">
                 ${questionsHTML}
+            </div>
+            <div class="footer" style="text-align: center; margin-top: 40px;">
+                <p style="font-size: 16px; font-weight: bold;">Best of Luck</p>
             </div>
         </body>
         </html>
