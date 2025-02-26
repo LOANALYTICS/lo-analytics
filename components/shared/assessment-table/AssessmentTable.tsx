@@ -50,6 +50,7 @@ const getCLOKeys = (assessments: Assessment[], numberOfClos: number): string[] =
 
 export default function AssessmentTable({ initialData, onSave, saving, onUpload, numberOfClos, courseId }: AssessmentTableProps) {
   const [spreadsheetType, setSpreadsheetType] = useState<string | null>(null);
+  const [selectedAssessmentId, setSelectedAssessmentId] = useState<string | null>(null);
   const [assessments, setAssessments] = useState<Assessment[]>(() => {
     if (initialData.length > 0) {
       // Add any missing CLO keys to each assessment
@@ -274,6 +275,7 @@ export default function AssessmentTable({ initialData, onSave, saving, onUpload,
                       onClick={() => {
                         setSpreadsheetOpen(true)
                         setSpreadsheetType(assessment.type)
+                        setSelectedAssessmentId(assessment.id)
                       }}
                     >
                       <Plus className="h-4 w-4" />
@@ -323,9 +325,14 @@ export default function AssessmentTable({ initialData, onSave, saving, onUpload,
           console.log('Spreadsheet data:', data)
           setSpreadsheetOpen(false)
         }}
+        
         courseId={courseId}
         type={spreadsheetType || ''}
-        numberOfQuestions={Object.values(assessments[0].clos).flat().length}
+        numberOfQuestions={
+          selectedAssessmentId 
+            ? Object.values(assessments.find(a => a.id === selectedAssessmentId)?.clos || {}).flat().length 
+            : 0
+        }
       />
     </div>
   );
