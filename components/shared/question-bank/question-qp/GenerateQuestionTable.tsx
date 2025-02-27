@@ -30,6 +30,7 @@ export function GenerateQuestionTable({ topics, courseId }: GenerateQuestionTabl
     const [cloCount, setCloCount] = useState(3)
     const router = useRouter()
     const [selectedYear, setSelectedYear] = useState<string>("");
+    const [date, setDate] = useState(new Date())
 
     const handleYearChange = async (value: string) => {
         setSelectedYear(value);
@@ -127,10 +128,17 @@ export function GenerateQuestionTable({ topics, courseId }: GenerateQuestionTabl
             return row
         }))
     }
+    useEffect(() => {
+        console.log(date)
+    },[date])
 
     const handleGenerate = async () => {
         if (!examName.trim()) {
             toast.error('Please enter an exam name')
+            return
+        }
+        if(!date){
+            toast.error('Please select a date')
             return
         }
         if (!selectedYear.trim()) {
@@ -153,6 +161,7 @@ export function GenerateQuestionTable({ topics, courseId }: GenerateQuestionTabl
             const result = await createQuestionPaper({
                 examName,
                 courseId,
+                date,
                 topicQuestions: tableData.map(row => ({
                     topic: row.topicName,
                     clos: Object.fromEntries(
@@ -164,6 +173,7 @@ export function GenerateQuestionTable({ topics, courseId }: GenerateQuestionTabl
                 }))
             }, user?._id, selectedYear)
 
+            console.log(result)
             router.push(`/dashboard/question-bank/qps`)
             toast.success('Question paper structure created successfully')
         } catch (error) {
@@ -196,6 +206,7 @@ export function GenerateQuestionTable({ topics, courseId }: GenerateQuestionTabl
                             <SelectItem value={"2023-2024"}>2023-2024</SelectItem>
                         </SelectContent>
                     </Select>
+                    <input type="date" className='max-w-lg w-full min-w-md' onChange={e => setDate(new Date(e.target.value))} />
                 </div>
 
                 <Button onClick={handleGenerate}>

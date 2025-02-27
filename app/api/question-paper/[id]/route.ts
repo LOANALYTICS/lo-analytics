@@ -51,6 +51,7 @@ export async function GET(
         const htmlContent = generateQuestionPaperHTML({
             ...questionPaperData,
             withAnswers,
+            examDate: questionPaperData.date,
             course: {
                 course_name: courseData.course_name,
                 level: courseData.level,

@@ -6,10 +6,12 @@ import { Course, QuestionBank, QuestionPaper } from "@/lib/models";
 import courseTemplateModel from "@/server/models/courseTemplate.model";
 import { getTopics } from "./question-bank.service";
 import { generateDistributionReportHTML } from "@/templates/distributionReport";
+import { date } from "zod";
 
 interface GenerateQPInput {
     examName: string
     courseId: string
+    date: Date
     topicQuestions: {
         topic: string
         clos: Record<string, number>
@@ -112,6 +114,7 @@ export async function createQuestionPaper(input: GenerateQPInput,userId: string,
             academicYear: academicYear,
             examName: input.examName,
             course: new mongoose.Types.ObjectId(input.courseId),
+            date: input.date,
             topicQuestions: input.topicQuestions,
             QuestionsOrder: finalQuestions.map((question, index) => ({
                 questionId: question._id,
@@ -159,6 +162,7 @@ export async function generateQuestionsByPaperId(questionPaperId: string, withAn
 
         return {
             examName: questionPaper.examName,
+            date: questionPaper.date,
             courseCode: questionPaper.course.course_code,
             questions: orderedQuestions
         };

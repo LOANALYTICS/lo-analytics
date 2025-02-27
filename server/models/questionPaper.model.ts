@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 export interface IQuestionPaper {
     examName: string;
     course: mongoose.Types.ObjectId;
+    date: Date;
     topicQuestions: {
         topic: string;
         clos: Record<string, number>;
@@ -24,6 +25,10 @@ export const questionPaperSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Course',
         required: true
+    },
+    date: {
+        type: Date,
+        default: Date.now
     },
     topicQuestions: [{
         topic: {

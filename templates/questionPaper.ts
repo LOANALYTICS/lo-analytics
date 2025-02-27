@@ -5,6 +5,7 @@ export function generateQuestionPaperHTML(data: {
     courseCode: string;
     questions: any[];
     withAnswers?: boolean;
+    date?: any;
     course: {
         course_name: string;
         level: number;
@@ -61,7 +62,7 @@ export function generateQuestionPaperHTML(data: {
 `
         )
         .join("");
-    let date = new Date()
+    let localdate = new Date()
 
     return `
         <!DOCTYPE html>
@@ -278,15 +279,11 @@ export function generateQuestionPaperHTML(data: {
                 <div class="student_info" >
                     <span class="detail-label" style="width: 100px; text-align: start;">Student ID:</span> <div class="student_name_space" style="height: 30px; width: 100%; "></div>
                 </div>
-             
-
-
 
               <div class="course-details">
                 <div class="detail-item">
-                  <span class="detail-label">Date:</span> ${dayjs(date).format('DD-MM-YYYY')}
+                  <span class="detail-label">Date:</span> ${dayjs(data.date ? data.date : localdate).format('DD-MM-YYYY')}
                 </div>
-
                 
                 <div class="detail-item">
                   <span class="detail-label">Course Code:</span> ${data.course.course_code}
