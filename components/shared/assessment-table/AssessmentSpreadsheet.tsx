@@ -47,6 +47,7 @@ export function AssessmentSpreadsheet({
   const [loading, setLoading] = useState(true)
   const [isMultipleMode, setIsMultipleMode] = useState(false)
   const gridRef = useRef<any>(null)
+  const [rowCount, setRowCount] = useState(0)
 
   useEffect(() => {
     const fetchStudents = async () => {
@@ -54,7 +55,7 @@ export function AssessmentSpreadsheet({
         setLoading(true)
         const response = await getAssessmentStudents(courseId)
         
-        // Store original student data for reference
+     
         const students = response.data.map((student: any) => ({
           id: student.studentId,
           name: student.studentName
@@ -153,8 +154,8 @@ export function AssessmentSpreadsheet({
         setColumns(gridColumns)
         
         if (isMultipleMode) {
-          // Create just 2 empty rows initially for multiple mode
-          const emptyRows = Array(2).fill(null).map(() => {
+          // Remove the limit on the number of empty rows for multiple mode
+          const emptyRows = Array(10).fill(null).map(() => { // Change 2 to 10 or any desired number
             const emptyRow: RowData = {
               studentId: '',
               studentName: '',
@@ -223,10 +224,8 @@ export function AssessmentSpreadsheet({
   const restoreStudentInfo = () => {
     if (data.length < 2 || originalStudentData.length === 0) return
     
-    // Create a copy of the current data
     const newData = [...data]
     
-    // Skip the key row (index 0)
     for (let i = 1; i < newData.length && i - 1 < originalStudentData.length; i++) {
       const student = originalStudentData[i - 1]
       newData[i] = {
@@ -242,49 +241,107 @@ export function AssessmentSpreadsheet({
 
   const handleSave = async () => {
     try {
-      // First restore student info to ensure it's correct
-      restoreStudentInfo()
-      
-      // Convert to array format for Excel
-      const headerRow = columns.map(col => col.title)
-      
-      // Convert data to array format
-      const rowsData = data.map(row => {
-        return columns.map(col => row[col.key])
-      })
-      
-      // Combine header and rows
-      const excelData = [headerRow, ...rowsData]
-      
-      // Create Excel file
-      const ws = XLSX.utils.aoa_to_sheet(excelData)
-      const wb = XLSX.utils.book_new()
-      XLSX.utils.book_append_sheet(wb, ws, "Assessment")
-      
-      // Generate Excel file
-      const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" })
-      const blob = new Blob([excelBuffer], {
-        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      })
-      
-      const formData = new FormData()
-      formData.append("file", blob, `${type}-results.xlsx`)
-      formData.append("courseId", courseId)
-      formData.append("type", type)
-      
-      const response = await fetch("/api/assessment-upload", {
-        method: "POST",
-        body: formData,
-      })
-      
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.message || "Failed to save assessment data")
+      if (isMultipleMode) {
+        // For multiple mode, directly use the data without filtering
+        const rowsData = data.map(row => {
+          return [
+            row.studentId,
+            row.studentName,
+            row.percentage,
+            row.score,
+            row.correct,
+            row.blank,
+            ...Array.from({ length: numberOfQuestions }, (_, i) => row[`q${i + 1}`] || '')
+          ]
+        })
+        
+        // Create Excel file
+        const ws = XLSX.utils.aoa_to_sheet(rowsData)
+        const wb = XLSX.utils.book_new()
+        XLSX.utils.book_append_sheet(wb, ws, "Results Grid")
+        
+        // Generate Excel file
+        const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" })
+        const blob = new Blob([excelBuffer], {
+          type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        })
+        
+        // Trigger download
+        const url = window.URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = `${type}-results.xlsx`
+        document.body.appendChild(a)
+        a.click()
+        a.remove()
+        window.URL.revokeObjectURL(url)
+
+        // Prepare form data for API
+        const formData = new FormData()
+        formData.append("file", blob, `${type}-results.xlsx`)
+        formData.append("courseId", courseId)
+        formData.append("type", type)
+        
+        // Send to API for verification
+        const response = await fetch("/api/assessment-upload", {
+          method: "POST",
+          body: formData,
+        })
+        
+        if (!response.ok) {
+          const errorData = await response.json()
+          throw new Error(errorData.message || "Failed to save assessment data")
+        }
+        
+        toast.success("Assessment data saved successfully")
+        onOpenChange(false)
+        window.location.reload()
+      } else {
+        // Original single mode logic
+        const rowsData = data.filter(row => Object.values(row).some(val => val !== '')).map(row => {
+          return columns.map(col => row[col.key] || '')
+        })
+        
+        // Create Excel file
+        const ws = XLSX.utils.aoa_to_sheet(rowsData)
+        const wb = XLSX.utils.book_new()
+        XLSX.utils.book_append_sheet(wb, ws, "Results Grid")
+        
+        // Rest of the existing code for single mode...
+        const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" })
+        const blob = new Blob([excelBuffer], {
+          type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        })
+        
+        // Trigger download and API call as before...
+        const url = window.URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = `${type}-results.xlsx`
+        document.body.appendChild(a)
+        a.click()
+        a.remove()
+        window.URL.revokeObjectURL(url)
+
+        const formData = new FormData()
+        formData.append("file", blob, `${type}-results.xlsx`)
+        formData.append("courseId", courseId)
+        formData.append("type", type)
+        
+        const response = await fetch("/api/assessment-upload", {
+          method: "POST",
+          body: formData,
+        })
+        
+        if (!response.ok) {
+          const errorData = await response.json()
+          throw new Error(errorData.message || "Failed to save assessment data")
+        }
+        
+        toast.success("Assessment data saved successfully")
+        onOpenChange(false)
+        window.location.reload()
       }
-      
-      toast.success("Assessment data saved successfully")
-      onOpenChange(false)
-      window.location.reload()
     } catch (error) {
       console.error("Failed to save data:", error)
       toast.error(error instanceof Error ? error.message : "Failed to save data")
@@ -390,10 +447,31 @@ export function AssessmentSpreadsheet({
     toast.success("Answer data pasted successfully")
   }
 
+  const loadMoreRows = () => {
+    if (isMultipleMode) {
+      const newRows = Array(10).fill(null).map(() => { // Load 10 more rows
+        const emptyRow: RowData = {
+          studentId: '',
+          studentName: '',
+          percentage: '',
+          score: '',
+          correct: '',
+          blank: '',
+        }
+        for (let i = 0; i < numberOfQuestions; i++) {
+          emptyRow[`q${i+1}`] = ''
+        }
+        return emptyRow
+      })
+      setData(prevData => [...prevData, ...newRows])
+      setRowCount(prevCount => prevCount + newRows.length)
+    }
+  }
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-[90vw]">
-        <DialogHeader>
+        <DialogHeader className="pr-8">
           <DialogTitle className="flex items-center justify-between">
             <span>{type} Results Entry</span>
             <div className="flex items-center gap-2">
@@ -415,39 +493,29 @@ export function AssessmentSpreadsheet({
           </DialogTitle>
         </DialogHeader>
         
-        <div className="bg-blue-50 p-3 rounded-md border border-blue-200 mb-3">
+        <div className="bg-blue-50 p-3 rounded-md border border-blue-200 m-3">
           <p className="font-medium text-blue-800">
             Instructions:
           </p>
           <ol className="text-sm text-gray-600 list-decimal pl-5 mt-1">
-            {isMultipleMode ? (
+            {isMultipleMode && (
               <>
                 <li>Copy entire data from Excel including student info (Ctrl+A, Ctrl+C)</li>
                 <li>Click in the empty spreadsheet below and paste (Ctrl+V)</li>
               </>
-            ) : (
-              <>
-                <li>Copy data from Excel (Ctrl+A, Ctrl+C)</li>
-                <li>Click in the spreadsheet below and paste (Ctrl+V)</li>
-                <li>If student info is overwritten, click "Restore Student Info"</li>
-              </>
-            )}
+            )
+            }
             <li>Click "Save Results" when done</li>
           </ol>
-          {!isMultipleMode && (
-            <div className="mt-2">
-              <Button 
-                onClick={restoreStudentInfo} 
-                variant="default"
-                className="w-full"
-              >
-                Restore Student Info
-              </Button>
-            </div>
-          )}
+              
         </div>
         
-        <div className="spreadsheet-container border border-gray-200 rounded overflow-auto" style={{ height: '500px' }}>
+        <div className="spreadsheet-container border border-gray-200 rounded overflow-auto" style={{ height: '440px' }} onScroll={(e) => {
+          const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
+          if (scrollHeight - scrollTop <= clientHeight + 10) { // Load more when near the bottom
+            loadMoreRows();
+          }
+        }}>
           <style jsx global>{`
             .student-column {
               background-color: #f0f7ff !important;
@@ -476,7 +544,7 @@ export function AssessmentSpreadsheet({
               rowHeight={35}
               headerRowHeight={40}
               addRowsComponent={() => null}
-              autoAddRow={false}
+              autoAddRow={true}
               ref={gridRef}
             />
           )}
