@@ -65,7 +65,7 @@ export async function POST(request: Request) {
     const studentResults: StudentResult[] = [];
     const studentMap = new Map(
       assessmentResponse.data.students.map((student: { studentId: string; studentName: string }) => 
-        [student.studentName.toLowerCase().trim(), student.studentId]
+        [student.studentId.toLowerCase().trim(), student.studentName]
       )
     );
 

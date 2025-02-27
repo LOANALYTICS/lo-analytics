@@ -108,17 +108,17 @@ export function AssessmentSpreadsheet({
           },
         ] : [
           {
-            ...keyColumn('studentId', textColumn),
+            ...keyColumn('studentName', textColumn),
             title: 'A',
             disabled: true,
-            minWidth: 120,
+            minWidth: 200,
             className: 'student-column'
           },
           {
-            ...keyColumn('studentName', textColumn),
+            ...keyColumn('studentId', textColumn),
             title: 'B',
             disabled: true,
-            minWidth: 200,
+            minWidth: 120,
             className: 'student-column'
           },
           {
@@ -181,48 +181,40 @@ export function AssessmentSpreadsheet({
           })
           setData(emptyRows)
         } else {
-          // Create row data for single mode
-          const rowData = response.data.map((student: any) => {
-            return {
-              studentId: student.studentId,
-              studentName: student.studentName,
-              percentage: '',
-              score: '',
-              correct: '',
-              blank: '',
-              q1: ''
-            }
-          })
-          
-          if (!isMultipleMode) {
-            // Create header row with descriptive labels
-            const headerRow: RowData = {
-              studentId: 'Student ID',
-              studentName: 'Student Name',
-              percentage: '%',
-              score: 'Score',
-              correct: '#Correct',
-              blank: 'Blank',
-              q1: 'Q1'
-            }
-
-            // Add key row as second row
-            const keyRow: RowData = {
-              studentId: 'Key',
-              studentName: '',
-              percentage: '40',
-              score: '40',
-              correct: '40',
-              blank: '40',
-              q1: '40'
-            }
-
-            // Set data with header row first, then key row, then student data
-            setData([headerRow, keyRow, ...rowData])
-          } else {
-            // Keep original multiple mode logic
-            setData(rowData)
+          // Create header row with Student Name first
+          const headerRow: RowData = {
+            studentName: 'Student Name',
+            studentId: 'Student ID',
+            percentage: '%',
+            score: 'Score',
+            correct: '#Correct',
+            blank: 'Blank',
+            q1: 'Q1'
           }
+          
+          // Create key row
+          const keyRow: RowData = {
+            studentName: '',
+            studentId: 'Key',
+            percentage: '40',
+            score: '40',
+            correct: '40',
+            blank: '40',
+            q1: 'SCORE'
+          }
+          
+          // Format student data with name first
+          const rowData = response.data.map((student: any) => ({
+            studentName: student.studentName,
+            studentId: student.studentId,
+            percentage: '',
+            score: '',
+            correct: '',
+            blank: '',
+            q1: ''
+          }))
+          
+          setData([headerRow, keyRow, ...rowData])
         }
         
         setLoading(false)
@@ -314,50 +306,45 @@ export function AssessmentSpreadsheet({
         onOpenChange(false)
         window.location.reload()
       } else {
-        // Original single mode logic
-        const rowsData = data.filter(row => Object.values(row).some(val => val !== '')).map(row => {
-          return columns.map(col => row[col.key] || '')
-        })
-        
-        // Create Excel file
-        const ws = XLSX.utils.aoa_to_sheet(rowsData)
-        const wb = XLSX.utils.book_new()
-        XLSX.utils.book_append_sheet(wb, ws, "Results Grid")
-        
-        const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" })
-        const blob = new Blob([excelBuffer], {
-          type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        })
-        
-        // Comment out download trigger
-        // const url = window.URL.createObjectURL(blob)
-        // const a = document.createElement('a')
-        // a.href = url
-        // a.download = `${type}-results.xlsx`
-        // document.body.appendChild(a)
-        // a.click()
-        // a.remove()
-        // window.URL.revokeObjectURL(url)
+        // Format data for assessment-direct API
+        const formattedData = [
+          // Row 1: Headers
+          ['Student Name', 'Student ID', '%', 'Score', '#Correct', 'Blank', 'Q1'],
+          // Row 2: Key row with total marks (40) in Q1
+          ['', 'Key', '40', '40', '40', '40', '40'],
+          // Row 3+: Student data with ID in second column
+          ...data.slice(2).map(row => [
+            row.studentName,
+            row.studentId,  // ID must be in second column for API
+            row.percentage,
+            row.score,
+            row.correct,
+            row.blank,
+            row.q1
+          ])
+        ]
 
-        const formData = new FormData()
-        formData.append("file", blob, `${type}-results.xlsx`)
-        formData.append("courseId", courseId)
-        formData.append("type", type)
-        
-        const response = await fetch("/api/assessment-upload", {
+        const response = await fetch("/api/assessment-direct", {
           method: "POST",
-          body: formData,
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            courseId,
+            type,
+            data: formattedData
+          }),
         })
-        
+
         if (!response.ok) {
           const errorData = await response.json()
           throw new Error(errorData.message || "Failed to save assessment data")
         }
-        
-        toast.success("Assessment data saved successfully")
-        onOpenChange(false)
-        window.location.reload()
       }
+      
+      toast.success("Assessment data saved successfully")
+      onOpenChange(false)
+      window.location.reload()
     } catch (error) {
       console.error("Failed to save data:", error)
       toast.error(error instanceof Error ? error.message : "Failed to save data")
