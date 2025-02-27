@@ -30,6 +30,7 @@ interface RowData {
   score: string
   correct: string
   blank: string
+  q1: string
   [key: string]: string // For dynamic question columns
 }
 
@@ -104,51 +105,59 @@ export function AssessmentSpreadsheet({
             ...keyColumn('blank', textColumn),
             title: 'F',
             minWidth: 80
-          }
+          },
         ] : [
           {
             ...keyColumn('studentId', textColumn),
-            title: 'Student ID',
+            title: 'A',
             disabled: true,
             minWidth: 120,
             className: 'student-column'
           },
           {
             ...keyColumn('studentName', textColumn),
-            title: 'Student Name',
+            title: 'B',
             disabled: true,
             minWidth: 200,
             className: 'student-column'
           },
           {
             ...keyColumn('percentage', textColumn),
-            title: '%',
+            title: 'C',
             minWidth: 80
           },
           {
             ...keyColumn('score', textColumn),
-            title: 'Score',
+            title: 'D',
             minWidth: 80
           },
           {
             ...keyColumn('correct', textColumn),
-            title: '#Correct',
+            title: 'E',
             minWidth: 100
           },
           {
             ...keyColumn('blank', textColumn),
-            title: 'Blank',
+            title: 'F',
+            minWidth: 80
+          },
+          {
+            ...keyColumn('q1', textColumn),
+            title: 'G',
             minWidth: 80
           }
         ]
         
-        // Add question columns
-        for (let i = 0; i < numberOfQuestions; i++) {
-          gridColumns.push({
-            ...keyColumn(`q${i+1}`, textColumn),
-            title: isMultipleMode ? getExcelColumnName(i + 6) : `Q${i+1}`, // Start from G (index 6)
-            minWidth: 80
-          })
+        // Remove the additional column adding logic for single mode
+        if (isMultipleMode) {
+          // Add question columns only for multiple mode
+          for (let i = 0; i < numberOfQuestions; i++) {
+            gridColumns.push({
+              ...keyColumn(`q${i+1}`, textColumn),
+              title: getExcelColumnName(i + 6),
+              minWidth: 80
+            })
+          }
         }
         
         setColumns(gridColumns)
@@ -163,6 +172,7 @@ export function AssessmentSpreadsheet({
               score: '',
               correct: '',
               blank: '',
+              q1: ''
             }
             for (let i = 0; i < numberOfQuestions; i++) {
               emptyRow[`q${i+1}`] = ''
@@ -173,39 +183,46 @@ export function AssessmentSpreadsheet({
         } else {
           // Create row data for single mode
           const rowData = response.data.map((student: any) => {
-            const row: RowData = {
+            return {
               studentId: student.studentId,
               studentName: student.studentName,
               percentage: '',
               score: '',
               correct: '',
               blank: '',
+              q1: ''
             }
-            
-            // Add question columns
-            for (let i = 0; i < numberOfQuestions; i++) {
-              row[`q${i+1}`] = ''
-            }
-            
-            return row
           })
           
-          // Add key row at the top for single mode
-          const keyRow: RowData = {
-            studentId: 'Key',
-            studentName: '',
-            percentage: '40',
-            score: '40',
-            correct: '',
-            blank: '',
+          if (!isMultipleMode) {
+            // Create header row with descriptive labels
+            const headerRow: RowData = {
+              studentId: 'Student ID',
+              studentName: 'Student Name',
+              percentage: '%',
+              score: 'Score',
+              correct: '#Correct',
+              blank: 'Blank',
+              q1: 'Q1'
+            }
+
+            // Add key row as second row
+            const keyRow: RowData = {
+              studentId: 'Key',
+              studentName: '',
+              percentage: '40',
+              score: '40',
+              correct: '40',
+              blank: '40',
+              q1: '40'
+            }
+
+            // Set data with header row first, then key row, then student data
+            setData([headerRow, keyRow, ...rowData])
+          } else {
+            // Keep original multiple mode logic
+            setData(rowData)
           }
-          
-          // Add empty values for question columns in key row
-          for (let i = 0; i < numberOfQuestions; i++) {
-            keyRow[`q${i+1}`] = ''
-          }
-          
-          setData([keyRow, ...rowData])
         }
         
         setLoading(false)
@@ -266,15 +283,15 @@ export function AssessmentSpreadsheet({
           type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         })
         
-        // Trigger download
-        const url = window.URL.createObjectURL(blob)
-        const a = document.createElement('a')
-        a.href = url
-        a.download = `${type}-results.xlsx`
-        document.body.appendChild(a)
-        a.click()
-        a.remove()
-        window.URL.revokeObjectURL(url)
+        // Comment out download trigger
+        // const url = window.URL.createObjectURL(blob)
+        // const a = document.createElement('a')
+        // a.href = url
+        // a.download = `${type}-results.xlsx`
+        // document.body.appendChild(a)
+        // a.click()
+        // a.remove()
+        // window.URL.revokeObjectURL(url)
 
         // Prepare form data for API
         const formData = new FormData()
@@ -307,21 +324,20 @@ export function AssessmentSpreadsheet({
         const wb = XLSX.utils.book_new()
         XLSX.utils.book_append_sheet(wb, ws, "Results Grid")
         
-        // Rest of the existing code for single mode...
         const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" })
         const blob = new Blob([excelBuffer], {
           type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         })
         
-        // Trigger download and API call as before...
-        const url = window.URL.createObjectURL(blob)
-        const a = document.createElement('a')
-        a.href = url
-        a.download = `${type}-results.xlsx`
-        document.body.appendChild(a)
-        a.click()
-        a.remove()
-        window.URL.revokeObjectURL(url)
+        // Comment out download trigger
+        // const url = window.URL.createObjectURL(blob)
+        // const a = document.createElement('a')
+        // a.href = url
+        // a.download = `${type}-results.xlsx`
+        // document.body.appendChild(a)
+        // a.click()
+        // a.remove()
+        // window.URL.revokeObjectURL(url)
 
         const formData = new FormData()
         formData.append("file", blob, `${type}-results.xlsx`)
@@ -372,6 +388,7 @@ export function AssessmentSpreadsheet({
           score: columns[3] || '',
           correct: columns[4] || '',
           blank: columns[5] || '',
+          q1: ''
         }
         
         // Add question columns
@@ -457,6 +474,7 @@ export function AssessmentSpreadsheet({
           score: '',
           correct: '',
           blank: '',
+          q1: ''
         }
         for (let i = 0; i < numberOfQuestions; i++) {
           emptyRow[`q${i+1}`] = ''
