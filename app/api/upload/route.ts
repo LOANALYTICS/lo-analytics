@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import * as XLSX from 'xlsx';
 import courseTemplateModel from "@/server/models/courseTemplate.model";
+export const dynamic = 'force-dynamic';
 
 export async function POST(req: NextRequest) {
   try {

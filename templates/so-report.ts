@@ -294,6 +294,15 @@ function generateGradeDistributionChartHTML(assessmentData: Record<string, Grade
         `;
     }).join('');
 
+    // Add legend at bottom
+    const legendItems = grades.map((grade, i) => {
+        const x = margin.left + (i * 45);
+        return `
+            <rect x="${x}" y="${height - 25}" width="12" height="12" fill="${getColorForGrade(grade)}" />
+            <text x="${x + 15}" y="${height - 15}" font-size="10">${grade}</text>
+        `;
+    }).join('');
+
     return `
         <svg width="${width}" height="${height}">
             <text x="${width/2}" y="30" text-anchor="middle" font-weight="bold">
@@ -301,33 +310,32 @@ function generateGradeDistributionChartHTML(assessmentData: Record<string, Grade
             </text>
             ${yAxis}
             ${bars}
+            ${legendItems}
         </svg>
     `;
 }
 
 function getColorForGrade(grade: string): string {
-    // Implement your logic to determine the color based on the grade
-    // For example, you can use a switch statement or a mapping
     switch (grade) {
-        case 'A+':
-            return '#007bff';
+        case 'A+': 
+            return '#1a4b99'; // Dark matte blue
         case 'A':
-            return '#00c2ff';
+            return '#3366cc'; // Medium matte blue
         case 'B+':
-            return '#00ff00';
+            return '#6b5b95'; // Dark matte purple
         case 'B':
-            return '#00ff00';
+            return '#8b7cb7'; // Medium matte purple  
         case 'C+':
-            return '#ffff00';
+            return '#d17b46'; // Dark matte orange
         case 'C':
-            return '#ffff00';
+            return '#e69a73'; // Medium matte orange
         case 'D+':
-            return '#ff0000';
+            return '#993333'; // Dark matte red
         case 'D':
-            return '#ff0000';
+            return '#cc4444'; // Medium matte red
         case 'F':
-            return '#ff0000';
+            return '#800000'; // Deep matte red
         default:
-            return '#000000';
+            return '#666666';
     }
 }

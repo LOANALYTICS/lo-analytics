@@ -3,6 +3,7 @@ import { analyzeSemester } from "@/server/services/semester-analysis.service";
 import { Collage } from "@/lib/models";
 import { connectToMongoDB } from "@/lib/db";
 import { convertNumberToWord } from "@/lib/utils/number-to-word";
+export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {
   try {
