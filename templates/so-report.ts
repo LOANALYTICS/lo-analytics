@@ -88,19 +88,20 @@ export function generateSOHTML({
                 .chart-grid {
                     display: flex;
                     flex-wrap: wrap;
-                    justify-content: space-between;
                     gap: 20px;
                 }
-                .chart-container {
-                    flex: 0 1 calc(50% - 20px);
-                    min-height: 300px;
+                .chart-wrapper {
                     break-inside: avoid;
                     page-break-inside: avoid;
-                    page-break-after: auto;
                 }
-                .page-break {
-                    page-break-after: always;
-                    margin-bottom: 30px;
+                @page {
+                    size: A4;
+                    margin: 2cm;
+                }
+                @media print {
+                    .chart-wrapper:nth-child(2n) {
+                        page-break-after: always;
+                    }
                 }
                     .course-details {
             display: grid;
@@ -233,11 +234,11 @@ export function generateSOHTML({
                 </table>
                 <div class="chart-grid">
                     ${Object.keys(assessmentData).map(examType => `
-                        <div class="chart-container">
+                        <div class="chart-wrapper">
                             ${generateGradeDistributionChartHTML(assessmentData, examType)}
                         </div>
                     `).join('')}
-                    <div class="chart-container">
+                    <div class="chart-wrapper">
                         ${generateGradeDistributionChartHTML(overallData, 'Overall')}
                     </div>
                 </div>
@@ -265,22 +266,19 @@ function generateGradeDistributionChartHTML(assessmentData: Record<string, Grade
     };
     const barWidth = 32;
     const spacing = 14;
-    const chartWidth = width - margin.left - margin.right;
     const chartHeight = height - margin.top - margin.bottom;
 
     const bars = grades.map((grade, i) => {
         const value = Number(values[i]);
-        const x = margin.left + (i * (barWidth + spacing));  
-        const y = height - margin.bottom - (value * 2.4);   
-        const barHeight = value * 2.4;
+        const x = margin.left + (i * (barWidth + spacing));
+        const barHeight = (value * 2); // Scale height to match y-axis
+        const y = height - margin.bottom - barHeight;
 
         return `
-            <g>
-                <rect x="${x}" y="${y}" width="${barWidth}" height="${barHeight}" 
-                      fill="${getColorForGrade(grade)}" />
-                <text x="${x + barWidth/2}" y="${y-10}" text-anchor="middle">${value}%</text>
-                <text x="${x + barWidth/2}" y="${height - margin.bottom + 20}" text-anchor="middle">${grade}</text>
-            </g>
+            <rect x="${x}" y="${y}" width="${barWidth}" height="${barHeight}" 
+                  fill="${getColorForGrade(grade)}" />
+            <text x="${x + barWidth/2}" y="${y-10}" text-anchor="middle">${value}%</text>
+            <text x="${x + barWidth/2}" y="${height - margin.bottom + 20}" text-anchor="middle">${grade}</text>
         `;
     }).join('');
 
@@ -290,28 +288,30 @@ function generateGradeDistributionChartHTML(assessmentData: Record<string, Grade
         return `
             <line x1="${margin.left}" x2="${width - margin.right}" y1="${y}" y2="${y}" 
                   stroke="#eee" stroke-width="1" />
-            <text x="${margin.left - 10}" y="${y + 5}" text-anchor="end">${i * 10}%</text>
+            <text x="${margin.left - 10}" y="${y + 5}" text-anchor="end">${i * 10}</text>
         `;
     }).join('');
 
     // Add legend at bottom
     const legendItems = grades.map((grade, i) => {
-        const x = margin.left + (i * 45);
+        const x = margin.left + (i * 35);
         return `
-            <rect x="${x}" y="${height - 25}" width="12" height="12" fill="${getColorForGrade(grade)}" />
-            <text x="${x + 15}" y="${height - 15}" font-size="10">${grade}</text>
+            <rect x="${x}" y="${height - 25}" width="10" height="10" fill="${getColorForGrade(grade)}" />
+            <text x="${x + 15}" y="${height - 17}" font-size="10">${grade}</text>
         `;
     }).join('');
 
     return `
-        <svg width="${width}" height="${height}">
-            <text x="${width/2}" y="30" text-anchor="middle" font-weight="bold">
-                ${examType} Grade Distribution
-            </text>
-            ${yAxis}
-            ${bars}
-            ${legendItems}
-        </svg>
+        <div class="chart-wrapper">
+            <svg width="${width}" height="${height}">
+                <text x="${width/2}" y="30" text-anchor="middle" font-weight="bold">
+                    ${examType} Grade Distribution
+                </text>
+                ${yAxis}
+                ${bars}
+                ${legendItems}
+            </svg>
+        </div>
     `;
 }
 
