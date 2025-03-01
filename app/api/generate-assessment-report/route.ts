@@ -236,7 +236,7 @@ export async function POST(request: Request) {
     }
 console.log(courseData,'strt')
     // Generate HTML content
-    const htmlContent = generateAssessmentReportHTML({
+    const htmlContent = await  generateAssessmentReportHTML({
       course: {
         course_name: courseData.course_name,
         level: courseData.level,

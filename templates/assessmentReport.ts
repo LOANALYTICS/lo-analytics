@@ -4,36 +4,28 @@ import { createCanvas } from 'canvas';
 // Register Chart.js components
 Chart.register(...registerables);
 
-function generateAchievementChartHTML(achievementData: any, sortedClos: string[]): string {
+async function generateAchievementChartHTML(achievementData: any, sortedClos: string[]): Promise<string> {
   const chartData = sortedClos.map(clo => {
     const achievement = achievementData[60].find((a: any) => a.clo === clo);
-    return {
-      clo,
-      percentageAchieving: achievement ? parseFloat(achievement.percentageAchieving) : 0
-    };
+    return achievement ? parseFloat(achievement.percentageAchieving) : 0;
   });
 
-  // Create canvas
-  const canvas = createCanvas(600, 300);
-  const ctx = canvas.getContext('2d');
-
-  // Create chart
-  const chart = new Chart(canvas as unknown as HTMLCanvasElement, {
+  const labels = sortedClos.map(clo => clo.toUpperCase());
+  
+  const chartConfig = encodeURIComponent(JSON.stringify({
     type: 'bar',
     data: {
-      labels: chartData.map(d => d.clo.toUpperCase()),
+      labels: labels,
       datasets: [
         {
-          // Bars for achievement percentages
           label: 'Achievement Percentage',
-          data: chartData.map(d => d.percentageAchieving),
+          data: chartData,
           backgroundColor: 'rgb(65, 105, 225)',
           barThickness: 40
         },
         {
-          // Horizontal line for 60% threshold
           label: 'Threshold',
-          data: Array(sortedClos.length).fill(60), // Changed to 60% threshold line
+          data: Array(sortedClos.length).fill(60),
           type: 'line',
           borderColor: 'red',
           borderWidth: 2,
@@ -43,23 +35,26 @@ function generateAchievementChartHTML(achievementData: any, sortedClos: string[]
       ]
     },
     options: {
-      responsive: false,
       plugins: {
         legend: {
           display: false
         },
-        tooltip: {
-          enabled: false
+        datalabels: {
+          anchor: 'end',
+          align: 'top',
+          formatter: (value: number) => value + '%',
+          font: {
+            weight: 'bold',
+            size: 12
+          }
         }
       },
       scales: {
         y: {
-          min: 40, // Start from 40%
+          min: 40,
           max: 100,
           ticks: {
-            callback: function (value) {
-              return value + '%';
-            },
+            callback: (value: number) => value + '%',
             stepSize: 10,
             font: {
               size: 10
@@ -81,43 +76,28 @@ function generateAchievementChartHTML(achievementData: any, sortedClos: string[]
             }
           }
         }
-      },
-      layout: {
-        padding: {
-          top: 30,
-          right: 20,
-          bottom: 10,
-          left: 20
-        }
       }
     }
-  });
+  }));
 
-  // Add percentage labels on top of bars
-  chartData.forEach((data, index) => {
-    const percentage = data.percentageAchieving;
-    ctx.fillStyle = 'black';
-    ctx.font = 'bold 12px Arial';
-    ctx.textAlign = 'center';
-    const xPos = chart.getDatasetMeta(0).data[index].x;
-    const yPos = chart.getDatasetMeta(0).data[index].y - 10;
-    ctx.fillText(`${percentage}%`, xPos, yPos);
-  });
-
-  // Convert to base64 image
-  const chartImage = canvas.toDataURL('image/png');
-
-  // Clean up
-  chart.destroy();
-
-  return `
-  <div style="break-inside: avoid; page-break-inside: avoid;">
-    <h2 class="h2_class">CLO Achievement Chart</h2>
-    <div style="text-align: center;">
-      <img src="${chartImage}" alt="CLO Achievement Chart" style="max-width:600px; height:auto; border: 1px solid #ccc;"/>
-    </div>
-  </div>
-`;
+  const chartUrl = `https://quickchart.io/chart?c=${chartConfig}&w=800&h=400&format=base64`;
+  
+  try {
+    const response = await fetch(chartUrl);
+    const base64Image = await response.text();
+    
+    return `
+      <div style="break-inside: avoid; page-break-inside: avoid;">
+        <h2 class="h2_class">CLO Achievement Chart</h2>
+        <div style="text-align: center;">
+          <img src="data:image/png;base64,${base64Image}" alt="CLO Achievement Chart" style="max-width: 100%; height: auto;">
+        </div>
+      </div>
+    `;
+  } catch (error) {
+    console.error('Error generating chart:', error);
+    return '';
+  }
 }
 
 export interface AssessmentReportProps {
@@ -162,9 +142,10 @@ export interface AssessmentReportProps {
   };
 }
 
-export function generateAssessmentReportHTML(props: AssessmentReportProps): string {
+export async function generateAssessmentReportHTML(props: AssessmentReportProps): Promise<string> {
   const { course, college, assessmentData } = props;
   const { sortedClos, achievementData } = assessmentData;
+  
   function escapeHTML(str: string): string {
     return str.replace(/&/g, "&amp;")
       .replace(/</g, "&lt;")
@@ -172,6 +153,9 @@ export function generateAssessmentReportHTML(props: AssessmentReportProps): stri
       .replace(/"/g, "&quot;")
       .replace(/'/g, "&#039;");
   }
+
+  // Generate the chart HTML
+  const chartHtml = await generateAchievementChartHTML(achievementData, sortedClos);
 
   return `
     <!DOCTYPE html>
@@ -397,7 +381,7 @@ export function generateAssessmentReportHTML(props: AssessmentReportProps): stri
           </div>
 
           <div class="chart-section">
-            ${generateAchievementChartHTML(achievementData, sortedClos)}
+            ${chartHtml}
           </div>
         </div>
       </body>

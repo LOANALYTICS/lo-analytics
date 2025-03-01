@@ -133,8 +133,8 @@ export async function GET(request: Request) {
             else overallStudentGrades['F']++;
         });
 
-        // Generate HTML using the template
-        const htmlContent = generateSOHTML({
+        // Await the HTML generation
+        const htmlContent = await generateSOHTML({
             assessmentData,
             overallGrades: overallStudentGrades,
             course: {
