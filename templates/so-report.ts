@@ -1,5 +1,4 @@
 import { Chart, registerables } from 'chart.js';
-import { createCanvas } from 'canvas';
 
 // Register Chart.js components
 Chart.register(...registerables);
@@ -98,6 +97,10 @@ export function generateSOHTML({
                     break-inside: avoid;
                     page-break-inside: avoid;
                     page-break-after: auto;
+                }
+                .page-break {
+                    page-break-after: always;
+                    margin-bottom: 30px;
                 }
                     .course-details {
             display: grid;
@@ -234,7 +237,6 @@ export function generateSOHTML({
                             ${generateGradeDistributionChartHTML(assessmentData, examType)}
                         </div>
                     `).join('')}
-                    <!-- New Overall Grade Distribution Chart -->
                     <div class="chart-container">
                         ${generateGradeDistributionChartHTML(overallData, 'Overall')}
                     </div>
@@ -245,125 +247,87 @@ export function generateSOHTML({
 }
 
 function generateGradeDistributionChartHTML(assessmentData: Record<string, GradeCount>, examType: string): string {
-    const filteredData = assessmentData[examType]; // Get data for the specific exam
+    const filteredData = assessmentData[examType];
+    const total = Object.values(filteredData).reduce<number>((sum, count) => sum + count, 0);
 
-    // Define colors for each grade
-    const gradeColors = {
-        'A+': 'rgb(0, 102, 204)',
-        'A': 'rgb(51, 153, 255)',
-        'B+': 'rgb(102, 51, 153)',
-        'B': 'rgb(153, 102, 255)',
-        'C+': 'rgb(255, 128, 0)',
-        'C': 'rgb(255, 178, 102)',
-        'D+': 'rgb(255, 51, 51)',
-        'D': 'rgb(255, 102, 102)',
-        'F': 'rgb(128, 128, 128)'
-    };
-
-    const labels = [examType]; // Use the exam type as the label
     const grades = ['A+', 'A', 'B+', 'B', 'C+', 'C', 'D+', 'D', 'F'];
+    const values = grades.map(grade => 
+        ((filteredData[grade as keyof GradeCount] / total) * 100).toFixed(1)
+    );
 
-    const total = Object.values(filteredData).reduce<number>((sum, count) => sum + count, 0); // Calculate total
+    const width = 460;
+    const height = 300;
+    const margin = {
+        left: 40,
+        right: 30,
+        top: 40,
+        bottom: 60
+    };
+    const barWidth = 32;
+    const spacing = 14;
+    const chartWidth = width - margin.left - margin.right;
+    const chartHeight = height - margin.top - margin.bottom;
 
-    const datasets = grades.map(grade => ({
-        label: grade,
-        data: [((filteredData[grade as keyof GradeCount] / total) * 100).toFixed(1)], // Calculate percentage
-        backgroundColor: gradeColors[grade as keyof typeof gradeColors],
-        barPercentage: 0.8,
-        categoryPercentage: 0.9
-    }));
+    const bars = grades.map((grade, i) => {
+        const value = Number(values[i]);
+        const x = margin.left + (i * (barWidth + spacing));  
+        const y = height - margin.bottom - (value * 2.4);   
+        const barHeight = value * 2.4;
 
-    const canvas = createCanvas(1000, 500);
-    const ctx = canvas.getContext('2d');
+        return `
+            <g>
+                <rect x="${x}" y="${y}" width="${barWidth}" height="${barHeight}" 
+                      fill="${getColorForGrade(grade)}" />
+                <text x="${x + barWidth/2}" y="${y-10}" text-anchor="middle">${value}%</text>
+                <text x="${x + barWidth/2}" y="${height - margin.bottom + 20}" text-anchor="middle">${grade}</text>
+            </g>
+        `;
+    }).join('');
 
-    const chart = new Chart(ctx as unknown as CanvasRenderingContext2D, {
-        type: 'bar',
-        data: {
-            labels: labels,
-            datasets: datasets
-        },
-        options: {
-            responsive: false,
-            scales: {
-                x: {
-                    grid: {
-                        display: false
-                    },
-                    ticks: {
-                        font: {
-                            family: "'Helvetica Neue', 'Helvetica', 'Arial', sans-serif",
-                            size: 20
-                        }
-                    }
-                },
-                y: {
-                    beginAtZero: true,
-                    max: 100,
-                    grid: {
-                        color: 'rgba(0, 0, 0, 0.1)'
-                    },
-                    ticks: {
-                        callback: function (value) {
-                            return value + '%';
-                        },
-                        stepSize: 10,
-                        font: {
-                            family: "'Helvetica Neue', 'Helvetica', 'Arial', sans-serif",
-                            size: 20
-                        }
-                    }
-                }
-            },
-            plugins: {
-                legend: {
-                    display: true,
-                    position: 'bottom',
-                    labels: {
-                        font: {
-                            family: "'Helvetica Neue', 'Helvetica', 'Arial', sans-serif",
-                            size: 20
-                        }
-                    }
-                },
-                title: {
-                    display: true,
-                    text: 'Grade Distribution Chart',
-                    font: {
-                        family: "'Helvetica Neue', 'Helvetica', 'Arial', sans-serif",
-                        size: 24
-                    }
-                }
-            }
-        }
-    });
-
-    // Update the percentage labels font
-    datasets.forEach((dataset, datasetIndex) => {
-        dataset.data.forEach((value, index) => {
-            const numValue = parseFloat(value as string);
-            const meta = chart.getDatasetMeta(datasetIndex);
-            const bar = meta.data[index];
-            ctx.fillStyle = 'black';
-            ctx.font = "bold 20px 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif";
-            ctx.textAlign = 'center';
-
-            ctx.fillText(
-                `${numValue}%`,
-                bar.x,
-                bar.y - 15
-            );
-        });
-    });
-
-    const chartImage = canvas.toDataURL('image/png');
-    chart.destroy();
+    // Y-axis starts at left margin
+    const yAxis = Array.from({length: 11}, (_, i) => {
+        const y = height - margin.bottom - (i * (chartHeight/10));
+        return `
+            <line x1="${margin.left}" x2="${width - margin.right}" y1="${y}" y2="${y}" 
+                  stroke="#eee" stroke-width="1" />
+            <text x="${margin.left - 10}" y="${y + 5}" text-anchor="end">${i * 10}%</text>
+        `;
+    }).join('');
 
     return `
-        <div class="chart-container">
-            <h2 style="text-align: center;">${examType} Grade Distribution Chart</h2>
-            <div style="text-align: center;">
-                <img src="${chartImage}" alt="${examType} Grade Distribution Chart" style="max-width:100%; height:auto; border: 1px solid #ccc;"/>
-            </div>
-        </div>
+        <svg width="${width}" height="${height}">
+            <text x="${width/2}" y="30" text-anchor="middle" font-weight="bold">
+                ${examType} Grade Distribution
+            </text>
+            ${yAxis}
+            ${bars}
+        </svg>
     `;
+}
+
+function getColorForGrade(grade: string): string {
+    // Implement your logic to determine the color based on the grade
+    // For example, you can use a switch statement or a mapping
+    switch (grade) {
+        case 'A+':
+            return '#007bff';
+        case 'A':
+            return '#00c2ff';
+        case 'B+':
+            return '#00ff00';
+        case 'B':
+            return '#00ff00';
+        case 'C+':
+            return '#ffff00';
+        case 'C':
+            return '#ffff00';
+        case 'D+':
+            return '#ff0000';
+        case 'D':
+            return '#ff0000';
+        case 'F':
+            return '#ff0000';
+        default:
+            return '#000000';
+    }
 }
