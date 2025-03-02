@@ -8,7 +8,6 @@ import { MoreHorizontal, Pencil, Trash, Save, X, PlusCircle } from 'lucide-react
 import { v4 as uuidv4 } from 'uuid'
 import { toast } from "sonner"
 import { Checkbox } from "@/components/ui/checkbox"
-import { updateCourseStudents } from '@/services/courses.action';
 import { updateAssessmentStudents } from '@/services/assessment.action'
 
 export type Student = {

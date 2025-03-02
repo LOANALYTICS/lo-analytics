@@ -6,7 +6,6 @@ import { Course, QuestionBank, QuestionPaper } from "@/lib/models";
 import courseTemplateModel from "@/server/models/courseTemplate.model";
 import { getTopics } from "./question-bank.service";
 import { generateDistributionReportHTML } from "@/templates/distributionReport";
-import { date } from "zod";
 
 interface GenerateQPInput {
     examName: string
@@ -71,7 +70,6 @@ export async function createQuestionPaper(input: GenerateQPInput,userId: string,
             const topicInBank = questionBank.topics.find((t: any) => t.name === topicQuestion.topic);
             
             if (!topicInBank) {
-                console.log(`Topic ${topicQuestion.topic} not found in question bank`);
                 continue;
             }
 
@@ -99,9 +97,9 @@ export async function createQuestionPaper(input: GenerateQPInput,userId: string,
                 const shuffled = availableQuestions.sort(() => 0.5 - Math.random());
                 const selected = shuffled.slice(0, requiredCount as number);
 
-                if (selected.length < (requiredCount as number)) {
-                    console.log(`Warning: Not enough questions for ${clo} in topic ${topicQuestion.topic}. Required: ${requiredCount}, Available: ${selected.length}`);
-                }
+                // if (selected.length < (requiredCount as number)) {
+                //     console.log(`Warning: Not enough questions for ${clo} in topic ${topicQuestion.topic}. Required: ${requiredCount}, Available: ${selected.length}`);
+                // }
 
                 selectedQuestions.push(...selected);
             }

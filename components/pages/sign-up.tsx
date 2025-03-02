@@ -51,15 +51,12 @@ export default function SignUp({collages}:{collages:any}) {
      
       async function onSubmit(values: z.infer<typeof formSchema>) {
         setLoading(true)
-        console.log(values)
         try {
           const res = await axios.post("/api/auth/register-user", values)
           if(res.status === 201){
-            console.log(res)
             toast.success("Account created successfully")
             router.push("/dashboard")
           }
-          console.log(res)
         } catch (error) {
           console.error(error)
         }

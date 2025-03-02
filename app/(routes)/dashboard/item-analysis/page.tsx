@@ -30,7 +30,6 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { getCurrentUser } from "@/server/utils/helper";
 import { getCoursesByCreator } from "@/services/courses.action";
-import MigrateButton from "@/components/core/New";
 import { toast } from "sonner";
 
 // Form schema
@@ -100,15 +99,12 @@ const generatePDF = async (html: string, fileName: string) => {
       .then((pdf: any) => {
         const totalPages = pdf.internal.getNumberOfPages();
 
-        // Add logo to each page
         for (let i = 1; i <= totalPages; i++) {
           pdf.setPage(i);
 
-          // Add logo with opacity
           const logoImg = new Image();
           logoImg.src = "/pdf_logo.png";
 
-          // Set global alpha for transparency
           pdf.saveGraphicsState();
           pdf.setGState(new pdf.GState({ opacity: 0.7 }));
 
@@ -121,7 +117,6 @@ const generatePDF = async (html: string, fileName: string) => {
             0.5
           );
 
-          // Restore graphics state
           pdf.restoreGraphicsState();
         }
       })
@@ -185,11 +180,6 @@ export default function ItemAnalysisPage() {
     },
   });
 
-  const onSubmit = async (data: FormValues) => {
-    console.log(data);
-    setFilterOpen(false);
-  };
-
   const onCompareSubmit = async (data: {
     left: FormValues;
     right: FormValues;
@@ -204,10 +194,8 @@ export default function ItemAnalysisPage() {
         sectionA: data?.left?.section?.toLowerCase(),
         sectionB: data?.right?.section?.toLowerCase(),
       });
-      console.log(params, "params");
 
       const response = await fetch(`/api/course-compare?${params}`);
-      console.log(response, "responsess");
 
       if (!response.ok) {
         throw new Error("Failed to fetch comparison data");
@@ -262,7 +250,6 @@ export default function ItemAnalysisPage() {
   const onAnalysisSubmit = async (data: FormValues) => {
     try {
       setIsAnalysisLoading(true);
-      console.log("Analysis Submit Data:", data);
       const params = new URLSearchParams({
         collegeId: user?.cid,
         semester: data.semester.toString(),
@@ -288,10 +275,12 @@ export default function ItemAnalysisPage() {
 
   useEffect(() => {
     const getData = async () => {
+      const startTime = Date.now();
       const currentUser = await getCurrentUser();
       setUser(currentUser);
       const res = await getCoursesByCreator(currentUser?.id!);
       setCourses(res);
+      console.log("User fetch time:", Date.now() - startTime, "ms");
     };
     getData();
   }, []);

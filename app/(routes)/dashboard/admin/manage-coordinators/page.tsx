@@ -74,7 +74,6 @@ export default function ManageCoordinators() {
     // Update permissions on the server
     try {
       await updatePermissions(coordinatorId, selectedPermissions)
-      console.log(`Permissions updated for User ID ${coordinatorId}:`, selectedPermissions)
     } catch (error) {
       console.error("Failed to update permissions:", error)
     }

@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { getAssessmentByCourse, updateAssessmentPlans } from '@/services/assessment.action';
 import { getCourseById } from '@/services/courses.action';
 import { getCLOData } from '@/services/blueprint/learning-outcome.action';
-import { Loader2Icon, ThumbsUp } from 'lucide-react';
+import { ThumbsUp } from 'lucide-react';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
@@ -53,7 +53,6 @@ export default function AssessmentPlanPage() {
           setAssessmentData(formattedData);
      
         }
-        console.log('ererererererer', courseResponse)
         setCourse(courseResponse);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -160,14 +159,12 @@ export default function AssessmentPlanPage() {
     if (!selectedFile || !course) return;
     
     try {
-      console.log('Starting upload...');
       setLoadingDialog(true);
       const formData = new FormData();
       formData.append('file', selectedFile);
       formData.append('courseId', course._id);
       formData.append('type', selectedType);
 
-      console.log('Making fetch request to:', '/api/assessment-upload');
       const response = await fetch('/api/assessment-upload', {
         method: 'POST',
         headers: {
@@ -176,7 +173,6 @@ export default function AssessmentPlanPage() {
         body: formData,
       });
 
-      console.log('Response received:', response.status);
       const data = await response.json();
 
       if (!response.ok) {

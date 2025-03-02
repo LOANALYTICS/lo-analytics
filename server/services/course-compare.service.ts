@@ -633,11 +633,6 @@ function processCoursesForComparison(
     }
   });
 
-  console.log("Processed Data:", {
-    levels: groupedByLevel,
-    departments: groupedByDepartment,
-  });
-
   return { groupedByLevel, groupedByDepartment };
 }
 

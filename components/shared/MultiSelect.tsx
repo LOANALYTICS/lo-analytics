@@ -12,7 +12,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
-type Checked = DropdownMenuCheckboxItemProps["checked"]
 
 interface DropdownMenuProps {
   options: string[]; // Array of options to be rendered in the dropdown

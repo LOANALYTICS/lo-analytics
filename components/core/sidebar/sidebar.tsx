@@ -49,9 +49,7 @@ const Sidebar = ({ userRole, userPermissions,user }: { userRole: string, userPer
     setIsCollapsed((prev) => !prev);
   };
 
-  // Filter sidebar items based on permissions
   const filteredSidebarItems = sidebarItems.filter(item => {
-    // If user has permission for this item, show it
     return userPermissions.includes(item.name);
   });
 

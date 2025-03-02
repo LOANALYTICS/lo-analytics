@@ -1,5 +1,4 @@
 import { Chart, registerables } from 'chart.js';
-import { createCanvas } from 'canvas';
 
 // Register Chart.js components
 Chart.register(...registerables);

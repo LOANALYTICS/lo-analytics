@@ -16,7 +16,6 @@ import { getCoursesBySemester } from '@/services/courses.action';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
 import { compareKRValues } from '@/services/compareKRValues.action';
 import { generateComparisonHTML } from '@/services/CompareKRHTML';
-import axios from 'axios';
 
 export default function CourseCard({ cardOf, href, template, user, isQP }: { 
   cardOf?: string,
@@ -34,7 +33,6 @@ export default function CourseCard({ cardOf, href, template, user, isQP }: {
   const [selectedCourseId, setSelectedCourseId] = useState<string>('');
 
 
-  console.log(template)
   useEffect(() => {
     if (compareOpen && template.semister) {
       const fetchSemesterCourses = async () => {
@@ -145,7 +143,6 @@ export default function CourseCard({ cardOf, href, template, user, isQP }: {
       const contentType = response.headers.get("content-type");
       if (contentType?.includes("application/json")) {
         const result = await response.json();
-        console.log("File uploaded successfully:", result);
       } else {
         const htmlContent = await response.text();
         await generatePDF(htmlContent, "analysis-report.pdf");

@@ -37,8 +37,6 @@ export function GenerateQuestionTable({ topics, courseId }: GenerateQuestionTabl
         
         try {
             const topicCounts = await getPaperDetails(courseId, value);
-            console.log(topicCounts, 'topicCounts')
-            // Reset table data with original values first
             setTableData(prev => prev.map((row, index) => ({
                 id: `${index + 1}`,
                 topicName: row.topicName,
@@ -128,9 +126,7 @@ export function GenerateQuestionTable({ topics, courseId }: GenerateQuestionTabl
             return row
         }))
     }
-    useEffect(() => {
-        console.log(date)
-    },[date])
+
 
     const handleGenerate = async () => {
         if (!examName.trim()) {
@@ -173,7 +169,6 @@ export function GenerateQuestionTable({ topics, courseId }: GenerateQuestionTabl
                 }))
             }, user?._id, selectedYear)
 
-            console.log(result)
             router.push(`/dashboard/question-bank/qps`)
             toast.success('Question paper structure created successfully')
         } catch (error) {

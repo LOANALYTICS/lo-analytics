@@ -1,7 +1,5 @@
 import NavigateBack from "@/components/core/NavigateBack"
 import { QuestionsContainer } from "@/components/shared/question-bank/QuestionsContainer"
-
-
 export default async function TopicQuestionsPage({ params }: any) {
     const { questionId: courseId, topicId } = await params
 

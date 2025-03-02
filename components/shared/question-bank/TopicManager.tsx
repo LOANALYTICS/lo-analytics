@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Plus, Save, Trash2, Edit2, ReceiptPoundSterling, File } from "lucide-react"
+import { Plus, Save, Trash2, Edit2, File } from "lucide-react"
 import { useEffect, useState } from "react"
 import { addTopic, deleteTopic, updateTopic, getTopics } from "@/services/question-bank/question-bank.service"
 import { useRouter } from "next/navigation"
@@ -82,9 +82,6 @@ export function TopicManager({ courseId }: TopicManagerProps) {
             }
         }
     }
-    useEffect(() => {
-        console.log(selectedTopics)
-    }, [selectedTopics])
 
     const handleEdit = async (oldTopic: string, index: number) => {
         if (!editValue.trim()) return
@@ -145,14 +142,7 @@ export function TopicManager({ courseId }: TopicManagerProps) {
         setDialogOpen(true)
     }
 
-    const handleQuestionPaperSelect = (paperId: string) => {
-        console.log("Selected paper:", paperId)
-    }
 
-    const handleCourseSelect = (courseId: string) => {
-        console.log("Selected course:", courseId)
-        // Add your course selection logic here
-    }
 
     return (
         <>

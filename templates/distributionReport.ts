@@ -3,7 +3,6 @@ export function generateDistributionReportHTML(data: {
   topics: any[];
   papers: any[];
 }) {
-  console.log("Data received:", data); // For debugging
 
   // Ensure we have all required data
   if (!data.topics || !data.papers || !data.courseName) {

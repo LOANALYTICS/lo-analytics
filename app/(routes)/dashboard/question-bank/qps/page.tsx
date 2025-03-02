@@ -12,7 +12,6 @@ export default async function page() {
   }
   const questionPapers = await getQuestionPapers(user?.id)
   const coursesTemplate = await getCoordinatorCourseTemplates(user?.id!) 
-console.log(questionPapers)
   return (
     <div className="space-y-4">
       <div className="flex justify-end">

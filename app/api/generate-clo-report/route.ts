@@ -27,7 +27,6 @@ export async function GET(request: Request) {
         const academicYear = searchParams.get('academicYear');
         const section = searchParams.get('section');
         const coordinator = searchParams.get('coordinator');
-console.log(percentage,courseId, 'itis')
         if (!courseId) {
             return NextResponse.json({ message: 'Assessment ID is required' }, { status: 400 });
         }
@@ -84,7 +83,6 @@ console.log(percentage,courseId, 'itis')
             assessment.achievementData[percentage]?.map(item => [item.clo, item.percentageAchieving]) || []
         );
 
-        console.log(achievementMap, 'achievementMap')
         // Generate HTML using the template with achievement data
         const htmlContent = generateCloReportHTML({
             cloData: assessment.cloData,

@@ -367,18 +367,7 @@ function generateSummaryTableHTML(title: string, summaries: any[], isLevel: bool
   const avgRejectedA = Math.round(summaries.reduce((acc, curr) => acc + (curr.averages.yearA?.rejected || 0), 0) / summaries.length);
   const avgAcceptedB = Math.round(summaries.reduce((acc, curr) => acc + (curr.averages.yearB?.accepted || 0), 0) / summaries.length);
   const avgRejectedB = Math.round(summaries.reduce((acc, curr) => acc + (curr.averages.yearB?.rejected || 0), 0) / summaries.length);
-  
 
-
-
-  console.log({
-    sss: {
-      avgAcceptedA,
-      avgRejectedA,
-      avgAcceptedB,
-      avgRejectedB
-    }}
-  )
   const totalA = avgAcceptedA + avgRejectedA;
   const totalB = avgAcceptedB + avgRejectedB;
 

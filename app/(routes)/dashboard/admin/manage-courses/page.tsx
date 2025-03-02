@@ -26,11 +26,9 @@ export default function ManageCoordinators() {
 
   const fetchData = async () => {
     setLoading(true)
-    console.log("Fetching courses and coordinators...") 
     const courseData = await getCoursesTemplates()
     const coordinatorData = await getUsersByRole("course_coordinator")
     const collegeData = await getCollage()
-    console.log("Coordinators fetched:", coordinatorData)
 
     setCourses(courseData)
     setCoordinators(coordinatorData)
@@ -91,7 +89,6 @@ export default function ManageCoordinators() {
 
     try {
       if (selectedCoordinatorIds.length > 0) {
-        console.log(selectedCoordinatorIds)
         await assignCoordinatorsToCourse(courseId, selectedCoordinatorIds)
         toast.success(`Successfully assigned coordinators to course ${courseId}`)
       } else {
@@ -103,15 +100,12 @@ export default function ManageCoordinators() {
     }
   }
 
-  // Get list of coordinator names for each course filtered by college
   const courseCoordinators = (course: any) => {
-    console.log("Filtering coordinators for course:", course); // Debug log for course
     const filteredCoordinators = coordinators
       .filter((coordinator: any) => 
         coordinator.collage && course.college && 
-        coordinator.collage._id === course.college._id // Compare by college ID
+        coordinator.collage._id === course.college._id
       ); 
-    console.log("Filtered coordinators:", filteredCoordinators); // Debug log for filtered coordinators
     return filteredCoordinators.map((coordinator: any) => coordinator.name); // Return only names
   }
 

@@ -3,23 +3,9 @@ import { KRValue, Course } from "@/lib/models";
 import { generateHTML } from "@/services/KR20GenerateHTML";
 import { NextRequest, NextResponse } from "next/server";
 
-type Props = {
-  params: {
-    id: string;
-  };
-};
 
 export async function GET(request: NextRequest, { params }: any) {
-  // • Log the params received in the request
-  console.log(params, "params");
-
-  // • Log all request headers
-  console.log("Request Headers:", request.headers);
-
-  // • Access the userInformation cookie
   const userInformationCookie = request.cookies.get("userInformation")?.value;
-  // • Log the user information cookie
-  console.log("User Information Cookie:", userInformationCookie);
 
   if (!userInformationCookie) {
     return NextResponse.json(

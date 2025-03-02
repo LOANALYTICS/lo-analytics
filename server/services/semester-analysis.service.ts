@@ -20,8 +20,7 @@ function calculateQuestionStats(course: any) {
     veryDifficultQuestions: 0,
     kr20: Number(course.krValues?.KR_20) || 0,
   };
-  console.log("Original KR20:", course.krValues?.KR_20);
-  console.log("Stats KR20:", stats.kr20);
+
 
   course.krValues?.groupedItemAnalysisResults?.forEach((group: any) => {
     switch (group.classification) {
@@ -95,7 +94,6 @@ function calculateAverages(courses: any[]) {
   const totals = courses.reduce(
     (acc, course) => {
       const stats = calculateQuestionStats(course);
-      console.log("Individual course KR20:", stats.kr20);
       return {
         goodQuestions: acc.goodQuestions + stats.goodQuestions,
         easyQuestions: acc.easyQuestions + stats.easyQuestions,

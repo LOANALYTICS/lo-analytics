@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
 import { createQuestion, getQuestions, updateQuestion } from "@/services/question-bank/question.service"
 import { Card, CardContent } from "@/components/ui/card"
-import { Plus, Trash2, Loader2 } from "lucide-react"
+import { Plus, Loader2 } from "lucide-react"
 import QuestionsListing from "./QuestionsListing"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
@@ -16,15 +16,15 @@ interface QuestionFormProps {
     refreshTrigger: number;
 }
 
-interface CreateQuestionInput {
-    courseId: string
-    topic: string
-    question: string
-    options: string[]
-    correctAnswer: string
-    clos?: number
+// interface CreateQuestionInput {
+//     courseId: string
+//     topic: string
+//     question: string
+//     options: string[]
+//     correctAnswer: string
+//     clos?: number
 
-}
+// }
 
 export function QuestionForm({ courseId, topic, refreshTrigger }: QuestionFormProps) {
     const [question, setQuestion] = useState('')
@@ -43,7 +43,6 @@ export function QuestionForm({ courseId, topic, refreshTrigger }: QuestionFormPr
     const handleQuestionSelect = (question: any) => {
         setSelectedQuestion(question)
         if (!question) {
-            // Reset form when selection becomes null
             setQuestion('')
             setOptions(['', '', '', ''])
             setCorrectAnswer('')

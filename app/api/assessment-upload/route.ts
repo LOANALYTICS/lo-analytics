@@ -247,10 +247,6 @@ export async function POST(request: Request) {
       }))
     };
 
-    console.log('Debug - Assessment Results before update:', JSON.stringify(assessment.assessmentResults, null, 2));
-    console.log('Debug - New Result:', JSON.stringify(newResult, null, 2));
-    console.log('Debug - Existing Result Index:', existingResultIndex);
-
     // Create a new array with the updated results
     const updatedResults = [...assessment.assessmentResults];
     if (existingResultIndex !== -1) {
@@ -355,16 +351,12 @@ function extractQuestionKeys(data: Array<Array<string | number>>): QuestionKey[]
       )
     );
   
-    console.log('Debug Info:');
-    console.log('Student ID Map:', Object.fromEntries(studentMap));
-  
     for (let i = 2; i < data.length; i++) {
       const row = data[i];
       if (!row || row.length === 0) continue;
   
       const excelStudentId = String(row[1] || '').trim();
       if (!excelStudentId) {
-        console.log(`Skipping row ${i + 1}: No student ID`);
         continue;
       }
   
@@ -429,13 +421,7 @@ function extractQuestionKeys(data: Array<Array<string | number>>): QuestionKey[]
   
       results.push(studentResult);
     }
-  
-    console.log('\nProcessing Summary:');
-    console.log('Total results processed:', results.length);
-    if (results.length > 0) {
-      console.log('First processed result:', results[0]);
-    }
-    
+   
     return results;
   }
   

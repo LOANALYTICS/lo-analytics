@@ -196,17 +196,7 @@ export function FilterDialog({ courseTemplates }: FilterDialogProps) {
     }
   };
 
-  useEffect(() => {
-    console.log("Component mounted");
-    console.log("Topics:", topics);
-    console.log("Raw topics object:", JSON.stringify(topics, null, 2));
-
-    // Add this to check if useEffect is running at all
-    return () => {
-      console.log("Component unmounting");
-    };
-  }, []);
-
+ 
   return (
     <>
       <Dialog open={open} onOpenChange={setOpen}>

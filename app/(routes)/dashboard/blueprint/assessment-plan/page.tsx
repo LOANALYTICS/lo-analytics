@@ -1,7 +1,6 @@
 export const dynamic = 'force-dynamic'
 
 import AssessmentCard from '@/components/shared/assessment-table/AssessmentCard'
-import CourseCard from '@/components/shared/course-card'
 import { getCurrentUser } from '@/server/utils/helper'
 import { getCoursesByCreator } from '@/services/courses.action'
 import React from 'react'

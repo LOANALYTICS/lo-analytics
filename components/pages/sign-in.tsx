@@ -9,7 +9,6 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -53,16 +52,13 @@ export default function SignIn({ collages }: { collages: any }) {
     setLoading(true);
     try {
       const res = await axios.post("/api/auth/login-user", values);
-      console.log(res);
 
       if (res.status === 200) {
-        console.log(res);
         toast.success("Account login successfully");
         localStorage.setItem("user", res.data);
         router.push("/dashboard");
       }
     } catch (error: any) {
-      console.log(error);
       toast.error(error?.response?.data?.message);
     }
     setLoading(false);
@@ -127,7 +123,6 @@ export default function SignIn({ collages }: { collages: any }) {
                       ))}
                   </SelectContent>
                 </Select>
-
                 <FormMessage />
               </FormItem>
             )}

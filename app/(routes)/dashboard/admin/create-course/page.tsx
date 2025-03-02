@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button"
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -61,7 +60,6 @@ export default function CreateCoursePage() {
     async function onSubmit(values: z.infer<typeof formSchema>) {
         setIsLoading(true);
         try {
-            console.log("Submitting values:", values);
             const response = await axios.post("/api/course-template/create-course-template", values)
 
             if (response.status === 201) {

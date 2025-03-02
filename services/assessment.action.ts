@@ -26,9 +26,6 @@ interface CourseDoc {
 
 export async function updateAssessmentStudents(courseId: string, students: Student[]) {
     try {
-        console.log('Updating assessment students:', students);
-
-        // Find existing assessment or create new one
         let assessment = await Assessment.findOne({ course: courseId });
 
         if (!assessment) {
@@ -133,14 +130,10 @@ type AssessmentPlan = {
 
 export async function updateAssessmentPlans(courseId: string, academicYear: string, assessments: AssessmentPlan[]) {
     try {
-        console.log('Updating assessment plans:', assessments, academicYear,courseId);
         const course = await Course.findOne({_id: courseId, academic_year: academicYear}).lean() as unknown as CourseDoc;
         if (!course) {
             throw new Error('Course not found or students not configured');
         }
-
-    
-
         // Update existing assessment
         const assessment = await Assessment.findOneAndUpdate(
             { course: courseId },

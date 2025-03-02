@@ -63,7 +63,6 @@ const ManageDepartments = ({ params }: any) => {
     const fetchCollege = async () => {
         try {
             const collegeData = await getCollegeById(collegeId);
-            console.log(collegeData,"collegeData");
             setCollege(collegeData);
         } catch (error) {
             toast.error('Failed to fetch college data');

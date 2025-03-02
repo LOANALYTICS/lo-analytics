@@ -12,7 +12,6 @@ export async function POST(request: Request) {
     const { email, password, collage } = await request.json(); 
 
     const user = await User.findOne({ email }).populate('collage');
-    console.log(user?.collage?._id + "", collage)
     
     if (!user) {
       return NextResponse.json({ message: 'User not found' }, { status: 404 });
@@ -38,7 +37,6 @@ export async function POST(request: Request) {
       permissions: userWithoutPassword.permissions,
     }, process.env.JWT_SECRET!, { expiresIn: '1h' });
 
-    // Prepare response and set cookies
     const response = NextResponse.json({
       message: 'Login successful',
       user: userWithoutPassword,
@@ -56,7 +54,6 @@ export async function POST(request: Request) {
     // Return response with cookies set
     return response;
   } catch (error) {
-    console.error('Login error:', error);
     return NextResponse.json({
       message: 'Error logging in',
       error: error instanceof Error ? error.message : 'Unknown error',

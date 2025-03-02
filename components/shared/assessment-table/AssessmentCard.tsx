@@ -156,14 +156,9 @@ export default function AssessmentCard({ href, course }: {
         }, 5000);
       });
       
-console.log(tempContainer.innerHTML)  
-      // Generate PDF with the rendered content
-
       await generatePDF(tempContainer.innerHTML, 'assessment_report');
       toast.dismiss();
       toast.success('Report generated successfully');
-      
-      // Cleanup
       document.body.removeChild(tempContainer);
   
     } catch (error: any) {

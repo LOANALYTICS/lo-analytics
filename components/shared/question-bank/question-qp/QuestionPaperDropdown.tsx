@@ -1,13 +1,9 @@
 'use client'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import React, { useEffect, useState } from 'react'
-import { Button } from '@/components/ui/button'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { TopicData } from '@/types/question-bank'
 import { getCoursesByCreator } from '../../../../services/courses.action'
-import { CourseModel } from '@/lib/models'
-
-
 
 export default function QuestionPaperDropdown({
     open, 
@@ -27,13 +23,11 @@ export default function QuestionPaperDropdown({
     
     const [courses, setCourses] = useState<any[]>([])
     const [loading, setLoading] = useState(true)
-console.log(topicsData, userId,courseCode, "topicsData")
     useEffect(() => {
         const fetchCourses = async () => {
             try {
                 if (userId) {
                     const fetchedCourses = await getCoursesByCreator(userId)
-                    console.log("Fetched courses:", fetchedCourses.data)
                     setCourses(fetchedCourses.data)
                 }
             } catch (error) {

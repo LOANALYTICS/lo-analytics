@@ -162,8 +162,6 @@ export async function POST(request: Request) {
       }
     };
 
-    console.log(course, "krs")
-
     const krValueDoc = await KRValue.create({
       courseId: courseData._id,
       KR_20: KR_20,
@@ -181,8 +179,6 @@ export async function POST(request: Request) {
       studentsPassedPercentage: Number(((passedStudentsCount / totalStudentsFromExcel) * 100).toFixed(2))
     });
 
-    console.log(krValueDoc, "krValueDoc")
-    // Update course to only keep the latest KR value
     await Course.findByIdAndUpdate(
       courseData._id,
       {
@@ -197,11 +193,6 @@ export async function POST(request: Request) {
       _id: { $ne: krValueDoc._id }
     });
 
-    // Add error handling
-    console.log('KR Value Document:', krValueDoc);
-    console.log('Course ID:', courseData._id);
-
-    // Generate and return HTML response
     const KR20HTML = generateHTML({
       groupedItemAnalysisResults: [
         ...groupedItemAnalysisResults,
