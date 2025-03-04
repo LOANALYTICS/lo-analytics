@@ -11,7 +11,7 @@ export default async function SignUpPage() {
     const collages = await getCollage()
     
     if (!collages) {
-      throw new Error('Failed to fetch collages')
+      throw new Error('Failed to fetch colleges')
     }
 
     return (

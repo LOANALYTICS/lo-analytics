@@ -1,6 +1,5 @@
 'use client'
 import React, { useState, useEffect } from 'react'
-import { Button } from '@/components/ui/button'
 import { getCollage } from '@/services/collage.action'
 import { Loader2, Plus } from 'lucide-react'
 import {
@@ -87,7 +86,7 @@ export default function ManageCollage() {
                         ))}
                     </div>
                 ) : (
-                    <div>No collages found</div>
+                    <div>No colleges found</div>
                 )}
             </section>
         </main>

@@ -116,11 +116,11 @@ export default function SignUp({collages}:{collages:any}) {
           name="collage"
           render={({ field }) => (
             <FormItem >
-              <FormLabel>Collage</FormLabel>
+              <FormLabel>College</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select Collage" />
+                    <SelectValue placeholder="Select College" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
