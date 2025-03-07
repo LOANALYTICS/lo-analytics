@@ -14,7 +14,6 @@ const BaseLayout = async ({ children }: { children: React.ReactNode }) => {
   const topbarLinks = [
     { name: "Add Course", href: "/dashboard/new-course", icon: Plus },
   ];
-
   return (
     <div className="flex p-2 h-screen gap-2">
       <Sidebar userRole={role} user={user} userPermissions={user?.permissions ?? []} />
@@ -26,7 +25,7 @@ const BaseLayout = async ({ children }: { children: React.ReactNode }) => {
           </div>
           <div className='flex gap-3 items-center'>
             {
-              topbarLinks.map((link) => (
+              role !== "admin" && topbarLinks.map((link) => (
                 <Link
                   key={link.name}
                   href={link.href}

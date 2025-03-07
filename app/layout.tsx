@@ -17,8 +17,8 @@ const geistMono = localFont({
 const nunito = Nunito({ subsets: ["latin"],weight:['1000','900','800','700','600','500','400','300','200'] });
 
 export const metadata: Metadata = {
-  title: "University Management System",
-  description: "Manage your university with ease",
+  title: "Loso Analytics",
+  description: "Loso Analytics",
 };
 
 export default function RootLayout({

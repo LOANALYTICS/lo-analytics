@@ -114,7 +114,7 @@ const Sidebar = ({ userRole, userPermissions,user }: { userRole: string, userPer
           }
 
           <div className="space-y-1">
-            {userRole === "admin" && (
+            {userRole !== "admin" && (
               isCollapsed ? (
                 <h4 className="px-4 font-bold pb-1">...</h4>
               ) : (
