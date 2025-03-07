@@ -1,15 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 export default async function middleware(req: NextRequest) {
-  console.log('Middleware executed for:', req.nextUrl.pathname); // Log the path
-
   const token = req.cookies.get('token')?.value;
 
   if (!token) {
     return NextResponse.redirect(new URL('/sign-in', req.url));
   }
-
-  // Call the API route to verify the token
   const response = await fetch(`${req.nextUrl.origin}/api/auth/verify`, {
     method: 'POST',
     headers: {
@@ -22,21 +18,16 @@ export default async function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL('/sign-in', req.url));
   }
 
-  const { decoded } = await response.json(); // Get the decoded user information
+  const { decoded } = await response.json(); 
   const nextResponse = NextResponse.next();
   
-  // Set the user information in a cookie instead of a header
   nextResponse.cookies.set('userInformation', JSON.stringify(decoded), {
-    httpOnly: true, // Optional: make it httpOnly for security
-    path: '/', // Set the path for the cookie
+    httpOnly: true, 
+    path: '/', 
   });
-
-  // Log the userInformation being set
-  console.log('Set userInformation cookie:', decoded);
-
   return nextResponse;
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*', '/api/kr-value/download/:id'], // Ensure this includes your route
+  matcher: ['/dashboard/:path*', '/api/kr-value/download/:id'], 
 };

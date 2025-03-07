@@ -24,6 +24,10 @@ interface CourseDoc {
     academic_year: string;
 }
 
+interface IndirectAssessmentDoc extends AssessmentDoc {
+    indirectAssessments: IndirectAssessment[];
+}
+
 export async function updateAssessmentStudents(courseId: string, students: Student[]) {
     try {
         let assessment = await Assessment.findOne({ course: courseId });
@@ -160,4 +164,63 @@ export async function updateAssessmentPlans(courseId: string, academicYear: stri
         throw new Error('Failed to update assessment plans');
     }
 } 
+
+interface IndirectAssessment {
+    clo: string;
+    achievementRate: number;
+    benchmark: string;
+    achievementPercentage: number;
+}
+
+export async function updateIndirectAssessments(courseId: string, indirectAssessments: IndirectAssessment[]) {
+    try {
+        // First check if assessment exists
+        const existingAssessment = await Assessment.findOne({ course: courseId });
+        
+        if (!existingAssessment) {
+            return {
+                success: false,
+                message: 'Assessment not found for this course. Please configure assessment first.',
+                data: null
+            };
+        }
+
+        // If assessment exists, update it
+        const assessment = await Assessment.findOneAndUpdate(
+            { course: courseId },
+            { $set: { indirectAssessments } },
+            { new: true }
+        ).lean();
+
+        revalidatePath('/dashboard/blueprint/assessment-plan/[courseId]');
+
+        return {
+            success: true,
+            message: 'Indirect assessments updated successfully',
+            data: JSON.parse(JSON.stringify(assessment))
+        };
+    } catch (error) {
+        console.error('Error updating indirect assessments:', error);
+        return {
+            success: false,
+            message: 'Failed to update indirect assessments',
+            data: null
+        };
+    }
+}
+
+export async function getIndirectAssessments(courseId: string) {
+    try {
+        const assessment = await Assessment.findOne({ course: courseId }).select('indirectAssessments').lean() as unknown as IndirectAssessmentDoc;
+        
+        return {
+            success: true,
+            data: JSON.parse(JSON.stringify(assessment?.indirectAssessments)) || [],
+            message: 'Indirect assessments retrieved successfully'
+        };
+    } catch (error) {
+        console.error('Error getting indirect assessments:', error);
+        throw new Error('Failed to get indirect assessments');
+    }
+}
 

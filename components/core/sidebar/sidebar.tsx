@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import Image from "next/image";
-import { SidebarIcon, ChartBarStacked, SquareLibrary, BookOpenCheck, Plus, User, UsersRound, BookMarked, BookDashed, AsteriskSquare, LogOut, Building } from "lucide-react";
+import { SidebarIcon, ChartBarStacked, SquareLibrary, BookOpenCheck, Plus, User, UsersRound, BookDashed, AsteriskSquare, Building,Contact2 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -30,7 +30,7 @@ interface SidebarItem {
   displayName?: string;
   href: string;
   icon: any;
-  others?: SidebarItem[]; // Optional for expandable items
+  others?: SidebarItem[];
 }
 
 
@@ -80,7 +80,7 @@ const Sidebar = ({ userRole, userPermissions,user }: { userRole: string, userPer
             >University</p>
           </div>
         </div>
-        <ul className="p-2 space-y-3">
+        <ul className="p-2 h-full flex flex-col gap-3">
 
           {
             userRole === "admin" && (
@@ -161,6 +161,8 @@ const Sidebar = ({ userRole, userPermissions,user }: { userRole: string, userPer
                             </Link>
                           </li>
                         ))}
+                         
+
                       </ul>
                     </div>
                   </>
@@ -168,28 +170,16 @@ const Sidebar = ({ userRole, userPermissions,user }: { userRole: string, userPer
               </li>
             ))}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
           </div>
-
+<Link
+                              href={'/support'}
+                              className={`flex items-center mt-auto mb-[68px]  p-2 rounded-lg text-black transition-colors duration-200 ${pathname === '/support' ? "bg-neutral-500 text-white" : "hover:bg-gray-200"}`}
+                            >
+                              <Contact2 className="text-xl min-w-[20px] w-[20px] ml-1" />
+                              <span className={`ml-4 break-keep line-clamp-1 text-sm font-medium transition-opacity duration-300 ${isCollapsed ? "opacity-0 pointer-events-none" : "opacity-100"}`}>
+                                {'Contact & support'}
+                              </span>
+                            </Link>
         </ul>
 
       </aside>

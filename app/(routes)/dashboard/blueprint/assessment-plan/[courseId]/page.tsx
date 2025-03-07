@@ -12,6 +12,7 @@ import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import SimpleLoader from '@/components/core/SimpleLoader';
 import SectionHeader from '@/components/core/SectionHeader';
+import IndirectAssessmentTable from '@/components/shared/assessment-table/IndirectAssessmentTable';
 // Dummy data with the same structure as your MongoDB model will have
 
 
@@ -30,6 +31,7 @@ export default function AssessmentPlanPage() {
   const [loadingDialog, setLoadingDialog] = useState(false);
 
   const [selectedType, setSelectedType] = useState<string>('');
+  const [tab, setTab] = useState<'direct' | 'indirect'>('direct')
 
   useEffect(() => {
     const fetchData = async () => {
@@ -183,8 +185,7 @@ export default function AssessmentPlanPage() {
       setUploadOpen(false);
       setSelectedFile(null);
       setProgress(0);
-      // Optionally refresh the assessment data
-      // window.location.reload();
+
     } catch (error) {
       console.error('Error uploading assessment:', error);
       toast.error(error instanceof Error ? error.message : 'Failed to upload assessment');
@@ -200,8 +201,23 @@ export default function AssessmentPlanPage() {
 
   return (
     <div className="space-y-2 p-2">
-      <SectionHeader courseDetails={course} />
-      <AssessmentTable 
+      <div className='flex gap-12 items-center justify-between bg-blue-50 rounded-lg p-2'>
+      <div className='flex flex-col '>
+        <h1 className='text-xl font-bold capitalize'>{`${course.course_name} (${course.course_code}) `}</h1>
+        <p className='text-sm text-muted-foreground'>{`${course.semister === 1 ? "First" : "Second"} Semester - ${course.academic_year}`}</p>
+      </div>
+      <div className='space-x-4'>
+        <Button variant={tab === 'direct' ? 'outline' : 'default'} onClick={() => setTab('direct')}>
+          Direct
+        </Button>
+        <Button variant={tab === 'indirect' ? 'outline' : 'default'} onClick={() => setTab('indirect')}>
+          InDirect
+        </Button>
+      </div>
+    </div>
+     {
+      tab === 'direct' ? (
+        <AssessmentTable 
         courseId={courseId}
         saving={saving}
         initialData={assessmentData}
@@ -212,6 +228,10 @@ export default function AssessmentPlanPage() {
         }}
         numberOfClos={numberOfClos}
       />
+      ): (
+       <IndirectAssessmentTable numberOfClos={numberOfClos} courseId={courseId}/>
+      )
+     }
 
       
     {/* //drawers */}

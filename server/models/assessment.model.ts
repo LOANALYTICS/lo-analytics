@@ -21,6 +21,12 @@ export interface IAssessment extends Document {
         };
         weight: number;
     }[];
+    indirectAssessments: {
+        clo: string;
+        achievementRate: number;
+        benchmark: string;
+        achievementPercentage: number;
+    }[];
     assessmentResults: {
         type: string;
         mode: string;
@@ -89,6 +95,12 @@ export const assessmentSchema = new Schema<IAssessment>({
             required: true
         },
         weight: { type: Number, required: true }
+    }],
+    indirectAssessments: [{
+        clo: { type: String, required: true },
+        achievementRate: { type: Number, required: true },
+        benchmark: { type: String, required: true },
+        achievementPercentage: { type: Number, required: true }
     }],
     assessmentResults: [{
         type: { type: String, required: true },
