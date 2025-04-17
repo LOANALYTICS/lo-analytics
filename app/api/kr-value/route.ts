@@ -15,7 +15,7 @@ import {
 } from '@/server/utils/kr-utils';
 import { generateHTML } from '@/services/KR20GenerateHTML';
 import { connectToMongoDB } from '@/lib/db';
-import { Collage, Course, KRValue } from '@/lib/models';
+import { Course, KRValue } from '@/lib/models';
 
 
 // Configure API route settings

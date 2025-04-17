@@ -29,10 +29,14 @@ interface AssessmentData {
 
 export const dynamic = 'force-dynamic';
 
+import { NextRequest } from 'next/server';
+
 export async function GET(
-    request: Request,
-    { params }: { params: { courseId: string } }
-) {
+    request: NextRequest,
+    context: { params: { courseId: string } }
+  ) {
+    const params = context.params;
+
     try {
         await connectToMongoDB();
         

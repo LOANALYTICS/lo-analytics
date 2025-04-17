@@ -106,6 +106,7 @@ export default function AssessmentCard({ href, course }: {
   course: any,
 }) {
   const [coordinator, setCoordinator] = useState<any>();
+
   useEffect(() => {
     const fetchCoordinator = async () => {
       const user = await getCurrentUser()

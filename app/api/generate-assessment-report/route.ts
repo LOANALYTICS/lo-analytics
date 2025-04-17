@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { connectToMongoDB } from '@/lib/db';
 import { Course, Assessment } from '@/lib/models';
 import { generateAssessmentReportHTML } from '@/templates/assessmentReport';
-import courseTemplateModel from '@/server/models/courseTemplate.model';
+// import courseTemplateModel from '@/server/models/courseTemplate.model';
 
 interface CourseData {
   course_name: string;
