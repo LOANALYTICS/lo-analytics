@@ -8,12 +8,12 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { Button } from "@/components/ui/button"
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
 } from "@/components/ui/form"
 import {
     Dialog,
@@ -23,7 +23,7 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger,
-  } from "@/components/ui/dialog"
+} from "@/components/ui/dialog"
 
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -34,15 +34,15 @@ import { toast } from "sonner"
 import { getCurrentUser } from '@/server/utils/helper'
 
 const formSchema = z.object({
-  course_name: z.string(),
-  course_code: z.string(),
-  credit_hours: z.string(),
-  department: z.string(),
-  examType: z.string().min(1, { message: "Please select an exam type" }),
-  semister: z.coerce.number().min(1, { message: "Semester is required" }),
-  level: z.number().min(1, { message: "Level is required" }),
-  section: z.string().min(1, { message: "Section is required" }),
-  academic_year: z.string().min(1, { message: "Academic year is required" }),
+    course_name: z.string(),
+    course_code: z.string(),
+    credit_hours: z.string(),
+    department: z.string(),
+    examType: z.string().min(1, { message: "Please select an exam type" }),
+    semister: z.coerce.number().min(1, { message: "Semester is required" }),
+    level: z.number().min(1, { message: "Level is required" }),
+    section: z.string().min(1, { message: "Section is required" }),
+    academic_year: z.string().min(1, { message: "Academic year is required" }),
 })
 
 type FormValues = z.infer<typeof formSchema>
@@ -60,7 +60,7 @@ export default function NewCoursePage() {
     const [isSubmitting, setIsSubmitting] = useState(false)
     const dialogRef = useRef<any>(null)
     const [isUploading, setIsUploading] = useState(false);
-    
+
     const form = useForm<FormValues>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -77,10 +77,10 @@ export default function NewCoursePage() {
     })
 
     useEffect(() => {
-       
+
         async function loadCourseTemplate() {
             const user = await getCurrentUser()
-           
+
             if (!params.tempId) {
                 setIsLoading(false)
                 return
@@ -132,7 +132,7 @@ export default function NewCoursePage() {
                 collage: user?.cid,
                 createdBy: user?.id
             });
-            
+
             if (!response || !response.success) {
                 // Handle specific duplicate course error
                 if (response.error.includes('already exists')) {
@@ -142,7 +142,7 @@ export default function NewCoursePage() {
                     });
                     return;
                 }
-                
+
                 toast.error(response.error);
                 return;
             }
@@ -163,98 +163,98 @@ export default function NewCoursePage() {
             Loading...
         </div>
     }
-   
+
 
     const handleFileChange = (e: any) => {
         const file = e.target.files[0];
         setSelectedFile(file);
-    
+
         // Simulate a brief progress animation upon file selection
         setLoading(true);
         setProgress(0);
-    
-        const fakeProgressInterval = setInterval(() => {
-          setProgress((prevProgress:any) => {
-            if (prevProgress >= 100) {
-              clearInterval(fakeProgressInterval);
-              setLoading(false);
-              return 100;
-            }
-            return prevProgress + 10; // Update by 10% per interval
-          });
-        }, 50); // Adjust this interval to control speed
-      };
 
-   
-      const handleUpload = async () => {
+        const fakeProgressInterval = setInterval(() => {
+            setProgress((prevProgress: any) => {
+                if (prevProgress >= 100) {
+                    clearInterval(fakeProgressInterval);
+                    setLoading(false);
+                    return 100;
+                }
+                return prevProgress + 10; // Update by 10% per interval
+            });
+        }, 50); // Adjust this interval to control speed
+    };
+
+
+    const handleUpload = async () => {
         if (!selectedFile) {
-          toast.error("Please select a file before uploading.");
-          return;
+            toast.error("Please select a file before uploading.");
+            return;
         }
-    
+
         setIsUploading(true);
         const formData = new FormData();
         formData.append("file", selectedFile);
         formData.append("courseId", createdCourseId);
         formData.append("collageId", user?.cid);
-    
+
         try {
-          const response = await fetch("/api/kr-value", {
-            method: "POST",
-            body: formData,
-          });
-    
-          if (!response.ok) {
-            throw new Error("Failed to upload file");
-          }
-    
-          const contentType = response.headers.get("content-type");
-          if (contentType?.includes("application/json")) {
-            const result = await response.json();
-            console.log("File uploaded successfully:", result);
-          } else {
-            const htmlContent = await response.text();
-            await generatePDF(htmlContent, `${form.watch("course_code")} - Item Analysis Report.pdf`);
-            toast.success("Report downloaded successfully");
-          }
-          router.push(`/dashboard/item-analysis`);
-        } catch (error) {
-          console.error("Error uploading file:", error);
-          toast.error("Failed to upload file");
-        } finally {
-          setIsUploading(false);
-        }
-      };
-
-
-      const handleDragOver = (e: React.DragEvent<HTMLLabelElement>) => {
-        e.preventDefault();
-        e.stopPropagation();
-      };
-    
-      const handleDrop = (e: React.DragEvent<HTMLLabelElement>) => {
-        e.preventDefault();
-        e.stopPropagation();
-        
-        const file = e.dataTransfer.files?.[0];
-        if (file && (file.type === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" || 
-                     file.type === "application/vnd.ms-excel")) {
-          setSelectedFile(file);
-          setProgress(0);
-    
-          const fakeProgressInterval = setInterval(() => {
-            setProgress((prevProgress) => {
-              if (prevProgress >= 100) {
-                clearInterval(fakeProgressInterval);
-                return 100;
-              }
-              return prevProgress + 10;
+            const response = await fetch("/api/kr-value", {
+                method: "POST",
+                body: formData,
             });
-          }, 50);
-        } else {
-          toast.error('Please upload only Excel files (.xlsx, .xls)');
+
+            if (!response.ok) {
+                throw new Error("Failed to upload file");
+            }
+
+            const contentType = response.headers.get("content-type");
+            if (contentType?.includes("application/json")) {
+                const result = await response.json();
+                console.log("File uploaded successfully:", result);
+            } else {
+                const htmlContent = await response.text();
+                await generatePDF(htmlContent, `${form.watch("course_code")} - Item Analysis Report.pdf`);
+                toast.success("Report downloaded successfully");
+            }
+            router.push(`/dashboard/item-analysis`);
+        } catch (error) {
+            console.error("Error uploading file:", error);
+            toast.error("Failed to upload file");
+        } finally {
+            setIsUploading(false);
         }
-      };
+    };
+
+
+    const handleDragOver = (e: React.DragEvent<HTMLLabelElement>) => {
+        e.preventDefault();
+        e.stopPropagation();
+    };
+
+    const handleDrop = (e: React.DragEvent<HTMLLabelElement>) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const file = e.dataTransfer.files?.[0];
+        if (file && (file.type === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
+            file.type === "application/vnd.ms-excel")) {
+            setSelectedFile(file);
+            setProgress(0);
+
+            const fakeProgressInterval = setInterval(() => {
+                setProgress((prevProgress) => {
+                    if (prevProgress >= 100) {
+                        clearInterval(fakeProgressInterval);
+                        return 100;
+                    }
+                    return prevProgress + 10;
+                });
+            }, 50);
+        } else {
+            toast.error('Please upload only Excel files (.xlsx, .xls)');
+        }
+    };
     return (
         <section className='min-w-[400px] border shadow-sm rounded-lg py-4 px-6'>
             <Form {...form}>
@@ -336,43 +336,43 @@ export default function NewCoursePage() {
                                 </FormItem>
                             )}
                         />
-<FormField
-    control={form.control}
-    name="level"
-    render={({ field }) => (
-        <FormItem>
-            <FormLabel>Level</FormLabel>
-            <Select 
-                onValueChange={(value) => field.onChange(Number(value))} 
-                defaultValue={field.value?.toString()} // Keep the current value
-            >
-                <FormControl>
-                    <SelectTrigger>
-                        <SelectValue placeholder="Select Level" />
-                    </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                    {[...Array(20)].map((_, index) => {
-                        const level = index + 1;
-                        const semester = form.watch("semister");
-                        // Render odd levels for semester 1 and even levels for semester 2
-                        if ((semester === 1 && level % 2 === 1) || 
-                            (semester === 2 && level % 2 === 0)) {
-                            return (
-                                <SelectItem key={level} value={level.toString()}>
-                                    Level {level}
-                                </SelectItem>
-                            );
-                        }
-                        return null;
-                    })}
-                </SelectContent>
-            </Select>
-            <FormMessage />
-        </FormItem>
-    )}
-/>
-                    
+                        <FormField
+                            control={form.control}
+                            name="level"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Level</FormLabel>
+                                    <Select
+                                        onValueChange={(value) => field.onChange(Number(value))}
+                                        defaultValue={field.value?.toString()} // Keep the current value
+                                    >
+                                        <FormControl>
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Select Level" />
+                                            </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                            {[...Array(20)].map((_, index) => {
+                                                const level = index + 1;
+                                                const semester = form.watch("semister");
+                                                // Render odd levels for semester 1 and even levels for semester 2
+                                                if ((semester === 1 && level % 2 === 1) ||
+                                                    (semester === 2 && level % 2 === 0)) {
+                                                    return (
+                                                        <SelectItem key={level} value={level.toString()}>
+                                                            Level {level}
+                                                        </SelectItem>
+                                                    );
+                                                }
+                                                return null;
+                                            })}
+                                        </SelectContent>
+                                    </Select>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
                         <FormField
                             control={form.control}
                             name="section"
@@ -407,10 +407,11 @@ export default function NewCoursePage() {
                                             </SelectTrigger>
                                         </FormControl>
                                         <SelectContent>
-                                            <SelectItem value={"2020-2021"}>2020-2021</SelectItem>
-                                            <SelectItem value={"2021-2022"}>2021-2022</SelectItem>
-                                            <SelectItem value={"2022-2023"}>2022-2023</SelectItem>
-                                            <SelectItem value={"2023-2024"}>2023-2024</SelectItem>
+                                            {academicYears.map((year: string) => (
+                                                <SelectItem key={year} value={year}>
+                                                    {year}
+                                                </SelectItem>
+                                            ))}
                                         </SelectContent>
                                     </Select>
                                     <FormMessage />
@@ -441,10 +442,10 @@ export default function NewCoursePage() {
                             )}
                         />
                     </div>
-                    <Button 
-                        type="submit" 
-                        className='w-full' 
-                        style={{marginTop:"20px"}}
+                    <Button
+                        type="submit"
+                        className='w-full'
+                        style={{ marginTop: "20px" }}
                         disabled={isSubmitting}
                     >
                         {isSubmitting ? (
@@ -470,53 +471,53 @@ export default function NewCoursePage() {
                     </DialogHeader>
                     {
 
-selectedFile ? (
-  loading ? (
-    <div className="w-full bg-gray-200 rounded-full h-2.5 mt-4">
-      <div
-        className="bg-blue-500 h-2.5 rounded-full transition-all duration-300"
-        style={{ width: `${progress}%` }}
-      ></div>
-    </div>
-  ) : (
-    progress === 100 && (
-      <div className='flex gap-1 items-center justify-center'>
-        <ThumbsUp size={20} className=''/>
-      <p className='font-semibold text-center'>File uploaded successfully</p>
-      </div>
-    )
-   
-  )
-): (
-    <div className="flex items-center justify-center w-full">
-    <label htmlFor="dropzone-file" className="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 "
-       onDragOver={handleDragOver}
-       onDrop={handleDrop}
-    >
-        <div className="flex flex-col items-center justify-center pt-5 pb-6">
-            <svg className="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
-                <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
-            </svg>
-            <p className="mb-2 text-sm text-gray-500 dark:text-gray-400"><span className="font-semibold">Click to upload</span> or drag and drop</p>
-        </div>
-        <input id="dropzone-file" type="file" accept=".xlsx, .xls" onChange={handleFileChange} className="hidden" />
-    </label>
-</div>
-)
-  
-}
+                        selectedFile ? (
+                            loading ? (
+                                <div className="w-full bg-gray-200 rounded-full h-2.5 mt-4">
+                                    <div
+                                        className="bg-blue-500 h-2.5 rounded-full transition-all duration-300"
+                                        style={{ width: `${progress}%` }}
+                                    ></div>
+                                </div>
+                            ) : (
+                                progress === 100 && (
+                                    <div className='flex gap-1 items-center justify-center'>
+                                        <ThumbsUp size={20} className='' />
+                                        <p className='font-semibold text-center'>File uploaded successfully</p>
+                                    </div>
+                                )
+
+                            )
+                        ) : (
+                            <div className="flex items-center justify-center w-full">
+                                <label htmlFor="dropzone-file" className="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 "
+                                    onDragOver={handleDragOver}
+                                    onDrop={handleDrop}
+                                >
+                                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                                        <svg className="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
+                                            <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2" />
+                                        </svg>
+                                        <p className="mb-2 text-sm text-gray-500 dark:text-gray-400"><span className="font-semibold">Click to upload</span> or drag and drop</p>
+                                    </div>
+                                    <input id="dropzone-file" type="file" accept=".xlsx, .xls" onChange={handleFileChange} className="hidden" />
+                                </label>
+                            </div>
+                        )
+
+                    }
 
 
 
 
 
-                 
+
 
                     <DialogFooter className='w-full'>
                         <Button className='w-full' variant={'outline'} onClick={() => setOpen(false)}>Cancel</Button>
-                        <Button 
-                            className='w-full' 
-                            disabled={!selectedFile || isUploading} 
+                        <Button
+                            className='w-full'
+                            disabled={!selectedFile || isUploading}
                             onClick={handleUpload}
                         >
                             {isUploading ? (

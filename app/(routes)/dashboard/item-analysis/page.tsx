@@ -305,7 +305,7 @@ export default function ItemAnalysisPage() {
             className="flex items-center gap-2 p-0  w-fit h-9 px-4"
             onClick={() => setCompareOpen(true)}
           >
-             <span className="font-bold">Course Comparison </span>  <SplitIcon className="w-4 h-4" />
+            <span className="font-bold">Course Comparison </span>  <SplitIcon className="w-4 h-4" />
           </Button>
           <Button
             variant="outline"
@@ -352,10 +352,11 @@ export default function ItemAnalysisPage() {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="2020-2021">2020-2021</SelectItem>
-                        <SelectItem value="2021-2022">2021-2022</SelectItem>
-                        <SelectItem value="2022-2023">2022-2023</SelectItem>
-                        <SelectItem value="2023-2024">2023-2024</SelectItem>
+                        {academicYears.map((year: string) => (
+                          <SelectItem key={year} value={year}>
+                            {year}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </FormItem>
@@ -444,10 +445,11 @@ export default function ItemAnalysisPage() {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="2020-2021">2020-2021</SelectItem>
-                            <SelectItem value="2021-2022">2021-2022</SelectItem>
-                            <SelectItem value="2022-2023">2022-2023</SelectItem>
-                            <SelectItem value="2023-2024">2023-2024</SelectItem>
+                            {academicYears.map((year: string) => (
+                              <SelectItem key={year} value={year}>
+                                {year}
+                              </SelectItem>
+                            ))}
                           </SelectContent>
                         </Select>
                       </FormItem>
@@ -528,10 +530,11 @@ export default function ItemAnalysisPage() {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="2020-2021">2020-2021</SelectItem>
-                            <SelectItem value="2021-2022">2021-2022</SelectItem>
-                            <SelectItem value="2022-2023">2022-2023</SelectItem>
-                            <SelectItem value="2023-2024">2023-2024</SelectItem>
+                            {academicYears.map((year: string) => (
+                              <SelectItem key={year} value={year}>
+                                {year}
+                              </SelectItem>
+                            ))}
                           </SelectContent>
                         </Select>
                       </FormItem>
@@ -649,10 +652,11 @@ export default function ItemAnalysisPage() {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="2020-2021">2020-2021</SelectItem>
-                            <SelectItem value="2021-2022">2021-2022</SelectItem>
-                            <SelectItem value="2022-2023">2022-2023</SelectItem>
-                            <SelectItem value="2023-2024">2023-2024</SelectItem>
+                            {academicYears.map((year: string) => (
+                              <SelectItem key={year} value={year}>
+                                {year}
+                              </SelectItem>
+                            ))}
                           </SelectContent>
                         </Select>
                       </FormItem>
@@ -707,10 +711,11 @@ export default function ItemAnalysisPage() {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="2020-2021">2020-2021</SelectItem>
-                            <SelectItem value="2021-2022">2021-2022</SelectItem>
-                            <SelectItem value="2022-2023">2022-2023</SelectItem>
-                            <SelectItem value="2023-2024">2023-2024</SelectItem>
+                            {academicYears.map((year: string) => (
+                              <SelectItem key={year} value={year}>
+                                {year}
+                              </SelectItem>
+                            ))}
                           </SelectContent>
                         </Select>
                       </FormItem>

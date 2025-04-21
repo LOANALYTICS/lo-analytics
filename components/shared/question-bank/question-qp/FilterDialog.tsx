@@ -215,11 +215,12 @@ export function FilterDialog({ courseTemplates }: FilterDialogProps) {
                 <SelectValue placeholder="Select Year" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="2020-2021">2020-2021</SelectItem>
-                <SelectItem value="2021-2022">2021-2022</SelectItem>
-                <SelectItem value="2022-2023">2022-2023</SelectItem>
-                <SelectItem value="2023-2024">2023-2024</SelectItem>
-              </SelectContent>
+                            {academicYears.map((year: string) => (
+                              <SelectItem key={year} value={year}>
+                                {year}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
             </Select>
             <Select
               value={selectedCourse?.course_code}
