@@ -32,6 +32,7 @@ import { generatePDF } from '@/services/PdfGeneratorService'
 import { createCourse } from '@/services/courses.action';
 import { toast } from "sonner"
 import { getCurrentUser } from '@/server/utils/helper'
+import { academicYears } from '@/lib/utils/y'
 
 const formSchema = z.object({
     course_name: z.string(),

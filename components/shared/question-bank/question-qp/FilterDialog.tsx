@@ -23,9 +23,7 @@ import {
   getFilteredQuestionPapers,
 } from "@/services/question-bank/generate-qp.service";
 import { getTopics } from "@/services/question-bank/question-bank.service";
-import { useEditor } from "@tiptap/react";
-import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
+import {academicYears} from '@/lib/utils/y'
 
 interface CourseTemplate {
   _id: string;
