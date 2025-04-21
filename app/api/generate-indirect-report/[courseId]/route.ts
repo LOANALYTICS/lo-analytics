@@ -33,9 +33,8 @@ import { NextRequest } from 'next/server';
 
 export async function GET(
     request: NextRequest,
-    context: { params: { courseId: string } }
+    { params }: { params: { courseId: string } }
   ) {
-    const params = context.params;
 
     try {
         await connectToMongoDB();
