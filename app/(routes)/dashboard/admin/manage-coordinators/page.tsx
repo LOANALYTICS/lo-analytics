@@ -119,7 +119,7 @@ export default function ManageCoordinators() {
                 <DynamicDropdownMenu
                   options={["Item Analysis", "Question Bank", "Learning Outcome"]}
                   state={dropdownState[coordinator._id] || {}} // Pass the state for this coordinator
-                  handleCheckedChange={(option, checked) => 
+                  handleCheckedChangeAction={(option, checked) => 
                     handleCheckedChange(coordinator._id, option, checked) // Call the handler with the coordinator ID
                   }
                 />
