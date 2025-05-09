@@ -1,7 +1,7 @@
 import { Types } from "mongoose";
 import { Course } from "@/lib/models";
 import { formatPercentage } from "../utils/format.utils";
-import logger from "@/lib/logger";
+// import logger from "@/lib/logger";
 import { convertNumberToWord } from "@/lib/utils/number-to-word";
 
 interface SemesterAnalysisParams {
@@ -128,31 +128,31 @@ function calculateAverages(courses: any[]) {
 
   const kr20Value = totals.kr20 / count;
 
-  logger.info({
-    goodQuestions: Math.round(totals.goodQuestions / count),
-    easyQuestions: Math.round(totals.easyQuestions / count),
-    difficultQuestions: Math.round(totals.difficultQuestions / count),
-    veryDifficultQuestions: Math.round(totals.veryDifficultQuestions / count),
-    poorQuestions: Math.round(totals.poorQuestions / count),
-    veryEasyQuestions: Math.round(totals.veryEasyQuestions / count),
-    totalAccepted: Math.round(totalAccepted / count),
-    totalRejected: Math.round(totalRejected / count),
-    kr20: kr20Value.toFixed(2),
-    percentages: {
-      goodQuestions: Math.round((totals.goodQuestions / totalAccepted) * 100),
-      easyQuestions: Math.round((totals.easyQuestions / totalAccepted) * 100),
-      difficultQuestions: Math.round(
-        (totals.difficultQuestions / totalAccepted) * 100
-      ),
-      veryDifficultQuestions: Math.round(
-        (totals.veryDifficultQuestions / totalRejected) * 100
-      ),
-      poorQuestions: Math.round((totals.poorQuestions / totalRejected) * 100),
-      veryEasyQuestions: Math.round(
-        (totals.veryEasyQuestions / totalRejected) * 100
-      ),
-    },
-  });
+  // logger.info({
+  //   goodQuestions: Math.round(totals.goodQuestions / count),
+  //   easyQuestions: Math.round(totals.easyQuestions / count),
+  //   difficultQuestions: Math.round(totals.difficultQuestions / count),
+  //   veryDifficultQuestions: Math.round(totals.veryDifficultQuestions / count),
+  //   poorQuestions: Math.round(totals.poorQuestions / count),
+  //   veryEasyQuestions: Math.round(totals.veryEasyQuestions / count),
+  //   totalAccepted: Math.round(totalAccepted / count),
+  //   totalRejected: Math.round(totalRejected / count),
+  //   kr20: kr20Value.toFixed(2),
+  //   percentages: {
+  //     goodQuestions: Math.round((totals.goodQuestions / totalAccepted) * 100),
+  //     easyQuestions: Math.round((totals.easyQuestions / totalAccepted) * 100),
+  //     difficultQuestions: Math.round(
+  //       (totals.difficultQuestions / totalAccepted) * 100
+  //     ),
+  //     veryDifficultQuestions: Math.round(
+  //       (totals.veryDifficultQuestions / totalRejected) * 100
+  //     ),
+  //     poorQuestions: Math.round((totals.poorQuestions / totalRejected) * 100),
+  //     veryEasyQuestions: Math.round(
+  //       (totals.veryEasyQuestions / totalRejected) * 100
+  //     ),
+  //   },
+  // });
 
   return {
     goodQuestions: Math.round(totals.goodQuestions / count),

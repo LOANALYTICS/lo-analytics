@@ -1,7 +1,6 @@
 "use client"
 
 import * as React from "react"
-import { DropdownMenuCheckboxItemProps } from "@radix-ui/react-dropdown-menu"
 import { ScanEye } from 'lucide-react';
 import { Button } from "@/components/ui/button"
 import {
@@ -14,12 +13,12 @@ import {
 
 
 interface DropdownMenuProps {
-  options: string[]; // Array of options to be rendered in the dropdown
-  state: Record<string, boolean>; // The current state of each option
-  handleCheckedChange: (option: string, checked: boolean) => void; // Handler to update state
+  options: string[]; 
+  state: Record<string, boolean>; 
+  handleCheckedChangeAction: (option: string, checked: boolean) => void; 
 }
 
-export function DynamicDropdownMenu({ options, state, handleCheckedChange }: DropdownMenuProps) {
+export function DynamicDropdownMenu({ options, state, handleCheckedChangeAction }: DropdownMenuProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -29,11 +28,11 @@ export function DynamicDropdownMenu({ options, state, handleCheckedChange }: Dro
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56">
         <DropdownMenuSeparator />
-        {options.map((option) => (
+        {options.map((option, index) => (
           <DropdownMenuCheckboxItem
-            key={option}
+            key={option + index}
             checked={state[option as keyof typeof state]}
-            onCheckedChange={(checked: boolean) => handleCheckedChange(option, checked)}
+            onCheckedChange={(checked: boolean) => handleCheckedChangeAction(option, checked)}
           >
             {option}
           </DropdownMenuCheckboxItem>

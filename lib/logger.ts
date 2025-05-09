@@ -22,7 +22,7 @@ const logFormat = winston.format.combine(
 const logger = winston.createLogger({
   level: process.env.LOG_LEVEL || "info",
   format: logFormat,
-  transports: [
+  transports: process.env.NODE_ENV === 'development' ? [
     // Console transport
     new winston.transports.Console(),
     // File transport for errors
@@ -38,13 +38,15 @@ const logger = winston.createLogger({
       maxsize: 5242880, // 5MB
       maxFiles: 5,
     }),
-  ],
+  ] : [],
 });
 
 // Add a stream for Morgan middleware if needed
 export const logStream = {
   write: (message: string) => {
-    logger.info(String(message).trim());
+    if (process.env.NODE_ENV === 'development') {
+      logger.info(String(message).trim());
+    }
   },
 };
 

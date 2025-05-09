@@ -89,7 +89,7 @@ function generateTableHTML(
           <tr>
             <th colspan="2" style="border-color: #000000 !important; width: 300px !important; background-color: #f0f0f0;" class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;">
               <p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 14px;">${
-                isLevel ? `Level ${title}` : `DEPARTMENT: ${title}`
+                isLevel ? ` ${title}` : `DEPARTMENT: ${title}`
               }</p>
             </th>
             <th colspan="3" class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;">

@@ -10,28 +10,28 @@ interface CompareParams {
   collegeId: string;
 }
 
-interface GroupedComparison {
-  byLevel: {
-    [key: number]: {
-      yearA: {
-        [section: string]: any[];
-      };
-      yearB: {
-        [section: string]: any[];
-      };
-    };
-  };
-  byDepartment: {
-    [key: string]: {
-      yearA: {
-        [section: string]: any[];
-      };
-      yearB: {
-        [section: string]: any[];
-      };
-    };
-  };
-}
+// interface GroupedComparison {
+//   byLevel: {
+//     [key: number]: {
+//       yearA: {
+//         [section: string]: any[];
+//       };
+//       yearB: {
+//         [section: string]: any[];
+//       };
+//     };
+//   };
+//   byDepartment: {
+//     [key: string]: {
+//       yearA: {
+//         [section: string]: any[];
+//       };
+//       yearB: {
+//         [section: string]: any[];
+//       };
+//     };
+//   };
+// }
 
 function calculateLevelTotals(courses: any[]) {
   const totals = {
@@ -47,7 +47,6 @@ function calculateLevelTotals(courses: any[]) {
     }), { accepted: 0, rejected: 0, kr20: 0 })
   };
 
-  // Calculate averages
   const courseCount = courses.length;
   return {
     yearA: {

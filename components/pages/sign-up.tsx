@@ -29,7 +29,7 @@ import { Separator } from '../ui/separator'
 import Link from 'next/link'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
-import { Loader2 } from 'lucide-react'
+import { Eye, EyeClosed, Loader2 } from 'lucide-react'
 const formSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters" }),
   email: z.string().email({ message: "Please enter a valid email" }),
@@ -37,6 +37,7 @@ const formSchema = z.object({
   collage: z.string(),
 })
 export default function SignUp({collages}:{collages:any}) {
+    const [togglePasswordView, setTogglePasswordView] = useState(true)
   const [loading, setLoading] = useState(false)
   const router = useRouter()
     const form = useForm<z.infer<typeof formSchema>>({
@@ -104,8 +105,17 @@ export default function SignUp({collages}:{collages:any}) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Password</FormLabel>
-                  <FormControl>
-                    <Input required placeholder="Password" {...field} />
+                  <FormControl  className='relative'>
+                    <div>
+                    <Input  type={togglePasswordView ? 'password' : "text"} required placeholder="Password" {...field} />
+                    <span className="absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer">
+                    {
+                      togglePasswordView ?
+                      <Eye size={20} onClick={() => setTogglePasswordView(false)}/> :
+                      <EyeClosed size={20} onClick={() => setTogglePasswordView(true)}/>
+                    }
+                  </span>
+                  </div>
                   </FormControl>
                 </FormItem>
               )}

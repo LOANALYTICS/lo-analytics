@@ -122,7 +122,7 @@ const Sidebar = ({ userRole, userPermissions,user }: { userRole: string, userPer
               )
             )
             }
-            {filteredSidebarItems.map(({ name, displayName, href, icon: Icon, others }) => (
+            {userRole !== "admin" && filteredSidebarItems.map(({ name, displayName, href, icon: Icon, others }) => (
               <li key={name}>
                 {!others ? (
                   <Link

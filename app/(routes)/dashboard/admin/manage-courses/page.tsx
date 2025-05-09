@@ -143,7 +143,7 @@ export default function ManageCoordinators() {
                 <DynamicDropdownMenu
                   options={courseCoordinators(course)} // Pass the filtered list of coordinators to the dropdown
                   state={dropdownState[course._id] || {}} // Pass the state for this course
-                  handleCheckedChange={(name, checked) =>
+                  handleCheckedChangeAction={(name, checked) =>
                     handleCheckedChange(course._id, name, checked) // Handle state changes for this course
                   }
                 />
