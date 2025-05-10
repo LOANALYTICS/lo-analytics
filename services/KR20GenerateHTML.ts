@@ -282,7 +282,7 @@ export function generateHTML(data: any): string {
             item?.classification === "Reliability"
               ? `<td colspan="3" style="vertical-align: middle; text-align: center; padding: 16px;"><p style="text-align: center; margin-bottom: 10px; font-weight: bold;">KR20 = ${(
                   KR_20 || 0
-                ).toFixed(2)}</p></td>`
+                ).toFixed(3)}</p></td>`
               : `
               <td class="question-no-cell"><p style="text-align: center; margin-bottom: 10px;">${formatQuestions(
                 item?.questions || []
@@ -339,9 +339,19 @@ export function generateHTML(data: any): string {
         <td><p style="text-align: center; margin-bottom: 10px; font-size: 23px;">${
           studentsAttended || ""
         }</p></td>
-         <td><p style="text-align: center; margin-bottom: 10px; font-size: 23px;">${
-          studentsPassed || ""
-        }</p></td>
+       
+
+
+        <td class="split-cell">
+            <div class="cell-row"><p style="text-align: center; margin-bottom: 10px; font-size: 23px;">${
+              studentsPassed || ""
+            }</p></div>
+            <div class="cell-row"><p style="text-align: center; margin-bottom: 10px; font-size: 23px;">${
+              studentsPassed && studentsAttended
+                ? ((studentsPassed / studentsAttended) * 100).toFixed(2) + "%"
+                : ""
+            }</p></div>
+          </td>
        
         ${(segregatedGradedStudents || [])
           .map(

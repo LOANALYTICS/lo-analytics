@@ -45,6 +45,8 @@ export function generateComparisonHTML(data: any): string {
             margin: 0;
           }
           table {
+                      font-size: 12px;
+
             margin-top: 5px !important;
             margin-bottom: 40px !important;
           }
@@ -64,9 +66,12 @@ export function generateComparisonHTML(data: any): string {
           }
           .header-container {
             margin-bottom: 80px;
+            width: 100%;
           }
           .header {
             text-align: center;
+            width: 100%;
+
             padding: 4px;
             margin-bottom: 10px;
           }
@@ -87,9 +92,7 @@ export function generateComparisonHTML(data: any): string {
             text-align: center;
           }
           .college-logo {
-            max-width: 200px;
             margin: 0 auto;
-            aspect-ratio: 16/9;
           }
           .college-name {
             font-size: 18px;
@@ -101,7 +104,7 @@ export function generateComparisonHTML(data: any): string {
         </style>
       </head>
       <body>
-        <div class="header-container">
+        <div class="header-container" >
           <div class="header">
             ${college.logo ? `<img src="${college.logo}" alt="College Logo" class="college-logo"/>` : ''}
             <div class="college-name">

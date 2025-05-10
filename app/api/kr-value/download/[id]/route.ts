@@ -1,5 +1,5 @@
 import { connectToMongoDB } from "@/lib/db";
-import { KRValue, Course } from "@/lib/models";
+import { Course } from "@/lib/models";
 import { generateHTML } from "@/services/KR20GenerateHTML";
 import { NextRequest, NextResponse } from "next/server";
 
