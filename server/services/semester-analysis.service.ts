@@ -210,7 +210,7 @@ function generateTableHTML(
           <tr>
             <th colspan="2" style="width: 300px !important;" class="border border-black bg-yellow-200 p-1">
               <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
-                isLevel ? `LEVEL ${title}` : `DEPARTMENT: ${title}`
+                isLevel ? `LEVEL ${title}` : ` ${title}`
               }</p>
             </th>
             <th colspan="9" class="border border-black p-1">
@@ -543,7 +543,7 @@ function generateKR20SegregationHTML(courses: any[]) {
       </h2>
       
       <div style="padding: 16px;">
-        <div class="exam-category">
+        <div class="exam-category good">
           <h3 style="color: #16a34a; font-size: 14px; font-weight: bold; margin-bottom: 8px;">
             Good Exams (KR20 ≥ 0.80)
           </h3>
@@ -555,7 +555,7 @@ function generateKR20SegregationHTML(courses: any[]) {
                 ${course.course_name} (${course.course_code})
                 ${
                   course.section
-                    ? `- Section ${
+                    ? `- ${
                         course.section.charAt(0).toUpperCase() +
                         course.section.slice(1).toLowerCase()
                       }`
@@ -563,7 +563,7 @@ function generateKR20SegregationHTML(courses: any[]) {
                 } 
                 - KR20: ${
                   course.krValues?.KR_20
-                    ? Math.round(course.krValues.KR_20)
+                    ? course.krValues.KR_20.toFixed(3)
                     : "N/A"
                 }
               </li>
@@ -578,7 +578,7 @@ function generateKR20SegregationHTML(courses: any[]) {
           </ul>
         </div>
 
-        <div class="exam-category" style="margin-top: 16px;">
+        <div class="exam-category average" style="margin-top: 16px;">
           <h3 style="color: #ca8a04; font-size: 14px; font-weight: bold; margin-bottom: 8px;">
             Average Exams (KR20: 0.70-0.79)
           </h3>
@@ -590,7 +590,7 @@ function generateKR20SegregationHTML(courses: any[]) {
                 ${course.course_name} (${course.course_code})
                 ${
                   course.section
-                    ? `- Section ${
+                    ? `- ${
                         course.section.charAt(0).toUpperCase() +
                         course.section.slice(1).toLowerCase()
                       }`
@@ -598,7 +598,7 @@ function generateKR20SegregationHTML(courses: any[]) {
                 } 
                 - KR20: ${
                   course.krValues?.KR_20
-                    ? Math.round(course.krValues.KR_20)
+                    ? course.krValues.KR_20.toFixed(3)
                     : "N/A"
                 }
               </li>
@@ -613,7 +613,7 @@ function generateKR20SegregationHTML(courses: any[]) {
           </ul>
         </div>
 
-        <div class="exam-category" style="margin-top: 16px;">
+        <div class="exam-category bad" style="margin-top: 16px;">
           <h3 style="color: #dc2626; font-size: 14px; font-weight: bold; margin-bottom: 8px;">
             Bad Exams (KR20 < 0.70)
           </h3>
@@ -625,7 +625,7 @@ function generateKR20SegregationHTML(courses: any[]) {
                 ${course.course_name} (${course.course_code})
                 ${
                   course.section
-                    ? `- Section ${
+                    ? `- ${
                         course.section.charAt(0).toUpperCase() +
                         course.section.slice(1).toLowerCase()
                       }`
@@ -633,7 +633,7 @@ function generateKR20SegregationHTML(courses: any[]) {
                 } 
                 - KR20: ${
                   course.krValues?.KR_20
-                    ? Math.round(course.krValues.KR_20)
+                    ? course.krValues.KR_20.toFixed(3)
                     : "N/A"
                 }
               </li>
@@ -860,17 +860,9 @@ export async function analyzeSemester({
           border-radius: 50%;
         }
         
-        .exam-category:nth-child(1) h3::before {
-          background-color: #16a34a;
-        }
-        
-        .exam-category:nth-child(2) h3::before {
-          background-color: #ca8a04;
-        }
-        
-        .exam-category:nth-child(3) h3::before {
-          background-color: #dc2626;
-        }
+      .exam-category.good h3::before { background-color: #16a34a; }
+.exam-category.average h3::before { background-color: #ca8a04; }
+.exam-category.bad h3::before { background-color: #dc2626; }
 
         .kr20-segregation {
           page-break-inside: auto;
@@ -1023,7 +1015,7 @@ function generateSummaryTableHTML(
               <p style="text-align: left; margin: 0; margin-bottom: 10px;">${
                 isLevel
                   ? `Level ${summary.name}`
-                  : `DEPARTMENT: ${summary.name}`
+                  : ` ${summary.name}`
               }</p>
             </td>
             <td class="border border-black p-1">
@@ -1162,32 +1154,32 @@ function generateSummaryTableHTML(
           <td class="border border-black p-1 font-bold">
             <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
               percentages.goodQuestions
-            }%</p>
+            }</p>
           </td>
           <td class="border border-black p-1 font-bold">
             <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
               percentages.easyQuestions
-            }%</p>
+            }</p>
           </td>
           <td class="border border-black p-1 font-bold">
             <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
               percentages.difficultQuestions
-            }%</p>
+            }</p>
           </td>
           <td class="border border-black p-1 font-bold">
             <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
               percentages.veryDifficultQuestions
-            }%</p>
+            }</p>
           </td>
           <td class="border border-black p-1 font-bold">
             <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
               percentages.poorQuestions
-            }%</p>
+            }</p>
           </td>
           <td class="border border-black p-1 font-bold">
             <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
               percentages.veryEasyQuestions
-            }%</p>
+            }</p>
           </td>
         </tr>
       </tbody>

@@ -95,7 +95,7 @@ export async function GET(request: Request) {
             </div>
           </div>
           <div class="tables-container">
-            ${analysis.tables.join("\n")}
+            ${analysis.tables.join("\n \n")}
           </div>
         </body>
       </html>

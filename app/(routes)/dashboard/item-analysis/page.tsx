@@ -71,7 +71,7 @@ const generatePDF = async (html: string, fileName: string) => {
         quality: 0.98,
       },
       html2canvas: {
-        scale: 2,
+        scale: 2.1,
         useCORS: true,
         scrollY: -window.scrollY,
         removeContainer: true,
@@ -263,7 +263,7 @@ export default function ItemAnalysisPage() {
       }
 
       const htmlContent = await response.text();
-      await generatePDF(htmlContent, "semester-analysis");
+      await generatePDF(htmlContent, `${data.semester === 1 ? "First" : "Second"} Semester (${data.academic_year})`);
       toast.success("Report downloaded successfully");
       setFilterOpen(false);
     } catch (error) {
