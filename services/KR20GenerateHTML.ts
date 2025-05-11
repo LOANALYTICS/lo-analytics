@@ -216,7 +216,7 @@ export function generateHTML(data: any): string {
       </div>
       <hr style="margin-bottom: 40px;"/>
       <div class="header-description">
-        <h2 style="font-size: 30px;">Item Analysis Report</h2>
+        <h2 style="font-size: 30px; font-weight:700;">Item Analysis Report</h2>
        
       </div>
     </div>

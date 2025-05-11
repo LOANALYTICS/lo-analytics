@@ -89,7 +89,7 @@ export async function GET(request: Request) {
             </div>
             <hr style="margin-bottom: 40px;"/>
             <div class="header-description">
-              <h2>Semester Analysis Report</h2>
+              <h2 style="font-weight:600;">Semester Item Analysis Report</h2>
               <hr/>
               <p>${convertNumberToWord(parseInt(semester))} Semester ${year}</p>
             </div>

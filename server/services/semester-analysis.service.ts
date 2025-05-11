@@ -555,7 +555,7 @@ function generateKR20SegregationHTML(courses: any[]) {
                 ${course.course_name} (${course.course_code})
                 ${
                   course.section
-                    ? `- ${
+                    ? `${
                         course.section.charAt(0).toUpperCase() +
                         course.section.slice(1).toLowerCase()
                       }`
@@ -590,7 +590,7 @@ function generateKR20SegregationHTML(courses: any[]) {
                 ${course.course_name} (${course.course_code})
                 ${
                   course.section
-                    ? `- ${
+                    ? `${
                         course.section.charAt(0).toUpperCase() +
                         course.section.slice(1).toLowerCase()
                       }`
@@ -625,7 +625,7 @@ function generateKR20SegregationHTML(courses: any[]) {
                 ${course.course_name} (${course.course_code})
                 ${
                   course.section
-                    ? `- ${
+                    ? `${
                         course.section.charAt(0).toUpperCase() +
                         course.section.slice(1).toLowerCase()
                       }`
