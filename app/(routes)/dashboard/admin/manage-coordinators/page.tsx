@@ -12,7 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { getCollage } from "@/services/collage.action"
-import { Loader2 } from "lucide-react"
+import { Loader2, Mail } from "lucide-react"
 
 export default function ManageCoordinators() {
   const [coordinators, setCoordinators] = useState<IUser[]>([])
@@ -49,9 +49,9 @@ export default function ManageCoordinators() {
   }, []);
 
   // Filter coordinators based on selected college
-  const filteredCoordinators = selectedCollege === 'all' 
-    ? coordinators 
-    : coordinators.filter((coordinator:any) => coordinator.collage?._id?.toString() === selectedCollege);
+  const filteredCoordinators = selectedCollege === 'all'
+    ? coordinators
+    : coordinators.filter((coordinator: any) => coordinator.collage?._id?.toString() === selectedCollege);
 
   // Handle changes in the dropdown menu
   const handleCheckedChange = async (coordinatorId: string, option: string, checked: boolean) => {
@@ -106,20 +106,24 @@ export default function ManageCoordinators() {
               </SelectContent>
             </Select>
           </div>
-          <section className="flex flex-col gap-2 mt-4">
-            {filteredCoordinators.map((coordinator : any) => (
+          <section className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))]  gap-2 mt-4">
+            {filteredCoordinators.map((coordinator: any) => (
               <div
                 key={coordinator._id}
                 className="flex justify-between items-center border border-gray-300 shadow-sm px-3 rounded-md p-2"
               >
-                <div className="flex flex-col">
-                  <h2>{coordinator.name}</h2>
+                <div className="flex flex-col ">
+                  <h2 className="font-medium">{coordinator.name}</h2>
+                  <div className="text-gray-500 text-sm flex gap-1 items-center">
+                    <Mail size={12} />
+                    <h4>{coordinator.email}</h4>
+                  </div>
                   <p className="text-xs text-gray-500">Accociated with college: {coordinator.collage?.english}</p>
                 </div>
                 <DynamicDropdownMenu
                   options={["Item Analysis", "Question Bank", "Learning Outcome"]}
                   state={dropdownState[coordinator._id] || {}} // Pass the state for this coordinator
-                  handleCheckedChangeAction={(option, checked) => 
+                  handleCheckedChangeAction={(option, checked) =>
                     handleCheckedChange(coordinator._id, option, checked) // Call the handler with the coordinator ID
                   }
                 />

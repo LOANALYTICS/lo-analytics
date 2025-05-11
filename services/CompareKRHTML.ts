@@ -66,11 +66,9 @@ export function generateComparisonHTML(data: any): string {
           }
           .header-container {
             margin-bottom: 80px;
-            width: 100%;
           }
           .header {
             text-align: center;
-            width: 100%;
 
             padding: 4px;
             margin-bottom: 10px;
@@ -80,50 +78,40 @@ export function generateComparisonHTML(data: any): string {
             margin: 0 auto;
           }
           .header-description h2 {
-            font-size: 16px;
+            font-size: 28px;
             text-align: center;
           }
           .header-description hr {
             margin-top: 10px;
           }
           .header-description p {
-            font-size: 12px;
+            font-size: 20px;
             margin-top: -4px;
             text-align: center;
           }
           .college-logo {
             margin: 0 auto;
           }
-          .college-name {
-            font-size: 18px;
-            font-weight: bold;
-          }
-          .university-name {
-            font-size: 16px;
-          }
+        
         </style>
       </head>
       <body>
         <div class="header-container" >
           <div class="header">
             ${college.logo ? `<img src="${college.logo}" alt="College Logo" class="college-logo"/>` : ''}
-            <div class="college-name">
-              ${college.english} | ${college.regional}
-            </div>
-            <div class="university-name">${college.university}</div>
           </div>
           <hr style="margin-bottom: 40px;"/>
           <div class="header-description">
-            <h2>Course Comparison Report</h2>
+            <h2>Comparative Item Alalysis Report</h2>
             <hr/>
-            <p>${course1.details.name} (${course1.details.section}) - ${course1.details.academic_year} vs ${course2.details.name} (${course2.details.section}) - ${course2.details.academic_year}</p>
+            <p>${course1.details.name}- ${course1.details.academic_year}(${course1.details.section.charAt(0).toUpperCase() + course1.details.section.slice(1)}) v/s ${course2.details.academic_year}(${course2.details.section.charAt(0).toUpperCase() + course2.details.section.slice(1)})</p>
           </div>
         </div>
         <div class="tables-container">
-          <table class="min-w-full border-collapse border rounded-md overflow-hidden mt-[5px] border-gray-300">
+          <table style="width:100%; font-size:24px;" class="min-w-full border-collapse border rounded-md overflow-hidden mt-[5px] border-gray-300">
             <colgroup>
-              <col style="width: 40px;">
-              <col style="width: 200px;">
+              <col style="width: 60px;">
+              <col style="width: 400px;">
               <col span="6" style="width: auto;">
             </colgroup>
             <thead>
@@ -132,10 +120,10 @@ export function generateComparisonHTML(data: any): string {
                   <p style="text-align: center; margin: 0; margin-bottom: 10px;">Course Comparison</p>
                 </th>
                 <th colspan="3" class="border border-gray-300 p-1">
-                  <p style="text-align: center; margin: 0; margin-bottom: 10px;">${course1.details.name} (${course1.details.section}) - ${course1.details.academic_year}</p>
+                  <p style="text-align: center; margin: 0; margin-bottom: 10px;">${course1.details.section.charAt(0).toUpperCase() + course1.details.section.slice(1)} - ${course1.details.academic_year}</p>
                 </th>
                 <th colspan="3" class="border border-gray-300 p-1">
-                  <p style="text-align: center; margin: 0; margin-bottom: 10px;">${course2.details.name} (${course2.details.section}) - ${course2.details.academic_year}</p>
+                  <p style="text-align: center; margin: 0; margin-bottom: 10px;">${course2.details.section.charAt(0).toUpperCase() + course2.details.section.slice(1)} - ${course2.details.academic_year}</p>
                 </th>
               </tr>
               <tr>

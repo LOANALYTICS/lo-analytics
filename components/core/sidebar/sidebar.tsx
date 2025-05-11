@@ -66,7 +66,7 @@ const Sidebar = ({ userRole, userPermissions,user }: { userRole: string, userPer
           }`}
       >
         <div className="flex h-16 transition-opacity px-2 py-2 duration-300">
-          <div className="px-1 flex w-full cursor-pointer gap-2 items-center rounded-md hover:bg-neutral-100">
+          <div className="px-1 flex w-full cursor-pointer gap-1 items-center rounded-md hover:bg-neutral-100">
             <Image
               width={36}
               height={36}
@@ -75,9 +75,13 @@ const Sidebar = ({ userRole, userPermissions,user }: { userRole: string, userPer
               alt="logo"
             />
             <p className=
-              {`text-xs font-bold break-keep line-clamp-1  transition-opacity duration-300 ${isCollapsed ? "opacity-0 pointer-events-none" : "opacity-100 "
+              {`text-xs font-semibold  py-px px-2 rounded-md mt-px break-keep line-clamp-2  transition-opacity duration-300 ${isCollapsed ? "opacity-0 pointer-events-none" : "opacity-100 "
                 }`}
-            >University</p>
+            >
+            {
+             "Learning Outcomes, Student Outcomes \n Items Analysis"
+            }
+            </p>
           </div>
         </div>
         <ul className="p-2 h-full flex flex-col gap-3">
