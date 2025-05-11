@@ -134,18 +134,13 @@ type AssessmentPlan = {
 
 export async function updateAssessmentPlans(courseId: string, academicYear: string, assessments: AssessmentPlan[]) {
     try {
-        const course = await Course.findOne({_id: courseId, academic_year: academicYear}).lean() as unknown as CourseDoc;
+        const course = await Course.findOne({ _id: courseId, academic_year: academicYear }).lean();
         if (!course) {
             throw new Error('Course not found or students not configured');
         }
-        // Update existing assessment
-        const assessment = await Assessment.findOneAndUpdate(
-            { course: courseId },
-            { $set: { assessments: assessments } },
-            { new: true }
-        ).lean();
 
-        if (!assessment) {
+        const assessmentDoc = await Assessment.findOne({ course: courseId });
+        if (!assessmentDoc) {
             return {
                 success: false,
                 message: 'Assessment not found for this course',
@@ -153,17 +148,31 @@ export async function updateAssessmentPlans(courseId: string, academicYear: stri
             };
         }
 
+        // Use `type` as the linking key
+        const updatedTypes = assessments.map(a => a.type);
+
+        // Update assessments
+        assessmentDoc.assessments = assessments;
+
+        // Remove outdated assessmentResults
+        assessmentDoc.assessmentResults = assessmentDoc.assessmentResults.filter((result : any) =>
+            updatedTypes.includes(result.type)
+        );
+
+        const updated = await assessmentDoc.save();
+
         return {
             success: true,
             message: 'Assessment plans updated successfully',
-            data: JSON.parse(JSON.stringify(assessment))
+            data: JSON.parse(JSON.stringify(updated))
         };
 
     } catch (error) {
         console.error('Error updating assessment plans:', error);
         throw new Error('Failed to update assessment plans');
     }
-} 
+}
+
 
 interface IndirectAssessment {
     clo: string;

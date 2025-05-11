@@ -211,7 +211,7 @@ export default function AssessmentPlanPage() {
           Direct
         </Button>
         <Button variant={tab === 'indirect' ? 'outline' : 'default'} onClick={() => setTab('indirect')}>
-          InDirect
+          Indirect
         </Button>
       </div>
     </div>
