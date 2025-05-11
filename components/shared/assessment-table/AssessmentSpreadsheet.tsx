@@ -15,6 +15,7 @@ interface AssessmentSpreadsheetProps {
   onSave: (data: any) => void
   courseId: string
   type: string
+  weight: number
   numberOfQuestions: number
 }
 
@@ -40,6 +41,7 @@ export function AssessmentSpreadsheet({
   onSave, 
   courseId, 
   type,
+  weight,
   numberOfQuestions 
 }: AssessmentSpreadsheetProps) {
   const [data, setData] = useState<RowData[]>([])
@@ -196,11 +198,11 @@ export function AssessmentSpreadsheet({
           const keyRow: RowData = {
             studentName: '',
             studentId: 'Key',
-            percentage: '40',
-            score: '40',
-            correct: '40',
-            blank: '40',
-            q1: 'SCORE'
+            percentage: String(weight),
+            score: String(weight),
+            correct: String(weight),
+            blank: String(weight),
+            q1: String(weight)
           }
           
           // Format student data with name first
@@ -311,7 +313,7 @@ export function AssessmentSpreadsheet({
           // Row 1: Headers
           ['Student Name', 'Student ID', '%', 'Score', '#Correct', 'Blank', 'Q1'],
           // Row 2: Key row with total marks (40) in Q1
-          ['', 'Key', '40', '40', '40', '40', '40'],
+          ['', 'Key', String(weight), String(weight), String(weight), String(weight),String(weight) ],
           // Row 3+: Student data with ID in second column
           ...data.slice(2).map(row => [
             row.studentName,

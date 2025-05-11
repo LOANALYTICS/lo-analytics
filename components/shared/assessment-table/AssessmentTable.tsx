@@ -50,6 +50,7 @@ const getCLOKeys = (assessments: Assessment[], numberOfClos: number): string[] =
 
 export default function AssessmentTable({ initialData, onSave, saving, onUpload, numberOfClos, courseId }: AssessmentTableProps) {
   const [spreadsheetType, setSpreadsheetType] = useState<string | null>(null);
+  const [spreadsheetWeight, setSpreadsheetWeight] = useState<number | null>(null);
   const [selectedAssessmentId, setSelectedAssessmentId] = useState<string | null>(null);
   const [assessments, setAssessments] = useState<Assessment[]>(() => {
     if (initialData.length > 0) {
@@ -275,6 +276,7 @@ export default function AssessmentTable({ initialData, onSave, saving, onUpload,
                       onClick={() => {
                         setSpreadsheetOpen(true)
                         setSpreadsheetType(assessment.type)
+                        setSpreadsheetWeight(assessment.weight)
                         setSelectedAssessmentId(assessment.id)
                       }}
                     >
@@ -328,6 +330,7 @@ export default function AssessmentTable({ initialData, onSave, saving, onUpload,
         
         courseId={courseId}
         type={spreadsheetType || ''}
+        weight={spreadsheetWeight || 0}
         numberOfQuestions={
           selectedAssessmentId 
             ? Object.values(assessments.find(a => a.id === selectedAssessmentId)?.clos || {}).flat().length 
