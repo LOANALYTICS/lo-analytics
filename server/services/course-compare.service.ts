@@ -1,6 +1,6 @@
 import { Course } from "@/lib/models";
 import { Types } from "mongoose";
-import { formatPercentage, formatNumber } from "../utils/format.utils";
+import { formatKRAverage, formatNumber } from "../utils/format.utils";
 import { convertNumberToWord } from "@/lib/utils/number-to-word";
 
 interface CourseCompareParams {
@@ -88,21 +88,18 @@ function generateTableHTML(
         <thead>
           <tr>
             <th colspan="2" style="border-color: #000000 !important; width: 300px !important; background-color: #f0f0f0;" class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;">
-              <p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 14px;">${
-                isLevel ? ` ${title}` : `DEPARTMENT: ${title}`
-              }</p>
+              <p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 14px;">${isLevel ? ` ${title}` : `DEPARTMENT: ${title}`
+    }</p>
             </th>
             <th colspan="3" class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;">
-              <p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 14px;"> ${
-                sectionA?.charAt(0).toUpperCase() +
-                sectionA?.slice(1).toLowerCase()
-              }, ${yearA}</p>
+              <p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 14px;"> ${sectionA?.charAt(0).toUpperCase() +
+    sectionA?.slice(1).toLowerCase()
+    }, ${yearA}</p>
             </th>
             <th colspan="3" class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;">
-              <p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 14px;"> ${
-                sectionB?.charAt(0).toUpperCase() +
-                sectionB?.slice(1).toLowerCase()
-              }, ${yearB}</p>
+              <p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 14px;"> ${sectionB?.charAt(0).toUpperCase() +
+    sectionB?.slice(1).toLowerCase()
+    }, ${yearB}</p>
             </th>
           </tr>
           <tr>
@@ -118,143 +115,129 @@ function generateTableHTML(
         </thead>
         <tbody>
           ${courses
-            .map(
-              (course, index) => `
+      .map(
+        (course, index) => `
             <tbody class="row-pair">
               <tr>
-                <td rowspan="2" class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">${
-                  index + 1
-                }</p></td>
-                <td rowspan="2" class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: left; margin: 0; margin-bottom: 10px; font-size: 12px;">${
-                  course.courseTitle
-                }</p></td>
+                <td rowspan="2" class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">${index + 1
+          }</p></td>
+                <td rowspan="2" class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: left; margin: 0; margin-bottom: 10px; font-size: 12px;">${course.courseTitle
+          }</p></td>
                 <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">${formatNumber(
-                  course.yearA?.accepted
-                )}</p></td>
+            course.yearA?.accepted
+          )}</p></td>
                 <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">${formatNumber(
-                  course.yearA?.rejected
-                )}</p></td>
+            course.yearA?.rejected
+          )}</p></td>
                 <td rowspan="2" class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;">
-                  <p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold">${
-                    course.yearA?.kr20 ? Number(course.yearA.kr20).toFixed(2) : "-"
-                  }</p>
+                  <p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold">${course.yearA?.kr20 ? Number(course.yearA.kr20).toFixed(2) : "-"
+          }</p>
                 </td>
                 <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">${formatNumber(
-                  course.yearB?.accepted
-                )}</p></td>
+            course.yearB?.accepted
+          )}</p></td>
                 <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">${formatNumber(
-                  course.yearB?.rejected
-                )}</p></td>
+            course.yearB?.rejected
+          )}</p></td>
                 <td rowspan="2" class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;">
-                  <p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold">${
-                    course.yearB?.kr20 ? Number(course.yearB.kr20).toFixed(2) : "-"
-                  }</p>
+                  <p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold">${course.yearB?.kr20 ? Number(course.yearB.kr20).toFixed(2) : "-"
+          }</p>
                 </td>
               </tr>
               <tr>
                 <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;">
                   <p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">
-                    ${
-                      course.yearA?.acceptedPercentage
-                        ? Math.round(course.yearA.acceptedPercentage) + "%"
-                        : ""
-                    }
+                    ${course.yearA?.acceptedPercentage
+            ? Math.round(course.yearA.acceptedPercentage) + "%"
+            : ""
+          }
                   </p>
                 </td>
                 <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;">
                   <p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">
-                    ${
-                      course.yearA?.rejectedPercentage
-                        ? Math.round(course.yearA.rejectedPercentage) + "%"
-                        : ""
-                    }
+                    ${course.yearA?.rejectedPercentage
+            ? Math.round(course.yearA.rejectedPercentage) + "%"
+            : ""
+          }
                   </p>
                 </td>
                 <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;">
                   <p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">
-                    ${
-                      course.yearB?.acceptedPercentage
-                        ? Math.round(course.yearB.acceptedPercentage) + "%"
-                        : ""
-                    }
+                    ${course.yearB?.acceptedPercentage
+            ? Math.round(course.yearB.acceptedPercentage) + "%"
+            : ""
+          }
                   </p>
                 </td>
                 <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;">
                   <p style="text-align: center; margin: 0; margin-bottom: 10px; font-size: 12px;">
-                    ${
-                      course.yearB?.rejectedPercentage
-                        ? Math.round(course.yearB.rejectedPercentage) + "%"
-                        : ""
-                    }
+                    ${course.yearB?.rejectedPercentage
+            ? Math.round(course.yearB.rejectedPercentage) + "%"
+            : ""
+          }
                   </p>
                 </td>
               </tr>
             </tbody>
           `
-            )
-            .join("")}
+      )
+      .join("")}
           <tr>
             <td rowspan="2" colspan="2"   style="border-color: #000000 !important;" class="border border-black p-1">
               <p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px;font-weight: bold;">Average</p>
             </td>
             <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px;font-weight: bold;">${formatNumber(
-              averages.accepted
-            )}</p></td>
+        averages.accepted
+      )}</p></td>
             <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px;font-weight: bold;">${formatNumber(
-              averages.rejected
-            )}</p></td>
+        averages.rejected
+      )}</p></td>
             <td rowspan="2" class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;">
-              <p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px; font-weight: bold;">${
-                averages.kr20A ? Number(averages.kr20A).toFixed(2) : "-"
-              }</p>
+              <p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px; font-weight: bold;">${formatKRAverage(averages.kr20A)
+    }</p>
             </td>
             <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px; font-weight: bold;">${formatNumber(
-              averages.acceptedB
-            )}</p></td>
+      averages.acceptedB
+    )}</p></td>
             <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px; font-weight: bold;">${formatNumber(
-              averages.rejectedB
-            )}</p></td>
+      averages.rejectedB
+    )}</p></td>
             <td rowspan="2" class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;">
-              <p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px; font-weight: bold;">${
-                averages.kr20B ? Number(averages.kr20B).toFixed(2) : "-"
-              }</p>
+              <p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px; font-weight: bold;">${formatKRAverage(averages.kr20B)
+    }</p>
             </td>
           </tr>
           <tr>
             <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;">
               <p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px; font-weight: bold;">
-                ${
-                  averages.acceptedPercentageA
-                    ? averages.acceptedPercentageA + "%"
-                    : ""
-                }
+                ${averages.acceptedPercentageA
+      ? averages.acceptedPercentageA + "%"
+      : ""
+    }
               </p>
             </td>
             <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;">
               <p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px; font-weight: bold;">
-                ${
-                  averages.rejectedPercentageA
-                    ? averages.rejectedPercentageA + "%"
-                    : ""
-                }
+                ${averages.rejectedPercentageA
+      ? averages.rejectedPercentageA + "%"
+      : ""
+    }
               </p>
             </td>
             <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;">
               <p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px; font-weight: bold;">
-                ${
-                  averages.acceptedPercentageB
-                    ? averages.acceptedPercentageB + "%"
-                    : ""
-                }
+                ${averages.acceptedPercentageB
+      ? averages.acceptedPercentageB + "%"
+      : ""
+    }
               </p>
             </td>
             <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;">
               <p style="text-align: center; margin: 0; font-size: 12px; margin-bottom: 10px; font-weight: bold;">
-                ${
-                  averages.rejectedPercentageB
-                    ? averages.rejectedPercentageB + "%"
-                    : ""
-                }
+                ${averages.rejectedPercentageB
+      ? averages.rejectedPercentageB + "%"
+      : ""
+    }
               </p>
             </td>
           </tr>
@@ -399,23 +382,20 @@ function generateSummaryTableHTML(
             <p style="text-align: center; margin: 0; margin-bottom: 10px;">${title}</p>
           </th>
           <th colspan="3" class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;">
-            <p style="text-align: center; margin: 0; margin-bottom: 10px;"> ${
-              sectionA?.charAt(0).toUpperCase() +
-              sectionA?.slice(1).toLowerCase()
-            }, ${yearA}</p>
+            <p style="text-align: center; margin: 0; margin-bottom: 10px;"> ${sectionA?.charAt(0).toUpperCase() +
+    sectionA?.slice(1).toLowerCase()
+    }, ${yearA}</p>
           </th>
           <th colspan="3" class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;">
-            <p style="text-align: center; margin: 0; margin-bottom: 10px;"> ${
-              sectionB?.charAt(0).toUpperCase() +
-              sectionB?.slice(1).toLowerCase()
-            }, ${yearB}</p>
+            <p style="text-align: center; margin: 0; margin-bottom: 10px;"> ${sectionB?.charAt(0).toUpperCase() +
+    sectionB?.slice(1).toLowerCase()
+    }, ${yearB}</p>
           </th>
         </tr>
         <tr>
           <th class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px;">N</p></th>
-          <th class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: left; margin: 0; margin-bottom: 10px;">${
-            isLevel ? "Level" : "Department"
-          }</p></th>
+          <th class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: left; margin: 0; margin-bottom: 10px;">${isLevel ? "Level" : "Department"
+    }</p></th>
           <th class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px;">Accepted</p></th>
           <th class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px;">Rejected</p></th>
           <th class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px;">KR20</p></th>
@@ -426,102 +406,96 @@ function generateSummaryTableHTML(
       </thead>
       <tbody class="row-pair">
         ${summaries
-          .map(
-            (summary, index) => `
+      .map(
+        (summary, index) => `
           <tr>
-            <td rowspan="2" class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${
-              index + 1
-            }</p></td>
-            <td rowspan="2" class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: left; margin: 0; margin-bottom: 10px;">${
-              summary.name
-            }</p></td>
-            <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${
-              summary.averages.accepted || "-"
-            }</p></td>
-            <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${
-              summary.averages.rejected || "-"
-            }</p></td>
-            <td rowspan="2" class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold">${
-              summary.averages.kr20A || "-"
-            }</p></td>
-            <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${
-              summary.averages.acceptedB || "-"
-            }</p></td>
-            <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${
-              summary.averages.rejectedB || "-"
-            }</p></td>
-            <td rowspan="2" class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold">${
-              summary.averages.kr20B || "-"
-            }</p></td>
+            <td rowspan="2" class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${index + 1
+          }</p></td>
+            <td rowspan="2" class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: left; margin: 0; margin-bottom: 10px;">${summary.name
+          }</p></td>
+            <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${summary.averages.accepted === 0 ? "-" : summary.averages.accepted || "-"
+          }</p></td>
+            <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${summary.averages.rejected === 0 ? "-" : summary.averages.rejected || "-"
+          }</p></td>
+            <td rowspan="2" class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold">${summary.averages.kr20A || "-"
+          }</p></td>
+            <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${summary.averages.acceptedB === 0 ? "-" : summary.averages.acceptedB || "-"
+          }</p></td>
+            <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${summary.averages.rejectedB === 0 ? "-" : summary.averages.rejectedB|| "-"
+          }</p></td>
+            <td rowspan="2" class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold">${summary.averages.kr20B || "-"
+          }</p></td>
           </tr>
           <tr>
-            <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${
-              summary.averages.acceptedPercentageA || "-"
-            }%</p></td>
-            <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${
-              summary.averages.rejectedPercentageA || "-"
-            }%</p></td>
-            <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${
-              summary.averages.acceptedPercentageB || "-"
-            }%</p></td>
-            <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${
-              summary.averages.rejectedPercentageB || "-"
-            }%</p></td>
+            <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${summary.averages.acceptedPercentageA || "-"
+          }</p></td>
+            <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${summary.averages.rejectedPercentageA || "-"
+          }</p></td>
+            <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${summary.averages.acceptedPercentageB || "-"
+          }</p></td>
+            <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${summary.averages.rejectedPercentageB || "-"
+          }</p></td>
           </tr>
         `
-          )
-          .join("")}
+      )
+      .join("")}
         <tr>
           <td rowspan="2" colspan="2" style="border-color: #000000 !important;" class="border border-black p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">Average</p></td>
-          <td class="border style="border-color: #000000 !important;" border-black p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${Math.round(
-            summaries.reduce((acc, curr) => acc + curr.averages.accepted, 0) /
-              summaries.length
-          )}</p></td>
-          <td class="border style="border-color: #000000 !important;" border-black p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${Math.round(
-            summaries.reduce((acc, curr) => acc + curr.averages.rejected, 0) /
-              summaries.length
-          )}</p></td>
-          <td rowspan="2" style="border-color: #000000 !important;" class=" border-black p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${(
-            summaries.reduce((acc, curr) => {
-              const kr20 = curr.averages.kr20A ? Number(curr.averages.kr20A) : 0;
-              return acc + kr20;
-            }, 0) / (summaries.length || 1)
-          ).toFixed(2)}</p></td>
-          <td class="border style="border-color: #000000 !important;" border-black p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${Math.round(
-            summaries.reduce((acc, curr) => acc + curr.averages.acceptedB, 0) /
-              summaries.length
-          )}</p></td>
-          <td class="border style="border-color: #000000 !important;" border-black p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${Math.round(
-            summaries.reduce((acc, curr) => acc + curr.averages.rejectedB, 0) /
-              summaries.length
-          )}</p></td>
-          <td rowspan="2" style="border-color: #000000 !important;" class=" border-black p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${(
-            summaries.reduce((acc, curr) => {
-              const kr20 = curr.averages.kr20B ? Number(curr.averages.kr20B) : 0;
-              return acc + kr20;
-            }, 0) / (summaries.length || 1)
-          ).toFixed(2)}</p></td>
+          <td style="border-color: #000000 !important;" class="border border-black p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${Math.round(
+        summaries.reduce((acc, curr) => acc + curr.averages.accepted, 0) /
+        summaries.length
+      )}</p></td>
+          <td style="border-color: #000000 !important;" class="border border-black p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${Math.round(
+        summaries.reduce((acc, curr) => acc + curr.averages.rejected, 0) /
+        summaries.length
+      )}</p></td>
+          <td rowspan="2" style="border-color: #000000 !important;" class=" border border-black p-1 font-bold">
+  <p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">
+    ${(
+      summaries.reduce((acc, curr) => {
+        const raw = curr.averages.kr20A;
+        const kr20 = !isNaN(Number(raw)) ? Number(raw) : 0;
+        return acc + kr20;
+      }, 0) / (summaries.length || 1)
+    ).toFixed(2)}
+  </p>
+</td>
+          <td style="border-color: #000000 !important;" class="border border-black p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${Math.round(
+      summaries.reduce((acc, curr) => acc + curr.averages.acceptedB, 0) /
+      summaries.length
+    )}</p></td>
+          <td style="border-color: #000000 !important;" class="border border-black p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${Math.round(
+      summaries.reduce((acc, curr) => acc + curr.averages.rejectedB, 0) /
+      summaries.length
+    )}</p></td>
+          <td rowspan="2" style="border-color: #000000 !important;" class="border border-black p-1 font-bold">
+  <p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">
+    ${(
+      summaries.reduce((acc, curr) => {
+        const raw = curr.averages.kr20B;
+        const kr20 = !isNaN(Number(raw)) ? Number(raw) : 0;
+        return acc + kr20;
+      }, 0) / (summaries.length || 1)
+    ).toFixed(2)}
+  </p>
+</td>
         </tr>
         <tr>
           <td class="border border-black p-1 font-bold" style="border-color: #000000 !important;">
-            <p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${avgAcceptedPercentageA}${
-    avgAcceptedPercentageA ? "%" : ""
-  }</p>
+            <p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${avgAcceptedPercentageA}${avgAcceptedPercentageA ? "%" : ""
+    }</p>
           </td>
           <td class="border border-black p-1 font-bold" style="border-color: #000000 !important;">
-            <p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${avgRejectedPercentageA}${
-    avgRejectedPercentageA ? "%" : ""
-  }</p>
+            <p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${avgRejectedPercentageA}${avgRejectedPercentageA ? "%" : ""
+    }</p>
           </td>
           <td class="border border-black p-1 font-bold" style="border-color: #000000 !important;">
-            <p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${avgAcceptedPercentageB}${
-    avgAcceptedPercentageB ? "%" : ""
-  }</p>
+            <p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${avgAcceptedPercentageB}${avgAcceptedPercentageB ? "%" : ""
+    }</p>
           </td>
           <td class="border border-black p-1 font-bold" style="border-color: #000000 !important;">
-            <p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${avgRejectedPercentageB}${
-    avgRejectedPercentageB ? "%" : ""
-  }</p>
+            <p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${avgRejectedPercentageB}${avgRejectedPercentageB ? "%" : ""
+    }</p>
           </td>
         </tr>
       </tbody>

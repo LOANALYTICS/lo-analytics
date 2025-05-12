@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/select";
 import { DockIcon, SplitIcon, CalendarIcon, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { getCurrentUser } from "@/server/utils/helper";
@@ -285,6 +285,16 @@ export default function ItemAnalysisPage() {
     };
     getData();
   }, []);
+  const leftSemester = useWatch({
+    control: compareForm.control,
+    name: "left.semester",
+  });
+  
+  useEffect(() => {
+    if (leftSemester !== undefined) {
+      compareForm.setValue("right.semester", leftSemester);
+    }
+  }, [leftSemester, compareForm]);
 
   return (
     <main className="px-2">
@@ -548,10 +558,11 @@ export default function ItemAnalysisPage() {
                       <FormItem>
                         <FormLabel>Semester</FormLabel>
                         <Select
-                          onValueChange={(value) =>
-                            field.onChange(Number(value))
-                          }
-                          defaultValue={field.value?.toString()}
+                          // onValueChange={(value) =>
+                          //   field.onChange(Number(value))
+                          // }
+                          // defaultValue={field.value?.toString()}
+                          disabled value={field.value?.toString()}
                         >
                           <FormControl>
                             <SelectTrigger>

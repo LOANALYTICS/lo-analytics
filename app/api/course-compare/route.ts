@@ -127,15 +127,15 @@ export async function GET(request: Request) {
             </div>
             <hr style="margin-bottom: 40px;"/>
             <div class="header-description">
-              <h2>Course Comparison Report</h2>
+              <h2 style="font-weight:bold;">Courses Comparison Report</h2>
               <hr/>
               <p>${convertNumberToWord(
                 Number(semister)
-              )} Semester ${yearA} Section ${
+              )} Semester ${yearA}(${
       sectionA.charAt(0).toUpperCase() + sectionA.slice(1).toLowerCase()
-    } vs ${yearB} Section ${
+    }) vs ${yearB}(${
       sectionB.charAt(0).toUpperCase() + sectionB.slice(1).toLowerCase()
-    }</p>
+    })</p>
             </div>
           </div>
           <div class="tables-container">
