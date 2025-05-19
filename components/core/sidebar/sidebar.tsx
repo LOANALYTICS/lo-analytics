@@ -65,22 +65,23 @@ const Sidebar = ({ userRole, userPermissions,user }: { userRole: string, userPer
         className={`h-full border rounded-xl bg-white transition-all duration-300 ease-in-out overflow-hidden ${isCollapsed ? "w-16" : "w-64"
           }`}
       >
-        <div className="flex h-16 transition-opacity px-2 py-2 duration-300">
-          <div className="px-1 flex w-full cursor-pointer gap-1 items-center rounded-md hover:bg-neutral-100">
+        <div className="flex h-20 transition-opacity px-2 py-2 duration-300">
+          <div className="px-1  flex w-full cursor-pointer gap-1 items-center rounded-md hover:bg-neutral-100">
             <Image
-              width={36}
-              height={36}
-              className="rounded-lg aspect-square border p-1"
+              width={60}
+              height={60}
+              className="rounded-lg aspect-square border p-2"
               src="/assets/logo.svg"
               alt="logo"
             />
             <p className=
-              {`text-xs font-semibold  py-px px-2 rounded-md mt-px break-keep line-clamp-2  transition-opacity duration-300 ${isCollapsed ? "opacity-0 pointer-events-none" : "opacity-100 "
+              {`text-sm font-semibold  py-px px-2 rounded-md mt-px break-keep line-clamp-3  transition-opacity duration-300 ${isCollapsed ? "opacity-0 pointer-events-none" : "opacity-100 "
                 }`}
             >
-            {
-             "Learning Outcomes, Student Outcomes \n Items Analysis"
-            }
+              <p>Learning Outcomes</p>
+              <p>Students Outcomes</p>
+              <p>Item Analysis</p>
+            
             </p>
           </div>
         </div>

@@ -1,6 +1,6 @@
 import { Types } from "mongoose";
 import { Course } from "@/lib/models";
-import { formatPercentage } from "../utils/format.utils";
+import { formatNew, formatPercentage } from "../utils/format.utils";
 // import logger from "@/lib/logger";
 import { convertNumberToWord } from "@/lib/utils/number-to-word";
 
@@ -153,7 +153,7 @@ function calculateAverages(courses: any[]) {
   //     ),
   //   },
   // });
-
+  
   return {
     goodQuestions: Math.round(totals.goodQuestions / count),
     easyQuestions: Math.round(totals.easyQuestions / count),
@@ -280,47 +280,47 @@ function generateTableHTML(
                   </td>
                   <td class="border border-black p-1">
                     <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
-                      stats.goodQuestions
+                      stats.goodQuestions === 0 || isNaN(stats.goodQuestions) ? "-" : stats.goodQuestions
                     }</p>
                   </td>
                   <td class="border border-black p-1">
                     <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
-                      stats.easyQuestions
+                      stats.easyQuestions === 0 || isNaN(stats.easyQuestions) ? "-" : stats.easyQuestions
                     }</p>
                   </td>
                   <td class="border border-black p-1">
                     <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
-                      stats.difficultQuestions
+                      stats.difficultQuestions === 0 || isNaN(stats.difficultQuestions) ? "-" : stats.difficultQuestions
                     }</p>
                   </td>
                   <td rowspan="2" class="border border-black p-1">
                     <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
-                      stats.totalAccepted
+                      stats.totalAccepted === 0 || isNaN(stats.totalAccepted) ? "-" : stats.totalAccepted
                     }</p>
                   </td>
                   <td class="border border-black p-1">
                     <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
-                      stats.veryDifficultQuestions
+                      stats.veryDifficultQuestions === 0 || isNaN(stats.veryDifficultQuestions) ? "-" : stats.veryDifficultQuestions
                     }</p>
                   </td>
                   <td class="border border-black p-1">
                     <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
-                      stats.poorQuestions
+                      stats.poorQuestions === 0 || isNaN(stats.poorQuestions) ? "-" : stats.poorQuestions
                     }</p>
                   </td>
                   <td class="border border-black p-1">
                     <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
-                      stats.veryEasyQuestions
+                      stats.veryEasyQuestions === 0 || isNaN(stats.veryEasyQuestions) ? "-" : stats.veryEasyQuestions
                     }</p>
                   </td>
                   <td rowspan="2" class="border border-black p-1">
                     <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
-                      stats.totalRejected
+                      stats.totalRejected === 0 || isNaN(stats.totalRejected) ? "-" : stats.totalRejected
                     }</p>
                   </td>
                   <td rowspan="2" class="border border-black p-1">
                     <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
-                      Number(stats.kr20).toFixed(2)
+                      Number(stats.kr20) === 0 || isNaN(Number(stats.kr20)) ? "-" :  Number(stats.kr20).toFixed(2)
                     }</p>
                   </td>
                 </tr>
@@ -366,80 +366,80 @@ function generateTableHTML(
             </td>
             <td class="border border-black p-1 font-bold">
               <p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${
-                averages.goodQuestions
+                formatNew(averages.goodQuestions)
               }</p>
             </td>
             <td class="border border-black p-1 font-bold">
               <p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${
-                averages.easyQuestions
+                formatNew(averages.easyQuestions)
               }</p>
             </td>
             <td class="border border-black p-1 font-bold">
               <p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${
-                averages.difficultQuestions
+                formatNew(averages.difficultQuestions)
               }</p>
             </td>
             <td rowspan="2" class="border border-black p-1 font-bold">
               <p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${
-                averages.totalAccepted
+                formatNew(averages.totalAccepted)
               }</p>
             </td>
             <td class="border border-black p-1 font-bold">
               <p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${
-                averages.veryDifficultQuestions
+                formatNew(averages.veryDifficultQuestions)
               }</p>
             </td>
             <td class="border border-black p-1 font-bold">
               <p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${
-                averages.poorQuestions
+                formatNew(averages.poorQuestions)
               }</p>
             </td>
             <td class="border border-black p-1 font-bold">
               <p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${
-                averages.veryEasyQuestions
+                formatNew(averages.veryEasyQuestions)
               }</p>
             </td>
             <td rowspan="2" class="border border-black p-1 font-bold">
               <p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${
-                averages.totalRejected
+                formatNew(averages.totalRejected)
               }</p>
             </td>
             <td rowspan="2" class="border border-black p-1 font-bold">
               <p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${
-                averages.kr20
+                Number(averages.kr20) === 0 || isNaN(Number(averages.kr20)) ? "-" : Number(averages.kr20)
               }</p>
             </td>
           </tr>
           <tr>
             <td class="border border-black p-1 font-bold">
               <p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${
-                averages.percentages.goodQuestions
-              }%</p>
+                formatPercentage(averages.percentages.goodQuestions)
+              }</p>
             </td>
             <td class="border border-black p-1 font-bold">
               <p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${
-                averages.percentages.easyQuestions
-              }%</p>
+                formatPercentage(averages.percentages.easyQuestions)
+              }</p>
             </td>
             <td class="border border-black p-1 font-bold">
               <p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${
-                averages.percentages.difficultQuestions
-              }%</p>
+                formatPercentage(averages.percentages.difficultQuestions)
+              }</p>
             </td>
             <td class="border border-black p-1 font-bold">
               <p style="text-align: center; margin: 0; margin-bottom: 10px;font-weight: bold;">${
-                averages.percentages.veryDifficultQuestions
-              }%</p>
+                formatPercentage(averages.percentages.veryDifficultQuestions)
+              }</p>
             </td>
             <td class="border border-black p-1 font-bold">
               <p style="text-align: center; margin: 0; margin-bottom: 10px;font-weight: bold;">${
-                averages.percentages.poorQuestions
-              }%</p>
+                formatPercentage(averages.percentages.poorQuestions)
+              }</p>
             </td>
             <td class="border border-black p-1 font-bold">
               <p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${
-                averages.percentages.veryEasyQuestions
-              }%</p>
+                formatPercentage(averages.percentages.veryEasyQuestions)
+              }</p>
             </td>
           </tr>
         </tbody>
@@ -1020,80 +1020,80 @@ function generateSummaryTableHTML(
             </td>
             <td class="border border-black p-1">
               <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
-                summary.averages.goodQuestions
+                formatNew(summary.averages.goodQuestions) 
               }</p>
             </td>
             <td class="border border-black p-1">
               <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
-                summary.averages.easyQuestions
+                formatNew(summary.averages.easyQuestions)
               }</p>
             </td>
             <td class="border border-black p-1">
               <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
-                summary.averages.difficultQuestions
+                formatNew(summary.averages.difficultQuestions)
               }</p>
             </td>
             <td rowspan="2" class="border border-black p-1">
               <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
-                summary.averages.totalAccepted
+                formatNew(summary.averages.totalAccepted)
               }</p>
             </td>
             <td class="border border-black p-1">
               <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
-                summary.averages.veryDifficultQuestions
+                formatNew(summary.averages.veryDifficultQuestions)
               }</p>
             </td>
             <td class="border border-black p-1">
               <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
-                summary.averages.poorQuestions
+                formatNew(summary.averages.poorQuestions)
               }</p>
             </td>
             <td class="border border-black p-1">
               <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
-                summary.averages.veryEasyQuestions
+                formatNew(summary.averages.veryEasyQuestions)
               }</p>
             </td>
             <td rowspan="2" class="border border-black p-1">
               <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
-                summary.averages.totalRejected
+                formatNew(summary.averages.totalRejected)
               }</p>
             </td>
             <td rowspan="2" class="border border-black p-1">
               <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
-                Number(summary.averages.kr20).toFixed(2)
+                Number(summary.averages.kr20) === 0 || isNaN(Number(summary.averages.kr20))? "-" : Number(summary.averages.kr20).toFixed(2)
               }</p>
             </td>
           </tr>
           <tr>
             <td class="border border-black p-1">
               <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
-                summary.averages.percentages.goodQuestions
-              }%</p>
+                formatPercentage(summary.averages.percentages.goodQuestions) 
+              }</p>
             </td>
             <td class="border border-black p-1">
               <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
-                summary.averages.percentages.easyQuestions
-              }%</p>
+                formatPercentage(summary.averages.percentages.easyQuestions)
+              }</p>
             </td>
             <td class="border border-black p-1">
               <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
-                summary.averages.percentages.difficultQuestions
-              }%</p>
+                formatPercentage(summary.averages.percentages.difficultQuestions)
+              }</p>
             </td>
             <td class="border border-black p-1">
               <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
-                summary.averages.percentages.veryDifficultQuestions
-              }%</p>
+                formatPercentage(summary.averages.percentages.veryDifficultQuestions)
+              }</p>
             </td>
             <td class="border border-black p-1">
               <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
-                summary.averages.percentages.poorQuestions
-              }%</p>
+                formatPercentage(summary.averages.percentages.poorQuestions)
+              }</p>
             </td>
             <td class="border border-black p-1">
               <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
-                summary.averages.percentages.veryEasyQuestions
-              }%</p>
+                formatPercentage(summary.averages.percentages.veryEasyQuestions)
+              }</p>
             </td>
           </tr>
         `
@@ -1106,42 +1106,42 @@ function generateSummaryTableHTML(
           </td>
           <td class="border border-black p-1 font-bold">
             <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
-              finalAverages.goodQuestions
+               formatNew(finalAverages.goodQuestions)
             }</p>
           </td>
           <td class="border border-black p-1 font-bold">
             <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
-              finalAverages.easyQuestions
+              formatNew(finalAverages.easyQuestions)
             }</p>
           </td>
           <td class="border border-black p-1 font-bold">
             <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
-              finalAverages.difficultQuestions
+              formatNew(finalAverages.difficultQuestions)
             }</p>
           </td>
           <td rowspan="2" class="border border-black p-1 font-bold">
             <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
-              finalAverages.totalAccepted
+              formatNew(finalAverages.totalAccepted)
             }</p>
           </td>
           <td class="border border-black p-1 font-bold">
             <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
-              finalAverages.veryDifficultQuestions
+              formatNew(finalAverages.veryDifficultQuestions)
             }</p>
           </td>
           <td class="border border-black p-1 font-bold">
             <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
-              finalAverages.poorQuestions
+              formatNew(finalAverages.poorQuestions)
             }</p>
           </td>
           <td class="border border-black p-1 font-bold">
             <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
-              finalAverages.veryEasyQuestions
+              formatNew(finalAverages.veryEasyQuestions)
             }</p>
           </td>
           <td rowspan="2" class="border border-black p-1 font-bold">
             <p style="text-align: center; margin: 0; margin-bottom: 10px;">${
-              finalAverages.totalRejected
+              formatNew(finalAverages.totalRejected)
             }</p>
           </td>
           <td rowspan="2" class="border border-black p-1 font-bold">

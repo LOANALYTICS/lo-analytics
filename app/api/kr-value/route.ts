@@ -122,7 +122,7 @@ export async function POST(request: Request) {
     // Fetch course and college data
     const courseData: any = await Course.findById(courseId)
       .populate('collage')
-      .select('course_name section level semister department course_code credit_hours no_of_student students_withdrawn student_absent coordinator')
+      .select('course_name academic_year section level semister department course_code credit_hours no_of_student students_withdrawn student_absent coordinator')
       .lean();
 
     if (!courseData || !courseData.collage) {

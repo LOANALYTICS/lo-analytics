@@ -17,9 +17,9 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@
 import { compareKRValues } from '@/services/compareKRValues.action';
 import { generateComparisonHTML } from '@/services/CompareKRHTML';
 
-export default function CourseCard({ cardOf, href, template, user, isQP }: { 
+export default function CourseCard({ cardOf, href, template, user, isQP }: {
   cardOf?: string,
-  href?: string, 
+  href?: string,
   template: any,
   user?: any,
   isQP?: boolean
@@ -38,7 +38,7 @@ export default function CourseCard({ cardOf, href, template, user, isQP }: {
       const fetchSemesterCourses = async () => {
         try {
           const response = await getCoursesBySemester(
-            template.semister, 
+            template.semister,
             template._id,
             template.course_name
           );
@@ -56,29 +56,29 @@ export default function CourseCard({ cardOf, href, template, user, isQP }: {
 
   const handleCompare = async () => {
     if (!selectedCourseId) {
-        toast.error('Please select a course to compare with');
-        return;
+      toast.error('Please select a course to compare with');
+      return;
     }
 
     try {
-        const response = await compareKRValues(template._id, selectedCourseId);
-        
-        if (response.success) {
-          const htmlContent = generateComparisonHTML(response.data);
-          await generatePDF(htmlContent, `kr-comparison-${template.course_name}.pdf`);
-          toast.success('Comparison PDF generated successfully');
-        }
-        setCompareOpen(false);
+      const response = await compareKRValues(template._id, selectedCourseId);
+
+      if (response.success) {
+        const htmlContent = generateComparisonHTML(response.data);
+        await generatePDF(htmlContent, `Comparative-IA-Report-${template.course_name}.pdf`);
+        toast.success('Comparison PDF generated successfully');
+      }
+      setCompareOpen(false);
     } catch (error) {
-        console.error('Error comparing courses:', error);
-        toast.error('Failed to generate comparison');
+      console.error('Error comparing courses:', error);
+      toast.error('Failed to generate comparison');
     }
   };
 
   const handleDownload = async () => {
     try {
       const response = await fetch(`/api/kr-value/download/${template._id}`);
-      
+
       if (!response.ok) {
         throw new Error('Failed to download KR Report');
       }
@@ -145,7 +145,7 @@ export default function CourseCard({ cardOf, href, template, user, isQP }: {
         const result = await response.json();
       } else {
         const htmlContent = await response.text();
-        await generatePDF(htmlContent, "analysis-report.pdf");
+        await generatePDF(htmlContent, `${template.course_code} - Item Analysis Report.pdf`);
         toast.success("PDF generated successfully");
       }
       setUploadOpen(false);
@@ -165,10 +165,10 @@ export default function CourseCard({ cardOf, href, template, user, isQP }: {
   const handleDrop = (e: React.DragEvent<HTMLLabelElement>) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
     const file = e.dataTransfer.files?.[0];
-    if (file && (file.type === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" || 
-                 file.type === "application/vnd.ms-excel")) {
+    if (file && (file.type === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
+      file.type === "application/vnd.ms-excel")) {
       setSelectedFile(file);
       setProgress(0);
 
@@ -192,27 +192,27 @@ export default function CourseCard({ cardOf, href, template, user, isQP }: {
           href={href}
           className='flex relative justify-between items-center border border-gray-300 group-hover:border-blue-400 shadow-sm p-3 rounded-md text-[13px]'
         >
-            <div className='flex flex-col gap-1'>
-              <h2><span className='font-semibold'>Course Name : </span><span className='capitalize'>{template.course_name}</span></h2>
-              <p><span className='font-semibold'>Course Code : </span><span className='capitalize'>{template.course_code}</span></p>
-              {
-                !isQP && (
-                 <>
-                    <p><span className='font-semibold'>Section : </span><span className='capitalize'>{template.section}</span></p>
-                    <p><span className='font-semibold'>Type : </span><span className='capitalize'>{template.examType}</span></p>
-                    <p><span className='font-semibold'>Semester : </span><span className='capitalize'>{template.semister == 1 ? 'First Semester' : 'Second Semester'}</span></p>
-                 </>
-                )
-              }
-           
-            </div>
-            {cardOf === 'assessment-plan' && (
-              <div className='absolute right-3 bottom-3 space-x-2'>
-                <Button variant='outline' size='sm' className='px-5 py-3 text-[11px] w-full h-fit font-bold'>
+          <div className='flex flex-col gap-1'>
+            <h2><span className='font-semibold'>Course Name : </span><span className='capitalize'>{template.course_name}</span></h2>
+            <p><span className='font-semibold'>Course Code : </span><span className='capitalize'>{template.course_code}</span></p>
+            {
+              !isQP && (
+                <>
+                  <p><span className='font-semibold'>Section : </span><span className='capitalize'>{template.section}</span></p>
+                  <p><span className='font-semibold'>Type : </span><span className='capitalize'>{template.examType}</span></p>
+                  <p><span className='font-semibold'>Semester : </span><span className='capitalize'>{template.semister == 1 ? 'First Semester' : 'Second Semester'}</span></p>
+                </>
+              )
+            }
+
+          </div>
+          {cardOf === 'assessment-plan' && (
+            <div className='absolute right-3 bottom-3 space-x-2'>
+              <Button variant='outline' size='sm' className='px-5 py-3 text-[11px] w-full h-fit font-bold'>
                 Generate Report
-                </Button>
-              </div>
-            )}
+              </Button>
+            </div>
+          )}
         </Link>
       ) : (
         <>
@@ -229,7 +229,7 @@ export default function CourseCard({ cardOf, href, template, user, isQP }: {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant='outline' size='sm' className='p-0 text-[11px] w-[74px] h-7'>
-                      <p className={template.krValues ? "text-green-500" : "text-red-500"}>KR20 Report </p>
+                    <p className={template.krValues ? "text-green-500" : "text-red-500"}>KR20 Report </p>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
@@ -241,9 +241,9 @@ export default function CourseCard({ cardOf, href, template, user, isQP }: {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-              <Button 
-                variant='outline' 
-                size='sm' 
+              <Button
+                variant='outline'
+                size='sm'
                 className='p-0 text-[11px] w-[74px] h-7'
                 onClick={() => setCompareOpen(true)}
               >
@@ -258,7 +258,7 @@ export default function CourseCard({ cardOf, href, template, user, isQP }: {
               <DialogHeader>
                 <DialogTitle>Generate KR Report - {template.course_name}</DialogTitle>
               </DialogHeader>
-              
+
               {selectedFile ? (
                 loading ? (
                   <div className="w-full bg-gray-200 rounded-full h-2.5 mt-4">
@@ -278,12 +278,12 @@ export default function CourseCard({ cardOf, href, template, user, isQP }: {
               ) : (
                 <div className="flex items-center justify-center w-full">
                   <label htmlFor={`dropzone-file-${template._id}`} className="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500"
-                  onDragOver={handleDragOver}
-                  onDrop={handleDrop}
+                    onDragOver={handleDragOver}
+                    onDrop={handleDrop}
                   >
                     <div className="flex flex-col items-center justify-center pt-5 pb-6">
                       <svg className="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
-                        <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
+                        <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2" />
                       </svg>
                       <p className="mb-2 text-sm text-gray-500 dark:text-gray-400"><span className="font-semibold">Click to upload</span> or drag and drop</p>
                     </div>
@@ -302,53 +302,53 @@ export default function CourseCard({ cardOf, href, template, user, isQP }: {
           {/* New Comparison Dialog */}
           <Dialog open={compareOpen} onOpenChange={setCompareOpen}>
             <DialogContent className="sm:max-w-[700px]">
-                <DialogHeader>
-                    <DialogTitle>Compare Course Analysis</DialogTitle>
-                </DialogHeader>
-                
-                <div className="flex gap-4 py-4">
-                    <div className="flex flex-col flex-1">
-                        <p className="text-sm font-medium">Current Course:</p>
-                        <p className="h-10 capitalize rounded-md text-sm text-center flex items-center justify-start px-3 bg-slate-100">
-                            {template.course_name} ({template.section}) - {template.academic_year} - {template.examType}
-                        </p>
-                    </div>
-                    <div className="flex flex-col flex-1">
-                        <p className="text-sm font-medium">Compare with:</p>
-                        <Select
-                            onValueChange={setSelectedCourseId}
-                            value={selectedCourseId}
-                        >
-                            <SelectTrigger>
-                                <SelectValue style={{textTransform: 'capitalize'}} placeholder="Select course to compare" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {semesterCourses.length > 0 ? (
-                                    semesterCourses.map((course) => (
-                                        <SelectItem key={course._id} value={course._id} className='capitalize'>
-                                            {course.course_name} - {course.section} ({course.academic_year}) - {course.examType}
-                                        </SelectItem>
-                                    ))
-                                ) : (
-                                    <div className="relative flex items-center justify-center py-2 px-2 text-sm text-muted-foreground">
-                                        No comparable courses found
-                                    </div>
-                                )}
-                            </SelectContent>
-                        </Select>
-                    </div>
-                </div>
+              <DialogHeader>
+                <DialogTitle>Compare Course Analysis</DialogTitle>
+              </DialogHeader>
 
-                <DialogFooter>
-                    <Button variant="outline" onClick={() => setCompareOpen(false)}>
-                        Cancel
-                    </Button>
-                    <Button onClick={handleCompare} disabled={!selectedCourseId}>
-                        Compare
-                    </Button>
-                </DialogFooter>
+              <div className="flex gap-4 py-4">
+                <div className="flex flex-col flex-1">
+                  <p className="text-sm font-medium">Current Course:</p>
+                  <p className="h-10 capitalize rounded-md text-sm text-center flex items-center justify-start px-3 bg-slate-100">
+                    {template.course_name} ({template.section}) - {template.academic_year} - {template.examType}
+                  </p>
+                </div>
+                <div className="flex flex-col flex-1">
+                  <p className="text-sm font-medium">Compare with:</p>
+                  <Select
+                    onValueChange={setSelectedCourseId}
+                    value={selectedCourseId}
+                  >
+                    <SelectTrigger>
+                      <SelectValue style={{ textTransform: 'capitalize' }} placeholder="Select course to compare" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {semesterCourses.length > 0 ? (
+                        semesterCourses.map((course) => (
+                          <SelectItem key={course._id} value={course._id} className='capitalize'>
+                            {course.course_name} - {course.section} ({course.academic_year}) - {course.examType}
+                          </SelectItem>
+                        ))
+                      ) : (
+                        <div className="relative flex items-center justify-center py-2 px-2 text-sm text-muted-foreground">
+                          No comparable courses found
+                        </div>
+                      )}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setCompareOpen(false)}>
+                  Cancel
+                </Button>
+                <Button onClick={handleCompare} disabled={!selectedCourseId}>
+                  Compare
+                </Button>
+              </DialogFooter>
             </DialogContent>
-        </Dialog>
+          </Dialog>
         </>
       )}
     </main>

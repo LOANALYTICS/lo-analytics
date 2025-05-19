@@ -1,8 +1,14 @@
 export function formatPercentage(value: number): string {
-  if (isNaN(value) || !isFinite(value)) {
+  if (isNaN(value) || !isFinite(value) || value === 0) {
     return "-";
   }
   return `${Math.round(value)}%`;
+}
+export function formatNew(value: number): string {
+  if (isNaN(value) || !isFinite(value) || value === 0) {
+    return "-";
+  }
+  return `${(value)}`;
 }
 
 export function formatNumber(value: number): string {
