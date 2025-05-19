@@ -74,7 +74,7 @@ const Sidebar = ({ userRole, userPermissions,user }: { userRole: string, userPer
               src="/assets/logo.svg"
               alt="logo"
             />
-            <p className=
+            <div className=
               {`text-sm font-semibold  py-px px-2 rounded-md mt-px break-keep line-clamp-3  transition-opacity duration-300 ${isCollapsed ? "opacity-0 pointer-events-none" : "opacity-100 "
                 }`}
             >
@@ -82,7 +82,7 @@ const Sidebar = ({ userRole, userPermissions,user }: { userRole: string, userPer
               <p>Students Outcomes</p>
               <p>Item Analysis</p>
             
-            </p>
+            </div>
           </div>
         </div>
         <ul className="p-2 h-full flex flex-col gap-3">
