@@ -1,4 +1,5 @@
 "use server";
+import { User } from "@/lib/models";
 import { ICourse } from "@/server/models/course.model";
 import courseTemplateModel from "@/server/models/courseTemplate.model";
 
@@ -35,6 +36,58 @@ export async function getCoursesTemplates(): Promise<any[]> {
         return serializedCourse;
     });
 }
+
+export async function getCoursesTemplatesByRole(userId: string): Promise<any[]> {
+    // Step 1: Fetch user role and college
+    const user = await User.findById(userId).select('role collage');
+
+    if (!user) {
+        throw new Error("User not found");
+    }
+
+    let coursesQuery: any = {};
+
+    // Step 2: Build query based on role
+    if (user.role === 'admin') {
+        // Admin gets all courses — leave coursesQuery empty
+    } else if (user.role === 'college_admin') {
+        if (!user.collage) {
+            return []; // No college assigned
+        }
+        coursesQuery.college = user.collage;
+    } else {
+        return []; // Other roles get nothing
+    }
+
+    // Step 3: Fetch courses based on the filtered query
+    const courses = await courseTemplateModel.find(coursesQuery)
+        .populate("college")
+        .populate("coordinator", "name")
+        .lean();
+
+    // Step 4: Serialize the response
+    return courses.map((course: any) => ({
+        _id: course._id.toString(),
+        course_name: course.course_name,
+        sem: course.sem,
+        department: course.department,
+        course_code: course.course_code,
+        credit_hours: course.credit_hours,
+        level: course.level,
+        college: course.college ? {
+            _id: course.college._id.toString(),
+            english: course.college.english
+        } : undefined,
+        coordinator: Array.isArray(course.coordinator)
+            ? course.coordinator.map((coord: any) => ({
+                _id: coord._id.toString(),
+                name: coord.name
+            }))
+            : [],
+        createdBy: course.createdBy ? course.createdBy.toString() : undefined,
+    }));
+}
+
 
 
 

@@ -2,11 +2,11 @@
 
 import React, { useState, useEffect } from "react"
 import { DynamicDropdownMenu } from '@/components/shared/MultiSelect'
-import { IUser } from '@/server/models/user.model'
+// import { IUser } from '@/server/models/user.model'
 import { getUsersByRole } from '@/services/users.actions'
 import { toast } from "sonner"
-import { assignCoordinatorsToCourse, getCoursesTemplates } from "@/services/courseTemplate.action"
-import { getCollage } from "@/services/collage.action"
+import { assignCoordinatorsToCourse, getCoursesTemplates, getCoursesTemplatesByRole } from "@/services/courseTemplate.action"
+import { getCollage, getCollageByRole } from "@/services/collage.action"
 import {
   Select,
   SelectContent,
@@ -17,6 +17,8 @@ import {
 import { Loader2 } from "lucide-react"
 
 export default function ManageCoordinators() {
+  const USER = JSON.parse(localStorage.getItem('user') || '{}')
+
   const [courses, setCourses] = useState<any[]>([])
   const [coordinators, setCoordinators] = useState<any>([])
   const [dropdownState, setDropdownState] = useState<Record<string, Record<string, boolean>>>({})
@@ -25,10 +27,10 @@ export default function ManageCoordinators() {
   const [loading, setLoading] = useState<boolean>(false)
 
   const fetchData = async () => {
-    setLoading(true)
-    const courseData = await getCoursesTemplates()
-    const coordinatorData = await getUsersByRole("course_coordinator")
-    const collegeData = await getCollage()
+    setLoading(true);
+    const courseData = await getCoursesTemplatesByRole(USER?._id);
+    const coordinatorData = await getUsersByRole("course_coordinator");
+    const collegeData = await getCollageByRole(USER?._id);
 
     setCourses(courseData)
     setCoordinators(coordinatorData)

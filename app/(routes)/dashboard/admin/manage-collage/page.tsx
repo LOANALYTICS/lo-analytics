@@ -17,7 +17,6 @@ export default function ManageCollage() {
     const [isOpen, setIsOpen] = useState(false)
     const [loading, setLoading] = useState(true)
     const USER = JSON.parse(localStorage.getItem('user') || '{}')
-console.log(USER)
     useEffect(() => {
         const fetchCollages = async () => {
             setLoading(true)

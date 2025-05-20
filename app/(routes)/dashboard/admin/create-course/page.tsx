@@ -22,7 +22,7 @@ SelectValue,
 } from "@/components/ui/select"
 
 import { Input } from "@/components/ui/input"
-import { getCollage, getCollegeById } from "@/services/collage.action";
+import { getCollage, getCollageByRole, getCollegeById } from "@/services/collage.action";
 import axios from 'axios'
 import { useRouter } from "next/navigation"
 import { toast } from 'sonner'
@@ -38,6 +38,9 @@ const formSchema = z.object({
 })
 
 export default function CreateCoursePage() {
+
+    const USER = JSON.parse(localStorage.getItem('user') || '{}')
+
     const router = useRouter()
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -84,7 +87,7 @@ export default function CreateCoursePage() {
     // Fetch colleges
     React.useEffect(() => {
         const fetchColleges = async () => {
-            const collegeData = await getCollage();
+            const collegeData = await getCollageByRole(USER?._id);
             setColleges(collegeData);
         };
         fetchColleges();
