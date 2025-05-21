@@ -29,7 +29,7 @@ import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { getCurrentUser } from "@/server/utils/helper";
-import { getCoursesByCreator } from "@/services/courses.action";
+import { getCoursesByCreator, getCoursesByUserRoleForItems } from "@/services/courses.action";
 import { toast } from "sonner";
 import {academicYears} from '@/lib/utils/y'
 
@@ -291,7 +291,7 @@ export default function ItemAnalysisPage() {
       const startTime = Date.now();
       const currentUser = await getCurrentUser();
       setUser(currentUser);
-      const res = await getCoursesByCreator(currentUser?.id!);
+      const res = await getCoursesByUserRoleForItems(currentUser?.id!);
       setCourses(res);
       console.log("User fetch time:", Date.now() - startTime, "ms");
     };
@@ -312,7 +312,7 @@ export default function ItemAnalysisPage() {
     <main className="px-2">
       <div className="flex justify-between items-center">
         <h1 className="font-semibold text-lg">
-          Courses - ({courses.data.length})
+          Courses - ({courses?.data?.length})
         </h1>
 
         {
