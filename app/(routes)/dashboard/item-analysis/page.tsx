@@ -186,6 +186,10 @@ export default function ItemAnalysisPage() {
     right: FormValues;
   }) => {
     try {
+      if(user?.role === "college_admin" || user?.role === "admin"){
+        toast.warning("You are not authorized to perform this action")
+        return;
+      }
       setIsCompareLoading(true);
       const params = new URLSearchParams({
         collegeId: user?.cid,
@@ -223,6 +227,10 @@ export default function ItemAnalysisPage() {
     right: Omit<FormValues, "section">;
   }) => {
     try {
+      if(user?.role === "college_admin" || user?.role === "admin"){
+        toast.warning("You are not authorized to perform this action")
+        return;
+      }
       setIsYearCompareLoading(true);
       const params = new URLSearchParams({
         collegeId: user?.cid,
@@ -250,6 +258,10 @@ export default function ItemAnalysisPage() {
 
   const onAnalysisSubmit = async (data: FormValues) => {
     try {
+      if(user?.role === "college_admin" || user?.role === "admin"){
+        toast.warning("You are not authorized to perform this action")
+        return;
+      }
       setIsAnalysisLoading(true);
       const params = new URLSearchParams({
         collegeId: user?.cid,
@@ -302,31 +314,37 @@ export default function ItemAnalysisPage() {
         <h1 className="font-semibold text-lg">
           Courses - ({courses.data.length})
         </h1>
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
-            className="flex items-center gap-2 p-0 w-fit h-9 px-4"
-            onClick={() => setFilterOpen(true)}
-          >
-            <span className="font-bold">Semester Analysis</span> <DockIcon className="w-4 h-4" />
-          </Button>
-          <Button
-            variant="outline"
 
-            className="flex items-center gap-2 p-0  w-fit h-9 px-4"
-            onClick={() => setCompareOpen(true)}
-          >
-            <span className="font-bold">Section Comparison </span>  <SplitIcon className="w-4 h-4" />
-          </Button>
-          <Button
-            variant="outline"
-
-            className="flex items-center gap-2 p-0  w-fit h-9 px-4"
-            onClick={() => setYearCompareOpen(true)}
-          >
-            <span className="font-bold">Year Comparison</span>   <CalendarIcon className="w-4 h-4" />
-          </Button>
-        </div>
+        {
+          user?.role === "college_admin" || user?.role === "admin" ? (
+            <div className="flex gap-2">
+            <Button
+              variant="outline"
+              className="flex items-center gap-2 p-0 w-fit h-9 px-4"
+              onClick={() => setFilterOpen(true)}
+            >
+              <span className="font-bold">Semester Analysis</span> <DockIcon className="w-4 h-4" />
+            </Button>
+            <Button
+              variant="outline"
+  
+              className="flex items-center gap-2 p-0  w-fit h-9 px-4"
+              onClick={() => setCompareOpen(true)}
+            >
+              <span className="font-bold">Section Comparison </span>  <SplitIcon className="w-4 h-4" />
+            </Button>
+            <Button
+              variant="outline"
+  
+              className="flex items-center gap-2 p-0  w-fit h-9 px-4"
+              onClick={() => setYearCompareOpen(true)}
+            >
+              <span className="font-bold">Year Comparison</span>   <CalendarIcon className="w-4 h-4" />
+            </Button>
+          </div>
+          ): null
+        }
+       
       </div>
 
 
