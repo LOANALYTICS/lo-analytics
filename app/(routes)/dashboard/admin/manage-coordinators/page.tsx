@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react"
 import { DynamicDropdownMenu } from "@/components/shared/MultiSelect"
 import { IUser } from "@/server/models/user.model"
-import { getUsersByRole, updatePermissions } from "@/services/users.actions"
+import { getUsersByRole, getUsersForManage, updatePermissions } from "@/services/users.actions"
 import {
   Select,
   SelectContent,
@@ -11,10 +11,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { getCollage } from "@/services/collage.action"
+import { getCollage, getCollageByRole } from "@/services/collage.action"
 import { Loader2, Mail } from "lucide-react"
 
 export default function ManageCoordinators() {
+  const USER = JSON.parse(localStorage.getItem('user') || '{}')
   const [coordinators, setCoordinators] = useState<IUser[]>([])
   const [colleges, setColleges] = useState<{ _id: string; english: string }[]>([])
   const [selectedCollege, setSelectedCollege] = useState<string>('all'); // State for selected college
@@ -25,11 +26,14 @@ export default function ManageCoordinators() {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      const coordinatorData = await getUsersByRole("course_coordinator");
-      const collegeData = await getCollage(); // Fetch colleges
+      const coordinatorData = await getUsersForManage(USER?._id);
+      const collegeData = await getCollageByRole(USER?._id); // Fetch colleges
 
       setCoordinators(coordinatorData);
       setColleges(collegeData);
+
+
+
 
       // Initialize dropdown state for each coordinator based on their permissions
       const initialState = coordinatorData.reduce((acc, coordinator) => {
@@ -46,6 +50,7 @@ export default function ManageCoordinators() {
     }
 
     fetchData();
+
   }, []);
 
   // Filter coordinators based on selected college
@@ -110,8 +115,14 @@ export default function ManageCoordinators() {
             {filteredCoordinators.map((coordinator: any) => (
               <div
                 key={coordinator._id}
-                className="flex justify-between items-center border border-gray-300 shadow-sm px-3 rounded-md p-2"
+                className="flex relative justify-between items-center border border-gray-300 shadow-sm px-3 rounded-md p-2"
               >
+                {
+                  coordinator?.role === "college_admin" && (
+                    <span className='bg-black px-2 py-0.5 rounded-md text-[10px] text-white absolute -top-2 right-2'>College Admin</span>
+
+                  )
+                }
                 <div className="flex flex-col ">
                   <h2 className="font-medium">{coordinator.name}</h2>
                   <div className="text-gray-500 text-sm flex gap-1 items-center">

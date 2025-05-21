@@ -24,6 +24,36 @@ export async function getUsersByRole(role: string): Promise<any[]> {
 
 }
 
+export async function getUsersForManage(userId: string): Promise<any[]> {
+    // Step 1: Get current user and their role + college
+    const currentUser = await User.findById(userId).select('role collage');
+
+    if (!currentUser) {
+        throw new Error("User not found");
+    }
+
+    let query: any = {};
+
+    // Step 2: Build query based on role
+    if (currentUser.role === 'admin') {
+        query.role = { $ne: 'admin' }; // exclude other admins
+    } else if (currentUser.role === 'college_admin') {
+        if (!currentUser.collage) {
+            return [];
+        }
+        query.collage = currentUser.collage;
+    } else {
+        return []; // unauthorized
+    }
+
+    // Step 3: Fetch users based on the query
+    const users = await User.find(query).populate('collage');
+
+    // Step 4: Serialize users and collage
+    return JSON.parse(JSON.stringify(users))
+}
+
+
 export async function updatePermissions(userId: string, permissions: string[]) {
     const user = await User.findByIdAndUpdate(userId, { permissions });
     return user ? true : false;
@@ -38,8 +68,6 @@ export const getUsersByCollegeId = async (collegeId: string): Promise<IUser[]> =
 };
 
 
-import { Types } from 'mongoose';
-const { ObjectId } = Types;
 
 export const assignRoleToUser = async (
     role: string,
