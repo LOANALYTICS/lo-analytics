@@ -297,6 +297,7 @@ export async function getCourseById(courseId: string) {
             academic_year: course.academic_year,
        
             section: course.section,
+            collage: course.collage.toString(),
             createdBy: course.createdBy ? course.createdBy.toString() : undefined,
             students: course.students.map((student) => {
                 return {
