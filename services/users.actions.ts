@@ -80,7 +80,7 @@ export const assignRoleToUser = async (
         if (!user) {
             throw new Error("User not found");
         }
-console.log('sfrds',user,user?.collage.toString(), collegeId)
+
         if (user.collage?.toString() !== collegeId ) {
             throw new Error("User does not belong to the specified college");
         }
@@ -119,5 +119,36 @@ console.log('sfrds',user,user?.collage.toString(), collegeId)
         throw new Error(`Failed to assign role to user: ${error.message}`);
     }
 };
+
+
+export async function editCoordinator(userId: string, updates: { name: string }): Promise<{ success: boolean }> {
+    try {
+      const result = await User.findByIdAndUpdate(userId, { $set: updates });
+  
+      if (!result) {
+        return { success: false };
+      }
+  
+      return { success: true };
+    } catch (error) {
+      console.error("Error updating user:", error);
+      return { success: false };
+    }
+  }
+
+  export async function deleteCoordinator(userId: string): Promise<{ success: boolean }> {
+    try {
+      const result = await User.findByIdAndDelete(userId);
+  
+      if (!result) {
+        return { success: false };
+      }
+  
+      return { success: true };
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      return { success: false };
+    }
+  }
 
 
