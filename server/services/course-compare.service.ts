@@ -421,7 +421,7 @@ function generateSummaryTableHTML(
           }</p></td>
             <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${summary.averages.acceptedB === 0 ? "-" : summary.averages.acceptedB || "-"
           }</p></td>
-            <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${summary.averages.rejectedB === 0 ? "-" : summary.averages.rejectedB|| "-"
+            <td class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${summary.averages.rejectedB === 0 ? "-" : summary.averages.rejectedB || "-"
           }</p></td>
             <td rowspan="2" class="border border-black p-1" style="border-color: #000000 !important; padding-top: 4px;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold">${summary.averages.kr20B || "-"
           }</p></td>

@@ -239,7 +239,7 @@ export default function ItemAnalysisPage() {
       }
 
       const htmlContent = await response.text();
-      await generatePDF(htmlContent, "year-comparison");
+      await generatePDF(htmlContent, "Semester Comparision Item Analysis Report");
       setYearCompareOpen(false);
     } catch (error) {
       console.error("Year comparison error:", error);
@@ -324,7 +324,7 @@ export default function ItemAnalysisPage() {
             className="flex items-center gap-2 p-0  w-fit h-9 px-4"
             onClick={() => setYearCompareOpen(true)}
           >
-            <span className="font-bold">Year Comparison</span>   <CalendarIcon className="w-4 h-4" />
+            <span className="font-bold">Semester Comparision</span>   <CalendarIcon className="w-4 h-4" />
           </Button>
         </div>
       </div>
@@ -340,7 +340,7 @@ export default function ItemAnalysisPage() {
       <Dialog open={filterOpen} onOpenChange={setFilterOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Semester Analysis</DialogTitle>
+            <DialogTitle>Semester Item Analysis Report</DialogTitle>
           </DialogHeader>
           <Form {...form}>
             <form
@@ -429,7 +429,7 @@ export default function ItemAnalysisPage() {
       <Dialog open={compareOpen} onOpenChange={setCompareOpen}>
         <DialogContent className="max-w-3xl">
           <DialogHeader>
-            <DialogTitle>Compare Semesters</DialogTitle>
+            <DialogTitle>Section Comparative Report</DialogTitle>
           </DialogHeader>
           <Form {...compareForm}>
             <form
@@ -637,7 +637,7 @@ export default function ItemAnalysisPage() {
       <Dialog open={yearCompareOpen} onOpenChange={setYearCompareOpen}>
         <DialogContent className="max-w-3xl">
           <DialogHeader>
-            <DialogTitle>Compare Years</DialogTitle>
+            <DialogTitle>Semester Comparision Report</DialogTitle>
           </DialogHeader>
           <Form {...yearCompareForm}>
             <form

@@ -1,6 +1,7 @@
 import { Types } from "mongoose";
 import { Course } from "@/lib/models";
 import { convertNumberToWord } from "@/lib/utils/number-to-word";
+import { formatKRAverage, formatNumber } from "../utils/format.utils";
 
 interface YearCompareParams {
   collegeId: string;
@@ -125,10 +126,10 @@ function generateTableHTML(
                   course.courseTitle
                 } (${course.courseCode})</p></td>
                 <td class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${
-                  course.yearA?.accepted || 0
+                  formatNumber(course.yearA?.accepted)
                 }</p></td>
                 <td class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${
-                  course.yearA?.rejected || 0
+                    formatNumber(course.yearA?.rejected)
                 }</p></td>
                 <td rowspan="2" class="border border-gray-300 p-1">
                   <p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${
@@ -136,10 +137,10 @@ function generateTableHTML(
                   }</p>
                 </td>
                 <td class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${
-                  course.yearB?.accepted || 0
+                  formatNumber(course.yearB?.accepted)
                 }</p></td>
                 <td class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${
-                  course.yearB?.rejected || 0
+                  formatNumber(course.yearB?.rejected)
                 }</p></td>
                 <td rowspan="2" class="border border-gray-300 p-1">
                   <p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${
@@ -150,24 +151,24 @@ function generateTableHTML(
               <tr>
                 <td class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${
                   course.yearA?.acceptedPercentage
-                    ? Math.round(course.yearA.acceptedPercentage)
-                    : "0"
-                }%</p></td>
+                    ? Math.round(course.yearA.acceptedPercentage) + "%"
+                    : ""
+                }</p></td>
                 <td class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${
                   course.yearA?.rejectedPercentage
-                    ? Math.round(course.yearA.rejectedPercentage)
-                    : "0"
-                }%</p></td>
+                    ? Math.round(course.yearA.rejectedPercentage) + "%"
+                    : ""
+                }</p></td>
                 <td class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${
                   course.yearB?.acceptedPercentage
-                    ? Math.round(course.yearB.acceptedPercentage)
-                    : "0"
-                }%</p></td>
+                    ? Math.round(course.yearB.acceptedPercentage) + "%"
+                    : ""
+                }</p></td>
                 <td class="border border-gray-300 p-1"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${
                   course.yearB?.rejectedPercentage
-                    ? Math.round(course.yearB.rejectedPercentage)
-                    : "0"
-                }%</p></td>
+                    ? Math.round(course.yearB.rejectedPercentage) + "%"
+                    : ""
+                }</p></td>
               </tr>
             </tbody>
           `
@@ -176,36 +177,36 @@ function generateTableHTML(
           <tr class="row-pair">
             <td rowspan="2" colspan="2" class="border border-gray-300 p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px;">Average</p></td>
             <td class="border border-gray-300 p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${
-              averages.accepted
+              formatNumber(averages.accepted)
             }</p></td>
             <td class="border border-gray-300 p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${
-              averages.rejected
+              formatNumber(averages.rejected)
             }</p></td>
             <td rowspan="2" class="border border-gray-300 p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${
-              averages.kr20A
+              formatKRAverage(averages.kr20A)
             }</p></td>
             <td class="border border-gray-300 p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${
-              averages.acceptedB
+              formatNumber(averages.acceptedB)
             }</p></td>
             <td class="border border-gray-300 p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${
-              averages.rejectedB
+              formatNumber(averages.rejectedB)
             }</p></td>
             <td rowspan="2" class="border border-gray-300 p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${
-              averages.kr20B
+              formatKRAverage(averages.kr20B)
             }</p></td>
           </tr>
           <tr>
             <td class="border border-gray-300 p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${
-              averages.acceptedPercentageA
+              averages.acceptedPercentageA ? averages.acceptedPercentageA : ""
             }%</p></td>
             <td class="border border-gray-300 p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${
-              averages.rejectedPercentageA
+              averages.rejectedPercentageA ? averages.rejectedPercentageA : ""
             }%</p></td>
             <td class="border border-gray-300 p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${
-              averages.acceptedPercentageB
+              averages.acceptedPercentageB ? averages.acceptedPercentageB : ""
             }%</p></td>
             <td class="border border-gray-300 p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${
-              averages.rejectedPercentageB
+              averages.rejectedPercentageB ? averages.rejectedPercentageB : ""
             }%</p></td>
           </tr>
         </tbody>
@@ -447,6 +448,7 @@ function processCoursesForComparison(
 
   return { groupedByLevel, groupedByDepartment };
 }
+
 
 export async function compareYears({
   collegeId,
@@ -734,39 +736,52 @@ function generateSummaryTableHTML(
               index + 1
             }</p></td>
             <td rowspan="2" class="border border-gray-300 p-1" style="border-color: #000000 !important;"><p style="text-align: left; margin: 0; margin-bottom: 10px;">${
-              isLevel ? `Level ${summary.name}` : `DEPARTMENT: ${summary.name}`
+              isLevel ? `Level ${summary.name}` : `${summary.name}`
             }</p></td>
             <td class="border border-gray-300 p-1" style="border-color: #000000 !important;"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${
-              summary.averages.accepted
+             formatNumber(summary.averages.accepted)
             }</p></td>
             <td class="border border-gray-300 p-1" style="border-color: #000000 !important;"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${
-              summary.averages.rejected
+              formatNumber(summary.averages.rejected)
             }</p></td>
             <td rowspan="2" class="border border-gray-300 p-1" style="border-color: #000000 !important;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${
-              summary.averages.kr20A
+              formatKRAverage(summary.averages.kr20A)
             }</p></td>
             <td class="border border-gray-300 p-1" style="border-color: #000000 !important;"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${
-              summary.averages.acceptedB
+              formatNumber(summary.averages.acceptedB)
             }</p></td>
             <td class="border border-gray-300 p-1" style="border-color: #000000 !important;"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${
-              summary.averages.rejectedB
+              formatNumber(summary.averages.rejectedB)
             }</p></td>
             <td rowspan="2" class="border border-gray-300 p-1" style="border-color: #000000 !important;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${
-              summary.averages.kr20B
+              formatKRAverage(summary.averages.kr20B)
             }</p></td>
           </tr>
           <tr>
             <td class="border border-gray-300 p-1" style="border-color: #000000 !important;"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${
-              summary.averages.acceptedPercentageA
+              (isNaN(summary.averages.acceptedPercentageA) ||
+               summary.averages.acceptedPercentageA === 0
+               ? "-"
+                : summary.averages.acceptedPercentageA)
             }%</p></td>
             <td class="border border-gray-300 p-1" style="border-color: #000000 !important;"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${
-              summary.averages.rejectedPercentageA
+              (isNaN(summary.averages.rejectedPercentageA) ||
+               summary.averages.rejectedPercentageA === 0
+              ? "-"
+                : summary.averages.rejectedPercentageA)
+              
             }%</p></td>
             <td class="border border-gray-300 p-1" style="border-color: #000000 !important;"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${
-              summary.averages.acceptedPercentageB
+              (isNaN(summary.averages.acceptedPercentageB) ||
+               summary.averages.acceptedPercentageB === 0)
+              ? "-"
+                : summary.averages.acceptedPercentageB
             }%</p></td>
             <td class="border border-gray-300 p-1" style="border-color: #000000 !important;"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${
-              summary.averages.rejectedPercentageB
+              (isNaN(summary.averages.rejectedPercentageB) ||
+               summary.averages.rejectedPercentageB === 0)
+             ? "-"
+                : summary.averages.rejectedPercentageB
             }%</p></td>
           </tr>
         `

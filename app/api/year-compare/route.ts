@@ -53,7 +53,7 @@ export async function GET(request: Request) {
         <head>
           <meta charset="UTF-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>Year Comparison</title>
+          <title>Courses Comparison Report</title>
           ${styles}
           <style>
             body {
@@ -97,6 +97,7 @@ export async function GET(request: Request) {
             .header-description h2 {
               font-size: 16px;
               text-align: center;
+              font-weight: bold;
 
             }
             .header-description hr {
@@ -127,7 +128,7 @@ export async function GET(request: Request) {
             </div>
             <hr style="margin-bottom: 40px;"/>
             <div class="header-description">
-              <h2>Year Comparison Report</h2>
+              <h2>Courses Comparison Report</h2>
               <hr/>
               <p>${convertNumberToWord(
                 Number(semisterA)
