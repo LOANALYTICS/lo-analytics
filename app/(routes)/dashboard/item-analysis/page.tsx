@@ -186,7 +186,7 @@ export default function ItemAnalysisPage() {
     right: FormValues;
   }) => {
     try {
-      if(user?.role === "college_admin" || user?.role === "admin"){
+      if(user?.role === "course_coordinator" || user?.role === "admin"){
         toast.warning("You are not authorized to perform this action")
         return;
       }
@@ -227,7 +227,7 @@ export default function ItemAnalysisPage() {
     right: Omit<FormValues, "section">;
   }) => {
     try {
-      if(user?.role === "college_admin" || user?.role === "admin"){
+      if(user?.role === "course_coordinator" || user?.role === "admin"){
         toast.warning("You are not authorized to perform this action")
         return;
       }
@@ -258,7 +258,7 @@ export default function ItemAnalysisPage() {
 
   const onAnalysisSubmit = async (data: FormValues) => {
     try {
-      if(user?.role === "college_admin" || user?.role === "admin"){
+      if(user?.role === "course_coordinator" || user?.role === "admin"){
         toast.warning("You are not authorized to perform this action")
         return;
       }
