@@ -14,6 +14,7 @@ interface CourseTemplate extends Document {
   college: mongoose.Types.ObjectId;
   coordinator: mongoose.Types.ObjectId[];
   createdBy?: mongoose.Types.ObjectId;
+  createdAt?: any;
 }
 
 // Define the schema
@@ -33,6 +34,10 @@ const CourseTemplateSchema = new Schema<CourseTemplate>({
   createdBy: {
     type: Schema.Types.ObjectId,
     ref: 'User'
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now
   }
 });
 

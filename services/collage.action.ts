@@ -1,6 +1,6 @@
 "use server"
 
-import { Collage } from "@/lib/models"
+import { Collage, User } from "@/lib/models"
 import { ICollage, IDepartment } from "@/server/models/collage.model"
 import { Types } from "mongoose"
 
@@ -16,6 +16,34 @@ export async function getCollage() {
         regional:collage.regional,
         university:collage.university
     }))
+}
+export async function getCollageByRole(userId: string) {
+    const user = await User.findById(userId).select('role collage');
+
+    if (!user) {
+        throw new Error('User not found');
+    }
+
+    let collages;
+
+    if (user.role === 'admin') {
+        collages = await Collage.find();
+    } else if (user.role === 'college_admin') {
+        if (!user.collage) {
+            return []; // No college assigned
+        }
+        collages = await Collage.find({ _id: user.collage });
+    } else {
+        return [];
+    }
+
+    return collages.map((collage: any) => ({
+        _id: collage._id.toString(),
+        logo: collage.logo,
+        english: collage.english,
+        regional: collage.regional,
+        university: collage.university
+    }));
 }
 
 export async function createCollage(collage: any) {

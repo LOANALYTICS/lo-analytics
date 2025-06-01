@@ -1,5 +1,5 @@
 "use server";
-import { Course } from '@/lib/models';
+import { Course, User } from '@/lib/models';
 import  { ICourse } from '@/server/models/course.model';
 import { Types } from 'mongoose';
 import { NextResponse } from 'next/server';
@@ -206,6 +206,67 @@ export async function getCoursesByCreator(userId: string): Promise<any> {
     }
 }
 
+export async function getCoursesByUserRoleForItems(userId: string): Promise<any> {
+    const user = await User.findById(userId).select('role collage');
+
+    if (!user) {
+        throw new Error("User not found");
+    }
+
+    let query: any = {};
+
+    if (user.role === 'college_admin') {
+        if (!user.collage) {
+            return [];
+        }
+        query.collage = user.collage;
+    } else if (user.role === 'course_coordinator') {
+        //course_coordinator
+        query.createdBy = user._id;
+    } else {
+        return []; // Ignore admin case 
+    }
+
+    const courses = await Course.find(query)
+        .populate('collage')
+        .populate('coordinator', 'name')
+        .lean();
+
+    return {
+        success: true,
+        message: 'Courses fetched successfully',
+        data:courses.map((course: any) => ({
+            _id: course._id.toString(),
+            course_name: course.course_name,
+            semister: course.semister,
+            department: course.department,
+            university_name: course.university_name,
+            course_code: course.course_code,
+            credit_hours: course.credit_hours,
+            level: course.level,
+            examType: course.examType,
+            question_ref: course.question_ref,
+            academic_year: course.academic_year,
+            section: course.section,
+            collage: course.collage ? {
+                _id: course.collage._id.toString(),
+                english: course.collage.english,
+                logo: course.collage.logo
+            } : null,
+            coordinator: Array.isArray(course.coordinator)
+                ? course.coordinator.map((c: any) => ({
+                    _id: c._id.toString(),
+                    name: c.name
+                }))
+                : [],
+            createdBy: course.createdBy?.toString(),
+            students: course.students || [],
+            krValues: course.krValues?.toString() || null
+        }))
+    }
+}
+
+
 export async function getCourseById(courseId: string) {
     try {
         const course = await Course.findById(courseId)
@@ -236,6 +297,7 @@ export async function getCourseById(courseId: string) {
             academic_year: course.academic_year,
        
             section: course.section,
+            collage: course.collage.toString(),
             createdBy: course.createdBy ? course.createdBy.toString() : undefined,
             students: course.students.map((student) => {
                 return {

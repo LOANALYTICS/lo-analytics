@@ -29,7 +29,7 @@ import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { getCurrentUser } from "@/server/utils/helper";
-import { getCoursesByCreator } from "@/services/courses.action";
+import { getCoursesByCreator, getCoursesByUserRoleForItems } from "@/services/courses.action";
 import { toast } from "sonner";
 import {academicYears} from '@/lib/utils/y'
 
@@ -186,6 +186,10 @@ export default function ItemAnalysisPage() {
     right: FormValues;
   }) => {
     try {
+      if(user?.role === "course_coordinator" || user?.role === "admin"){
+        toast.warning("You are not authorized to perform this action")
+        return;
+      }
       setIsCompareLoading(true);
       const params = new URLSearchParams({
         collegeId: user?.cid,
@@ -223,6 +227,10 @@ export default function ItemAnalysisPage() {
     right: Omit<FormValues, "section">;
   }) => {
     try {
+      if(user?.role === "course_coordinator" || user?.role === "admin"){
+        toast.warning("You are not authorized to perform this action")
+        return;
+      }
       setIsYearCompareLoading(true);
       const params = new URLSearchParams({
         collegeId: user?.cid,
@@ -250,6 +258,10 @@ export default function ItemAnalysisPage() {
 
   const onAnalysisSubmit = async (data: FormValues) => {
     try {
+      if(user?.role === "course_coordinator" || user?.role === "admin"){
+        toast.warning("You are not authorized to perform this action")
+        return;
+      }
       setIsAnalysisLoading(true);
       const params = new URLSearchParams({
         collegeId: user?.cid,
@@ -279,7 +291,7 @@ export default function ItemAnalysisPage() {
       const startTime = Date.now();
       const currentUser = await getCurrentUser();
       setUser(currentUser);
-      const res = await getCoursesByCreator(currentUser?.id!);
+      const res = await getCoursesByUserRoleForItems(currentUser?.id!);
       setCourses(res);
       console.log("User fetch time:", Date.now() - startTime, "ms");
     };
@@ -300,33 +312,39 @@ export default function ItemAnalysisPage() {
     <main className="px-2">
       <div className="flex justify-between items-center">
         <h1 className="font-semibold text-lg">
-          Courses - ({courses.data.length})
+          Courses - ({courses?.data?.length})
         </h1>
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
-            className="flex items-center gap-2 p-0 w-fit h-9 px-4"
-            onClick={() => setFilterOpen(true)}
-          >
-            <span className="font-bold">Semester Analysis</span> <DockIcon className="w-4 h-4" />
-          </Button>
-          <Button
-            variant="outline"
 
-            className="flex items-center gap-2 p-0  w-fit h-9 px-4"
-            onClick={() => setCompareOpen(true)}
-          >
-            <span className="font-bold">Section Comparison </span>  <SplitIcon className="w-4 h-4" />
-          </Button>
-          <Button
-            variant="outline"
-
-            className="flex items-center gap-2 p-0  w-fit h-9 px-4"
-            onClick={() => setYearCompareOpen(true)}
-          >
-            <span className="font-bold">Semester Comparision</span>   <CalendarIcon className="w-4 h-4" />
-          </Button>
-        </div>
+        {
+          user?.role === "college_admin" || user?.role === "admin" ? (
+            <div className="flex gap-2">
+            <Button
+              variant="outline"
+              className="flex items-center gap-2 p-0 w-fit h-9 px-4"
+              onClick={() => setFilterOpen(true)}
+            >
+              <span className="font-bold">Semester Analysis</span> <DockIcon className="w-4 h-4" />
+            </Button>
+            <Button
+              variant="outline"
+  
+              className="flex items-center gap-2 p-0  w-fit h-9 px-4"
+              onClick={() => setCompareOpen(true)}
+            >
+              <span className="font-bold">Section Comparison </span>  <SplitIcon className="w-4 h-4" />
+            </Button>
+            <Button
+              variant="outline"
+  
+              className="flex items-center gap-2 p-0  w-fit h-9 px-4"
+              onClick={() => setYearCompareOpen(true)}
+            >
+              <span className="font-bold">Year Comparison</span>   <CalendarIcon className="w-4 h-4" />
+            </Button>
+          </div>
+          ): null
+        }
+       
       </div>
 
 

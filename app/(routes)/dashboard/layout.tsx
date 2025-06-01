@@ -1,4 +1,3 @@
-import { cookies } from 'next/headers'; // Import cookies from next/headers
 import LogoutButton from '@/components/core/LogoutButton';
 import Sidebar from '@/components/core/sidebar/sidebar';
 import { Plus } from 'lucide-react';
@@ -25,7 +24,7 @@ const BaseLayout = async ({ children }: { children: React.ReactNode }) => {
           </div>
           <div className='flex gap-3 items-center'>
             {
-              role !== "admin" && topbarLinks.map((link) => (
+              role !== "admin" || role !== 'college_admin' && topbarLinks.map((link) => (
                 <Link
                   key={link.name}
                   href={link.href}

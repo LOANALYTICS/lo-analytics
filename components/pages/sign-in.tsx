@@ -56,7 +56,7 @@ export default function SignIn({ collages }: { collages: any }) {
 
       if (res.status === 200) {
         toast.success("Account login successfully");
-        localStorage.setItem("user", res.data);
+        localStorage.setItem("user", JSON.stringify(res?.data?.user));
         router.push("/dashboard");
       }
     } catch (error: any) {

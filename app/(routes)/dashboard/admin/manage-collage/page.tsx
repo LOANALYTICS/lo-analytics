@@ -1,11 +1,10 @@
 'use client'
 import React, { useState, useEffect } from 'react'
-import { getCollage } from '@/services/collage.action'
+import { getCollage, getCollageByRole } from '@/services/collage.action'
 import { Loader2, Plus } from 'lucide-react'
 import {
     Dialog,
     DialogContent,
-    DialogDescription,
     DialogHeader,
     DialogTitle,
     DialogTrigger,
@@ -17,12 +16,12 @@ export default function ManageCollage() {
     const [collages, setCollages] = useState<any>([])
     const [isOpen, setIsOpen] = useState(false)
     const [loading, setLoading] = useState(true)
-
+    const USER = JSON.parse(localStorage.getItem('user') || '{}')
     useEffect(() => {
         const fetchCollages = async () => {
             setLoading(true)
             try {
-                const collageData = await getCollage()
+                const collageData = await getCollageByRole(USER?._id)
                 setCollages(collageData)
             } catch (error) {
                 console.error('Error fetching collages:', error)
@@ -50,7 +49,9 @@ export default function ManageCollage() {
         <main className="px-2">
             <div className="flex justify-between items-center">
                 <h1 className="font-semibold text-lg">Manage Collage</h1>
-                <Dialog open={isOpen} onOpenChange={setIsOpen}>
+                {
+                    USER?.role === 'admin' && (
+                        <Dialog open={isOpen} onOpenChange={setIsOpen}>
                     <DialogTrigger>
                         <Plus className='p-1 border border-gray-300 rounded-md' />
                     </DialogTrigger>
@@ -64,6 +65,8 @@ export default function ManageCollage() {
                         }} />
                     </DialogContent>
                 </Dialog>
+                    )
+                }
             </div>
             <section className="flex flex-col gap-2 mt-4 ">
                 {loading ? (
