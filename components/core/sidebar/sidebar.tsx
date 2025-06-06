@@ -15,6 +15,7 @@ const sidebarItems: SidebarItem[] = [
       { name: "Student Details", href: "/dashboard/blueprint/student-details", icon: UsersRound },
       { name: "Learning Outcomes", href: "/dashboard/blueprint/learning-outcomes", icon: BookDashed },
       { name: "Assessment Plan", href: "/dashboard/blueprint/assessment-plan", icon: AsteriskSquare },
+      { name: "Reports", href: "/dashboard/blueprint/reports", icon: AsteriskSquare },
     ]
   },
 ];

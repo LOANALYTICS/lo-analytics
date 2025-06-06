@@ -126,22 +126,30 @@ export function AssessmentSpreadsheet({
           {
             ...keyColumn('percentage', textColumn),
             title: 'C',
-            minWidth: 80
+            minWidth: 0,
+            width: 0,
+            hidden: true
           },
           {
             ...keyColumn('score', textColumn),
             title: 'D',
-            minWidth: 80
+            minWidth: 0,
+            width: 0,
+            hidden: true
           },
           {
             ...keyColumn('correct', textColumn),
             title: 'E',
-            minWidth: 100
+            minWidth: 0,
+            width: 0,
+            hidden: true
           },
           {
             ...keyColumn('blank', textColumn),
             title: 'F',
-            minWidth: 80
+            minWidth: 0,
+            width: 0,
+            hidden: true
           },
           {
             ...keyColumn('q1', textColumn),

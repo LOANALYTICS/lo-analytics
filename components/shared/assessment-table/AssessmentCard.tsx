@@ -101,9 +101,10 @@ const generatePDF = async (html: string, fileName: string, orientation: 'portrai
 };
 
 
-export default function AssessmentCard({ href, course }: { 
+export default function AssessmentCard({ href, course, standalone }: { 
   href: string, 
   course: any,
+  standalone?: boolean
 }) {
   const [coordinator, setCoordinator] = useState<any>();
 
@@ -243,7 +244,52 @@ const handleStudentOutcome = async(e: any, id: string, ace_year: string, section
   return (
     <>
     <main className='w-full h-full hover:shadow-md transition-all duration-300 hover:translate-y-[-1px] group'>
-        <Link
+        {
+        standalone ?
+        (
+
+          <div
+          className='flex relative justify-between items-center border border-gray-300 group-hover:border-blue-400 shadow-sm p-3 rounded-md text-[13px]'
+        >
+            <div className='flex flex-col gap-1'>
+              <h2>Course Name : <span className='capitalize'>{course.course_name}</span></h2>
+              <p>Course Code : <span className='capitalize'>{course.course_code}</span></p>
+              <p>Section : <span className='capitalize'>{course.section}</span></p>
+              <p>Type : <span className='capitalize'>{course.examType}</span></p>
+              <p>Semester : <span className='capitalize'>{course.semister  == 1 ? 'First Semester' : 'Second Semester'}</span></p>
+            </div>
+            <div className='z-50 flex flex-col gap-2 self-end bottom-3 '>
+            <Button onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  handleStudentOutcome(e,course?._id, course?.academic_year, course?.section)}} variant='outline' size='sm' className='px-5 py-3 text-[11px] w-full h-fit font-bold'>
+                    S.O - Report
+                </Button>
+                <Button onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  handleAssessmentPlan(e)}} variant='outline' size='sm' className='px-5 py-3 text-[11px] w-full h-fit font-bold'>
+                    CLO - Report
+                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant='outline' size='sm' className='px-5 py-3 text-[11px] w-full h-fit font-bold'>
+                      PLO - Report
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={(e) => handleCloReport(e, 60,course?._id, course?.academic_year, course?.section)}>Generate at 60%</DropdownMenuItem>
+                    <DropdownMenuItem onClick={(e) => handleCloReport(e, 70,course?._id, course?.academic_year, course?.section)}>Generate at 70%</DropdownMenuItem>
+                    <DropdownMenuItem onClick={(e) => handleCloReport(e, 80,course?._id, course?.academic_year, course?.section)}>Generate at 80%</DropdownMenuItem>
+                    <DropdownMenuItem onClick={(e) => handleCloReport(e, 90,course?._id, course?.academic_year, course?.section)}>Generate at 90%</DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+          
+            </div>
+        </div>
+        ):(
+          <Link
           href={href}
           className='flex relative justify-between items-center border border-gray-300 group-hover:border-blue-400 shadow-sm p-3 rounded-md text-[13px]'
         >
@@ -284,6 +330,9 @@ const handleStudentOutcome = async(e: any, id: string, ace_year: string, section
           
             </div>
         </Link>
+        )
+         
+        }
     </main>
 
     </>
