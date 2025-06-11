@@ -140,7 +140,7 @@ export default function ManageCoordinators() {
       toast.error('Something went wrong')
     }
   }
- 
+ console.log(filteredCoordinators)
 
   return (
     <main className="px-2">
@@ -191,7 +191,7 @@ export default function ManageCoordinators() {
                 </div>
                 <div className="flex gap-3 items-center">
                   <DynamicDropdownMenu
-                    options={["Item Analysis", "Question Bank", "Learning Outcome"]}
+                    options={coordinator.collage?.toolAccess || []}
                     state={dropdownState[coordinator._id] || {}} // Pass the state for this coordinator
                     handleCheckedChangeAction={(option, checked) =>
                       handleCheckedChange(coordinator._id, option, checked) // Call the handler with the coordinator ID

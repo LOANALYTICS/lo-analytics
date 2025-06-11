@@ -136,3 +136,43 @@ export async function deleteDepartmentById(collegeId: string, departmentId: stri
     }
 }
 
+export async function updateToolAccess(collegeId: string, toolAccess: string[]) {
+    try {
+        const updatedCollege = await Collage.findByIdAndUpdate(
+            collegeId,
+            { $set: { toolAccess } },
+            { new: true }
+        );
+        
+        if (!updatedCollege) {
+            throw new Error('College not found');
+        }
+        
+        return {
+            success: true,
+            toolAccess: JSON.parse(JSON.stringify(updatedCollege.toolAccess))
+        };
+    } catch (error) {
+        console.error('Error updating tool access:', error);
+        throw error;
+    }
+}
+
+export async function getToolAccessByCollegeId(collegeId: string) {
+    try {
+        const college = await Collage.findById(collegeId).select('toolAccess');
+        
+        if (!college) {
+            throw new Error('College not found');
+        }
+        
+        return {
+            success: true,
+            toolAccess: JSON.parse(JSON.stringify(college.toolAccess))  || []
+        };
+    } catch (error) {
+        console.error('Error fetching tool access:', error);
+        throw error;
+    }
+}
+

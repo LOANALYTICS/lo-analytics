@@ -4,8 +4,8 @@ import React, { useEffect, useLayoutEffect, useState } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { addDepartment, getCollegeById, editDepartment, deleteDepartmentById } from '@/services/collage.action';
-import { EditIcon, Eye, Loader2, Mail, MoreVertical, Scan, TrashIcon } from 'lucide-react';
+import { addDepartment, getCollegeById, editDepartment, deleteDepartmentById, updateToolAccess, getToolAccessByCollegeId } from '@/services/collage.action';
+import { EditIcon, Eye, Loader2, Mail, MoreVertical, Scan, TrashIcon, Check, ChevronsUpDown } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { FormField, FormItem, FormLabel, FormControl, Form } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
@@ -16,6 +16,9 @@ import { Separator } from '@/components/ui/separator';
 import { assignRoleToUser, getUsersByCollegeId } from '@/services/users.actions';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@radix-ui/react-dropdown-menu';
 import { getRole } from '@/server/utils/helper';
+import { cn } from "@/lib/utils"
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 
 interface Props {
     params: {
@@ -62,6 +65,8 @@ const ManageDepartments = ({ params }: any) => {
     const [editDialogOpen, setEditDialogOpen] = useState(false);
     const [currentDepartment, setCurrentDepartment] = useState<Department | null>(null);
     const [isLoading, setIsLoading] = useState(false);
+    const [selectedTools, setSelectedTools] = useState<string[]>([])
+    const tools = ["Item Analysis", "Question Bank", "Learning Outcome"]
 
     const fetchCollege = async () => {
         try {
@@ -118,6 +123,23 @@ const ManageDepartments = ({ params }: any) => {
         }
     }, [currentDepartment, editDialogOpen, editForm]);
 
+    const fetchToolAccess = async () => {
+        try {
+            const result = await getToolAccessByCollegeId(collegeId);
+            if (result.success) {
+                setSelectedTools(result.toolAccess);
+            }
+        } catch (error) {
+            toast.error('Failed to fetch tool access');
+        }
+    };
+
+    useEffect(() => {
+        if (tab === 'edit-access') {
+            fetchCorodinators();
+            fetchToolAccess();
+        }
+    }, [collegeId, tab]);
 
     const onSubmit: SubmitHandler<DepartmentFormData> = async (data) => {
         try {
@@ -168,6 +190,16 @@ const ManageDepartments = ({ params }: any) => {
     if (USERROLE === "") {
         return null;
     }
+    const handleToolAccessUpdate = async (tools: string[]) => {
+        try {
+            const result = await updateToolAccess(collegeId, tools);
+            if (result.success) {
+                toast.success('Tool access updated successfully');
+            }
+        } catch (error) {
+            toast.error('Failed to update tool access');
+        }
+    };
     return (
         <main>
             <div className='flex justify-between items-center py-2'>
@@ -292,6 +324,61 @@ const ManageDepartments = ({ params }: any) => {
                             </div>
                         ) : (
                             <div className='p-4'>
+                                <div className="mb-4">
+                                    <h3 className="mb-2">Tools Access</h3>
+                                    <div>
+                                    <Popover>
+                                        <PopoverTrigger asChild>
+                                            <Button
+                                                variant="outline"
+                                                role="combobox"
+                                                className="w-[300px] justify-between"
+                                            >
+                                                {selectedTools.length > 0
+                                                    ? `${selectedTools.length} tools selected`
+                                                    : "Select tools..."}
+                                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                            </Button>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-[300px] p-0">
+                                            <Command>
+                                                <CommandInput placeholder="Search tools..." />
+                                                <CommandEmpty>No tools found.</CommandEmpty>
+                                                <CommandGroup>
+                                                    {tools.map((tool) => (
+                                                        <CommandItem
+                                                            key={tool}
+                                                            onSelect={() => {
+                                                                setSelectedTools((prev) =>
+                                                                    prev.includes(tool)
+                                                                        ? prev.filter((t) => t !== tool)
+                                                                        : [...prev, tool]
+                                                                )
+                                                            }}
+                                                        >
+                                                            <Check
+                                                                className={cn(
+                                                                    "mr-2 h-4 w-4",
+                                                                    selectedTools.includes(tool) ? "opacity-100" : "opacity-0"
+                                                                )}
+                                                            />
+                                                            {tool}
+                                                        </CommandItem>
+                                                    ))}
+                                                </CommandGroup>
+                                            </Command>
+                                        </PopoverContent>
+                                    </Popover>
+                                    <Button className='ml-4'
+                                    onClick={() => handleToolAccessUpdate(selectedTools)}
+                                    >
+                                        Update Access
+                                    </Button>
+
+                                    </div>
+                                    
+                                </div>
+                                {/* users  */}
                                 <div >
                                     <h3>Users</h3>
                                     <section className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))]  gap-2 mt-4">

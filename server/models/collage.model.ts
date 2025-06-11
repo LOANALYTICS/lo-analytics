@@ -15,6 +15,7 @@ export interface ICollage extends Document {
     regional: string;
     university: string;
     departments: IDepartment[];
+    toolAccess: string[];
 }
 
 export const collageSchema = new Schema<ICollage>({
@@ -25,5 +26,6 @@ export const collageSchema = new Schema<ICollage>({
     departments: [{ 
         name: { type: String, required: true },
         shortName: { type: String, required: true }
-    }]
+    }],
+    toolAccess: [{ type: String }]
 }, { timestamps: true });

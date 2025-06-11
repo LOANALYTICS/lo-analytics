@@ -11,6 +11,7 @@ export default function page() {
         <p>Back to analytics</p>
         </div>
         <section className='space-y-4 max-w-5xl mx-auto'>
+          <h1 className=' text-xl font-medium'><span className='bg-gradient-to-tr from-blue-300 text-transparent bg-clip-text to-blue-500  text-5xl font-semibold'>Get in touch</span> with us for any query.</h1>
         <div className='flex flex-col md:flex-row h-full w-full items-center justify-center gap-8'>
         <div className=" flex  items-center justify-center w-full overflow-hidden relative rounded-xl">
       <img src="/assets/contact.jpg" alt="Description" className="object-cover h-full w-full ab" />
