@@ -191,6 +191,7 @@ export default function ManageCoordinators() {
                 </div>
                 <div className="flex gap-3 items-center">
                   <DynamicDropdownMenu
+                  type={'tools'}
                     options={coordinator.collage?.toolAccess || []}
                     state={dropdownState[coordinator._id] || {}} // Pass the state for this coordinator
                     handleCheckedChangeAction={(option, checked) =>

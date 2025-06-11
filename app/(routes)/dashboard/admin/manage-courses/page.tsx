@@ -6,7 +6,7 @@ import { DynamicDropdownMenu } from '@/components/shared/MultiSelect'
 import { getUsersByRole } from '@/services/users.actions'
 import { toast } from "sonner"
 import { assignCoordinatorsToCourse, deleteCourseTemplateById, getCoursesTemplates, getCoursesTemplatesByRole } from "@/services/courseTemplate.action"
-import { getCollage, getCollageByRole } from "@/services/collage.action"
+import { getCollageByRole } from "@/services/collage.action"
 import {
   Select,
   SelectContent,
