@@ -260,6 +260,7 @@ export default function AssessmentTable({ initialData, onSave, saving, onUpload,
                   <Input
                     type="number"
                     value={assessment.weight}
+                    className='min-w-12'
                     onChange={(e) => setAssessments(prev => prev.map(a =>
                       a.id === assessment.id ? { ...a, weight: Number(e.target.value) } : a
                     ))}
@@ -286,6 +287,16 @@ export default function AssessmentTable({ initialData, onSave, saving, onUpload,
                 </TableCell>
               </TableRow>
             ))}
+            <TableRow className='border-b  border-black font-semibold'>
+              <TableCell colSpan={cloKeys.length + 2} className='py-4 border-r border-black'>
+                Total
+              </TableCell>
+              <TableCell colSpan={2} className='py-1 font-semibold '>
+                <span className='border px-4 py-2 rounded-lg -ml-2 font-bold'>
+                {assessments.reduce((sum, assessment) => sum + assessment.weight, 0)}
+                </span>
+              </TableCell>
+            </TableRow>
           </TableBody>
         </Table>
       </div>

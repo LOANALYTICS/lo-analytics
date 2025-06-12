@@ -10,7 +10,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import axios from 'axios';
 import { getCurrentUser } from '@/server/utils/helper';
 
 const generatePDF = async (html: string, fileName: string, orientation: 'portrait' | 'landscape' = 'portrait') => {
@@ -25,7 +24,8 @@ const generatePDF = async (html: string, fileName: string, orientation: 'portrai
     
     // Create a container for the sanitized HTML
     const container = document.createElement("div");
-    container.innerHTML = sanitizedHTML;
+    // Add CSS to prevent page breaks inside table rows
+    container.innerHTML = `<style>tr { page-break-inside: avoid !important; }</style>` + sanitizedHTML;
     document.body.appendChild(container);
 
     // Add the logo to the container
@@ -42,11 +42,11 @@ const generatePDF = async (html: string, fileName: string, orientation: 'portrai
 
     // PDF options with landscape orientation
     const opt = {
-      margin: 0.5,
+      margin: 0.25,
       filename: `${fileName}.pdf`,
       image: { type: "jpeg", quality: 0.98 },
       html2canvas: {
-        scale: 2,
+        scale: 1.5,
         useCORS: true,
         scrollY: -window.scrollY,
         removeContainer: true,
@@ -61,7 +61,7 @@ const generatePDF = async (html: string, fileName: string, orientation: 'portrai
       },
       pagebreak: {
         mode: ["css", "legacy"],
-        avoid: [".achievement-pair", "thead"],
+        avoid: [".achievement-pair", "thead",'table tr'],
       },
     };
 
@@ -158,7 +158,7 @@ export default function AssessmentCard({ href, course, standalone }: {
         }, 5000);
       });
       
-      await generatePDF(tempContainer.innerHTML, 'assessment_report');
+      await generatePDF(tempContainer.innerHTML,`${course?.course_code} CLO Report`);
       toast.dismiss();
       toast.success('Report generated successfully');
       document.body.removeChild(tempContainer);
@@ -198,7 +198,7 @@ const handleCloReport = async (e: any, percentage: number, id: string, ace_year:
 
     const html = await response.text();
     toast.loading("Generating report")
-    await generatePDF(html, `clo_report_${percentage}`, 'landscape');
+    await generatePDF(html, `${course?.course_code} PLO-${percentage}-perc Report`, 'landscape');
     toast.dismiss();
     toast.success('Report generated successfully');
 
@@ -231,7 +231,7 @@ const handleStudentOutcome = async(e: any, id: string, ace_year: string, section
     }
 
     const html = await response.text();
-    await generatePDF(html, 'student_outcome_report', 'landscape');
+    await generatePDF(html, `${course?.course_code} SO Report`, 'landscape');
     toast.dismiss();
     toast.success('Report generated successfully');
 
@@ -249,7 +249,7 @@ const handleStudentOutcome = async(e: any, id: string, ace_year: string, section
         (
 
           <div
-          className='flex relative justify-between items-center border border-gray-300 group-hover:border-blue-400 shadow-sm p-3 rounded-md text-[13px]'
+          className='flex relative gap-2 justify-between items-center border border-gray-300 group-hover:border-blue-400 shadow-sm p-3 rounded-md text-[13px]'
         >
             <div className='flex flex-col gap-1'>
               <h2>Course Name : <span className='capitalize'>{course.course_name}</span></h2>
@@ -258,6 +258,7 @@ const handleStudentOutcome = async(e: any, id: string, ace_year: string, section
               <p>Type : <span className='capitalize'>{course.examType}</span></p>
               <p>Semester : <span className='capitalize'>{course.semister  == 1 ? 'First Semester' : 'Second Semester'}</span></p>
             </div>
+          
             <div className='z-50 flex flex-col gap-2 self-end bottom-3 '>
             <Button onClick={(e) => {
                   e.preventDefault()
@@ -300,35 +301,39 @@ const handleStudentOutcome = async(e: any, id: string, ace_year: string, section
               <p>Type : <span className='capitalize'>{course.examType}</span></p>
               <p>Semester : <span className='capitalize'>{course.semister  == 1 ? 'First Semester' : 'Second Semester'}</span></p>
             </div>
-            <div className='z-50 flex flex-col gap-2 self-end bottom-3 '>
-            <Button onClick={(e) => {
-                  e.preventDefault()
-                  e.stopPropagation()
-                  handleStudentOutcome(e,course?._id, course?.academic_year, course?.section)}} variant='outline' size='sm' className='px-5 py-3 text-[11px] w-full h-fit font-bold'>
-                    S.O - Report
-                </Button>
+            {
+              standalone && (
+                <div className='z-50 flex flex-col gap-2 self-end bottom-3 '>
                 <Button onClick={(e) => {
-                  e.preventDefault()
-                  e.stopPropagation()
-                  handleAssessmentPlan(e)}} variant='outline' size='sm' className='px-5 py-3 text-[11px] w-full h-fit font-bold'>
-                    CLO - Report
-                </Button>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant='outline' size='sm' className='px-5 py-3 text-[11px] w-full h-fit font-bold'>
-                      PLO - Report
+                      e.preventDefault()
+                      e.stopPropagation()
+                      handleStudentOutcome(e,course?._id, course?.academic_year, course?.section)}} variant='outline' size='sm' className='px-5 py-3 text-[11px] w-full h-fit font-bold'>
+                        S.O - Report
                     </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={(e) => handleCloReport(e, 60,course?._id, course?.academic_year, course?.section)}>Generate at 60%</DropdownMenuItem>
-                    <DropdownMenuItem onClick={(e) => handleCloReport(e, 70,course?._id, course?.academic_year, course?.section)}>Generate at 70%</DropdownMenuItem>
-                    <DropdownMenuItem onClick={(e) => handleCloReport(e, 80,course?._id, course?.academic_year, course?.section)}>Generate at 80%</DropdownMenuItem>
-                    <DropdownMenuItem onClick={(e) => handleCloReport(e, 90,course?._id, course?.academic_year, course?.section)}>Generate at 90%</DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-          
-            </div>
+                    <Button onClick={(e) => {
+                      e.preventDefault()
+                      e.stopPropagation()
+                      handleAssessmentPlan(e)}} variant='outline' size='sm' className='px-5 py-3 text-[11px] w-full h-fit font-bold'>
+                        CLO - Report
+                    </Button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant='outline' size='sm' className='px-5 py-3 text-[11px] w-full h-fit font-bold'>
+                          PLO - Report
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={(e) => handleCloReport(e, 60,course?._id, course?.academic_year, course?.section)}>Generate at 60%</DropdownMenuItem>
+                        <DropdownMenuItem onClick={(e) => handleCloReport(e, 70,course?._id, course?.academic_year, course?.section)}>Generate at 70%</DropdownMenuItem>
+                        <DropdownMenuItem onClick={(e) => handleCloReport(e, 80,course?._id, course?.academic_year, course?.section)}>Generate at 80%</DropdownMenuItem>
+                        <DropdownMenuItem onClick={(e) => handleCloReport(e, 90,course?._id, course?.academic_year, course?.section)}>Generate at 90%</DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+              
+                </div>
+              )
+            }
         </Link>
         )
          

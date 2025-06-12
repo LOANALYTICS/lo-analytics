@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import Image from "next/image";
-import { SidebarIcon, ChartBarStacked, SquareLibrary, BookOpenCheck, Plus, User, UsersRound, BookDashed, AsteriskSquare, Building, Contact2 } from "lucide-react";
+import { SidebarIcon, ChartBarStacked, SquareLibrary, BookOpenCheck, Plus, User, UsersRound, BookDashed, AsteriskSquare, Building, Contact2, FileChartLine } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -10,12 +10,12 @@ const sidebarItems: SidebarItem[] = [
 
   { name: "Question Bank", displayName: "Question Bank", href: "/dashboard/question-bank", icon: SquareLibrary },
   {
-    name: "Learning Outcome", displayName: "Learning Outcome", href: "/dashboard/blueprint", icon: BookOpenCheck,
+    name: "Learning Outcome", displayName: "Assessments", href: "/dashboard/blueprint", icon: BookOpenCheck,
     others: [
       { name: "Student Details", href: "/dashboard/blueprint/student-details", icon: UsersRound },
       { name: "Learning Outcomes", href: "/dashboard/blueprint/learning-outcomes", icon: BookDashed },
       { name: "Assessment Plan", href: "/dashboard/blueprint/assessment-plan", icon: AsteriskSquare },
-      { name: "Reports", href: "/dashboard/blueprint/reports", icon: AsteriskSquare },
+      { name: "Reports", href: "/dashboard/blueprint/reports", icon: FileChartLine },
     ]
   },
 ];

@@ -19,50 +19,71 @@ async function generateAchievementChartHTML(achievementData: any, sortedClos: st
         {
           label: 'Achievement Percentage',
           data: chartData,
-          backgroundColor: 'rgb(65, 105, 225)',
-          barThickness: 40
+          backgroundColor: 'rgba(54, 162, 235, 0.8)',
+          borderColor: 'rgba(54, 162, 235, 1)',
+          borderWidth: 1,
+          barThickness: 40,
+          borderRadius: 4
         },
         {
-          label: 'Threshold',
+          label: 'Threshold (60%)',
           data: Array(sortedClos.length).fill(60),
           type: 'line',
-          borderColor: 'red',
+          borderColor: 'rgba(255, 99, 132, 1)',
           borderWidth: 2,
+          borderDash: [5, 5],
           pointRadius: 0,
           fill: false
         }
       ]
     },
     options: {
+      responsive: true,
+      maintainAspectRatio: false,
       plugins: {
         legend: {
-          display: false
+          display: true,
+          position: 'bottom',
+          labels: {
+            padding: 20,
+            font: {
+              size: 12,
+              weight: 'bold'
+            }
+          }
         },
-        datalabels: {
-          anchor: 'end',
-          align: 'top',
-          formatter: (value: number) => value + '%',
-          font: {
-            weight: 'bold',
-            size: 12
+        tooltip: {
+          callbacks: {
+            label: function(context: { dataset: { label: string }, raw: number }) {
+              return `${context.dataset.label}: ${context.raw}%`;
+            }
           }
         }
       },
       scales: {
         y: {
-          min: 40,
+          min: 50,
           max: 100,
           ticks: {
             callback: (value: number) => value + '%',
-            stepSize: 10,
+            stepSize: 5,
             font: {
-              size: 10
+              size: 11,
+              weight: 'bold'
             }
           },
           grid: {
             display: true,
             color: 'rgba(0, 0, 0, 0.1)',
             drawTicks: false
+          },
+          title: {
+            display: true,
+            text: 'Percentage',
+            font: {
+              size: 12,
+              weight: 'bold'
+            }
           }
         },
         x: {
@@ -71,7 +92,16 @@ async function generateAchievementChartHTML(achievementData: any, sortedClos: st
           },
           ticks: {
             font: {
-              size: 10
+              size: 11,
+              weight: 'bold'
+            }
+          },
+          title: {
+            display: true,
+            text: 'Course Learning Outcomes (CLOs)',
+            font: {
+              size: 12,
+              weight: 'bold'
             }
           }
         }
@@ -79,7 +109,7 @@ async function generateAchievementChartHTML(achievementData: any, sortedClos: st
     }
   }));
 
-  const chartUrl = `https://quickchart.io/chart?c=${chartConfig}&w=800&h=400&format=base64`;
+  const chartUrl = `https://quickchart.io/chart?c=${chartConfig}&w=800&h=400&format=base64&v=${Date.now()}`;
   
   try {
     const response = await fetch(chartUrl);
@@ -88,8 +118,8 @@ async function generateAchievementChartHTML(achievementData: any, sortedClos: st
     return `
       <div style="break-inside: avoid; page-break-inside: avoid;">
         <h2 class="h2_class">CLO Achievement Chart</h2>
-        <div style="text-align: center;">
-          <img src="data:image/png;base64,${base64Image}" alt="CLO Achievement Chart" style="max-width: 100%; height: auto;">
+        <div style="text-align: center; margin: 20px 0;">
+          <img src="data:image/png;base64,${base64Image}" alt="CLO Achievement Chart" style="max-width: 100%; height: auto; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
         </div>
       </div>
     `;
@@ -177,6 +207,12 @@ export async function generateAssessmentReportHTML(props: AssessmentReportProps)
             padding: 10px;
             font-size: 11px;
             text-align: center;
+            page-break-inside: avoid !important;
+          }
+          tr {
+            page-break-inside: avoid !important;
+            page-break-after: avoid !important;
+            break-inside: avoid !important;
           }
           .achievement-row { 
             background-color: #8b6b9f; 
@@ -224,6 +260,9 @@ export async function generateAssessmentReportHTML(props: AssessmentReportProps)
             padding-bottom: 20px;
             font-family: Arial, sans-serif;
           }
+          td p {
+            margin: 0;
+          }
           .course-details {
             width: 100%;
             display: grid;
@@ -244,13 +283,12 @@ export async function generateAssessmentReportHTML(props: AssessmentReportProps)
             font-weight: bold;
             white-space: nowrap;
           }
-          .student-group {
-            page-break-inside: auto;
-            break-inside: auto;
-          }
+
           .student-row {
-            page-break-inside: avoid;
-            break-inside: avoid;
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+            page-break-before: auto;
+            display: table-row !important;
           }
           tbody {
             page-break-before: auto;
@@ -332,8 +370,7 @@ export async function generateAssessmentReportHTML(props: AssessmentReportProps)
                   `).join('')}
                 </tr>
               </thead>
-              <tbody>
-                <tbody class="student-group">
+                <tbody >
                   ${assessmentData.students.map((student, index) => {
                     return `
                     <tr class="student-row">
@@ -375,7 +412,7 @@ export async function generateAssessmentReportHTML(props: AssessmentReportProps)
               
  
 
-              </tbody>
+              
             </table>
           </div>
 
