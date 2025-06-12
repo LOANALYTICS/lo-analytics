@@ -133,6 +133,8 @@ export interface AssessmentReportProps {
   course: {
     course_name: string;
     level: number;
+    section: string;
+    academic_year: string;
     semister: number;
     department: string;
     course_code: string;
@@ -321,15 +323,11 @@ export async function generateAssessmentReportHTML(props: AssessmentReportProps)
               <div class="course-details">
 
                 <div class="detail-item">
-                  <span class="detail-label">Department:</span> ${course.department}
-                </div>
-
-                <div class="detail-item">
                   <span class="detail-label">Course Code:</span> ${course.course_code}
                 </div>
 
                 <div class="detail-item">
-                  <span class="detail-label">Course Name:</span> ${course.course_name}
+                  <span class="detail-label">Course Name:</span> ${course.course_name} (${course.section.charAt(0).toUpperCase() + course.section.slice(1).toLowerCase()})
                 </div>
                  <div class="detail-item">
                   <span class="detail-label">Credit Hours:</span> ${course.credit_hours + 'Hours'}
@@ -340,7 +338,7 @@ export async function generateAssessmentReportHTML(props: AssessmentReportProps)
                 </div>
 
                 <div class="detail-item">
-                  <span class="detail-label">Semester:</span> ${course.semister === 1 ? "First Semester" : "Second Semester"}
+                  <span class="detail-label">Semester:</span> ${course.semister === 1 ? "First Semester" : "Second Semester"} ($${course?.academic_year})
                 </div>
                        <div class="detail-item">
                   <span class="detail-label">Course Co-ordinator:</span> ${course.coordinator}

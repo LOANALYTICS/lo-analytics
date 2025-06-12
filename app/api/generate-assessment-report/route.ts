@@ -8,6 +8,8 @@ interface CourseData {
   course_name: string;
   level: number;
   semister: number;
+  academic_year: string;
+  section: string;
   department: string;
   course_code: string;
   credit_hours: string;
@@ -71,7 +73,7 @@ export async function POST(request: Request) {
       academic_year: academicYear
     })
     .populate(['collage'])
-    .select('course_name level semister department course_code credit_hours collage')
+    .select('course_name level semister department course_code credit_hours collage academic_year section')
     .lean() as unknown as CourseData;
 
     if (!courseData) {
@@ -239,6 +241,8 @@ export async function POST(request: Request) {
       course: {
         course_name: courseData.course_name,
         level: courseData.level,
+        section: courseData?.section,
+        academic_year: courseData?.academic_year,
         semister: courseData.semister,
         department: courseData.department,
         course_code: courseData.course_code,
