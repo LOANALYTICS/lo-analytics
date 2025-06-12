@@ -7,6 +7,8 @@ import { generateSOHTML } from "@/templates/so-report";
 interface CourseData {
   course_name: string;
   level: number;
+  academic_year: string;
+  section: string;
   semister: number;
   department: string;
   course_code: string;
@@ -48,7 +50,7 @@ export async function GET(request: Request) {
             academic_year: academicYear
           })
           .populate('collage')
-          .select('course_name level semister department course_code credit_hours collage')
+          .select('course_name level semister department course_code credit_hours collage section academic_year')
           .lean() as unknown as CourseData;
       
           if (!courseData) {
@@ -142,8 +144,10 @@ export async function GET(request: Request) {
             course: {
                 course_name: courseData.course_name,
                 level: courseData.level,
+                section: courseData?.section,
                 semister: courseData.semister,
                 department: courseData.department,
+                academic_year:courseData?.academic_year,
                 course_code: courseData.course_code,
                 credit_hours: courseData.credit_hours,
                 coordinator: coordinator!
