@@ -3,11 +3,24 @@ import { Chart, registerables } from 'chart.js';
 // Register Chart.js components
 Chart.register(...registerables);
 
-async function generateAchievementChartHTML(achievementData: any, sortedClos: string[]): Promise<string> {
-  const chartData = sortedClos.map(clo => {
+async function generateAchievementChartHTML(achievementData: any, sortedClos: string[], indirectAssessmentData?: any): Promise<string> {
+  const directChartData = sortedClos.map(clo => {
     const achievement = achievementData[60].find((a: any) => a.clo === clo);
-    return achievement ? parseFloat(achievement.percentageAchieving) : 0;
+    const value = achievement ? parseFloat(achievement.percentageAchieving) : 0;
+    return value;
   });
+
+  const directBarColors = directChartData.map(value => value < 50 ? 'transparent' : 'rgba(54, 162, 235, 0.8)');
+  const directBarBorderColors = directChartData.map(value => value < 50 ? 'transparent' : 'rgba(54, 162, 235, 1)');
+
+  const indirectChartData = indirectAssessmentData ? sortedClos.map(clo => {
+    const assessment = indirectAssessmentData.indirectAssessments.find((a: any) => a.clo.replace(/\s/g, '').toUpperCase() === clo.replace(/\s/g, '').toUpperCase());
+    const value = assessment ? parseFloat(assessment.achievementPercentage) : 0;
+    return value;
+  }) : [];
+
+  const indirectBarColors = indirectChartData.map(value => value < 50 ? 'transparent' : 'rgba(75, 192, 192, 0.8)');
+  const indirectBarBorderColors = indirectChartData.map(value => value < 50 ? 'transparent' : 'rgba(75, 192, 192, 1)');
 
   const labels = sortedClos.map(clo => clo.toUpperCase());
   
@@ -17,19 +30,42 @@ async function generateAchievementChartHTML(achievementData: any, sortedClos: st
       labels: labels,
       datasets: [
         {
-          label: 'Achievement Percentage',
-          data: chartData,
+          label: 'Direct Assessment Achievement',
+          data: directChartData,
           backgroundColor: 'rgba(54, 162, 235, 0.8)',
           borderColor: 'rgba(54, 162, 235, 1)',
           borderWidth: 1,
           barThickness: 40,
-          borderRadius: 4
+          borderRadius: 4,
+          categoryPercentage: 0.7,
+          barPercentage: 0.7
         },
         {
-          label: 'Threshold (60%)',
+          label: 'Indirect Assessment Achievement',
+          data: indirectChartData,
+          backgroundColor: 'rgba(75, 192, 192, 0.8)',
+          borderColor: 'rgba(75, 192, 192, 1)',
+          borderWidth: 1,
+          barThickness: 40,
+          borderRadius: 4,
+          categoryPercentage: 0.7,
+          barPercentage: 0.7
+        },
+        {
+          label: 'Direct Threshold (60%)',
           data: Array(sortedClos.length).fill(60),
           type: 'line',
           borderColor: 'rgba(255, 99, 132, 1)',
+          borderWidth: 2,
+          borderDash: [5, 5],
+          pointRadius: 0,
+          fill: false
+        },
+        {
+          label: 'Indirect Threshold (80%)',
+          data: Array(sortedClos.length).fill(80),
+          type: 'line',
+          borderColor: 'rgba(153, 102, 255, 1)',
           borderWidth: 2,
           borderDash: [5, 5],
           pointRadius: 0,
@@ -40,6 +76,12 @@ async function generateAchievementChartHTML(achievementData: any, sortedClos: st
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      layout: {
+        overflow:'visible',
+        padding: {
+          top: 40
+        }
+      },
       plugins: {
         legend: {
           display: true,
@@ -52,20 +94,47 @@ async function generateAchievementChartHTML(achievementData: any, sortedClos: st
             }
           }
         },
-        tooltip: {
-          callbacks: {
-            label: function(context: { dataset: { label: string }, raw: number }) {
-              return `${context.dataset.label}: ${context.raw}%`;
-            }
+        annotation: {
+          annotations: {
+            ...directChartData.reduce((acc, value, index) => ({
+              ...acc,
+              [`label${index}`]: {
+                type: 'label',
+                xValue: index,
+                yValue: value,
+                content: Math.round(value) + '%',
+                color: '#000',
+                font: {
+                  weight: 'bold'
+                },
+                yAdjust: -15,
+                xAdjust: -25
+              }
+            }), {}),
+            ...indirectChartData.reduce((acc, value, index) => ({
+              ...acc,
+              [`indirectLabel${index}`]: {
+                type: 'label',
+                xValue: index,
+                yValue: value,
+                content: Math.round(value) + '%',
+                color: '#000',
+                font: {
+                  weight: 'bold'
+                },
+                yAdjust: -15,
+                xAdjust: 25
+              }
+            }), {})
           }
         }
       },
       scales: {
         y: {
           min: 50,
-          max: 100,
+          max: 105,
           ticks: {
-            callback: (value: number) => value + '%',
+            
             stepSize: 5,
             font: {
               size: 11,
@@ -109,7 +178,7 @@ async function generateAchievementChartHTML(achievementData: any, sortedClos: st
     }
   }));
 
-  const chartUrl = `https://quickchart.io/chart?c=${chartConfig}&w=800&h=400&format=base64&v=${Date.now()}`;
+  const chartUrl = `https://quickchart.io/chart?c=${chartConfig}&w=800&h=500&format=base64&v=${Date.now()}&backgroundColor=white&devicePixelRatio=2&plugins=chartjs-plugin-annotation`;
   
   try {
     const response = await fetch(chartUrl);
@@ -171,6 +240,14 @@ export interface AssessmentReportProps {
     };
     sortedClos: string[];
   };
+  indirectAssessmentData?: {
+    indirectAssessments: Array<{
+      clo: string;
+      achievementRate: number;
+      benchmark: string;
+      achievementPercentage: number;
+    }>;
+  };
 }
 
 export async function generateAssessmentReportHTML(props: AssessmentReportProps): Promise<string> {
@@ -186,7 +263,7 @@ export async function generateAssessmentReportHTML(props: AssessmentReportProps)
   }
 
   // Generate the chart HTML
-  const chartHtml = await generateAchievementChartHTML(achievementData, sortedClos);
+  const chartHtml = await generateAchievementChartHTML(achievementData, sortedClos, props.indirectAssessmentData);
 
   return `
     <!DOCTYPE html>

@@ -51,6 +51,12 @@ interface AssessmentData {
       };
     }>;
   }>;
+  indirectAssessments?: Array<{
+    clo: string;
+    achievementRate: number;
+    benchmark: string;
+    achievementPercentage: number;
+  }>;
 }
 export const dynamic = 'force-dynamic';
 export async function POST(request: Request) {
@@ -236,8 +242,11 @@ export async function POST(request: Request) {
       console.error('Failed to save achievement data:', error);
       // Continue with HTML generation even if save fails
     }
+
+    console.log('Indirect Assessment Data being passed:', assessmentData.indirectAssessments);
+
     // Generate HTML content
-    const htmlContent = await  generateAssessmentReportHTML({
+    const htmlContent = await generateAssessmentReportHTML({
       course: {
         course_name: courseData.course_name,
         level: courseData.level,
@@ -250,7 +259,10 @@ export async function POST(request: Request) {
         coordinator: coordinator
       },
       college: courseData.collage,
-      assessmentData: processedData
+      assessmentData: processedData,
+      indirectAssessmentData: assessmentData?.indirectAssessments ? {
+        indirectAssessments: assessmentData.indirectAssessments
+      } : undefined
     });
 
     return new NextResponse(htmlContent, {
