@@ -112,7 +112,7 @@ async function generateAchievementChartHTML(achievementData: any, sortedClos: st
               [`indirectLabel${index}`]: {
                 type: 'label',
                 xValue: index,
-                yValue: value,
+                yValue: Number(value) < 50 ? 50 :value,
                 content: Math.round(value) + '%',
                 color: '#000',
                 font: {
