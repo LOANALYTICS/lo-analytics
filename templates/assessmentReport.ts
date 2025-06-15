@@ -10,8 +10,6 @@ async function generateAchievementChartHTML(achievementData: any, sortedClos: st
     return value;
   });
 
-  const directBarColors = directChartData.map(value => value < 50 ? 'transparent' : 'rgba(54, 162, 235, 0.8)');
-  const directBarBorderColors = directChartData.map(value => value < 50 ? 'transparent' : 'rgba(54, 162, 235, 1)');
 
   const indirectChartData = indirectAssessmentData ? sortedClos.map(clo => {
     const assessment = indirectAssessmentData.indirectAssessments.find((a: any) => a.clo.replace(/\s/g, '').toUpperCase() === clo.replace(/\s/g, '').toUpperCase());
@@ -19,9 +17,7 @@ async function generateAchievementChartHTML(achievementData: any, sortedClos: st
     return value;
   }) : [];
 
-  const indirectBarColors = indirectChartData.map(value => value < 50 ? 'transparent' : 'rgba(75, 192, 192, 0.8)');
-  const indirectBarBorderColors = indirectChartData.map(value => value < 50 ? 'transparent' : 'rgba(75, 192, 192, 1)');
-
+ 
   const labels = sortedClos.map(clo => clo.toUpperCase());
   
   const chartConfig = encodeURIComponent(JSON.stringify({
@@ -251,7 +247,7 @@ export interface AssessmentReportProps {
 }
 
 export async function generateAssessmentReportHTML(props: AssessmentReportProps): Promise<string> {
-  const { course, college, assessmentData } = props;
+  const { course, college, assessmentData, indirectAssessmentData } = props;
   const { sortedClos, achievementData } = assessmentData;
   
   function escapeHTML(str: string): string {
@@ -263,7 +259,7 @@ export async function generateAssessmentReportHTML(props: AssessmentReportProps)
   }
 
   // Generate the chart HTML
-  const chartHtml = await generateAchievementChartHTML(achievementData, sortedClos, props.indirectAssessmentData);
+  const chartHtml = await generateAchievementChartHTML(achievementData, sortedClos, indirectAssessmentData);
 
   return `
     <!DOCTYPE html>
@@ -388,6 +384,30 @@ export async function generateAssessmentReportHTML(props: AssessmentReportProps)
             page-break-inside: avoid;
             break-inside: avoid;
           }
+          .assessment-type-label {
+            font-weight: bold;
+            background-color: #8b6b9f;
+            color: white;
+            padding: 10px 5px;
+            border-right: 1px solid black;
+            white-space: nowrap;
+            height: 100%;
+            font-size:12px;
+            position: relative;
+            text-align: center;
+          }
+          .vertical-text-container {
+            position: absolute;
+            text-align:center;
+            top: 60%;
+
+            left: 40%;
+            transform: translate(-50%, -40%) rotate(-90deg);
+            white-space: wrap;
+            width: 40px;
+            height: max-content;
+            transform-origin: center center;
+          }
         </style>
            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
            <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
@@ -466,7 +486,10 @@ export async function generateAssessmentReportHTML(props: AssessmentReportProps)
 
                 <tbody class="achievement-pair">
                   <tr class="achievement-row">
-                    <td colspan="3" class="achievement-label">Achievement Grades</td>
+                    <td rowspan="2" class="assessment-type-label">
+                      <div class="vertical-text-container">Direct Assessment</div>
+                    </td>
+                    <td colspan="2" class="achievement-label">Achievement Grades</td>
                     ${sortedClos.map(clo => {
     const totalScore = assessmentData.cloScores[clo];
     return `<td>${(totalScore * 0.6).toFixed(2)}</td>`;
@@ -474,7 +497,7 @@ export async function generateAssessmentReportHTML(props: AssessmentReportProps)
                     <td>-</td>
                   </tr>
                   <tr class="achievement-row">
-                    <td colspan="3" class="achievement-label">% of students scoring ≥ 60%</td>
+                    <td colspan="2" class="achievement-label">% of students scoring ≥ 60%</td>
                     ${sortedClos.map((clo, index) => {
     return `<td>${achievementData['60'][index].percentageAchieving}%</td>`;
   }).join('')}
@@ -482,7 +505,34 @@ export async function generateAssessmentReportHTML(props: AssessmentReportProps)
                   </tr>
                 </tbody>
 
-             
+                ${indirectAssessmentData ? `
+                <tbody class="achievement-pair">
+                  <tr class="achievement-row">
+                    <td rowspan="2" class="assessment-type-label">
+                      <div class="vertical-text-container">Indirect Assessment</div>
+                    </td>
+                    <td colspan="2" class="achievement-label">Achievement Rate</td>
+                    ${sortedClos.map(() => `<td>80.00</td>`).join('')}
+                    <td>-</td>
+                  </tr>
+                  <tr class="achievement-row">
+                    <td colspan="2" class="achievement-label">% of students agreed that they achieved 
+the CLO</td>
+                    ${sortedClos.map(clo => {
+                      const assessment = indirectAssessmentData.indirectAssessments.find(
+                        (a: any) => a.clo.replace(/\s/g, '').toUpperCase() === clo.replace(/\s/g, '').toUpperCase()
+                      );
+                      return `<td>${assessment ? assessment.achievementPercentage.toFixed(2) + '%' : '-'}</td>`;
+                    }).join('')}
+                    <td>-</td>
+                  </tr>
+                </tbody>
+                ` : ''}
+
+                <tbody>
+                </tbody>
+
+              
 
               
  
@@ -499,3 +549,10 @@ export async function generateAssessmentReportHTML(props: AssessmentReportProps)
     </html>
   `;
 }
+
+   // ${sortedClos.map(clo => {
+                //   const assessment = indirectAssessmentData.indirectAssessments.find(
+                //     (a: any) => a.clo.replace(/\s/g, '').toUpperCase() === clo.replace(/\s/g, '').toUpperCase()
+                //   );
+                //   return `<td>${assessment ? assessment.achievementRate.toFixed(2) + '%' : '-'}</td>`;
+                // }).join('')}
