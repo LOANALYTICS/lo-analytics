@@ -140,19 +140,13 @@ export default function ManageCoordinators() {
       toast.error('Something went wrong')
     }
   }
- console.log(filteredCoordinators)
 
   return (
     <main className="px-2">
+      <div className="flex justify-between">
+
       <h1 className="font-semibold text-lg">Manage Coordinators - ( {filteredCoordinators.length} )</h1>
-      {loading ? (
-        <div className="flex justify-center items-center h-64">
-          <Loader2 className="animate-spin" />
-        </div>
-      ) : (
-        <>
-          <div className="mb-4">
-            <Select
+      <Select
               value={selectedCollege}
               onValueChange={(value) => setSelectedCollege(value)} // Update selected college
             >
@@ -168,7 +162,14 @@ export default function ManageCoordinators() {
                 ))}
               </SelectContent>
             </Select>
-          </div>
+      </div>
+      {loading ? (
+        <div className="flex justify-center items-center h-64">
+          <Loader2 className="animate-spin" />
+        </div>
+      ) : (
+        <>
+   
           <section className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))]  gap-2 mt-4">
             {filteredCoordinators.map((coordinator: any) => (
               <div

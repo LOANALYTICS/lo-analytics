@@ -243,7 +243,6 @@ export async function POST(request: Request) {
       // Continue with HTML generation even if save fails
     }
 
-    console.log('Indirect Assessment Data being passed:', assessmentData.indirectAssessments);
 
     // Generate HTML content
     const htmlContent = await generateAssessmentReportHTML({

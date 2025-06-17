@@ -288,12 +288,10 @@ export default function ItemAnalysisPage() {
 
   useEffect(() => {
     const getData = async () => {
-      const startTime = Date.now();
       const currentUser = await getCurrentUser();
       setUser(currentUser);
       const res = await getCoursesByUserRoleForItems(currentUser?.id!);
       setCourses(res);
-      console.log("User fetch time:", Date.now() - startTime, "ms");
     };
     getData();
   }, []);

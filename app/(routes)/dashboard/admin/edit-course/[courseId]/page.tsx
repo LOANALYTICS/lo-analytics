@@ -103,9 +103,7 @@ export default function EditCoursePage({ params }: any) {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true)
     try {
-      console.log("values", values)
       const rs  = await editCourseTemplate(ClientParams.courseId, values)
-      console.log("rs", rs)
       if (!rs.success) {
         toast.error("something went wrong.")
         return
@@ -121,7 +119,6 @@ export default function EditCoursePage({ params }: any) {
   }
   React.useEffect(() => {
     const subscription = form.watch((value) => {
-      console.log('Form values:', value)
     })
     return () => subscription.unsubscribe()
   }, [form.watch])

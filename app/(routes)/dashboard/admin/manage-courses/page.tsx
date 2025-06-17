@@ -124,6 +124,7 @@ export default function ManageCoordinators() {
 
       await fetchData()
       setIsDeleting(false)
+      setIsOpenHandler()
     } catch (error) {
       toast.error(`Failed to delete course ${courseId}`)
       setIsDeleting(false)
@@ -133,16 +134,11 @@ export default function ManageCoordinators() {
 
   return (
     <main className="px-2">
-      <h1 className="font-semibold text-lg">Manage Courses - ( {filteredCourses.length} )</h1>
+        <div className="flex justify-between">
 
-      {loading ? (
-        <div className="flex justify-center items-center h-64">
-          <Loader2 className="animate-spin" />
-        </div>
-      ) : (
-        <>
-          <Select onValueChange={setSelectedCollege} defaultValue={selectedCollege || ""}>
-            <SelectTrigger>
+      <h1 className="font-semibold text-lg">Manage Courses - ( {filteredCourses.length} )</h1>
+      <Select onValueChange={setSelectedCollege} defaultValue={selectedCollege || ""}>
+            <SelectTrigger className="w-[200px]">
               <SelectValue placeholder="Select College" />
             </SelectTrigger>
             <SelectContent>
@@ -154,6 +150,15 @@ export default function ManageCoordinators() {
               ))}
             </SelectContent>
           </Select>
+        </div>
+
+      {loading ? (
+        <div className="flex justify-center items-center h-64">
+          <Loader2 className="animate-spin" />
+        </div>
+      ) : (
+        <>
+         
 
           <section className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))]  gap-2 mt-4">
             {filteredCourses.map((course) => (

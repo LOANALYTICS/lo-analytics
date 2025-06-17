@@ -173,7 +173,6 @@ const ManageDepartments = ({ params }: any) => {
         fetchCollege()
     }
     const assignRole = async (role: string, userId: string, collegeId: string) => {
-        console.log(role, userId, collegeId)
         const rs = await assignRoleToUser(role, userId, collegeId);
         if (rs.message === "Role is already occupied.") {
             toast.error(rs.message)

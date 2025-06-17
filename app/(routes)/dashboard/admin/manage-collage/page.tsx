@@ -48,12 +48,14 @@ export default function ManageCollage() {
     return (
         <main className="px-2">
             <div className="flex justify-between items-center">
+                <div className='flex justify-between w-full'>
+
                 <h1 className="font-semibold text-lg">Manage Collage</h1>
                 {
                     USER?.role === 'admin' && (
                         <Dialog open={isOpen} onOpenChange={setIsOpen}>
-                    <DialogTrigger>
-                        <Plus className='p-1 border border-gray-300 rounded-md' />
+                    <DialogTrigger className='px-4 py-2 border border-gray-300 hover:bg-blue-50 rounded-md flex items-center gap-2 text-sm' >
+                       Add  College <Plus size={16} />
                     </DialogTrigger>
                     <DialogContent>
                         <DialogHeader>
@@ -67,6 +69,8 @@ export default function ManageCollage() {
                 </Dialog>
                     )
                 }
+                </div>
+               
             </div>
             <section className="flex flex-col gap-2 mt-4 ">
                 {loading ? (

@@ -1,0 +1,44 @@
+{
+  "courseTemplates": [
+    {
+      "course_name": "Introduction to Computer Science",
+      "sem": 1,
+      "department": "hello world",
+      "course_code": "CS101",
+      "credit_hours": "3",
+      "level": 1
+    },
+    {
+      "course_name": "Data Structures and Algorithms",
+      "sem": 2,
+      "department": "hello world",
+      "course_code": "CS201",
+      "credit_hours": "4",
+      "level": 2
+    },
+    {
+      "course_name": "Database Management Systems",
+      "sem": 1,
+      "department": "hello world",
+      "course_code": "CS301",
+      "credit_hours": "3",
+      "level": 3
+    },
+    {
+      "course_name": "Software Engineering",
+      "sem": 2,
+      "department": "new-department",
+      "course_code": "CS401",
+      "credit_hours": "4",
+      "level": 4
+    },
+    {
+      "course_name": "Web Development",
+      "sem": 2,
+      "department": "new-department",
+      "course_code": "CS501",
+      "credit_hours": "3",
+      "level": 12
+    }
+  ]
+} 

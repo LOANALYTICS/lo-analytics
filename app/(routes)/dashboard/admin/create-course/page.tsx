@@ -26,6 +26,7 @@ import { getCollage, getCollageByRole, getCollegeById } from "@/services/collage
 import axios from 'axios'
 import { useRouter } from "next/navigation"
 import { toast } from 'sonner'
+import UploadDialog from "@/components/shared/admin/upload-dialog"
 
 const formSchema = z.object({
   course_name: z.string(),
@@ -59,6 +60,7 @@ export default function CreateCoursePage() {
     const [departments, setDepartments] = React.useState<any>([]);
     const [selectedCollege, setSelectedCollege] = React.useState("");
     const [isLoading, setIsLoading] = React.useState(false);
+    const [isUploadOpen,setIsUploadOpen] = React.useState(false)
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
         setIsLoading(true);
@@ -83,8 +85,6 @@ export default function CreateCoursePage() {
             setIsLoading(false);
         }
     }
-
-    // Fetch colleges
     React.useEffect(() => {
         const fetchColleges = async () => {
             const collegeData = await getCollageByRole(USER?._id);
@@ -105,7 +105,18 @@ export default function CreateCoursePage() {
     };
 
     return (
-        <section className='min-w-[400px] border shadow-sm rounded-lg py-4 px-6'>
+        <section className='min-w-[400px] shadow-sm rounded-lg px-2'>
+            <div className='flex justify-between w-full mb-8'>
+                <h1 className="font-semibold text-lg">Manage Collage</h1>
+                <div onClick={() => setIsUploadOpen((prev) => !prev)} className={`px-4 py-2 border border-gray-300 curs hover:bg-blue-50 rounded-md flex items-center gap-2 text-sm`}>
+                    Upload
+                </div>
+            </div>
+            <UploadDialog 
+                isOpen={isUploadOpen}
+                onClose={() => setIsUploadOpen(false)}
+                colleges={colleges}
+            />
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
                     <div className='grid grid-cols-3 gap-2'>
