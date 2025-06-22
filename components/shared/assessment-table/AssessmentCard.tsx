@@ -100,6 +100,65 @@ const generatePDF = async (html: string, fileName: string, orientation: 'portrai
   }
 };
 
+const generatePDFWithJsPDF = async (html: string, fileName: string, orientation: 'portrait' | 'landscape' = 'portrait') => {
+  try {
+    const jsPDF = (await import('jspdf')).default;
+    const html2canvas = (await import('html2canvas')).default;
+
+    // Create container
+    const container = document.createElement("div");
+    container.style.position = 'absolute';
+    container.style.left = '-9999px';
+    container.style.width = orientation === 'portrait' ? '800px' : '1200px';
+    container.innerHTML = html;
+    document.body.appendChild(container);
+
+    // Wait for images
+    const images = Array.from(container.getElementsByTagName('img'));
+    await Promise.all(images.map(img => {
+      return new Promise<void>((resolve) => {
+        if (img.complete) resolve();
+        img.onload = () => resolve();
+        img.onerror = () => resolve();
+      });
+    }));
+
+    // Convert to canvas
+    const canvas = await html2canvas(container, {
+      scale: 2,
+      useCORS: true,
+      allowTaint: true,
+      backgroundColor: '#ffffff'
+    });
+
+    // Calculate dimensions
+    const imgWidth = orientation === 'portrait' ? 210 : 297; // A4 width in mm
+    const pageHeight = orientation === 'portrait' ? 297 : 210; // A4 height in mm
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+    
+    // Create PDF
+    const pdf = new jsPDF(orientation, 'mm', 'a4');
+    
+    // If content fits on one page, add it
+    if (imgHeight <= pageHeight) {
+      pdf.addImage(canvas, 'JPEG', 0, 0, imgWidth, imgHeight);
+    } else {
+      // Scale down to fit one page
+      const scale = pageHeight / imgHeight;
+      const scaledWidth = imgWidth * scale;
+      const scaledHeight = pageHeight;
+      const xOffset = (imgWidth - scaledWidth) / 2;
+      pdf.addImage(canvas, 'JPEG', xOffset, 0, scaledWidth, scaledHeight);
+    }
+
+    pdf.save(`${fileName}.pdf`);
+    document.body.removeChild(container);
+
+  } catch (error) {
+    console.error("Error generating PDF:", error);
+    throw error;
+  }
+};
 
 export default function AssessmentCard({ href, course, standalone }: { 
   href: string, 
@@ -158,7 +217,7 @@ export default function AssessmentCard({ href, course, standalone }: {
         }, 5000);
       });
       
-      await generatePDF(tempContainer.innerHTML,`${course?.course_code} CLO Report`);
+      await generatePDFWithJsPDF(tempContainer.innerHTML,`${course?.course_code} CLO Report`);
       toast.dismiss();
       toast.success('Report generated successfully');
       document.body.removeChild(tempContainer);
@@ -198,7 +257,7 @@ const handleCloReport = async (e: any, percentage: number, id: string, ace_year:
 
     const html = await response.text();
     toast.loading("Generating report")
-    await generatePDF(html, `${course?.course_code} PLO-${percentage}-perc Report`, 'landscape');
+    await generatePDFWithJsPDF(html, `${course?.course_code} PLO-${percentage}-perc Report`, 'landscape');
     toast.dismiss();
     toast.success('Report generated successfully');
 
@@ -231,7 +290,7 @@ const handleStudentOutcome = async(e: any, id: string, ace_year: string, section
     }
 
     const html = await response.text();
-    await generatePDF(html, `${course?.course_code} SO Report`, 'landscape');
+    await generatePDFWithJsPDF(html, `${course?.course_code} SO Report`, 'landscape');
     toast.dismiss();
     toast.success('Report generated successfully');
 

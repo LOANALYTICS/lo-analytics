@@ -31,7 +31,7 @@ async function generateAchievementChartHTML(achievementData: any, sortedClos: st
           backgroundColor: 'rgba(54, 162, 235, 0.8)',
           borderColor: 'rgba(54, 162, 235, 1)',
           borderWidth: 1,
-          barThickness: 40,
+          barThickness: 30,
           borderRadius: 4,
           categoryPercentage: 0.7,
           barPercentage: 0.7
@@ -42,7 +42,7 @@ async function generateAchievementChartHTML(achievementData: any, sortedClos: st
           backgroundColor: 'rgba(75, 192, 192, 0.8)',
           borderColor: 'rgba(75, 192, 192, 1)',
           borderWidth: 1,
-          barThickness: 40,
+          barThickness: 30,
           borderRadius: 4,
           categoryPercentage: 0.7,
           barPercentage: 0.7
@@ -75,7 +75,7 @@ async function generateAchievementChartHTML(achievementData: any, sortedClos: st
       layout: {
         overflow:'visible',
         padding: {
-          top: 40
+          top: 20
         }
       },
       plugins: {
@@ -83,9 +83,9 @@ async function generateAchievementChartHTML(achievementData: any, sortedClos: st
           display: true,
           position: 'bottom',
           labels: {
-            padding: 20,
+            padding: 10,
             font: {
-              size: 12,
+              size: 10,
               weight: 'bold'
             }
           }
@@ -101,11 +101,13 @@ async function generateAchievementChartHTML(achievementData: any, sortedClos: st
                 content: Math.round(value) + '%',
                 color: '#000',
                 font: {
-                  weight: 'bold'
+                  weight: 'bold',
+                  size: 9
                 },
-                yAdjust: -15,
-                xAdjust: -25
+                yAdjust: -10,
+                xAdjust: -20
               }
+              
             }), {}),
             ...indirectChartData.reduce((acc, value, index) => ({
               ...acc,
@@ -116,10 +118,11 @@ async function generateAchievementChartHTML(achievementData: any, sortedClos: st
                 content: Math.round(value) + '%',
                 color: '#000',
                 font: {
-                  weight: 'bold'
+                  weight: 'bold',
+                  size: 9
                 },
-                yAdjust: -15,
-                xAdjust: 25
+                yAdjust: -10,
+                xAdjust: 20
               }
             }), {})
           }
@@ -130,10 +133,9 @@ async function generateAchievementChartHTML(achievementData: any, sortedClos: st
           min: 50,
           max: 105,
           ticks: {
-            
             stepSize: 5,
             font: {
-              size: 11,
+              size: 9,
               weight: 'bold'
             }
           },
@@ -146,7 +148,7 @@ async function generateAchievementChartHTML(achievementData: any, sortedClos: st
             display: true,
             text: 'Percentage',
             font: {
-              size: 12,
+              size: 10,
               weight: 'bold'
             }
           }
@@ -157,7 +159,7 @@ async function generateAchievementChartHTML(achievementData: any, sortedClos: st
           },
           ticks: {
             font: {
-              size: 11,
+              size: 9,
               weight: 'bold'
             }
           },
@@ -165,7 +167,7 @@ async function generateAchievementChartHTML(achievementData: any, sortedClos: st
             display: true,
             text: 'Course Learning Outcomes (CLOs)',
             font: {
-              size: 12,
+              size: 10,
               weight: 'bold'
             }
           }
@@ -174,17 +176,17 @@ async function generateAchievementChartHTML(achievementData: any, sortedClos: st
     }
   }));
 
-  const chartUrl = `https://quickchart.io/chart?c=${chartConfig}&w=800&h=500&format=base64&v=${Date.now()}&backgroundColor=white&devicePixelRatio=2&plugins=chartjs-plugin-annotation`;
+  const chartUrl = `https://quickchart.io/chart?c=${chartConfig}&w=600&h=250&format=base64&v=${Date.now()}&backgroundColor=white&devicePixelRatio=2&plugins=chartjs-plugin-annotation`;
   
   try {
     const response = await fetch(chartUrl);
     const base64Image = await response.text();
     
     return `
-      <div style="break-inside: avoid; page-break-inside: avoid;">
-        <h2 class="h2_class">CLO Achievement Chart</h2>
-        <div style="text-align: center; margin: 20px 0;">
-          <img src="data:image/png;base64,${base64Image}" alt="CLO Achievement Chart" style="max-width: 100%; height: auto; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+      <div class="chart-container">
+        <h3 class="chart-title">CLO Achievement Chart</h3>
+        <div class="chart-wrapper">
+          <img src="data:image/png;base64,${base64Image}" alt="CLO Achievement Chart" class="chart-image">
         </div>
       </div>
     `;
@@ -266,27 +268,63 @@ export async function generateAssessmentReportHTML(props: AssessmentReportProps)
     <html>
       <head>
         <style>
-          body { font-family: Arial, sans-serif; }
-          .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
-          .h2_class { text-align: center; margin-bottom: 30px;,margin:auto; }
-          .header { text-align: center; margin-bottom: 30px; }
-          .logo { max-width: 100%; height: auto; }
-          .title { font-size: 20px; margin: 20px 0; }
+          body { 
+            font-family: Arial, sans-serif; 
+            margin: 0;
+            padding: 0;
+          }
+          .container { 
+            max-width: 100%; 
+            margin: 0 auto; 
+            padding: 10px;
+          }
+          .h2_class { 
+            text-align: center; 
+            margin: 10px 0;
+            font-size: 16px;
+          }
+          .chart-title {
+            text-align: center;
+            margin: 10px 0;
+            font-size: 14px;
+            font-weight: bold;
+          }
+          .header {
+            width: 100%;
+            margin-bottom: 15px;
+          }
+          .logo {
+            width: 100%;
+            max-height: 80px;
+            object-fit: contain;
+            margin-bottom: 15px;
+          }
+          .course-details {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 5px 15px;
+            width: 100%;
+          }
+          .detail-item {
+            font-size: 10px;
+          }
+          .title { 
+            font-size: 18px; 
+            margin: 10px 0; 
+          }
           table { 
             width: 100%; 
             border-collapse: collapse; 
-            margin-top: 20px;
+            margin-top: 10px;
+            font-size: 9px;
           }
           th, td { 
             border: 1px solid black;
-            padding: 10px;
-            font-size: 11px;
+            padding: 4px;
+            font-size: 9px;
             text-align: center;
-            page-break-inside: avoid !important;
           }
           tr {
-            page-break-inside: avoid !important;
-            page-break-after: avoid !important;
             break-inside: avoid !important;
           }
           .achievement-row { 
@@ -295,10 +333,7 @@ export async function generateAssessmentReportHTML(props: AssessmentReportProps)
           }
           .achievement-row td {
             border: 1px solid black;
-            padding-left: 8px;
-            padding-right: 8px;
-            padding-top: 8px;
-            padding-bottom: 16px;
+            padding: 3px;
           }
           .achievement-pair tr:first-child td.achievement-label {
             border-bottom: 0px solid black;
@@ -307,32 +342,35 @@ export async function generateAssessmentReportHTML(props: AssessmentReportProps)
             border-top: 0px solid black;
           }
           thead tr:first-child th:first-child {
-            border-top-left-radius: 8px;
+            border-top-left-radius: 4px;
           }
           thead tr:first-child th:last-child {
-            border-top-right-radius: 8px;
+            border-top-right-radius: 4px;
           }
           tbody:last-child tr:last-child td:first-child {
-            border-bottom-left-radius: 8px;
+            border-bottom-left-radius: 4px;
           }
           tbody:last-child tr:last-child td:last-child {
-            border-bottom-right-radius: 8px;
+            border-bottom-right-radius: 4px;
           }
-          .serial-col { width: 50px; }
-          .id-col { width: 100px; }
-          .name-col { width: 200px; }
-          .marks-col { width: 80px; }
-          .clo-header { background-color: #e0e0e0;text-transform: uppercase; }
-          .total-header { background-color: #d0d0d0; }
+          .serial-col { width: 40px; }
+          .id-col { width: 80px; }
+          .name-col { width: 150px; }
+          .marks-col { width: 60px; }
+          .clo-header { 
+            background-color: #e0e0e0;
+            text-transform: uppercase; 
+            font-size: 8px;
+          }
+          .total-header { 
+            background-color: #d0d0d0; 
+          }
           .achievement-label { 
             font-weight: normal; 
             text-align: left;
-            font-size: 14px;
+            font-size: 10px;
             vertical-align: middle;
-            padding-left: 10px;
-            padding-right: 10px;
-            padding-top: 10px;
-            padding-bottom: 20px;
+            padding: 3px;
             font-family: Arial, sans-serif;
           }
           td p {
@@ -341,114 +379,104 @@ export async function generateAssessmentReportHTML(props: AssessmentReportProps)
           .course-details {
             width: 100%;
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
             justify-content: space-between;
-            margin-bottom: 30px;
+            margin-bottom: 15px;
             border: 1px solid #ddd;
-            padding: 15px;
-            border-radius: 5px;
+            padding: 8px;
+            border-radius: 3px;
           }
           .detail-item {
             display: flex;
-            gap: 5px;
-            font-size: 12px;
+            gap: 3px;
+            font-size: 10px;
           }
           .detail-label {
             font-weight: bold;
             white-space: nowrap;
           }
-
           .student-row {
-            page-break-inside: avoid !important;
             break-inside: avoid !important;
-            page-break-before: auto;
             display: table-row !important;
           }
-          tbody {
-            page-break-before: auto;
-            page-break-after: auto;
-          }
           .chart-container {
-            width: 100%;
-            height: 400px;
+            margin-top: 10px;
+            text-align: center;
           }
-          /* Add these new styles */
-          .report-section {
-            page-break-inside: avoid;
-            break-inside: avoid;
+          .chart-wrapper {
+            display: inline-block;
           }
-          .chart-section {
-            page-break-before: always;
-            margin-top: 20px;
-            page-break-inside: avoid;
-            break-inside: avoid;
+          .chart-image {
+            max-width: 100%;
+            height: auto;
+            max-height: 200px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
           }
           .assessment-type-label {
             font-weight: bold;
             background-color: #8b6b9f;
             color: white;
-            padding: 10px 5px;
+            padding: 3px;
             border-right: 1px solid black;
             white-space: nowrap;
             height: 100%;
-            font-size:12px;
+            font-size: 9px;
             position: relative;
             text-align: center;
           }
           .vertical-text-container {
             position: absolute;
-            text-align:center;
+            text-align: center;
             top: 60%;
-
             left: 40%;
             transform: translate(-50%, -40%) rotate(-90deg);
             white-space: wrap;
-            width: 40px;
+            width: 30px;
             height: max-content;
             transform-origin: center center;
+            font-size: 8px;
+          }
+          .table-section {
+            flex: 1;
+            overflow: hidden;
+          }
+          .chart-section {
+            flex-shrink: 0;
+            margin-top: 10px;
           }
         </style>
-           <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-           <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
       </head>
       <body>
         <div class="container">
-          <div class="report-section">
-            <div class="header">
-              <img src="${college.logo}" alt="College Logo" class="logo">
-              <div class="course-details">
-
+          <div class="header">
+            <img src="${college.logo}" alt="College Logo" class="logo">
+            <div class="course-details">
                 <div class="detail-item">
                   <span class="detail-label">Course Code:</span> ${course.course_code}
                 </div>
-
                 <div class="detail-item">
                   <span class="detail-label">Course Name:</span> ${course.course_name} (${course.section.charAt(0).toUpperCase() + course.section.slice(1).toLowerCase()})
                 </div>
-                 <div class="detail-item">
+                <div class="detail-item">
                   <span class="detail-label">Credit Hours:</span> ${course.credit_hours + 'Hours'}
                 </div>
-
-                  <div class="detail-item">
+                <div class="detail-item">
                   <span class="detail-label">Level:</span> ${course.level || 'NA'}
                 </div>
-
                 <div class="detail-item">
-                  <span class="detail-label">Semester:</span> ${course.semister === 1 ? "First Semester" : "Second Semester"} ($${course?.academic_year})
+                  <span class="detail-label">Semester:</span> ${course.semister === 1 ? "First Semester" : "Second Semester"} (${course?.academic_year})
                 </div>
-                       <div class="detail-item">
+                <div class="detail-item">
                   <span class="detail-label">Course Co-ordinator:</span> ${course.coordinator}
                 </div>
-                
-                
-               
-              </div>
             </div>
+          </div>
 
-            <h2 class="h2_class">Course Learning Outcome (CLO) Achievement Report</h2>
+          <h2 class="h2_class">Course Learning Outcome (CLO) Achievement Report</h2>
 
-            <table style="border-radius: 5px; overflow: hidden;">
+          <div class="table-section">
+            <table style="border-radius: 3px; overflow: hidden;">
               <thead>
                 <tr>
                   <th rowspan="2" class="serial-col">S.No</th>
@@ -465,79 +493,69 @@ export async function generateAssessmentReportHTML(props: AssessmentReportProps)
                   `).join('')}
                 </tr>
               </thead>
-                <tbody >
-                  ${assessmentData.students.map((student, index) => {
-                    return `
-                    <tr class="student-row">
-                      <td>${index + 1}</td>
-                      <td>${escapeHTML(student.studentId)}</td>
-                      <td>${escapeHTML(student.studentName)}</td>
-                      ${sortedClos.map(clo => {
-                        const totalScore = assessmentData.cloScores[clo];
-                        const threshold = totalScore * 0.6;
-                        const studentScore = student.cloScores[clo]?.marksScored || 0;
-                        const isBelow = studentScore < threshold;
-                        return `<td  style="background-color:${isBelow ? '#FD5D5F': 'white'} !important;">${isBelow ? `<p style="color:white">${studentScore.toFixed(2)}</p>` : `<p>${studentScore.toFixed(2)}</p>`}</td>`;
-                      }).join('')}
-                      <td>${student.totalMarksObtained.toFixed(2)}</td>
-                    </tr>
-                  `}).join('')}
-                </tbody>
-
-                <tbody class="achievement-pair">
-                  <tr class="achievement-row">
-                    <td rowspan="2" class="assessment-type-label">
-                      <div class="vertical-text-container">Direct Assessment</div>
-                    </td>
-                    <td colspan="2" class="achievement-label">Achievement Grades</td>
+              <tbody>
+                ${assessmentData.students.map((student, index) => {
+                  return `
+                  <tr class="student-row">
+                    <td>${index + 1}</td>
+                    <td>${escapeHTML(student.studentId)}</td>
+                    <td>${escapeHTML(student.studentName)}</td>
                     ${sortedClos.map(clo => {
+                      const totalScore = assessmentData.cloScores[clo];
+                      const threshold = totalScore * 0.6;
+                      const studentScore = student.cloScores[clo]?.marksScored || 0;
+                      const isBelow = studentScore < threshold;
+                      return `<td style="background-color:${isBelow ? '#FD5D5F': 'white'} !important;">${isBelow ? `<p style="color:white">${studentScore.toFixed(2)}</p>` : `<p>${studentScore.toFixed(2)}</p>`}</td>`;
+                    }).join('')}
+                    <td>${student.totalMarksObtained.toFixed(2)}</td>
+                  </tr>
+                `}).join('')}
+              </tbody>
+          
+
+              <tbody class="achievement-pair">
+                <tr class="achievement-row">
+                  <td rowspan="2" class="assessment-type-label">
+                    <div class="vertical-text-container">Direct Assessment</div>
+                  </td>
+                  <td colspan="2" class="achievement-label">Achievement Grades</td>
+                  ${sortedClos.map(clo => {
     const totalScore = assessmentData.cloScores[clo];
     return `<td>${(totalScore * 0.6).toFixed(2)}</td>`;
   }).join('')}
-                    <td>-</td>
-                  </tr>
-                  <tr class="achievement-row">
-                    <td colspan="2" class="achievement-label">% of students scoring ≥ 60%</td>
-                    ${sortedClos.map((clo, index) => {
+                  <td>-</td>
+                </tr>
+                <tr class="achievement-row">
+                  <td colspan="2" class="achievement-label">% of students scoring ≥ 60%</td>
+                  ${sortedClos.map((clo, index) => {
     return `<td>${achievementData['60'][index].percentageAchieving}%</td>`;
   }).join('')}
-                    <td>-</td>
-                  </tr>
-                </tbody>
+                  <td>-</td>
+                </tr>
+              </tbody>
 
-                ${indirectAssessmentData ? `
-                <tbody class="achievement-pair">
-                  <tr class="achievement-row">
-                    <td rowspan="2" class="assessment-type-label">
-                      <div class="vertical-text-container">Indirect Assessment</div>
-                    </td>
-                    <td colspan="2" class="achievement-label">Achievement Rate</td>
-                    ${sortedClos.map(() => `<td>80.00</td>`).join('')}
-                    <td>-</td>
-                  </tr>
-                  <tr class="achievement-row">
-                    <td colspan="2" class="achievement-label">% of students agreed that they achieved 
-the CLO</td>
-                    ${sortedClos.map(clo => {
-                      const assessment = indirectAssessmentData.indirectAssessments.find(
-                        (a: any) => a.clo.replace(/\s/g, '').toUpperCase() === clo.replace(/\s/g, '').toUpperCase()
-                      );
-                      return `<td>${assessment ? assessment.achievementPercentage.toFixed(2) + '%' : '-'}</td>`;
-                    }).join('')}
-                    <td>-</td>
-                  </tr>
-                </tbody>
-                ` : ''}
-
-                <tbody>
-                </tbody>
-
-              
-
-              
- 
-
-              
+              ${indirectAssessmentData ? `
+              <tbody class="achievement-pair">
+                <tr class="achievement-row">
+                  <td rowspan="2" class="assessment-type-label">
+                    <div class="vertical-text-container">Indirect Assessment</div>
+                  </td>
+                  <td colspan="2" class="achievement-label">Achievement Rate</td>
+                  ${sortedClos.map(() => `<td>80.00</td>`).join('')}
+                  <td>-</td>
+                </tr>
+                <tr class="achievement-row">
+                  <td colspan="2" class="achievement-label">% of students agreed that they achieved the CLO</td>
+                  ${sortedClos.map(clo => {
+                    const assessment = indirectAssessmentData.indirectAssessments.find(
+                      (a: any) => a.clo.replace(/\s/g, '').toUpperCase() === clo.replace(/\s/g, '').toUpperCase()
+                    );
+                    return `<td>${assessment ? assessment.achievementPercentage.toFixed(2) + '%' : '-'}</td>`;
+                  }).join('')}
+                  <td>-</td>
+                </tr>
+              </tbody>
+              ` : ''}
             </table>
           </div>
 
@@ -550,9 +568,3 @@ the CLO</td>
   `;
 }
 
-   // ${sortedClos.map(clo => {
-                //   const assessment = indirectAssessmentData.indirectAssessments.find(
-                //     (a: any) => a.clo.replace(/\s/g, '').toUpperCase() === clo.replace(/\s/g, '').toUpperCase()
-                //   );
-                //   return `<td>${assessment ? assessment.achievementRate.toFixed(2) + '%' : '-'}</td>`;
-                // }).join('')}
