@@ -131,24 +131,28 @@ const generatePDFWithJsPDF = async (html: string, fileName: string, orientation:
       backgroundColor: '#ffffff'
     });
 
-    // Calculate dimensions
-    const imgWidth = orientation === 'portrait' ? 210 : 297; // A4 width in mm
-    const pageHeight = orientation === 'portrait' ? 297 : 210; // A4 height in mm
+    // Calculate dimensions with margins
+    const margin = 15; // 15mm margin on all sides
+    const imgWidth = orientation === 'portrait' ? 210 - (margin * 2) : 297 - (margin * 2); // A4 width minus margins
+    const pageHeight = orientation === 'portrait' ? 297 - (margin * 2) : 210 - (margin * 2); // A4 height minus margins
     const imgHeight = (canvas.height * imgWidth) / canvas.width;
     
     // Create PDF
     const pdf = new jsPDF(orientation, 'mm', 'a4');
     
-    // If content fits on one page, add it
-    if (imgHeight <= pageHeight) {
-      pdf.addImage(canvas, 'JPEG', 0, 0, imgWidth, imgHeight);
+    // Add a small tolerance to prevent unnecessary scaling
+    const tolerance = 5; // 5mm tolerance
+
+    // If content fits on one page (with tolerance), add it with margins
+    if (imgHeight <= pageHeight + tolerance) {
+      pdf.addImage(canvas, 'JPEG', margin, margin, imgWidth, imgHeight);
     } else {
-      // Scale down to fit one page
+      // Scale down to fit one page with margins
       const scale = pageHeight / imgHeight;
       const scaledWidth = imgWidth * scale;
       const scaledHeight = pageHeight;
-      const xOffset = (imgWidth - scaledWidth) / 2;
-      pdf.addImage(canvas, 'JPEG', xOffset, 0, scaledWidth, scaledHeight);
+      const xOffset = margin + (imgWidth - scaledWidth) / 2;
+      pdf.addImage(canvas, 'JPEG', xOffset, margin, scaledWidth, scaledHeight);
     }
 
     pdf.save(`${fileName}.pdf`);

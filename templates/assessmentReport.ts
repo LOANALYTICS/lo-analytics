@@ -176,7 +176,7 @@ async function generateAchievementChartHTML(achievementData: any, sortedClos: st
     }
   }));
 
-  const chartUrl = `https://quickchart.io/chart?c=${chartConfig}&w=600&h=250&format=base64&v=${Date.now()}&backgroundColor=white&devicePixelRatio=2&plugins=chartjs-plugin-annotation`;
+  const chartUrl = `https://quickchart.io/chart?c=${chartConfig}&w=600&h=350&format=base64&v=${Date.now()}&backgroundColor=white&devicePixelRatio=2&plugins=chartjs-plugin-annotation`;
   
   try {
     const response = await fetch(chartUrl);
@@ -276,7 +276,7 @@ export async function generateAssessmentReportHTML(props: AssessmentReportProps)
           .container { 
             max-width: 100%; 
             margin: 0 auto; 
-            padding: 10px;
+            padding: 20px;
           }
           .h2_class { 
             text-align: center; 
@@ -401,16 +401,18 @@ export async function generateAssessmentReportHTML(props: AssessmentReportProps)
             display: table-row !important;
           }
           .chart-container {
-            margin-top: 10px;
+            margin-top: 20px;
             text-align: center;
+            min-height: 300px;
           }
           .chart-wrapper {
             display: inline-block;
+            height: 280px;
           }
           .chart-image {
             max-width: 100%;
             height: auto;
-            max-height: 200px;
+            max-height: 280px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
           }
           .assessment-type-label {
