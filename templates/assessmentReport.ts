@@ -343,6 +343,10 @@ font-weight: 500;
           tr {
             break-inside: avoid !important;
           }
+            tr th {
+            font-size: 14px;
+            font-weight: 700;
+            }
           .achievement-row { 
             background-color: #8b6b9f; 
             color: white;
@@ -378,7 +382,7 @@ font-weight: 500;
             background-color: #e0e0e0;
             text-transform: uppercase; 
             font-size: 14px;
-font-weight: 500;
+font-weight: 700;
           }
           .total-header { 
             background-color: #d0d0d0; 
