@@ -287,6 +287,7 @@ export async function generateAssessmentReportHTML(props: AssessmentReportProps)
             text-align: center;
             margin: 10px 0;
             font-size: 14px;
+font-weight: 500;
             font-weight: bold;
           }
           .header {
@@ -300,13 +301,26 @@ export async function generateAssessmentReportHTML(props: AssessmentReportProps)
             margin-bottom: 15px;
           }
           .course-details {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 5px 15px;
             width: 100%;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            padding: 8px;
+            border-radius: 3px;
           }
           .detail-item {
-            font-size: 10px;
+            display: flex;
+            gap: 3px;
+            font-size: 16px;
+            white-space: nowrap;
+            flex: 1 1 30%;
+          }
+          .detail-label {
+            font-weight: bold;
+            white-space: nowrap;
           }
           .title { 
             font-size: 18px; 
@@ -316,12 +330,14 @@ export async function generateAssessmentReportHTML(props: AssessmentReportProps)
             width: 100%; 
             border-collapse: collapse; 
             margin-top: 10px;
-            font-size: 9px;
+            font-weight: 500;
           }
           th, td { 
             border: 1px solid black;
             padding: 4px;
-            font-size: 9px;
+            padding-bottom:10px;
+            font-size: 14px;
+font-weight: 500;
             text-align: center;
           }
           tr {
@@ -333,7 +349,8 @@ export async function generateAssessmentReportHTML(props: AssessmentReportProps)
           }
           .achievement-row td {
             border: 1px solid black;
-            padding: 3px;
+            padding: 4px;
+            padding-bottom:10px;
           }
           .achievement-pair tr:first-child td.achievement-label {
             border-bottom: 0px solid black;
@@ -360,7 +377,8 @@ export async function generateAssessmentReportHTML(props: AssessmentReportProps)
           .clo-header { 
             background-color: #e0e0e0;
             text-transform: uppercase; 
-            font-size: 8px;
+            font-size: 14px;
+font-weight: 500;
           }
           .total-header { 
             background-color: #d0d0d0; 
@@ -368,33 +386,14 @@ export async function generateAssessmentReportHTML(props: AssessmentReportProps)
           .achievement-label { 
             font-weight: normal; 
             text-align: left;
-            font-size: 10px;
+            font-size: 14px;
+font-weight: 500;
             vertical-align: middle;
             padding: 3px;
             font-family: Arial, sans-serif;
           }
           td p {
             margin: 0;
-          }
-          .course-details {
-            width: 100%;
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
-            justify-content: space-between;
-            margin-bottom: 15px;
-            border: 1px solid #ddd;
-            padding: 8px;
-            border-radius: 3px;
-          }
-          .detail-item {
-            display: flex;
-            gap: 3px;
-            font-size: 10px;
-          }
-          .detail-label {
-            font-weight: bold;
-            white-space: nowrap;
           }
           .student-row {
             break-inside: avoid !important;
@@ -423,7 +422,8 @@ export async function generateAssessmentReportHTML(props: AssessmentReportProps)
             border-right: 1px solid black;
             white-space: nowrap;
             height: 100%;
-            font-size: 9px;
+            font-size: 14px;
+font-weight: 500;
             position: relative;
             text-align: center;
           }
