@@ -25,28 +25,39 @@ export function generateCloReportHTML(data: {
         regional: string;
         university: string;
       };
+      indirectAssessmentData?: {
+        indirectAssessments: Array<{
+          clo: string;
+          achievementRate: number;
+          benchmark: string;
+          achievementPercentage: number;
+        }>;
+      };
+      
 }) {
-    const { cloData, percentage, achievementMap,course, college } = data;
+    const { cloData, percentage, achievementMap,course, college,indirectAssessmentData } = data;
 
     // Helper function to generate PLO cells
     const generatePloCells = (mapping: Array<{ [key: string]: boolean }>, cloId: string) => {
         return mapping.map((item, index) => {
             const isChecked = Object.values(item)[0];
-            if (!isChecked) return `<td class="plo-cell"></td>`;
-            
-            const achievementValue = achievementMap.get(cloId);
-            
-            // Handle different cases for achievement value
-            let displayValue = '✓';  // default checkmark
-            if (achievementValue !== undefined && achievementValue !== null) {
-                // Convert to number and check if it's valid
-                const numValue = Number(achievementValue);
-                if (!isNaN(numValue)) {
-                    displayValue = `${numValue.toFixed(1)}%`;
+            let directCell, indirectCell;
+            // Direct cell (current logic)
+            if (!isChecked) directCell = `<td class="plo-cell"></td>`;
+            else {
+                const achievementValue = achievementMap.get(cloId);
+                let displayValue = '✓';
+                if (achievementValue !== undefined && achievementValue !== null) {
+                    const numValue = Number(achievementValue);
+                    if (!isNaN(numValue)) {
+                        displayValue = `${numValue.toFixed(1)}%`;
+                    }
                 }
+                directCell = `<td class="plo-cell checked">${displayValue}</td>`;
             }
-            
-            return `<td class="plo-cell checked">${displayValue}</td>`;
+            // Indirect cell (always '-')
+            indirectCell = `<td class="plo-cell">-</td>`;
+            return directCell + indirectCell;
         }).join('');
     };
 
@@ -78,7 +89,7 @@ export function generateCloReportHTML(data: {
                     font-size: 11px;
                     font-weight: 400;
                 }
-                .container { max-width: 1200px; margin: 0 auto; padding: 10px; }
+                .container {width: 100%; max-width: 100%; margin: 0 auto; padding: 10px; }
                 .header { text-align: center; margin-bottom: 30px; }
                 .logo { max-width: 100%; height: auto; }
                 .title { font-size: 24px; margin: 20px 0; }
@@ -91,18 +102,18 @@ export function generateCloReportHTML(data: {
                 
                 padding-left: 15px;
                 padding-right: 15px;
-                padding-top: 15px;
-                padding-bottom: 30px;
+                padding-top: 10px;
+                padding-bottom: 25px;
                 border-radius: 5px;
                 }
                 .detail-item {
                     display: flex;
-                    gap: 5px;
-                    font-weight: 400;
-                    font-size: 15px;
+                    gap: 4px;
+                    font-weight: 500;
+                    font-size: 16px;
                 }
                 .detail-label {
-                    font-weight: bold;
+                    font-weight: 700;
                 }
 
                 table {
@@ -139,19 +150,20 @@ export function generateCloReportHTML(data: {
                     padding-top: 6px;
                     padding-bottom: 14px;
                     text-align: center;
-                    font-size: 12px;
-                    font-weight: 400;
+                    font-size: 14px;
+                    font-weight: 500;
                 }
                 th {
                     background-color: #f5f5f5;
                     font-weight: bold;
                 }
                 .index-cell {
+                white-space:nowrap;
                     width: 50px;
                 }
                 .clo-cell {
                     text-align: left;
-                    min-width: 300px;
+                    min-width: 280px;
                 }
                 .plo-cell {
                     width: 40px;
@@ -209,19 +221,24 @@ export function generateCloReportHTML(data: {
             <table>
                 <thead>
                     <tr>
-                        <th rowspan="3">CLOs</th>
-                        <th rowspan="3">Course Learning Outcome (CLO) Description</th>
-                        <th colspan="${cloData[0].ploMapping.k.length + cloData[0].ploMapping.s.length + cloData[0].ploMapping.v.length}">Alignement of CLO with Program Learning Outcome (PLO)</th>
+                        <th rowspan="4">CLOs</th>
+                        <th rowspan="4">Course Learning Outcome (CLO) Description</th>
+                        <th colspan="${(cloData[0].ploMapping.k.length + cloData[0].ploMapping.s.length + cloData[0].ploMapping.v.length) * 2}">Alignement of CLO with Program Learning Outcome (PLO)</th>
                     </tr>
                     <tr>
-                        <th colspan="${cloData[0].ploMapping.k.length}" class="plo-header">Knowledge</th>
-                        <th colspan="${cloData[0].ploMapping.s.length}" class="plo-header">Skills</th>
-                        <th colspan="${cloData[0].ploMapping.v.length}" class="plo-header">Values</th>
+                        <th colspan="${cloData[0].ploMapping.k.length * 2}" class="plo-header">Knowledge</th>
+                        <th colspan="${cloData[0].ploMapping.s.length * 2}" class="plo-header">Skills</th>
+                        <th colspan="${cloData[0].ploMapping.v.length * 2}" class="plo-header">Values</th>
                     </tr>
                     <tr>
-                        ${cloData[0].ploMapping.k.map((_, i) => `<th class="plo-subheader">K${i + 1}</th>`).join('')}
-                        ${cloData[0].ploMapping.s.map((_, i) => `<th class="plo-subheader">S${i + 1}</th>`).join('')}
-                        ${cloData[0].ploMapping.v.map((_, i) => `<th class="plo-subheader">V${i + 1}</th>`).join('')}
+                        ${cloData[0].ploMapping.k.map((_, i) => `<th colspan="2" class="plo-header">K${i + 1}</th>`).join('')}
+                        ${cloData[0].ploMapping.s.map((_, i) => `<th colspan="2" class="plo-header">S${i + 1}</th>`).join('')}
+                        ${cloData[0].ploMapping.v.map((_, i) => `<th colspan="2" class="plo-header">V${i + 1}</th>`).join('')}
+                    </tr>
+                    <tr>
+                        ${cloData[0].ploMapping.k.map(() => `<th class=\"plo-subheader\">Direct</th><th class=\"plo-subheader\">Indirect</th>`).join('')}
+                        ${cloData[0].ploMapping.s.map(() => `<th class=\"plo-subheader\">Direct</th><th class=\"plo-subheader\">Indirect</th>`).join('')}
+                        ${cloData[0].ploMapping.v.map(() => `<th class=\"plo-subheader\">Direct</th><th class=\"plo-subheader\">Indirect</th>`).join('')}
                     </tr>
                 </thead>
                 <tbody>

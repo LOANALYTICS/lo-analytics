@@ -237,18 +237,18 @@ export default function AssessmentCard({ href, course, standalone }: {
   }
   
  
-const handleCloReport = async (e: any, percentage: number, id: string, ace_year: string, section: string) => {
+const handleCloReport = async (e: any, id: string, ace_year: string, section: string) => {
   e.preventDefault()
   e.stopPropagation()
 
-  if(!percentage || !id){
-    toast.error('Percentage and ID required');
+  if(!id){
+    toast.error('ID required');
     return;
   }
 
   try {
     toast.loading("Generating report")
-    const response = await fetch(`/api/generate-clo-report?perc=${percentage}&courseId=${id}&academicYear=${ace_year}&section=${section}&coordinator=${coordinator?.name}`, {
+    const response = await fetch(`/api/generate-clo-report?perc=${60}&courseId=${id}&academicYear=${ace_year}&section=${section}&coordinator=${coordinator?.name}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -261,7 +261,7 @@ const handleCloReport = async (e: any, percentage: number, id: string, ace_year:
 
     const html = await response.text();
     toast.loading("Generating report")
-    await generatePDFWithJsPDF(html, `${course?.course_code} PLO-${percentage}-perc Report`, 'landscape');
+    await generatePDFWithJsPDF(html, `${course?.course_code} PLO Report`, 'landscape');
     toast.dismiss();
     toast.success('Report generated successfully');
 
@@ -335,20 +335,13 @@ const handleStudentOutcome = async(e: any, id: string, ace_year: string, section
                   handleAssessmentPlan(e)}} variant='outline' size='sm' className='px-5 py-3 text-[11px] w-full h-fit font-bold'>
                     CLO - Report
                 </Button>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant='outline' size='sm' className='px-5 py-3 text-[11px] w-full h-fit font-bold'>
+               
+                    <Button
+                    onClick={(e)=>handleCloReport(e,course?._id, course?.academic_year, course?.section)}
+                    variant='outline' size='sm' className='px-5 py-3 text-[11px] w-full h-fit font-bold'>
                       PLO - Report
                     </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={(e) => handleCloReport(e, 60,course?._id, course?.academic_year, course?.section)}>Generate at 60%</DropdownMenuItem>
-                    <DropdownMenuItem onClick={(e) => handleCloReport(e, 70,course?._id, course?.academic_year, course?.section)}>Generate at 70%</DropdownMenuItem>
-                    <DropdownMenuItem onClick={(e) => handleCloReport(e, 80,course?._id, course?.academic_year, course?.section)}>Generate at 80%</DropdownMenuItem>
-                    <DropdownMenuItem onClick={(e) => handleCloReport(e, 90,course?._id, course?.academic_year, course?.section)}>Generate at 90%</DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                    
           
             </div>
         </div>
@@ -379,20 +372,13 @@ const handleStudentOutcome = async(e: any, id: string, ace_year: string, section
                       handleAssessmentPlan(e)}} variant='outline' size='sm' className='px-5 py-3 text-[11px] w-full h-fit font-bold'>
                         CLO - Report
                     </Button>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant='outline' size='sm' className='px-5 py-3 text-[11px] w-full h-fit font-bold'>
+                
+                        <Button 
+                        onClick={(e) => handleCloReport(e,course?._id, course?.academic_year, course?.section)}
+                        variant='outline' size='sm' className='px-5 py-3 text-[11px] w-full h-fit font-bold'>
                           PLO - Report
                         </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={(e) => handleCloReport(e, 60,course?._id, course?.academic_year, course?.section)}>Generate at 60%</DropdownMenuItem>
-                        <DropdownMenuItem onClick={(e) => handleCloReport(e, 70,course?._id, course?.academic_year, course?.section)}>Generate at 70%</DropdownMenuItem>
-                        <DropdownMenuItem onClick={(e) => handleCloReport(e, 80,course?._id, course?.academic_year, course?.section)}>Generate at 80%</DropdownMenuItem>
-                        <DropdownMenuItem onClick={(e) => handleCloReport(e, 90,course?._id, course?.academic_year, course?.section)}>Generate at 90%</DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                   
               
                 </div>
               )

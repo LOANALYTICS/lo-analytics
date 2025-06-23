@@ -42,7 +42,7 @@ export async function GET(request: Request) {
 
                 // Fetch assessment data with CLO mappings and achievement data
                 const assessment = await Assessment.findOne({course: courseId})
-                .select('cloData achievementData')
+                .select('cloData achievementData indirectAssessments')
                 .lean() as unknown as { 
                     cloData: Array<{
                         clo: string;
@@ -60,6 +60,7 @@ export async function GET(request: Request) {
                             percentageAchieving: number;
                         }>;
                     };
+                    indirectAssessments?: Array<any>;
                 };
     
 
@@ -98,7 +99,9 @@ export async function GET(request: Request) {
               coordinator: coordinator!
             },
             college: courseData.collage,
-
+            indirectAssessmentData: assessment?.indirectAssessments ? {
+                indirectAssessments: assessment.indirectAssessments
+            } : undefined
         });
 
         return new NextResponse(htmlContent, {
