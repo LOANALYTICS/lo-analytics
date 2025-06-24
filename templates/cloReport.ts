@@ -80,16 +80,22 @@ export function generateCloReportHTML(data: {
             <style>
                 @page {
                     size: A4 landscape;
-                    margin: 1cm;
+                    margin: 0;
                 }
-                body {
-                    font-family: Arial, sans-serif;
-                    margin: 20px;
+                html, body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+                .container {
+                    width: auto !important;
+                    max-width: none !important;
+                    min-width: 0 !important;
+                    margin: 0;
                     padding: 0;
-                    font-size: 11px;
-                    font-weight: 400;
+                    background: none;
                 }
-                .container {width: 100%; max-width: 100%; margin: 0 auto; padding: 10px; }
                 .header { text-align: center; margin-bottom: 30px; }
                 .logo { max-width: 100%; height: auto; }
                 .title { font-size: 24px; margin: 20px 0; }
@@ -109,21 +115,24 @@ export function generateCloReportHTML(data: {
                 .detail-item {
                     display: flex;
                     gap: 4px;
-                    font-weight: 500;
-                    font-size: 16px;
+                    font-weight: 600;
+                    font-size: 20px;
                 }
                 .detail-label {
                     font-weight: 700;
                 }
 
                 table {
-                    width: 100%;
+                    width: auto !important;
+                    min-width: 0 !important;
+                    max-width: none !important;
                     border: 1px solid #ddd;
                     border-radius: 6px;
                     overflow: hidden;
                     border-collapse: collapse;
                     margin-top: 15px;
                     page-break-inside: auto;
+                    table-layout: auto;
                 }
                 thead {
                     display: table-header-group;
@@ -163,7 +172,10 @@ export function generateCloReportHTML(data: {
                 }
                 .clo-cell {
                     text-align: left;
+                    width:auto;
                     min-width: 280px;
+                    max-width:280px
+
                 }
                 .plo-cell {
                     width: 40px;
@@ -172,13 +184,14 @@ export function generateCloReportHTML(data: {
                     background-color: #e6ffe6;
                 }
                 .plo-header {
+                    font-weight: 600;
                     background-color: #f0f0f0;
                 }
                 .plo-subheader {
-                    font-weight: normal;
-                    text-transform: uppercase;
+                    font-weight: 600;
+                    text-transform: capitalize;
                 }
-                .h2_class {font-weight: 600; text-align: center; margin-bottom: 30px;,margin:auto; font-size:16px }
+                .h2_class {font-weight: 700; text-align: center; margin-bottom: 30px;,margin:auto; font-size:20px }
             </style>
         </head>
         <body>
@@ -221,9 +234,9 @@ export function generateCloReportHTML(data: {
             <table>
                 <thead>
                     <tr>
-                        <th rowspan="4">CLOs</th>
-                        <th rowspan="4">Course Learning Outcome (CLO) Description</th>
-                        <th colspan="${(cloData[0].ploMapping.k.length + cloData[0].ploMapping.s.length + cloData[0].ploMapping.v.length) * 2}">Alignement of CLO with Program Learning Outcome (PLO)</th>
+                        <th rowspan="4" style='font-weight:700; font-size:700;'>CLOs</th>
+                        <th rowspan="4" style='font-weight:700; font-size:700;'>Course Learning Outcome (CLO) Description</th>
+                        <th colspan="${(cloData[0].ploMapping.k.length + cloData[0].ploMapping.s.length + cloData[0].ploMapping.v.length) * 2}" style='font-weight:600;'>Alignement of CLO with Program Learning Outcome (PLO)</th>
                     </tr>
                     <tr>
                         <th colspan="${cloData[0].ploMapping.k.length * 2}" class="plo-header">Knowledge</th>

@@ -100,6 +100,76 @@ const generatePDF = async (html: string, fileName: string, orientation: 'portrai
   }
 };
 
+const generateLandscapePDFSinglePage = async (html: string, fileName: string) => {
+  try {
+    const jsPDF = (await import('jspdf')).default;
+    const html2canvas = (await import('html2canvas')).default;
+
+    // Create container with NO fixed width or height
+    const container = document.createElement("div");
+    container.style.position = 'absolute';
+    container.style.left = '-9999px';
+    container.style.top = '0';
+    container.style.width = 'auto';
+    container.style.height = 'auto';
+    container.style.maxWidth = 'none';
+    container.style.maxHeight = 'none';
+    container.style.minWidth = '0';
+    container.style.minHeight = '0';
+    container.innerHTML = html;
+    document.body.appendChild(container);
+
+    // Wait for images
+    const images = Array.from(container.getElementsByTagName('img'));
+    await Promise.all(images.map(img => {
+      return new Promise<void>((resolve) => {
+        if (img.complete) resolve();
+        img.onload = () => resolve();
+        img.onerror = () => resolve();
+      });
+    }));
+
+    // Render to canvas (let html2canvas determine the width)
+    const canvas = await html2canvas(container, {
+      scale: 2,
+      useCORS: true,
+      allowTaint: true,
+      backgroundColor: '#ffffff'
+    });
+
+    // PDF page size in mm
+    const pdf = new jsPDF('landscape', 'mm', 'a4');
+    const pageWidth = pdf.internal.pageSize.getWidth(); // 297mm
+    const pageHeight = pdf.internal.pageSize.getHeight(); // 210mm
+    const margin = 10; // 10mm margin on all sides
+    const maxImgWidth = pageWidth - 2 * margin;
+    const maxImgHeight = pageHeight - 2 * margin;
+
+    // Calculate scale to fit both width and height
+    const pxPerMm = canvas.width / (canvas.width / 2.83465); // 1mm ≈ 2.83465px at 72dpi
+    const imgProps = {
+      width: canvas.width,
+      height: canvas.height
+    };
+    const widthScale = maxImgWidth / (imgProps.width / pxPerMm);
+    const heightScale = maxImgHeight / (imgProps.height / pxPerMm);
+    const scale = Math.min(widthScale, heightScale);
+    const pdfWidth = (imgProps.width / pxPerMm) * scale;
+    const pdfHeight = (imgProps.height / pxPerMm) * scale;
+    const x = (pageWidth - pdfWidth) / 2;
+    const y = (pageHeight - pdfHeight) / 2;
+
+    pdf.addImage(canvas, 'JPEG', x, y, pdfWidth, pdfHeight);
+
+    pdf.save(`${fileName}.pdf`);
+    document.body.removeChild(container);
+
+  } catch (error) {
+    console.error("Error generating PDF:", error);
+    throw error;
+  }
+};
+
 const generatePDFWithJsPDF = async (html: string, fileName: string, orientation: 'portrait' | 'landscape' = 'portrait') => {
   try {
     const jsPDF = (await import('jspdf')).default;
@@ -132,7 +202,7 @@ const generatePDFWithJsPDF = async (html: string, fileName: string, orientation:
     });
 
     // Calculate dimensions with margins
-    const margin = 15; // 15mm margin on all sides
+    const margin = 10; // 15mm margin on all sides
     const imgWidth = orientation === 'portrait' ? 210 - (margin * 2) : 297 - (margin * 2); // A4 width minus margins
     const pageHeight = orientation === 'portrait' ? 297 - (margin * 2) : 210 - (margin * 2); // A4 height minus margins
     const imgHeight = (canvas.height * imgWidth) / canvas.width;
@@ -261,7 +331,7 @@ const handleCloReport = async (e: any, id: string, ace_year: string, section: st
 
     const html = await response.text();
     toast.loading("Generating report")
-    await generatePDFWithJsPDF(html, `${course?.course_code} PLO Report`, 'landscape');
+    await generateLandscapePDFSinglePage(html, `${course?.course_code} PLO Report`);
     toast.dismiss();
     toast.success('Report generated successfully');
 
