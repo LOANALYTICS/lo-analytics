@@ -24,8 +24,7 @@ const generatePDF = async (html: string, fileName: string, orientation: 'portrai
     
     // Create a container for the sanitized HTML
     const container = document.createElement("div");
-    // Add CSS to prevent page breaks inside table rows
-    container.innerHTML = `<style>tr { page-break-inside: avoid !important; }</style>` + sanitizedHTML;
+    container.innerHTML = sanitizedHTML;
     document.body.appendChild(container);
 
     // Add the logo to the container
@@ -42,11 +41,11 @@ const generatePDF = async (html: string, fileName: string, orientation: 'portrai
 
     // PDF options with landscape orientation
     const opt = {
-      margin: 0.25,
+      margin: 0.5,
       filename: `${fileName}.pdf`,
       image: { type: "jpeg", quality: 0.98 },
       html2canvas: {
-        scale: 1.5,
+        scale: 2,
         useCORS: true,
         scrollY: -window.scrollY,
         removeContainer: true,
@@ -61,7 +60,7 @@ const generatePDF = async (html: string, fileName: string, orientation: 'portrai
       },
       pagebreak: {
         mode: ["css", "legacy"],
-        avoid: [".achievement-pair", "thead",'table tr'],
+        avoid: [".achievement-pair", "thead"],
       },
     };
 
@@ -99,7 +98,6 @@ const generatePDF = async (html: string, fileName: string, orientation: 'portrai
     throw error;
   }
 };
-
 const generateLandscapePDFSinglePage = async (html: string, fileName: string) => {
   try {
     const jsPDF = (await import('jspdf')).default;
@@ -364,7 +362,7 @@ const handleStudentOutcome = async(e: any, id: string, ace_year: string, section
     }
 
     const html = await response.text();
-    await generatePDFWithJsPDF(html, `${course?.course_code} SO Report`, 'landscape');
+    await generatePDF(html, `${course?.course_code} SO Report`,'landscape');
     toast.dismiss();
     toast.success('Report generated successfully');
 

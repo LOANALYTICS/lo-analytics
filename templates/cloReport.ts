@@ -42,9 +42,12 @@ export function generateCloReportHTML(data: {
         return mapping.map((item, index) => {
             const isChecked = Object.values(item)[0];
             let directCell, indirectCell;
+            
             // Direct cell (current logic)
-            if (!isChecked) directCell = `<td class="plo-cell"></td>`;
-            else {
+            if (!isChecked) {
+                directCell = `<td class="plo-cell"></td>`;
+                indirectCell = `<td class="plo-cell">-</td>`;
+            } else {
                 const achievementValue = achievementMap.get(cloId);
                 let displayValue = '✓';
                 if (achievementValue !== undefined && achievementValue !== null) {
@@ -54,9 +57,21 @@ export function generateCloReportHTML(data: {
                     }
                 }
                 directCell = `<td class="plo-cell checked">${displayValue}</td>`;
+                
+                // Indirect cell - find corresponding indirect assessment data
+                let indirectValue = '-';
+                if (indirectAssessmentData && indirectAssessmentData.indirectAssessments) {
+                    const cloNumber = cloId.replace('clo', '');
+                    const indirectAssessment = indirectAssessmentData.indirectAssessments.find(
+                        assessment => assessment.clo === `CLO ${cloNumber}`
+                    );
+                    if (indirectAssessment) {
+                        indirectValue = `${indirectAssessment.achievementPercentage.toFixed(1)}%`;
+                    }
+                }
+                indirectCell = `<td class="plo-cell checked">${indirectValue}</td>`;
             }
-            // Indirect cell (always '-')
-            indirectCell = `<td class="plo-cell">-</td>`;
+            
             return directCell + indirectCell;
         }).join('');
     };
@@ -70,6 +85,85 @@ export function generateCloReportHTML(data: {
             ${generatePloCells(clo.ploMapping.v, `clo${index + 1}`)}
         </tr>
     `).join('');
+
+    // Calculate averages for each PLO category
+    const calculateAverage = (mapping: Array<{ [key: string]: boolean }>[], cloIds: string[]) => {
+        const values: number[] = [];
+        
+        mapping.forEach((cloMapping, cloIndex) => {
+            const cloId = cloIds[cloIndex];
+            cloMapping.forEach((item, ploIndex) => {
+                const isChecked = Object.values(item)[0];
+                if (isChecked) {
+                    const achievementValue = achievementMap.get(cloId);
+                    if (achievementValue !== undefined && achievementValue !== null) {
+                        const numValue = Number(achievementValue);
+                        if (!isNaN(numValue)) {
+                            values.push(numValue);
+                        }
+                    }
+                }
+            });
+        });
+        
+        if (values.length === 0) return '-';
+        const average = values.reduce((sum, val) => sum + val, 0) / values.length;
+        return `${average.toFixed(1)}%`;
+    };
+
+    const calculateIndirectAverage = (mapping: Array<{ [key: string]: boolean }>[], cloIds: string[]) => {
+        const values: number[] = [];
+        
+        mapping.forEach((cloMapping, cloIndex) => {
+            const cloId = cloIds[cloIndex];
+            const cloNumber = cloId.replace('clo', '');
+            cloMapping.forEach((item, ploIndex) => {
+                const isChecked = Object.values(item)[0];
+                if (isChecked && indirectAssessmentData && indirectAssessmentData.indirectAssessments) {
+                    const indirectAssessment = indirectAssessmentData.indirectAssessments.find(
+                        assessment => assessment.clo === `CLO ${cloNumber}`
+                    );
+                    if (indirectAssessment) {
+                        values.push(indirectAssessment.achievementPercentage);
+                    }
+                }
+            });
+        });
+        
+        if (values.length === 0) return '-';
+        const average = values.reduce((sum, val) => sum + val, 0) / values.length;
+        return `${average.toFixed(1)}%`;
+    };
+
+    // Generate average cells for each PLO category
+    const generateAverageCells = () => {
+        const cloIds = cloData.map((_, index) => `clo${index + 1}`);
+        
+        const kMapping = cloData.map(clo => clo.ploMapping.k);
+        const sMapping = cloData.map(clo => clo.ploMapping.s);
+        const vMapping = cloData.map(clo => clo.ploMapping.v);
+        
+        const kDirectAvg = calculateAverage(kMapping, cloIds);
+        const kIndirectAvg = calculateIndirectAverage(kMapping, cloIds);
+        const sDirectAvg = calculateAverage(sMapping, cloIds);
+        const sIndirectAvg = calculateIndirectAverage(sMapping, cloIds);
+        const vDirectAvg = calculateAverage(vMapping, cloIds);
+        const vIndirectAvg = calculateIndirectAverage(vMapping, cloIds);
+        
+        return `
+            ${cloData[0].ploMapping.k.map(() => `<td class="plo-cell">${kDirectAvg}</td><td class="plo-cell checked">${kIndirectAvg}</td>`).join('')}
+            ${cloData[0].ploMapping.s.map(() => `<td class="plo-cell">${sDirectAvg}</td><td class="plo-cell checked">${sIndirectAvg}</td>`).join('')}
+            ${cloData[0].ploMapping.v.map(() => `<td class="plo-cell">${vDirectAvg}</td><td class="plo-cell checked">${vIndirectAvg}</td>`).join('')}
+        `;
+    };
+
+    // Add summary row
+    const summaryRow = `
+        <tr>
+            <td class="index-cell" colspan="2">Average</td>
+            ${generateAverageCells()}
+        </tr>
+    `;
 
     return `
         <!DOCTYPE html>
@@ -159,14 +253,17 @@ export function generateCloReportHTML(data: {
                     padding-top: 6px;
                     padding-bottom: 14px;
                     text-align: center;
-                    font-size: 14px;
-                    font-weight: 500;
+                    font-size: 15px;
+                    font-weight: 600;
                 }
                 th {
                     background-color: #f5f5f5;
                     font-weight: bold;
+                    font-size: 16px;
+
                 }
                 .index-cell {
+                
                 white-space:nowrap;
                     width: 50px;
                 }
@@ -256,6 +353,7 @@ export function generateCloReportHTML(data: {
                 </thead>
                 <tbody>
                     ${tableRows}
+                    ${summaryRow}
                 </tbody>
             </table>
         </body>
