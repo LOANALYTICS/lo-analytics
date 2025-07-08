@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { getIndirectAssessments, updateIndirectAssessments } from '@/services/assessment.action';
+import { Pencil, Check } from 'lucide-react';
 
 interface IndirectAssessment {
   clo: string;
@@ -46,6 +47,8 @@ const calculateOverall = (assessments: IndirectAssessment[]) => {
 export default function IndirectAssessmentTable({numberOfClos, courseId}: {numberOfClos: number, courseId: string}) {
   const [assessments, setAssessments] = useState<IndirectAssessment[]>([]);
   const [loading, setLoading] = useState(false);
+  const [editingBenchmark, setEditingBenchmark] = useState(false);
+  const [benchmarkInput, setBenchmarkInput] = useState('80%');
 
   useEffect(() => {
     const fetchIndirectAssessments = async () => {
@@ -53,18 +56,20 @@ export default function IndirectAssessmentTable({numberOfClos, courseId}: {numbe
         const response = await getIndirectAssessments(courseId);
         if (response.data && response.data.length > 0) {
           setAssessments(response.data);
+          setBenchmarkInput(response.data[0]?.benchmark || '80%');
         } else {
           setAssessments(generateEmptyAssessments(numberOfClos));
+          setBenchmarkInput('80%');
         }
       } catch (error) {
         console.error('Error fetching indirect assessments:', error);
         setAssessments(generateEmptyAssessments(numberOfClos));
+        setBenchmarkInput('80%');
       }
     };
-
     fetchIndirectAssessments();
   }, [numberOfClos, courseId]);
-
+console.log(assessments)
   const { averageRate, averagePercentage } = calculateOverall(assessments);
 
   const handleRateChange = (index: number, value: string) => {
@@ -90,6 +95,15 @@ export default function IndirectAssessmentTable({numberOfClos, courseId}: {numbe
       );
       setAssessments(updatedAssessments);
     }
+  };
+
+  const handleBenchmarkEdit = () => {
+    setEditingBenchmark(true);
+  };
+
+  const handleBenchmarkSave = () => {
+    setEditingBenchmark(false);
+    setAssessments(assessments => assessments.map(a => ({ ...a, benchmark: benchmarkInput })));
   };
 
   const handleSave = async () => {
@@ -200,7 +214,27 @@ export default function IndirectAssessmentTable({numberOfClos, courseId}: {numbe
           <TableRow>
             <TableHead>CLOs</TableHead>
             <TableHead>Achievement Rate</TableHead>
-            <TableHead>Benchmark</TableHead>
+            <TableHead className="flex items-center gap-2">
+              {editingBenchmark ? (
+                <>
+                  <Input
+                    value={benchmarkInput}
+                    onChange={e => setBenchmarkInput(e.target.value)}
+                    className="w-20"
+                  />
+                  <Button size="icon" variant="ghost" onClick={handleBenchmarkSave}>
+                    <Check size={16} />
+                  </Button>
+                </>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <span>{benchmarkInput} %</span>
+                  <Button size="icon" variant="ghost" onClick={handleBenchmarkEdit}>
+                    <Pencil size={16} />
+                  </Button>
+                </div>
+              )}
+            </TableHead>
             <TableHead>Achievement Percentage</TableHead>
           </TableRow>
         </TableHeader>
@@ -219,14 +253,14 @@ export default function IndirectAssessmentTable({numberOfClos, courseId}: {numbe
                   placeholder="Enter rate"
                 />
               </TableCell>
-              <TableCell>{assessment.benchmark}</TableCell>
+              <TableCell>{assessment.benchmark} %</TableCell>
               <TableCell>{assessment.achievementPercentage.toFixed(1)}%</TableCell>
             </TableRow>
           ))}
           <TableRow>
             <TableCell>Overall</TableCell>
             <TableCell>{averageRate || '-'}</TableCell>
-            <TableCell>80%</TableCell>
+            <TableCell>{benchmarkInput} %</TableCell>
             <TableCell>{averagePercentage || '0'}%</TableCell>
           </TableRow>
         </TableBody>

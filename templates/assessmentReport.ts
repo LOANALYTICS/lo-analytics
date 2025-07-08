@@ -58,8 +58,8 @@ async function generateAchievementChartHTML(achievementData: any, sortedClos: st
           fill: false
         },
         {
-          label: 'Indirect Threshold (80%)',
-          data: Array(sortedClos.length).fill(80),
+          label: `Indirect Threshold (${indirectAssessmentData?.indirectAssessments[0]?.benchmark}%)`,
+          data: Array(sortedClos.length).fill(indirectAssessmentData?.indirectAssessments[0]?.benchmark),
           type: 'line',
           borderColor: 'rgba(153, 102, 255, 1)',
           borderWidth: 2,
