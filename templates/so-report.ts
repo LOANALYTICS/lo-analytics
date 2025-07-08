@@ -254,29 +254,29 @@ function generateGradeDistributionChartHTML(assessmentData: Record<string, Grade
         ((filteredData[grade as keyof GradeCount] / total) * 100).toFixed(1)
     );
 
-    const width = 460;
-    const height = 300;
+    const width = 320;
+    const height = 240;
     const margin = {
-        left: 40,
-        right: 30,
-        top: 40,
-        bottom: 60
+        left: 32,
+        right: 20,
+        top: 32,
+        bottom: 44
     };
-    const barWidth = 32;
-    const spacing = 14;
+    const barWidth = 22;
+    const spacing = 10;
     const chartHeight = height - margin.top - margin.bottom;
 
     const bars = grades.map((grade, i) => {
         const value = Number(values[i]);
         const x = margin.left + (i * (barWidth + spacing));
-        const barHeight = (value * 2); // Scale height to match y-axis
+        const barHeight = (value * 1.6); // Scale height to match y-axis
         const y = height - margin.bottom - barHeight;
 
         return `
             <rect x="${x}" y="${y}" width="${barWidth}" height="${barHeight}" 
-                  fill="${getColorForGrade(grade)}" rx="5" ry="5" stroke="#333" stroke-width="0.5" />
-            <text x="${x + barWidth/2}" y="${y-10}" text-anchor="middle" font-size="12" font-weight="bold" fill="#333">${value}%</text>
-            <text x="${x + barWidth/2}" y="${height - margin.bottom + 20}" text-anchor="middle" font-size="11" font-weight="bold" fill="#555">${grade}</text>
+                  fill="${getColorForGrade(grade)}" rx="4" ry="4" stroke="#333" stroke-width="0.5" />
+            <text x="${x + barWidth/2}" y="${y-7}" text-anchor="middle" font-size="10" font-weight="bold" fill="#333">${value}%</text>
+            <text x="${x + barWidth/2}" y="${height - margin.bottom + 16}" text-anchor="middle" font-size="9" font-weight="bold" fill="#555">${grade}</text>
         `;
     }).join('');
 
@@ -286,23 +286,23 @@ function generateGradeDistributionChartHTML(assessmentData: Record<string, Grade
         return `
             <line x1="${margin.left}" x2="${width - margin.right}" y1="${y}" y2="${y}" 
                   stroke="#e0e0e0" stroke-width="0.8" />
-            <text x="${margin.left - 10}" y="${y + 5}" text-anchor="end" font-size="11" fill="#555">${i * 10}</text>
+            <text x="${margin.left - 8}" y="${y + 4}" text-anchor="end" font-size="9" fill="#555">${i * 10}</text>
         `;
     }).join('');
 
     // Add legend at bottom
     const legendItems = grades.map((grade, i) => {
-        const x = margin.left + (i * 35);
+        const x = margin.left + (i * 30);
         return `
-            <rect x="${x}" y="${height - 25}" width="10" height="10" fill="${getColorForGrade(grade)}" rx="3" ry="3" />
-            <text x="${x + 15}" y="${height - 17}" font-size="11" fill="#333">${grade}</text>
+            <rect x="${x}" y="${height - 20}" width="8" height="8" fill="${getColorForGrade(grade)}" rx="2" ry="2" />
+            <text x="${x + 11}" y="${height - 13}" font-size="8" fill="#333">${grade}</text>
         `;
     }).join('');
 
     return `
         <div class="chart-wrapper">
             <svg width="${width}" height="${height}">
-                <text x="${width/2}" y="30" text-anchor="middle" font-size="16" font-weight="bold" fill="#333">
+                <text x="${width/2}" y="14" text-anchor="middle" font-size="10" font-weight="bold" fill="#333">
                     ${examType} Grade Distribution
                 </text>
                 ${yAxis}

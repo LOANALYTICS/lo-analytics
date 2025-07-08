@@ -41,7 +41,7 @@ const generatePDF = async (html: string, fileName: string, orientation: 'portrai
 
     // PDF options with landscape orientation
     const opt = {
-      margin: 0.5,
+      margin: 0.25,
       filename: `${fileName}.pdf`,
       image: { type: "jpeg", quality: 0.98 },
       html2canvas: {
@@ -362,7 +362,7 @@ const handleStudentOutcome = async(e: any, id: string, ace_year: string, section
     }
 
     const html = await response.text();
-    await generatePDF(html, `${course?.course_code} SO Report`,'landscape');
+    await generatePDF(html, `${course?.course_code} SO Report`,'portrait');
     toast.dismiss();
     toast.success('Report generated successfully');
 
@@ -425,32 +425,7 @@ const handleStudentOutcome = async(e: any, id: string, ace_year: string, section
               <p>Type : <span className='capitalize'>{course.examType}</span></p>
               <p>Semester : <span className='capitalize'>{course.semister  == 1 ? 'First Semester' : 'Second Semester'}</span></p>
             </div>
-            {
-              standalone && (
-                <div className='z-50 flex flex-col gap-2 self-end bottom-3 '>
-                <Button onClick={(e) => {
-                      e.preventDefault()
-                      e.stopPropagation()
-                      handleStudentOutcome(e,course?._id, course?.academic_year, course?.section)}} variant='outline' size='sm' className='px-5 py-3 text-[11px] w-full h-fit font-bold'>
-                        S.O - Report
-                    </Button>
-                    <Button onClick={(e) => {
-                      e.preventDefault()
-                      e.stopPropagation()
-                      handleAssessmentPlan(e)}} variant='outline' size='sm' className='px-5 py-3 text-[11px] w-full h-fit font-bold'>
-                        CLO - Report
-                    </Button>
-                
-                        <Button 
-                        onClick={(e) => handleCloReport(e,course?._id, course?.academic_year, course?.section)}
-                        variant='outline' size='sm' className='px-5 py-3 text-[11px] w-full h-fit font-bold'>
-                          PLO - Report
-                        </Button>
-                   
-              
-                </div>
-              )
-            }
+           
         </Link>
         )
          

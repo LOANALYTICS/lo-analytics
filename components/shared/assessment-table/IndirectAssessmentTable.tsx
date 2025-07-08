@@ -135,52 +135,52 @@ export default function IndirectAssessmentTable({numberOfClos, courseId}: {numbe
     }
   };
 
-  const handleGenerate = async () => {
-    try {
-      const response = await fetch(`/api/generate-indirect-report/${courseId}`);
+  // const handleGenerate = async () => {
+  //   try {
+  //     const response = await fetch(`/api/generate-indirect-report/${courseId}`);
       
-      if (!response.ok) {
-        throw new Error('Failed to generate report');
-      }
+  //     if (!response.ok) {
+  //       throw new Error('Failed to generate report');
+  //     }
 
-      const html = await response.text();
+  //     const html = await response.text();
       
-      // Generate PDF from HTML
-      const html2pdf = (await import("html2pdf.js")).default;
-      const fileName = `indirect-assessment-report-${courseId}`;
+  //     // Generate PDF from HTML
+  //     const html2pdf = (await import("html2pdf.js")).default;
+  //     const fileName = `indirect-assessment-report-${courseId}`;
       
-      const opt = {
-        margin: [0.5, 0.5, 0.5, 0.5],  // Increased margins [top, left, bottom, right] in inches
-        filename: `${fileName}.pdf`,
-        image: { type: "jpeg", quality: 0.98 },
-        html2canvas: { 
-            scale: 2,  // Increased scale for better quality
-            useCORS: true,
-            logging: true
-        },
-        jsPDF: { 
-            unit: "in", 
-            format: "a4", 
-            orientation: "portrait",
-            hotfixes: ["px_scaling"]  // Better handling of pixel scaling
-        }
-      };
+  //     const opt = {
+  //       margin: [0.5, 0.5, 0.5, 0.5],  // Increased margins [top, left, bottom, right] in inches
+  //       filename: `${fileName}.pdf`,
+  //       image: { type: "jpeg", quality: 0.98 },
+  //       html2canvas: { 
+  //           scale: 2,  // Increased scale for better quality
+  //           useCORS: true,
+  //           logging: true
+  //       },
+  //       jsPDF: { 
+  //           unit: "in", 
+  //           format: "a4", 
+  //           orientation: "portrait",
+  //           hotfixes: ["px_scaling"]  // Better handling of pixel scaling
+  //       }
+  //     };
 
-      // Create container for HTML
-      const container = document.createElement("div");
-      container.innerHTML = html;
-      document.body.appendChild(container);
+  //     // Create container for HTML
+  //     const container = document.createElement("div");
+  //     container.innerHTML = html;
+  //     document.body.appendChild(container);
 
-      // Generate and save PDF
-      await html2pdf().set(opt).from(container).save();
+  //     // Generate and save PDF
+  //     await html2pdf().set(opt).from(container).save();
       
-      // Cleanup
-      document.body.removeChild(container);
-    } catch (error) {
-      console.error('Error generating report:', error);
-      toast.error("Failed to generate report");
-    }
-  };
+  //     // Cleanup
+  //     document.body.removeChild(container);
+  //   } catch (error) {
+  //     console.error('Error generating report:', error);
+  //     toast.error("Failed to generate report");
+  //   }
+  // };
 
   return (
     <div className="border-2 border-black rounded-lg mt-4">
@@ -190,9 +190,9 @@ export default function IndirectAssessmentTable({numberOfClos, courseId}: {numbe
           <Button onClick={handleSave} disabled={loading}>
             {loading ? 'Saving...' : 'Save'}
           </Button>
-          <Button onClick={handleGenerate} variant="secondary">
+          {/* <Button onClick={handleGenerate} variant="secondary">
             Generate Report
-          </Button>
+          </Button> */}
         </div>
       </div>
       <Table>
