@@ -96,8 +96,10 @@ export function AssessmentSpreadsheet({
 
         const gridColumns: any[] = isMultipleMode ? multipleModeColumnsConfig.map((col, idx) => ({
           ...keyColumn(col.key, textColumn),
-          title: String.fromCharCode(65 + idx),
-          minWidth: col.minWidth
+          title: getExcelColumnName(idx),
+          minWidth: col.minWidth,
+          // Make first and second columns uneditable
+          disabled: col.key === 'studentName' || col.key === 'studentId',
         })) : [
           {
             ...keyColumn('studentName', textColumn),
@@ -149,16 +151,6 @@ export function AssessmentSpreadsheet({
         ]
         
         // Remove the additional column adding logic for single mode
-        if (isMultipleMode) {
-          // Add question columns only for multiple mode
-          for (let i = 0; i < numberOfQuestions; i++) {
-            gridColumns.push({
-              ...keyColumn(`q${i+1}`, textColumn),
-              title: getExcelColumnName(i + 6),
-              minWidth: 80
-            })
-          }
-        }
         
         setColumns(gridColumns)
         
@@ -188,14 +180,7 @@ export function AssessmentSpreadsheet({
             return row
           })
 
-          const emptyRows: RowData[] = Array(10).fill(null).map(() => {
-            const emptyRow: RowData = {} as RowData
-            multipleModeColumnsConfig.forEach(col => {
-              emptyRow[col.key] = ''
-            })
-            return emptyRow
-          })
-          setData([headerRow, keyRow, ...studentRows, ...emptyRows])
+          setData([headerRow, keyRow, ...studentRows])
         } else {
           // Create header row with Student Name first
           const headerRow: RowData = {
@@ -246,23 +231,7 @@ export function AssessmentSpreadsheet({
     }
   }, [courseId, open, numberOfQuestions, isMultipleMode])
 
-  const restoreStudentInfo = () => {
-    if (data.length < 2 || originalStudentData.length === 0) return
-    
-    const newData = [...data]
-    
-    for (let i = 1; i < newData.length && i - 1 < originalStudentData.length; i++) {
-      const student = originalStudentData[i - 1]
-      newData[i] = {
-        ...newData[i],
-        studentId: student.id,
-        studentName: student.name
-      }
-    }
-    
-    setData(newData)
-    toast.success("Student information restored")
-  }
+
 
   const handleSave = async () => {
     try {
@@ -270,8 +239,8 @@ export function AssessmentSpreadsheet({
         // For multiple mode, directly use the data without filtering
         const rowsData = data.map(row => {
           return [
-            row.studentId,
             row.studentName,
+            row.studentId,
             row.percentage,
             row.score,
             row.correct,
@@ -279,6 +248,7 @@ export function AssessmentSpreadsheet({
             ...Array.from({ length: numberOfQuestions }, (_, i) => row[`q${i + 1}`] || '')
           ]
         })
+        console.log(rowsData)
         
         // Create Excel file
         const ws = XLSX.utils.aoa_to_sheet(rowsData)
@@ -290,8 +260,7 @@ export function AssessmentSpreadsheet({
         const blob = new Blob([excelBuffer], {
           type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         })
-        
-        // Comment out download trigger
+        // Trigger download of the file before uploading
         // const url = window.URL.createObjectURL(blob)
         // const a = document.createElement('a')
         // a.href = url
@@ -300,7 +269,7 @@ export function AssessmentSpreadsheet({
         // a.click()
         // a.remove()
         // window.URL.revokeObjectURL(url)
-
+        
         // Prepare form data for API
         const formData = new FormData()
         formData.append("file", blob, `${type}-results.xlsx`)

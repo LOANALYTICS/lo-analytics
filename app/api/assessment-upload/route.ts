@@ -92,13 +92,13 @@ export async function POST(request: Request) {
       .filter((id): id is string | number => id !== undefined && id !== null)
       .map(id => String(id).trim());
 
+      console.log(excelStudentIds)
     // Get all student IDs from assessment model
     const assessmentStudentIds = new Set(
       assessmentResponse.data.students.map(
         (student: { studentId: string }) => student.studentId.trim()
       )
     );
-
     // Check if we have all required students
     if (excelStudentIds.length === 0) {
       return NextResponse.json({
