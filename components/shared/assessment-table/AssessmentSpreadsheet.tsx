@@ -76,39 +76,29 @@ export function AssessmentSpreadsheet({
           return columnName
         }
         
-        // Create columns based on mode
-        const gridColumns = isMultipleMode ? [
-          {
-            ...keyColumn('studentId', textColumn),
-            title: 'A',
-            minWidth: 120
-          },
-          {
-            ...keyColumn('studentName', textColumn),
-            title: 'B',
-            minWidth: 200
-          },
-          {
-            ...keyColumn('percentage', textColumn),
-            title: 'C',
+        // Create columns and header row for multiple mode from a single source of truth
+        const multipleModeColumnsConfig: { key: string; title: string; minWidth: number }[] = [
+          { key: 'studentName', title: 'Student Name', minWidth: 200 },
+          { key: 'studentId', title: 'ID Number', minWidth: 120 },
+          { key: 'percentage', title: '%', minWidth: 80 },
+          { key: 'score', title: 'Score', minWidth: 80 },
+          { key: 'correct', title: '#Correct', minWidth: 100 },
+          { key: 'blank', title: 'Blank', minWidth: 80 },
+        ]
+        // Add question columns
+        for (let i = 0; i < numberOfQuestions; i++) {
+          multipleModeColumnsConfig.push({
+            key: `q${i+1}`,
+            title: `Q ${i+1}`,
             minWidth: 80
-          },
-          {
-            ...keyColumn('score', textColumn),
-            title: 'D',
-            minWidth: 80
-          },
-          {
-            ...keyColumn('correct', textColumn),
-            title: 'E',
-            minWidth: 100
-          },
-          {
-            ...keyColumn('blank', textColumn),
-            title: 'F',
-            minWidth: 80
-          },
-        ] : [
+          })
+        }
+
+        const gridColumns: any[] = isMultipleMode ? multipleModeColumnsConfig.map((col, idx) => ({
+          ...keyColumn(col.key, textColumn),
+          title: String.fromCharCode(65 + idx),
+          minWidth: col.minWidth
+        })) : [
           {
             ...keyColumn('studentName', textColumn),
             title: 'A',
@@ -173,23 +163,39 @@ export function AssessmentSpreadsheet({
         setColumns(gridColumns)
         
         if (isMultipleMode) {
-          // Remove the limit on the number of empty rows for multiple mode
-          const emptyRows = Array(10).fill(null).map(() => { // Change 2 to 10 or any desired number
-            const emptyRow: RowData = {
-              studentId: '',
-              studentName: '',
-              percentage: '',
-              score: '',
-              correct: '',
-              blank: '',
-              q1: ''
-            }
-            for (let i = 0; i < numberOfQuestions; i++) {
-              emptyRow[`q${i+1}`] = ''
-            }
+          // Create header row for multiple mode from config
+          const headerRow: RowData = {} as RowData
+          multipleModeColumnsConfig.forEach(col => {
+            headerRow[col.key] = col.title
+          })
+
+          // Insert key row after header
+          const keyRow: RowData = {} as RowData
+          multipleModeColumnsConfig.forEach((col) => {
+            if (col.key === 'studentName') keyRow[col.key] = 'Key'
+            else if (col.key === 'score' || col.key === 'correct') keyRow[col.key] = String(numberOfQuestions)
+            else keyRow[col.key] = ''
+          })
+
+          // Map student data to rows
+          const studentRows: RowData[] = originalStudentData.map(student => {
+            const row: RowData = {} as RowData
+            multipleModeColumnsConfig.forEach(col => {
+              if (col.key === 'studentName') row[col.key] = student.name
+              else if (col.key === 'studentId') row[col.key] = student.id
+              else row[col.key] = ''
+            })
+            return row
+          })
+
+          const emptyRows: RowData[] = Array(10).fill(null).map(() => {
+            const emptyRow: RowData = {} as RowData
+            multipleModeColumnsConfig.forEach(col => {
+              emptyRow[col.key] = ''
+            })
             return emptyRow
           })
-          setData(emptyRows)
+          setData([headerRow, keyRow, ...studentRows, ...emptyRows])
         } else {
           // Create header row with Student Name first
           const headerRow: RowData = {
