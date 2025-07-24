@@ -64,11 +64,11 @@ const Sidebar = ({ userRole, userPermissions, user }: { userRole: string, userPe
         {isCollapsed ? <SidebarIcon /> : <SidebarIcon />}
       </button>
       <aside
-        className={`h-full border rounded-xl bg-white transition-all duration-300 ease-in-out overflow-hidden ${isCollapsed ? "w-16" : "w-64"
+        className={`h-full  border rounded-xl bg-white transition-all duration-300 ease-in-out overflow-hidden ${isCollapsed ? "w-16" : "w-64"
           }`}
       >
-        <div className="flex h-20 transition-opacity px-2 py-2 duration-300">
-          <div className="px-1  flex w-full cursor-pointer gap-1 items-center rounded-md hover:bg-neutral-100">
+        <div className={`flex ${isCollapsed ? "h-16" : "h-20"}  transition-all  px-2 py-2 duration-300`}>
+          <div className="px-1  flex w-full  gap-1 items-center rounded-md ">
             <Image
               width={60}
               height={60}
@@ -180,7 +180,7 @@ const Sidebar = ({ userRole, userPermissions, user }: { userRole: string, userPe
           </div>
           <Link
             href={'/support'}
-            className={`flex items-center mt-auto mb-[68px]  p-2 rounded-lg text-black transition-colors duration-200 ${pathname === '/support' ? "bg-neutral-500 text-white" : "hover:bg-gray-200"}`}
+            className={`flex items-center mt-auto mb-[80px]  p-2 rounded-lg text-black transition-colors duration-200 ${pathname === '/support' ? "bg-neutral-500 text-white" : "hover:bg-gray-200"}`}
           >
             <Contact2 className="text-xl min-w-[20px] w-[20px] ml-1" />
             <span className={`ml-4 break-keep line-clamp-1 text-sm font-medium transition-opacity duration-300 ${isCollapsed ? "opacity-0 pointer-events-none" : "opacity-100"}`}>
