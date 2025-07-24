@@ -18,35 +18,77 @@ export function generateCloReportHTML(data: {
         course_code: string;
         credit_hours: string;
         coordinator: string;
-      };
-      college: {
+    };
+    college: {
         logo: string;
         english: string;
         regional: string;
         university: string;
-      };
-      indirectAssessmentData?: {
+    };
+    indirectAssessmentData?: {
         indirectAssessments: Array<{
-          clo: string;
-          achievementRate: number;
-          benchmark: string;
-          achievementPercentage: number;
+            clo: string;
+            achievementRate: number;
+            benchmark: string;
+            achievementPercentage: number;
         }>;
-      };
-      
-}) {
-    const { cloData, percentage, achievementMap,course, college,indirectAssessmentData } = data;
+    };
 
-    // Helper function to generate PLO cells
-    const generatePloCells = (mapping: Array<{ [key: string]: boolean }>, cloId: string) => {
-        return mapping.map((item, index) => {
+}) {
+    const { cloData, percentage, achievementMap, course, college, indirectAssessmentData } = data;
+
+    // Function to check if a PLO has any data (direct or indirect) across all CLOs
+    const hasAnyData = (ploMappings: Array<Array<{ [key: string]: boolean }>>, ploIndex: number) => {
+        const cloIds = cloData.map((_, index) => `clo${index + 1}`);
+
+        // Check for direct data
+        const hasDirectData = ploMappings.some((cloMapping, cloIndex) => {
+            const isChecked = Object.values(cloMapping[ploIndex])[0];
+            if (isChecked) {
+                const achievementValue = achievementMap.get(cloIds[cloIndex]);
+                return achievementValue !== undefined && achievementValue !== null && !isNaN(Number(achievementValue));
+            }
+            return false;
+        });
+
+        // Check for indirect data
+        const hasIndirectData = ploMappings.some((cloMapping, cloIndex) => {
+            const isChecked = Object.values(cloMapping[ploIndex])[0];
+            if (isChecked && indirectAssessmentData && indirectAssessmentData.indirectAssessments) {
+                const cloNumber = cloIds[cloIndex].replace('clo', '');
+                const indirectAssessment = indirectAssessmentData.indirectAssessments.find(
+                    assessment => assessment.clo === `CLO ${cloNumber}`
+                );
+                return indirectAssessment !== undefined;
+            }
+            return false;
+        });
+
+        return hasDirectData || hasIndirectData;
+    };
+
+    // Filter active PLOs for each category
+    const activeKPlos = cloData[0].ploMapping.k.map((_, index) => index).filter(index =>
+        hasAnyData(cloData.map(clo => clo.ploMapping.k), index)
+    );
+    const activeSPlos = cloData[0].ploMapping.s.map((_, index) => index).filter(index =>
+        hasAnyData(cloData.map(clo => clo.ploMapping.s), index)
+    );
+    const activeVPlos = cloData[0].ploMapping.v.map((_, index) => index).filter(index =>
+        hasAnyData(cloData.map(clo => clo.ploMapping.v), index)
+    );
+
+    // Helper function to generate PLO cells (only for active PLOs)
+    const generatePloCells = (mapping: Array<{ [key: string]: boolean }>, cloId: string, activePloIndexes: number[]) => {
+        return activePloIndexes.map(ploIndex => {
+            const item = mapping[ploIndex];
             const isChecked = Object.values(item)[0];
             let directCell, indirectCell;
-            
+
             // Direct cell (current logic)
             if (!isChecked) {
                 directCell = `<td class="plo-cell"></td>`;
-                indirectCell = `<td class="plo-cell">-</td>`;
+                indirectCell = `<td class="plo-cell"></td>`;
             } else {
                 const achievementValue = achievementMap.get(cloId);
                 let displayValue = '✓';
@@ -57,7 +99,7 @@ export function generateCloReportHTML(data: {
                     }
                 }
                 directCell = `<td class="plo-cell checked">${displayValue}</td>`;
-                
+
                 // Indirect cell - find corresponding indirect assessment data
                 let indirectValue = '';
                 if (indirectAssessmentData && indirectAssessmentData.indirectAssessments) {
@@ -71,7 +113,7 @@ export function generateCloReportHTML(data: {
                 }
                 indirectCell = `<td class="plo-cell checked">${indirectValue}</td>`;
             }
-            
+
             return directCell + indirectCell;
         }).join('');
     };
@@ -80,45 +122,53 @@ export function generateCloReportHTML(data: {
         <tr>
             <td class="index-cell">CLO ${index + 1}</td>
             <td class="clo-cell">${clo.description}</td>
-            ${generatePloCells(clo.ploMapping.k, `clo${index + 1}`)}
-            ${generatePloCells(clo.ploMapping.s, `clo${index + 1}`)}
-            ${generatePloCells(clo.ploMapping.v, `clo${index + 1}`)}
+            ${generatePloCells(clo.ploMapping.k, `clo${index + 1}`, activeKPlos)}
+            ${generatePloCells(clo.ploMapping.s, `clo${index + 1}`, activeSPlos)}
+            ${generatePloCells(clo.ploMapping.v, `clo${index + 1}`, activeVPlos)}
         </tr>
     `).join('');
 
     // Calculate averages for each PLO category
     const calculateAverage = (mapping: Array<{ [key: string]: boolean }>[], cloIds: string[]) => {
         const values: number[] = [];
-        mapping.forEach((cloMapping, cloIndex) => {
-            const cloId = cloIds[cloIndex];
-            cloMapping.forEach((item, ploIndex) => {
-                const isChecked = Object.values(item)[0];
-                if (isChecked) {
+
+        // For each CLO that has PLO mappings
+        cloIds.forEach((cloId, cloIndex) => {
+            const cloMapping = mapping[cloIndex];
+            if (cloMapping && cloMapping.length > 0) {
+                // Check if any PLO is mapped for this CLO
+                const hasMapping = cloMapping.some(item => Object.values(item)[0] === true);
+                if (hasMapping) {
                     const achievementValue = achievementMap.get(cloId);
-                    if (achievementValue !== undefined && achievementValue !== null) {
+                    // Only include CLOs that have valid achievement data
+                    if (achievementValue !== undefined && achievementValue !== null && !isNaN(Number(achievementValue))) {
                         const numValue = Number(achievementValue);
-                        if (!isNaN(numValue)) {
+                        // Include all valid numbers, even 0 (but exclude negative values if any)
+                        if (numValue >= 0) {
                             values.push(numValue);
                         }
                     }
                 }
-            });
+            }
         });
-        
-        if (values.length === 0) return '-';
+
+        if (values.length === 0) return '';
         const average = values.reduce((sum, val) => sum + val, 0) / values.length;
         return `${average.toFixed(1)}%`;
     };
 
     const calculateIndirectAverage = (mapping: Array<{ [key: string]: boolean }>[], cloIds: string[]) => {
         const values: number[] = [];
-        
-        mapping.forEach((cloMapping, cloIndex) => {
-            const cloId = cloIds[cloIndex];
-            const cloNumber = cloId.replace('clo', '');
-            cloMapping.forEach((item, ploIndex) => {
-                const isChecked = Object.values(item)[0];
-                if (isChecked && indirectAssessmentData && indirectAssessmentData.indirectAssessments) {
+
+        // For each CLO
+        cloIds.forEach((cloId, cloIndex) => {
+            // Check if this CLO has any checked mappings
+            const cloMapping = mapping[cloIndex];
+            if (cloMapping && cloMapping.length > 0) {
+                // Check if any PLO is mapped for this CLO
+                const hasMapping = cloMapping.some(item => Object.values(item)[0] === true);
+                if (hasMapping && indirectAssessmentData && indirectAssessmentData.indirectAssessments) {
+                    const cloNumber = cloId.replace('clo', '');
                     const indirectAssessment = indirectAssessmentData.indirectAssessments.find(
                         assessment => assessment.clo === `CLO ${cloNumber}`
                     );
@@ -126,34 +176,44 @@ export function generateCloReportHTML(data: {
                         values.push(indirectAssessment.achievementPercentage);
                     }
                 }
-            });
+            }
         });
-        
-        if (values.length === 0) return '-';
+
+        if (values.length === 0) return '';
         const average = values.reduce((sum, val) => sum + val, 0) / values.length;
         return `${average.toFixed(1)}%`;
     };
 
-    // Generate average cells for each PLO category
+    // Generate average cells for each individual PLO (only active PLOs)
     const generateAverageCells = () => {
         const cloIds = cloData.map((_, index) => `clo${index + 1}`);
-        
-        const kMapping = cloData.map(clo => clo.ploMapping.k);
-        const sMapping = cloData.map(clo => clo.ploMapping.s);
-        const vMapping = cloData.map(clo => clo.ploMapping.v);
-        
-        const kDirectAvg = calculateAverage(kMapping, cloIds);
-        const kIndirectAvg = calculateIndirectAverage(kMapping, cloIds);
-        const sDirectAvg = calculateAverage(sMapping, cloIds);
-        const sIndirectAvg = calculateIndirectAverage(sMapping, cloIds);
-        const vDirectAvg = calculateAverage(vMapping, cloIds);
-        const vIndirectAvg = calculateIndirectAverage(vMapping, cloIds);
-        
-        return `
-            ${cloData[0].ploMapping.k.map(() => `<td class="plo-cell">${kDirectAvg}</td><td class="plo-cell checked">${kIndirectAvg}</td>`).join('')}
-            ${cloData[0].ploMapping.s.map(() => `<td class="plo-cell">${sDirectAvg}</td><td class="plo-cell checked">${sIndirectAvg}</td>`).join('')}
-            ${cloData[0].ploMapping.v.map(() => `<td class="plo-cell">${vDirectAvg}</td><td class="plo-cell checked">${vIndirectAvg}</td>`).join('')}
-        `;
+        let cells = '';
+
+        // Calculate average for each active K PLO individually
+        activeKPlos.forEach(ploIndex => {
+            const kPloMapping = cloData.map(clo => [clo.ploMapping.k[ploIndex]]);
+            const kDirectAvg = calculateAverage(kPloMapping, cloIds);
+            const kIndirectAvg = calculateIndirectAverage(kPloMapping, cloIds);
+            cells += `<td class="plo-cell">${kDirectAvg}</td><td class="plo-cell ">${kIndirectAvg}</td>`;
+        });
+
+        // Calculate average for each active S PLO individually
+        activeSPlos.forEach(ploIndex => {
+            const sPloMapping = cloData.map(clo => [clo.ploMapping.s[ploIndex]]);
+            const sDirectAvg = calculateAverage(sPloMapping, cloIds);
+            const sIndirectAvg = calculateIndirectAverage(sPloMapping, cloIds);
+            cells += `<td class="plo-cell">${sDirectAvg}</td><td class="plo-cell ">${sIndirectAvg}</td>`;
+        });
+
+        // Calculate average for each active V PLO individually
+        activeVPlos.forEach(ploIndex => {
+            const vPloMapping = cloData.map(clo => [clo.ploMapping.v[ploIndex]]);
+            const vDirectAvg = calculateAverage(vPloMapping, cloIds);
+            const vIndirectAvg = calculateIndirectAverage(vPloMapping, cloIds);
+            cells += `<td class="plo-cell">${vDirectAvg}</td><td class="plo-cell ">${vIndirectAvg}</td>`;
+        });
+
+        return cells;
     };
 
     // Add summary row
@@ -332,22 +392,22 @@ export function generateCloReportHTML(data: {
                     <tr>
                         <th rowspan="4" style='font-weight:700; font-size:700;'>CLOs</th>
                         <th rowspan="4" style='font-weight:700; font-size:700;'>Course Learning Outcome (CLO) Description</th>
-                        <th colspan="${(cloData[0].ploMapping.k.length + cloData[0].ploMapping.s.length + cloData[0].ploMapping.v.length) * 2}" style='font-weight:600;'>Alignement of CLO with Program Learning Outcome (PLO)</th>
+                        <th colspan="${(activeKPlos.length + activeSPlos.length + activeVPlos.length) * 2}" style='font-weight:600;'>Alignement of CLO with Program Learning Outcome (PLO)</th>
                     </tr>
                     <tr>
-                        <th colspan="${cloData[0].ploMapping.k.length * 2}" class="plo-header">Knowledge</th>
-                        <th colspan="${cloData[0].ploMapping.s.length * 2}" class="plo-header">Skills</th>
-                        <th colspan="${cloData[0].ploMapping.v.length * 2}" class="plo-header">Values</th>
+                        ${activeKPlos.length > 0 ? `<th colspan="${activeKPlos.length * 2}" class="plo-header">Knowledge</th>` : ''}
+                        ${activeSPlos.length > 0 ? `<th colspan="${activeSPlos.length * 2}" class="plo-header">Skills</th>` : ''}
+                        ${activeVPlos.length > 0 ? `<th colspan="${activeVPlos.length * 2}" class="plo-header">Values</th>` : ''}
                     </tr>
                     <tr>
-                        ${cloData[0].ploMapping.k.map((_, i) => `<th colspan="2" class="plo-header">K${i + 1}</th>`).join('')}
-                        ${cloData[0].ploMapping.s.map((_, i) => `<th colspan="2" class="plo-header">S${i + 1}</th>`).join('')}
-                        ${cloData[0].ploMapping.v.map((_, i) => `<th colspan="2" class="plo-header">V${i + 1}</th>`).join('')}
+                        ${activeKPlos.map(i => `<th colspan="2" class="plo-header">K${i + 1}</th>`).join('')}
+                        ${activeSPlos.map(i => `<th colspan="2" class="plo-header">S${i + 1}</th>`).join('')}
+                        ${activeVPlos.map(i => `<th colspan="2" class="plo-header">V${i + 1}</th>`).join('')}
                     </tr>
                     <tr>
-                        ${cloData[0].ploMapping.k.map(() => `<th class=\"plo-subheader\">Direct</th><th class=\"plo-subheader\">Indirect</th>`).join('')}
-                        ${cloData[0].ploMapping.s.map(() => `<th class=\"plo-subheader\">Direct</th><th class=\"plo-subheader\">Indirect</th>`).join('')}
-                        ${cloData[0].ploMapping.v.map(() => `<th class=\"plo-subheader\">Direct</th><th class=\"plo-subheader\">Indirect</th>`).join('')}
+                        ${activeKPlos.map(() => `<th class=\"plo-subheader\">Direct</th><th class=\"plo-subheader\">Indirect</th>`).join('')}
+                        ${activeSPlos.map(() => `<th class=\"plo-subheader\">Direct</th><th class=\"plo-subheader\">Indirect</th>`).join('')}
+                        ${activeVPlos.map(() => `<th class=\"plo-subheader\">Direct</th><th class=\"plo-subheader\">Indirect</th>`).join('')}
                     </tr>
                 </thead>
                 <tbody>
