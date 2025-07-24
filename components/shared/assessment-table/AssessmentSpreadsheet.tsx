@@ -35,14 +35,14 @@ interface RowData {
   [key: string]: string // For dynamic question columns
 }
 
-export function AssessmentSpreadsheet({ 
-  open, 
-  onOpenChange, 
-  onSave, 
-  courseId, 
+export function AssessmentSpreadsheet({
+  open,
+  onOpenChange,
+  onSave,
+  courseId,
   type,
   weight,
-  numberOfQuestions 
+  numberOfQuestions
 }: AssessmentSpreadsheetProps) {
   const [data, setData] = useState<RowData[]>([])
   const [originalStudentData, setOriginalStudentData] = useState<Student[]>([])
@@ -57,14 +57,14 @@ export function AssessmentSpreadsheet({
       try {
         setLoading(true)
         const response = await getAssessmentStudents(courseId)
-        
-     
+
+
         const students = response.data.map((student: any) => ({
           id: student.studentId,
           name: student.studentName
         }))
         setOriginalStudentData(students)
-        
+
         // Helper function to get Excel column name
         const getExcelColumnName = (index: number) => {
           let columnName = ''
@@ -75,7 +75,7 @@ export function AssessmentSpreadsheet({
           }
           return columnName
         }
-        
+
         // Create columns and header row for multiple mode from a single source of truth
         const multipleModeColumnsConfig: { key: string; title: string; minWidth: number }[] = [
           { key: 'studentName', title: 'Student Name', minWidth: 200 },
@@ -88,8 +88,8 @@ export function AssessmentSpreadsheet({
         // Add question columns
         for (let i = 0; i < numberOfQuestions; i++) {
           multipleModeColumnsConfig.push({
-            key: `q${i+1}`,
-            title: `Q ${i+1}`,
+            key: `q${i + 1}`,
+            title: `Q ${i + 1}`,
             minWidth: 80
           })
         }
@@ -149,11 +149,11 @@ export function AssessmentSpreadsheet({
             minWidth: 80
           }
         ]
-        
+
         // Remove the additional column adding logic for single mode
-        
+
         setColumns(gridColumns)
-        
+
         if (isMultipleMode) {
           // Create header row for multiple mode from config
           const headerRow: RowData = {} as RowData
@@ -192,7 +192,7 @@ export function AssessmentSpreadsheet({
             blank: 'Blank',
             q1: 'Q1'
           }
-          
+
           // Create key row
           const keyRow: RowData = {
             studentName: '',
@@ -203,7 +203,7 @@ export function AssessmentSpreadsheet({
             blank: String(weight),
             q1: String(weight)
           }
-          
+
           // Format student data with name first
           const rowData = response.data.map((student: any) => ({
             studentName: student.studentName,
@@ -214,10 +214,10 @@ export function AssessmentSpreadsheet({
             blank: '',
             q1: ''
           }))
-          
+
           setData([headerRow, keyRow, ...rowData])
         }
-        
+
         setLoading(false)
       } catch (error) {
         console.error('Failed to fetch students:', error)
@@ -236,7 +236,7 @@ export function AssessmentSpreadsheet({
   const handleSave = async () => {
     try {
       if (isMultipleMode) {
-        // For multiple mode, directly use the data without filtering
+        // For multiple mode, send data directly as JSON
         const rowsData = data.map(row => {
           return [
             row.studentName,
@@ -248,55 +248,34 @@ export function AssessmentSpreadsheet({
             ...Array.from({ length: numberOfQuestions }, (_, i) => row[`q${i + 1}`] || '')
           ]
         })
-        console.log(rowsData)
-        
-        // Create Excel file
-        const ws = XLSX.utils.aoa_to_sheet(rowsData)
-        const wb = XLSX.utils.book_new()
-        XLSX.utils.book_append_sheet(wb, ws, "Results Grid")
-        
-        // Generate Excel file
-        const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" })
-        const blob = new Blob([excelBuffer], {
-          type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        })
-        // Trigger download of the file before uploading
-        // const url = window.URL.createObjectURL(blob)
-        // const a = document.createElement('a')
-        // a.href = url
-        // a.download = `${type}-results.xlsx`
-        // document.body.appendChild(a)
-        // a.click()
-        // a.remove()
-        // window.URL.revokeObjectURL(url)
-        
-        // Prepare form data for API
-        const formData = new FormData()
-        formData.append("file", blob, `${type}-results.xlsx`)
-        formData.append("courseId", courseId)
-        formData.append("type", type)
-        
-        // Send to API for verification
-        const response = await fetch("/api/assessment-upload", {
+
+        // Send to new multiple mode API
+        const response = await fetch("/api/assessment-multiple", {
           method: "POST",
-          body: formData,
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            courseId,
+            type,
+            data: rowsData
+          }),
         })
-        
+
         if (!response.ok) {
           const errorData = await response.json()
           throw new Error(errorData.message || "Failed to save assessment data")
         }
-        
-        toast.success("Assessment data saved successfully")
-        onOpenChange(false)
-        window.location.reload()
+
+        toast.success("Assessment data processed successfully")
+
       } else {
         // Format data for assessment-direct API
         const formattedData = [
           // Row 1: Headers
           ['Student Name', 'Student ID', '%', 'Score', '#Correct', 'Blank', 'Q1'],
           // Row 2: Key row with total marks (40) in Q1
-          ['', 'Key', String(weight), String(weight), String(weight), String(weight),String(weight) ],
+          ['', 'Key', String(weight), String(weight), String(weight), String(weight), String(weight)],
           // Row 3+: Student data with ID in second column
           ...data.slice(2).map(row => [
             row.studentName,
@@ -326,10 +305,10 @@ export function AssessmentSpreadsheet({
           throw new Error(errorData.message || "Failed to save assessment data")
         }
       }
-      
+
       toast.success("Assessment data saved successfully")
-      onOpenChange(false)
-      window.location.reload()
+      // onOpenChange(false)
+      // window.location.reload()
     } catch (error) {
       console.error("Failed to save data:", error)
       toast.error(error instanceof Error ? error.message : "Failed to save data")
@@ -338,13 +317,13 @@ export function AssessmentSpreadsheet({
 
   const handlePaste = (e: React.ClipboardEvent) => {
     e.preventDefault()
-    
+
     // Get clipboard data
     const clipboardData = e.clipboardData
     const pastedText = clipboardData.getData('text')
-    
+
     if (!pastedText) return
-    
+
     // Parse the pasted data
     const rows = pastedText.split(/\r?\n/).filter(row => row.trim())
     if (rows.length === 0) return
@@ -362,12 +341,12 @@ export function AssessmentSpreadsheet({
           blank: columns[5] || '',
           q1: ''
         }
-        
+
         // Add question columns
         for (let i = 0; i < numberOfQuestions; i++) {
-          rowData[`q${i+1}`] = columns[i + 6] || ''
+          rowData[`q${i + 1}`] = columns[i + 6] || ''
         }
-        
+
         return rowData
       })
 
@@ -380,13 +359,13 @@ export function AssessmentSpreadsheet({
     // Single mode - existing logic
     // Check if first row is a header by looking for common header terms
     const firstRow = rows[0].toLowerCase()
-    const isHeader = firstRow.includes('student') || 
-                    firstRow.includes('name') || 
-                    firstRow.includes('id') || 
-                    firstRow.includes('%') ||
-                    firstRow.includes('score') ||
-                    firstRow.includes('q1') ||
-                    firstRow.includes('q2')
+    const isHeader = firstRow.includes('student') ||
+      firstRow.includes('name') ||
+      firstRow.includes('id') ||
+      firstRow.includes('%') ||
+      firstRow.includes('score') ||
+      firstRow.includes('q1') ||
+      firstRow.includes('q2')
 
     // Process rows, skipping header if detected
     const processedRows = (isHeader ? rows.slice(1) : rows).map(row => {
@@ -394,43 +373,43 @@ export function AssessmentSpreadsheet({
       // Only take the answer columns (Q1, Q2, etc.) - typically starting from index 6
       return columns.slice(6) // Skip everything before Q1
     }).filter(row => row.length > 0) // Ensure we only keep non-empty rows
-    
+
     // Create a copy of the current data
     const newData = [...data]
-    
+
     // Get the selected cell position from the grid
     const selectedCell = gridRef.current?.getSelectedCell()
     if (!selectedCell) return
-    
+
     const { row: startRow } = selectedCell
-    
+
     // Never paste into the key row (index 0)
     if (startRow === 0) {
       toast.error("Cannot paste into the key row. Please select a student row.")
       return
     }
-    
+
     // Update data with pasted values, preserving all existing data except question answers
     for (let i = 0; i < processedRows.length && startRow + i < newData.length; i++) {
       const answerData = processedRows[i]
       const rowIndex = startRow + i
-      
+
       // Skip the key row (index 0)
       if (rowIndex === 0) continue
-      
+
       // Create a copy of the current row
       const updatedRow = { ...newData[rowIndex] }
-      
+
       // Only update the question answer columns (Q1, Q2, etc.)
       for (let q = 1; q <= Math.min(numberOfQuestions, answerData.length); q++) {
         const qKey = `q${q}`
-        updatedRow[qKey] = answerData[q-1] || ''
+        updatedRow[qKey] = answerData[q - 1] || ''
       }
-      
+
       // Update the row in the data
       newData[rowIndex] = updatedRow
     }
-    
+
     // Update the state
     setData(newData)
     toast.success("Answer data pasted successfully")
@@ -449,7 +428,7 @@ export function AssessmentSpreadsheet({
           q1: ''
         }
         for (let i = 0; i < numberOfQuestions; i++) {
-          emptyRow[`q${i+1}`] = ''
+          emptyRow[`q${i + 1}`] = ''
         }
         return emptyRow
       })
@@ -465,14 +444,14 @@ export function AssessmentSpreadsheet({
           <DialogTitle className="flex items-center justify-between">
             <span>{type} Results Entry</span>
             <div className="flex items-center gap-2">
-              <Button 
+              <Button
                 variant={!isMultipleMode ? "default" : "outline"}
                 onClick={() => setIsMultipleMode(false)}
                 size="sm"
               >
                 Single Entry
               </Button>
-              <Button 
+              <Button
                 variant={isMultipleMode ? "default" : "outline"}
                 onClick={() => setIsMultipleMode(true)}
                 size="sm"
@@ -482,7 +461,7 @@ export function AssessmentSpreadsheet({
             </div>
           </DialogTitle>
         </DialogHeader>
-        
+
         <div className="bg-blue-50 p-3 rounded-md border border-blue-200 m-3">
           <p className="font-medium text-blue-800">
             Instructions:
@@ -497,9 +476,9 @@ export function AssessmentSpreadsheet({
             }
             <li>Click "Save Results" when done</li>
           </ol>
-              
+
         </div>
-        
+
         <div className="spreadsheet-container border border-gray-200 rounded overflow-auto" style={{ height: '440px' }} onScroll={(e) => {
           const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
           if (scrollHeight - scrollTop <= clientHeight + 10) { // Load more when near the bottom
@@ -520,7 +499,7 @@ export function AssessmentSpreadsheet({
               font-weight: bold !important;
             }
           `}</style>
-          
+
           {loading ? (
             <div className="flex items-center justify-center h-full">
               <p>Loading student data...</p>
@@ -539,7 +518,7 @@ export function AssessmentSpreadsheet({
             />
           )}
         </div>
-        
+
         <div className="flex justify-end gap-2 mt-4">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
