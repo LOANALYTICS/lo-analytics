@@ -281,13 +281,14 @@ export async function generateAssessmentReportHTML(props: AssessmentReportProps)
           .h2_class { 
             text-align: center; 
             margin: 10px 0;
-            font-size: 16px;
+            font-size: 17px;
+            font-weight:800;
           }
           .chart-title {
             text-align: center;
             margin: 10px 0;
             font-size: 14px;
-font-weight: 500;
+            font-weight: 500;
             font-weight: bold;
           }
           .header {
@@ -309,6 +310,7 @@ font-weight: 500;
             margin-bottom: 15px;
             border: 1px solid #ddd;
             padding: 8px;
+            padding-bottom:16px !important;
             border-radius: 3px;
           }
           .detail-item {
@@ -436,12 +438,12 @@ font-weight: 500;
             text-align: center;
             top: 60%;
             left: 40%;
-            transform: translate(-50%, -40%) rotate(-90deg);
+            transform: translate(-50%, -20%) rotate(-90deg);
             white-space: wrap;
             width: 30px;
             height: max-content;
             transform-origin: center center;
-            font-size: 8px;
+            font-size: 11.5px;
           }
           .table-section {
             flex: 1;
@@ -458,12 +460,13 @@ font-weight: 500;
           <div class="header">
             <img src="${college.logo}" alt="College Logo" class="logo">
             <div class="course-details">
+               <div class="detail-item">
+                  <span class="detail-label">Course Name:</span> ${course.course_name} (${course.section.charAt(0).toUpperCase() + course.section.slice(1).toLowerCase()})
+                </div>
                 <div class="detail-item">
                   <span class="detail-label">Course Code:</span> ${course.course_code}
                 </div>
-                <div class="detail-item">
-                  <span class="detail-label">Course Name:</span> ${course.course_name} (${course.section.charAt(0).toUpperCase() + course.section.slice(1).toLowerCase()})
-                </div>
+             
                 <div class="detail-item">
                   <span class="detail-label">Credit Hours:</span> ${course.credit_hours + 'Hours'}
                 </div>
@@ -511,7 +514,7 @@ font-weight: 500;
                       const threshold = totalScore * 0.6;
                       const studentScore = student.cloScores[clo]?.marksScored || 0;
                       const isBelow = studentScore < threshold;
-                      return `<td style="background-color:${isBelow ? '#FD5D5F': 'white'} !important;">${isBelow ? `<p style="color:white">${studentScore.toFixed(2)}</p>` : `<p>${studentScore.toFixed(2)}</p>`}</td>`;
+                      return `<td style="background-color:${isBelow ? '#e6ffe6': 'white'} !important;">${isBelow ? `<p >${studentScore.toFixed(2)}</p>` : `<p>${studentScore.toFixed(2)}</p>`}</td>`;
                     }).join('')}
                     <td>${student.totalMarksObtained.toFixed(2)}</td>
                   </tr>
@@ -534,7 +537,7 @@ font-weight: 500;
                 <tr class="achievement-row">
                   <td colspan="2" class="achievement-label">% of students scoring ≥ 60%</td>
                   ${sortedClos.map((clo, index) => {
-    return `<td>${achievementData['60'][index].percentageAchieving}%</td>`;
+    return `<td>${Number(achievementData['60'][index].percentageAchieving).toFixed(1)}%</td>`;
   }).join('')}
                   <td>-</td>
                 </tr>
@@ -556,7 +559,7 @@ font-weight: 500;
                     const assessment = indirectAssessmentData.indirectAssessments.find(
                       (a: any) => a.clo.replace(/\s/g, '').toUpperCase() === clo.replace(/\s/g, '').toUpperCase()
                     );
-                    return `<td>${assessment ? assessment.achievementPercentage.toFixed(2) + '%' : '-'}</td>`;
+                    return `<td>${assessment ? assessment.achievementPercentage.toFixed(1) + '%' : '-'}</td>`;
                   }).join('')}
                   <td>-</td>
                 </tr>

@@ -205,7 +205,7 @@ export function generateSOHTML({
                             </tbody>`;
     }).join('')}
                     <tr>
-                        <td colspan="2" rowspan="2" style="text-align: right; font-weight: bold;">Overall Total</td>
+                        <td colspan="2" rowspan="2" style="text-align: right; font-weight: bold;">Overall</td>
                         <td>${overallGrades['A+']}</td>
                         <td>${overallGrades['A']}</td>
                         <td>${overallGrades['B+']}</td>
