@@ -73,10 +73,10 @@ export interface IAssessment extends Document {
 }
 
 export const assessmentSchema = new Schema<IAssessment>({
-    course: { 
-        type: Schema.Types.ObjectId, 
+    course: {
+        type: Schema.Types.ObjectId,
         ref: 'Course',
-        required: true 
+        required: true
     },
     students: [{
         studentId: { type: String, required: true },
