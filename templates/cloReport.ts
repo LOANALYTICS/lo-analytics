@@ -59,7 +59,7 @@ export function generateCloReportHTML(data: {
                 directCell = `<td class="plo-cell checked">${displayValue}</td>`;
                 
                 // Indirect cell - find corresponding indirect assessment data
-                let indirectValue = '-';
+                let indirectValue = '';
                 if (indirectAssessmentData && indirectAssessmentData.indirectAssessments) {
                     const cloNumber = cloId.replace('clo', '');
                     const indirectAssessment = indirectAssessmentData.indirectAssessments.find(
@@ -89,7 +89,6 @@ export function generateCloReportHTML(data: {
     // Calculate averages for each PLO category
     const calculateAverage = (mapping: Array<{ [key: string]: boolean }>[], cloIds: string[]) => {
         const values: number[] = [];
-        
         mapping.forEach((cloMapping, cloIndex) => {
             const cloId = cloIds[cloIndex];
             cloMapping.forEach((item, ploIndex) => {
