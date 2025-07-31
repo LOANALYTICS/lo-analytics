@@ -52,12 +52,25 @@ export default function SemisterAssessmentReportButtons() {
 
   const handleAssessmentReport = async (data: FormValues) => {
     try {
-      console.log(data)
-      toast.success("Report downloaded successfully");
+      const response = await fetch('/api/generate-assess-report', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json();
+      
+      if (result.success) {
+        console.log('API Response:', result);
+        toast.success("Report generated successfully");
+      } else {
+        toast.error(result.message || "Failed to generate report");
+      }
     } catch (error) {
       console.error("Analysis error:", error);
       toast.error("Failed to generate report");
-    } finally {
     }
   };
 

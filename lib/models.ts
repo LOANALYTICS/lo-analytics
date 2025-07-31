@@ -3,7 +3,7 @@ import { IUser, userSchema } from '@/server/models/user.model';
 import { ICollage, collageSchema } from '@/server/models/collage.model';
 import { ICourse, courseSchema } from '@/server/models/course.model';
 import { IKRValue, krValueSchema } from '@/server/models/kr-value.model';
-import  { IQuestionBank, questionBankSchema } from '@/server/models/questionBank.model';
+import { IQuestionBank, questionBankSchema } from '@/server/models/questionBank.model';
 import { IQuestion, questionSchema } from '@/server/models/question.model';
 import { IQuestionPaper, questionPaperSchema } from '@/server/models/questionPaper.model';
 import { IAssessment, assessmentSchema } from '@/server/models/assessment.model';
