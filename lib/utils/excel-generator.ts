@@ -1,4 +1,4 @@
-import * as XLSX from 'xlsx';
+import * as ExcelJS from 'exceljs';
 
 interface CourseAssessmentData {
   course: {
@@ -25,27 +25,51 @@ interface CourseAssessmentData {
   }> | null;
 }
 
-export function generateAssessmentReportExcel(
+export async function generateAssessmentReportExcel(
   coursesData: CourseAssessmentData[],
   academic_year: string,
   semester: number,
   section: string
-): Buffer {
-  // Create Excel workbook
-  const workbook = XLSX.utils.book_new();
-  
-  // Create the data array
-  const excelData: any[][] = [];
-  
-  // Header rows
-  excelData.push(['S No', 'Level', 'Course Name & Code', 'CLOs', 'CLO Achievement']);
-  excelData.push(['', '', '', '', 'Direct', 'Indirect']);
-  
-  // Data rows - each course gets multiple rows (one per CLO)
+): Promise<Buffer> {
+  // Create Excel workbook using ExcelJS
+  const workbook = new ExcelJS.Workbook();
+  const worksheet = workbook.addWorksheet('Assessment Report');
+
+  // Add headers
+  worksheet.addRow(['S No', 'Level', 'Course Name & Code', 'CLOs', 'CLO Achievement']);
+  worksheet.addRow(['', '', '', '', 'Direct', 'Indirect']);
+
+  // Merge header cells
+  worksheet.mergeCells('E1:F1'); // Merge "CLO Achievement" across Direct/Indirect
+
+  // Style headers with yellow background and center alignment
+  const headerRow1 = worksheet.getRow(1);
+  const headerRow2 = worksheet.getRow(2);
+
+  [headerRow1, headerRow2].forEach(row => {
+    row.eachCell((cell) => {
+      cell.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FFFFFF00' } // Yellow background
+      };
+      cell.font = { bold: true, size: 12 };
+      cell.alignment = { horizontal: 'center', vertical: 'middle' };
+      cell.border = {
+        top: { style: 'thin' },
+        left: { style: 'thin' },
+        bottom: { style: 'thin' },
+        right: { style: 'thin' }
+      };
+    });
+  });
+
+  // Add data rows
+  let currentRow = 3;
   coursesData.forEach((courseData, courseIndex) => {
     if (!courseData.assessment?.cloData || courseData.assessment.cloData.length === 0) {
       // If no CLO data, add one row with empty CLO info
-      excelData.push([
+      const row = worksheet.addRow([
         courseIndex + 1,
         courseData.course.level,
         `${courseData.course.course_name} ${courseData.course.course_code}`,
@@ -53,6 +77,19 @@ export function generateAssessmentReportExcel(
         '',
         ''
       ]);
+
+      // Style the row with center alignment
+      row.eachCell((cell) => {
+        cell.alignment = { horizontal: 'center', vertical: 'middle' };
+        cell.border = {
+          top: { style: 'thin' },
+          left: { style: 'thin' },
+          bottom: { style: 'thin' },
+          right: { style: 'thin' }
+        };
+      });
+
+      currentRow++;
       return;
     }
 
@@ -62,6 +99,8 @@ export function generateAssessmentReportExcel(
       const bNum = parseInt(b.clo.replace(/[^\d]/g, ''));
       return aNum - bNum;
     });
+
+    const startRow = currentRow;
 
     sortedCourseClos.forEach((cloData, cloIndex) => {
       // Create proper CLO name (CLO 1, CLO 2, etc.)
@@ -79,22 +118,40 @@ export function generateAssessmentReportExcel(
       );
       const indirectValue = indirectAchievement ? `${Math.round(Number(indirectAchievement.achievementPercentage))}%` : '';
 
-      excelData.push([
-        cloIndex === 0 ? (courseIndex + 1).toString() : '', // S No only on first CLO row
-        cloIndex === 0 ? courseData.course.level.toString() : '', // Level only on first CLO row
+      const row = worksheet.addRow([
+        cloIndex === 0 ? courseIndex + 1 : '', // S No only on first CLO row
+        cloIndex === 0 ? courseData.course.level : '', // Level only on first CLO row
         cloIndex === 0 ? `${courseData.course.course_name} ${courseData.course.course_code}` : '', // Course name only on first CLO row
         properCloName, // CLO name
         directValue, // Direct achievement
         indirectValue // Indirect achievement
       ]);
+
+      // Style the row with center alignment
+      row.eachCell((cell) => {
+        cell.alignment = { horizontal: 'center', vertical: 'middle' };
+        cell.border = {
+          top: { style: 'thin' },
+          left: { style: 'thin' },
+          bottom: { style: 'thin' },
+          right: { style: 'thin' }
+        };
+      });
+
+      currentRow++;
     });
+
+    // Merge cells for course info spanning multiple CLO rows
+    if (sortedCourseClos.length > 1) {
+      const endRow = currentRow - 1;
+      worksheet.mergeCells(`A${startRow}:A${endRow}`); // S No
+      worksheet.mergeCells(`B${startRow}:B${endRow}`); // Level
+      worksheet.mergeCells(`C${startRow}:C${endRow}`); // Course Name & Code
+    }
   });
 
-  // Create worksheet from array
-  const worksheet = XLSX.utils.aoa_to_sheet(excelData);
-
   // Set column widths
-  worksheet['!cols'] = [
+  worksheet.columns = [
     { width: 8 },   // S No
     { width: 8 },   // Level
     { width: 30 },  // Course Name & Code
@@ -103,47 +160,6 @@ export function generateAssessmentReportExcel(
     { width: 12 }   // Indirect
   ];
 
-  // Apply basic styling
-  const range = XLSX.utils.decode_range(worksheet['!ref'] || 'A1');
-  
-  // Style all cells
-  for (let R = range.s.r; R <= range.e.r; ++R) {
-    for (let C = range.s.c; C <= range.e.c; ++C) {
-      const cellAddress = XLSX.utils.encode_cell({ r: R, c: C });
-      
-      if (!worksheet[cellAddress]) {
-        worksheet[cellAddress] = { t: 's', v: '' };
-      }
-      
-      const isHeader = R <= 1;
-      
-      worksheet[cellAddress].s = {
-        fill: isHeader ? { fgColor: { rgb: "FFFF00" } } : undefined,
-        font: {
-          bold: isHeader,
-          sz: isHeader ? 12 : 10
-        },
-        alignment: {
-          horizontal: "center",
-          vertical: "center"
-        },
-        border: {
-          top: { style: "thin" },
-          bottom: { style: "thin" },
-          left: { style: "thin" },
-          right: { style: "thin" }
-        }
-      };
-    }
-  }
-
-  // Add worksheet to workbook
-  XLSX.utils.book_append_sheet(workbook, worksheet, 'Assessment Report');
-
   // Generate Excel buffer
-  return XLSX.write(workbook, { 
-    type: 'buffer', 
-    bookType: 'xlsx',
-    cellStyles: true
-  }) as Buffer;
+  return await workbook.xlsx.writeBuffer() as Buffer;
 }

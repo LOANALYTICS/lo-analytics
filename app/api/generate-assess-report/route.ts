@@ -205,7 +205,7 @@ export async function POST(request: NextRequest) {
 
 
     // Generate Excel file using utility function
-    const excelBuffer = generateAssessmentReportExcel(
+    const excelBuffer = await generateAssessmentReportExcel(
       coursesWithAssessments,
       academic_year,
       semester,

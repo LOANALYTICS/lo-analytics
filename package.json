@@ -35,6 +35,7 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "dayjs": "^1.11.13",
+    "exceljs": "^4.4.0",
     "html2canvas": "^1.4.1",
     "html2pdf.js": "^0.10.2",
     "jsonwebtoken": "^9.0.2",
