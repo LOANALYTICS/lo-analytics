@@ -60,13 +60,28 @@ export default function SemisterAssessmentReportButtons() {
         body: JSON.stringify(data),
       });
 
-      const result = await response.json();
-      
-      if (result.success) {
-        console.log('API Response:', result);
-        toast.success("Report generated successfully");
+      if (response.ok) {
+        // Handle Excel file download
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `semester-assessment-report-${data.academic_year}-sem${data.semester}-${data.section}.xlsx`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+
+        toast.success("Report downloaded successfully");
+        setIsAssessReportOpen(false);
       } else {
-        toast.error(result.message || "Failed to generate report");
+        // Try to parse error message
+        try {
+          const errorResult = await response.json();
+          toast.error(errorResult.message || "Failed to generate report");
+        } catch {
+          toast.error("Failed to generate report");
+        }
       }
     } catch (error) {
       console.error("Analysis error:", error);
