@@ -201,8 +201,6 @@ export async function POST(request: NextRequest) {
           indirectData: assessment.indirectAssessments || []
         };
 
-        console.log(cloDataWithPLO)
-
         return courseData;
       })
     );
