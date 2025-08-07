@@ -274,8 +274,8 @@ export async function generateAssessmentReportExcel(
       }
     });
 
-    const directAvg = directValues.length > 0 ? `${Math.round(directValues.reduce((sum, val) => sum + val, 0) / directValues.length)}%` : '';
-    const indirectAvg = indirectValues.length > 0 ? `${Math.round(indirectValues.reduce((sum, val) => sum + val, 0) / indirectValues.length)}%` : '';
+    const directAvg = directValues.length > 0 ? `${(directValues.reduce((sum, val) => sum + val, 0) / directValues.length).toFixed(1)}%` : '';
+    const indirectAvg = indirectValues.length > 0 ? `${(indirectValues.reduce((sum, val) => sum + val, 0) / indirectValues.length).toFixed(1)}%` : '';
 
     return { direct: directAvg, indirect: indirectAvg };
   };
@@ -351,13 +351,13 @@ export async function generateAssessmentReportExcel(
       // Find direct achievement
       const directAchievementKey = `clo${cloNumber}`;
       const directAchievement = courseData.achievementData?.find(ach => ach.clo === directAchievementKey);
-      const directValue = directAchievement ? `${Math.round(Number(directAchievement.percentageAchieving))}%` : '';
+      const directValue = directAchievement ? `${Number(directAchievement.percentageAchieving).toFixed(1)}%` : '';
 
       // Find indirect achievement
       const indirectAchievement = courseData.indirectData?.find(indirect =>
         indirect.clo === properCloName || indirect.clo === `CLO ${cloNumber}`
       );
-      const indirectValue = indirectAchievement ? `${Math.round(Number(indirectAchievement.achievementPercentage))}%` : '';
+      const indirectValue = indirectAchievement ? `${Number(indirectAchievement.achievementPercentage).toFixed(1)}%` : '';
 
       const row = worksheet.addRow([
         cloIndex === 0 ? courseIndex + 1 : '', // S No only on first CLO row
