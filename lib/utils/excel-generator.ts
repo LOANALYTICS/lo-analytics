@@ -10,6 +10,11 @@ interface CourseAssessmentData {
     cloData: Array<{
       clo: string;
       description: string;
+      ploMapping: {
+        k: Array<{ [key: string]: boolean }>;
+        s: Array<{ [key: string]: boolean }>;
+        v: Array<{ [key: string]: boolean }>;
+      };
     }>;
   } | null;
   achievementData: Array<{
@@ -35,18 +40,191 @@ export async function generateAssessmentReportExcel(
   const workbook = new ExcelJS.Workbook();
   const worksheet = workbook.addWorksheet('Assessment Report');
 
-  // Add headers
-  worksheet.addRow(['S No', 'Level', 'Course Name & Code', 'CLOs', 'CLO Achievement']);
-  worksheet.addRow(['', '', '', '', 'Direct', 'Indirect']);
+  // Helper function to calculate PLO average across all courses
+  const calculatePloAverage = (ploType: 'k' | 's' | 'v', ploIndex: number): string => {
+    const allValues: number[] = [];
 
-  // Merge header cells
-  worksheet.mergeCells('E1:F1'); // Merge "CLO Achievement" across Direct/Indirect
+    coursesData.forEach(courseData => {
+      if (!courseData.assessment?.cloData) return;
 
-  // Style headers with yellow background and center alignment
-  const headerRow1 = worksheet.getRow(1);
-  const headerRow2 = worksheet.getRow(2);
+      courseData.assessment.cloData.forEach((cloData, cloIdx) => {
+        const ploMapping = cloData.ploMapping?.[ploType]?.[ploIndex];
+        if (!ploMapping) return;
 
-  [headerRow1, headerRow2].forEach(row => {
+        const isChecked = Object.values(ploMapping)[0];
+        if (!isChecked) return;
+
+        // Get direct achievement
+        const cloNumber = cloIdx + 1;
+        const directAchievementKey = `clo${cloNumber}`;
+        const directAchievement = courseData.achievementData?.find(ach => ach.clo === directAchievementKey);
+        if (directAchievement && !isNaN(Number(directAchievement.percentageAchieving))) {
+          allValues.push(Number(directAchievement.percentageAchieving));
+        }
+
+        // Get indirect achievement
+        const properCloName = `CLO ${cloNumber}`;
+        const indirectAchievement = courseData.indirectData?.find(indirect =>
+          indirect.clo === properCloName || indirect.clo === `CLO ${cloNumber}`
+        );
+        if (indirectAchievement && !isNaN(Number(indirectAchievement.achievementPercentage))) {
+          allValues.push(Number(indirectAchievement.achievementPercentage));
+        }
+      });
+    });
+
+    if (allValues.length === 0) return '';
+    const average = allValues.reduce((sum, val) => sum + val, 0) / allValues.length;
+    return `${average.toFixed(1)}%`;
+  };
+
+  // Get PLO headers from first course that has CLO data
+  const firstCourse = coursesData.find(c => c.assessment?.cloData && c.assessment.cloData.length > 0);
+  const ploHeaders: string[] = [];
+  const ploSubHeaders: string[] = [];
+
+  if (firstCourse?.assessment?.cloData?.[0]?.ploMapping) {
+    const ploMapping = firstCourse.assessment.cloData[0].ploMapping;
+
+    // Add K PLO headers with averages
+    ploMapping.k.forEach((_, index) => {
+      const average = calculatePloAverage('k', index);
+      const headerText = average ? `K${index + 1} (${average})` : `K${index + 1}`;
+      ploHeaders.push(headerText, '');
+      ploSubHeaders.push('Direct', 'Indirect');
+    });
+
+    // Add S PLO headers with averages
+    ploMapping.s.forEach((_, index) => {
+      const average = calculatePloAverage('s', index);
+      const headerText = average ? `S${index + 1} (${average})` : `S${index + 1}`;
+      ploHeaders.push(headerText, '');
+      ploSubHeaders.push('Direct', 'Indirect');
+    });
+
+    // Add V PLO headers with averages
+    ploMapping.v.forEach((_, index) => {
+      const average = calculatePloAverage('v', index);
+      const headerText = average ? `V${index + 1} (${average})` : `V${index + 1}`;
+      ploHeaders.push(headerText, '');
+      ploSubHeaders.push('Direct', 'Indirect');
+    });
+  }
+
+  // Create 4-row header structure to match your Excel format
+  const sectionText = section === 'all' ? 'All Sections' : section === 'male' ? 'Male' : 'Female';
+  const semesterText = semester === 1 ? 'First Semester' : 'Second Semester';
+  const titleText = `(If for semester add the semester like ${semesterText}, ${academic_year} otherwise Academic Year, ${academic_year}, If semester based on gender)`;
+
+  // Row 1: Title spanning all columns
+  const totalColumns = 6 + ploHeaders.length;
+  const headerRow1 = [titleText, ...Array(totalColumns - 1).fill('')];
+
+  // Row 2: Main section headers
+  const headerRow2 = ['S No', 'Level', 'Course Name & Code', 'CLOs', 'CLO Achievement', '', 'PLOs Achievement', ...Array(ploHeaders.length - 1).fill('')];
+
+  // Row 3: PLO headers (K1, K2, S1, S2, etc.) - just plain names, no averages
+  const ploHeadersRow3: string[] = [];
+  if (firstCourse?.assessment?.cloData?.[0]?.ploMapping) {
+    const ploMapping = firstCourse.assessment.cloData[0].ploMapping;
+
+    // Add K PLO headers - just plain names
+    ploMapping.k.forEach((_, index) => {
+      ploHeadersRow3.push(`K${index + 1}`, '');
+    });
+
+    // Add S PLO headers - just plain names
+    ploMapping.s.forEach((_, index) => {
+      ploHeadersRow3.push(`S${index + 1}`, '');
+    });
+
+    // Add V PLO headers - just plain names
+    ploMapping.v.forEach((_, index) => {
+      ploHeadersRow3.push(`V${index + 1}`, '');
+    });
+  }
+
+  const headerRow3 = ['', '', '', '', '', '', ...ploHeadersRow3];
+
+  // Row 4: Direct/Indirect subheaders
+  const headerRow4 = ['', '', '', '', 'Direct', 'Indirect', ...ploSubHeaders];
+
+  worksheet.addRow(headerRow1);
+  worksheet.addRow(headerRow2);
+  worksheet.addRow(headerRow3);
+  worksheet.addRow(headerRow4);
+
+  // Helper function to convert column number to Excel column letter
+  const getColumnLetter = (colNum: number): string => {
+    let result = '';
+    while (colNum > 0) {
+      colNum--;
+      result = String.fromCharCode(65 + (colNum % 26)) + result;
+      colNum = Math.floor(colNum / 26);
+    }
+    return result;
+  };
+
+  // Merge cells for 4-row header structure
+
+  try {
+    // Row 1: Title spanning all columns
+    worksheet.mergeCells(`A1:${getColumnLetter(totalColumns)}1`);
+
+    // Row 2: Merge main section headers
+    worksheet.mergeCells('A2:A4'); // S No
+    worksheet.mergeCells('B2:B4'); // Level
+    worksheet.mergeCells('C2:C4'); // Course Name & Code
+    worksheet.mergeCells('D2:D4'); // CLOs
+    worksheet.mergeCells('E2:F2'); // CLO Achievement
+
+    // PLOs Achievement header spanning all PLO columns
+    if (ploHeaders.length > 0) {
+      worksheet.mergeCells(`G2:${getColumnLetter(6 + ploHeaders.length)}2`);
+    }
+
+    // Row 3: Merge individual PLO headers (K1, K2, etc.) spanning Direct/Indirect
+    let currentCol = 7; // Starting after CLO Achievement columns
+    if (firstCourse?.assessment?.cloData?.[0]?.ploMapping) {
+      const ploMapping = firstCourse.assessment.cloData[0].ploMapping;
+
+      // Merge K PLO headers
+      ploMapping.k.forEach(() => {
+        const startCol = getColumnLetter(currentCol);
+        const endCol = getColumnLetter(currentCol + 1);
+        worksheet.mergeCells(`${startCol}3:${endCol}3`);
+        currentCol += 2;
+      });
+
+      // Merge S PLO headers
+      ploMapping.s.forEach(() => {
+        const startCol = getColumnLetter(currentCol);
+        const endCol = getColumnLetter(currentCol + 1);
+        worksheet.mergeCells(`${startCol}3:${endCol}3`);
+        currentCol += 2;
+      });
+
+      // Merge V PLO headers
+      ploMapping.v.forEach(() => {
+        const startCol = getColumnLetter(currentCol);
+        const endCol = getColumnLetter(currentCol + 1);
+        worksheet.mergeCells(`${startCol}3:${endCol}3`);
+        currentCol += 2;
+      });
+    }
+  } catch (error) {
+    console.warn('Warning: Could not merge header cells:', error);
+  }
+
+  // Style all 4 header rows with yellow background and center alignment
+  const headerRows = [
+    worksheet.getRow(1),
+    worksheet.getRow(2),
+    worksheet.getRow(3),
+    worksheet.getRow(4)
+  ];
+
+  headerRows.forEach(row => {
     row.eachCell((cell) => {
       cell.fill = {
         type: 'pattern',
@@ -64,8 +242,46 @@ export async function generateAssessmentReportExcel(
     });
   });
 
-  // Add data rows
-  let currentRow = 3;
+  // Helper function to calculate PLO average for a specific course
+  const calculateCoursePloAverage = (courseData: CourseAssessmentData, ploType: 'k' | 's' | 'v', ploIndex: number): { direct: string, indirect: string } => {
+    if (!courseData.assessment?.cloData) return { direct: '', indirect: '' };
+
+    const directValues: number[] = [];
+    const indirectValues: number[] = [];
+
+    courseData.assessment.cloData.forEach((cloData, cloIdx) => {
+      const ploMapping = cloData.ploMapping?.[ploType]?.[ploIndex];
+      if (!ploMapping) return;
+
+      const isChecked = Object.values(ploMapping)[0];
+      if (!isChecked) return;
+
+      // Get direct achievement
+      const cloNumber = cloIdx + 1;
+      const directAchievementKey = `clo${cloNumber}`;
+      const directAchievement = courseData.achievementData?.find(ach => ach.clo === directAchievementKey);
+      if (directAchievement && !isNaN(Number(directAchievement.percentageAchieving))) {
+        directValues.push(Number(directAchievement.percentageAchieving));
+      }
+
+      // Get indirect achievement
+      const properCloName = `CLO ${cloNumber}`;
+      const indirectAchievement = courseData.indirectData?.find(indirect =>
+        indirect.clo === properCloName || indirect.clo === `CLO ${cloNumber}`
+      );
+      if (indirectAchievement && !isNaN(Number(indirectAchievement.achievementPercentage))) {
+        indirectValues.push(Number(indirectAchievement.achievementPercentage));
+      }
+    });
+
+    const directAvg = directValues.length > 0 ? `${Math.round(directValues.reduce((sum, val) => sum + val, 0) / directValues.length)}%` : '';
+    const indirectAvg = indirectValues.length > 0 ? `${Math.round(indirectValues.reduce((sum, val) => sum + val, 0) / indirectValues.length)}%` : '';
+
+    return { direct: directAvg, indirect: indirectAvg };
+  };
+
+  // Add data rows - separate row for each CLO with course info spanning
+  let currentRow = 5; // Starting after 4 header rows
   coursesData.forEach((courseData, courseIndex) => {
     if (!courseData.assessment?.cloData || courseData.assessment.cloData.length === 0) {
       // If no CLO data, add one row with empty CLO info
@@ -75,7 +291,8 @@ export async function generateAssessmentReportExcel(
         `${courseData.course.course_name} ${courseData.course.course_code}`,
         'No CLO data',
         '',
-        ''
+        '',
+        ...Array(ploHeaders.length).fill('') // Empty PLO columns
       ]);
 
       // Style the row with center alignment
@@ -102,8 +319,32 @@ export async function generateAssessmentReportExcel(
 
     const startRow = currentRow;
 
+    // Calculate PLO averages for this course (single values per PLO)
+    const coursePloValues: string[] = [];
+    if (firstCourse?.assessment?.cloData?.[0]?.ploMapping) {
+      const ploMapping = firstCourse.assessment.cloData[0].ploMapping;
+
+      // K PLOs
+      ploMapping.k.forEach((_, ploIndex) => {
+        const avg = calculateCoursePloAverage(courseData, 'k', ploIndex);
+        coursePloValues.push(avg.direct, avg.indirect);
+      });
+
+      // S PLOs
+      ploMapping.s.forEach((_, ploIndex) => {
+        const avg = calculateCoursePloAverage(courseData, 's', ploIndex);
+        coursePloValues.push(avg.direct, avg.indirect);
+      });
+
+      // V PLOs
+      ploMapping.v.forEach((_, ploIndex) => {
+        const avg = calculateCoursePloAverage(courseData, 'v', ploIndex);
+        coursePloValues.push(avg.direct, avg.indirect);
+      });
+    }
+
+    // Add separate row for each CLO
     sortedCourseClos.forEach((cloData, cloIndex) => {
-      // Create proper CLO name (CLO 1, CLO 2, etc.)
       const cloNumber = cloIndex + 1;
       const properCloName = `CLO ${cloNumber}`;
 
@@ -124,7 +365,8 @@ export async function generateAssessmentReportExcel(
         cloIndex === 0 ? `${courseData.course.course_name} ${courseData.course.course_code}` : '', // Course name only on first CLO row
         properCloName, // CLO name
         directValue, // Direct achievement
-        indirectValue // Indirect achievement
+        indirectValue, // Indirect achievement
+        ...(cloIndex === 0 ? coursePloValues : Array(coursePloValues.length).fill('')) // PLO values only on first row
       ]);
 
       // Style the row with center alignment
@@ -144,21 +386,54 @@ export async function generateAssessmentReportExcel(
     // Merge cells for course info spanning multiple CLO rows
     if (sortedCourseClos.length > 1) {
       const endRow = currentRow - 1;
-      worksheet.mergeCells(`A${startRow}:A${endRow}`); // S No
-      worksheet.mergeCells(`B${startRow}:B${endRow}`); // Level
-      worksheet.mergeCells(`C${startRow}:C${endRow}`); // Course Name & Code
+      try {
+        worksheet.mergeCells(`A${startRow}:A${endRow}`); // S No
+        worksheet.mergeCells(`B${startRow}:B${endRow}`); // Level
+        worksheet.mergeCells(`C${startRow}:C${endRow}`); // Course Name & Code
+
+        // Merge PLO columns for this course
+        let colIndex = 7; // Starting after CLO Achievement columns
+        for (let i = 0; i < coursePloValues.length; i++) {
+          const colLetter = getColumnLetter(colIndex);
+          worksheet.mergeCells(`${colLetter}${startRow}:${colLetter}${endRow}`);
+          colIndex++;
+        }
+      } catch (error) {
+        console.warn(`Warning: Could not merge cells for course ${courseData.course.course_name}:`, error);
+      }
     }
   });
 
+  // Apply borders to all cells in the used range
+  const usedRange = worksheet.actualRowCount;
+  const usedColumns = totalColumns;
+
+  for (let row = 1; row <= usedRange; row++) {
+    for (let col = 1; col <= usedColumns; col++) {
+      const cell = worksheet.getCell(row, col);
+      if (!cell.border) {
+        cell.border = {
+          top: { style: 'thin' },
+          left: { style: 'thin' },
+          bottom: { style: 'thin' },
+          right: { style: 'thin' }
+        };
+      }
+    }
+  }
+
   // Set column widths
-  worksheet.columns = [
+  const columnWidths = [
     { width: 8 },   // S No
     { width: 8 },   // Level
     { width: 30 },  // Course Name & Code
     { width: 12 },  // CLOs
     { width: 12 },  // Direct
-    { width: 12 }   // Indirect
+    { width: 12 },  // Indirect
+    ...Array(ploHeaders.length).fill({ width: 10 }) // PLO columns
   ];
+
+  worksheet.columns = columnWidths;
 
   // Generate Excel buffer
   return await workbook.xlsx.writeBuffer() as Buffer;

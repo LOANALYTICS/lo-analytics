@@ -9,56 +9,7 @@ interface CourseData {
   course_code: string;
 }
 
-interface AssessmentData {
-  assessments: Array<{
-    type: string;
-    clos: {
-      [cloId: string]: number[];
-    };
-    weight: number;
-  }>;
-  students: Array<{
-    studentId: string;
-    studentName: string;
-  }>;
-  assessmentResults: Array<{
-    type: string;
-    results: Array<{
-      studentId: string;
-      studentName: string;
-      cloResults: {
-        [cloId: string]: {
-          totalQuestions: number;
-          correctAnswers: number;
-          marksScored: number;
-          totalMarks: number;
-        };
-      };
-    }>;
-  }>;
-  cloData: Array<{
-    clo: string;
-    description: string;
-    ploMapping: {
-      k: Array<{ [key: string]: boolean }>;
-      s: Array<{ [key: string]: boolean }>;
-      v: Array<{ [key: string]: boolean }>;
-    };
-  }>;
-  achievementData?: {
-    [key: string]: Array<{
-      clo: string;
-      achievementGrade: number;
-      percentageAchieving: number;
-    }>;
-  };
-  indirectAssessments?: Array<{
-    clo: string;
-    achievementRate: number;
-    benchmark: string;
-    achievementPercentage: number;
-  }>;
-}
+
 
 export async function POST(request: NextRequest) {
   try {
@@ -94,7 +45,51 @@ export async function POST(request: NextRequest) {
       courses.map(async (course) => {
         const assessment = await Assessment.findOne({ course: course._id })
           .select('cloData achievementData indirectAssessments assessments students assessmentResults')
-          .lean() as unknown as AssessmentData | null;
+          .lean() as unknown as {
+            cloData: Array<{
+              clo: string;
+              description: string;
+              ploMapping: {
+                k: Array<{ [key: string]: boolean }>;
+                s: Array<{ [key: string]: boolean }>;
+                v: Array<{ [key: string]: boolean }>;
+              };
+            }>;
+            achievementData?: {
+              [key: string]: Array<{
+                clo: string;
+                achievementGrade: number;
+                percentageAchieving: number;
+              }>;
+            };
+            indirectAssessments?: Array<any>;
+            assessments?: Array<{
+              type: string;
+              clos: {
+                [cloId: string]: number[];
+              };
+              weight: number;
+            }>;
+            students?: Array<{
+              studentId: string;
+              studentName: string;
+            }>;
+            assessmentResults?: Array<{
+              type: string;
+              results: Array<{
+                studentId: string;
+                studentName: string;
+                cloResults: {
+                  [cloId: string]: {
+                    totalQuestions: number;
+                    correctAnswers: number;
+                    marksScored: number;
+                    totalMarks: number;
+                  };
+                };
+              }>;
+            }>;
+          } | null;
 
         if (!assessment) {
           return {
@@ -117,15 +112,15 @@ export async function POST(request: NextRequest) {
           const uniqueClos = new Set<string>();
           const cloTotalMarks = new Map<string, number>();
 
-          assessment.assessments.forEach(assessmentItem => {
+          assessment.assessments.forEach((assessmentItem: any) => {
             if (assessmentItem.clos) {
               const totalQuestionsInType = Object.values(assessmentItem.clos)
-                .reduce((sum, questions) => sum + questions.length, 0);
+                .reduce((sum: number, questions: any) => sum + (questions as number[]).length, 0);
               const marksPerQuestion = assessmentItem.weight / totalQuestionsInType;
 
               Object.entries(assessmentItem.clos).forEach(([clo, questions]) => {
                 uniqueClos.add(clo);
-                const marksForThisCLO = questions.length * marksPerQuestion;
+                const marksForThisCLO = (questions as number[]).length * marksPerQuestion;
                 cloTotalMarks.set(clo, (cloTotalMarks.get(clo) || 0) + marksForThisCLO);
               });
             }
@@ -138,8 +133,8 @@ export async function POST(request: NextRequest) {
             cloScores: { [key: string]: { marksScored: number; totalMarks: number } };
           }>();
 
-          assessment.assessmentResults.forEach(result => {
-            result.results.forEach(studentResult => {
+          assessment.assessmentResults.forEach((result: any) => {
+            result.results.forEach((studentResult: any) => {
               const actualStudentId = /^\d+$/.test(studentResult.studentId) ?
                 studentResult.studentId : studentResult.studentName;
 
@@ -155,7 +150,7 @@ export async function POST(request: NextRequest) {
                 studentResults.set(actualStudentId, student);
               }
 
-              Object.entries(studentResult.cloResults).forEach(([cloId, result]) => {
+              Object.entries(studentResult.cloResults).forEach(([cloId, result]: [string, any]) => {
                 if (!student.cloScores[cloId]) {
                   student.cloScores[cloId] = {
                     marksScored: 0,
@@ -185,6 +180,14 @@ export async function POST(request: NextRequest) {
           };
         }
 
+        // Get CLO data from assessment
+        const cloDataWithPLO = assessment?.cloData || [];
+
+        // Skip courses that don't have proper PLO mappings
+        if (cloDataWithPLO.length > 0 && !cloDataWithPLO[0].ploMapping) {
+          console.warn(`Course ${course.course_name} (${course.course_code}) has CLO data but no PLO mappings. Skipping PLO report generation.`);
+        }
+
         const courseData = {
           course: {
             course_name: course.course_name,
@@ -192,17 +195,17 @@ export async function POST(request: NextRequest) {
             level: course.level || 12
           },
           assessment: assessment ? {
-            cloData: assessment.cloData
+            cloData: cloDataWithPLO
           } : null,
           achievementData: achievementData?.['60'] || [],
           indirectData: assessment.indirectAssessments || []
         };
 
+        console.log(cloDataWithPLO)
 
         return courseData;
       })
     );
-
 
     // Generate Excel file using utility function
     const excelBuffer = await generateAssessmentReportExcel(
