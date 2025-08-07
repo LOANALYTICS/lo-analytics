@@ -369,9 +369,13 @@ export async function generateAssessmentReportExcel(
         ...(cloIndex === 0 ? coursePloValues : Array(coursePloValues.length).fill('')) // PLO values only on first row
       ]);
 
-      // Style the row with center alignment
+      // Style the row with center alignment and text wrapping
       row.eachCell((cell) => {
-        cell.alignment = { horizontal: 'center', vertical: 'middle' };
+        cell.alignment = {
+          horizontal: 'center',
+          vertical: 'middle',
+          wrapText: true // Enable text wrapping for better course name display
+        };
         cell.border = {
           top: { style: 'thin' },
           left: { style: 'thin' },
@@ -426,7 +430,7 @@ export async function generateAssessmentReportExcel(
   const columnWidths = [
     { width: 8 },   // S No
     { width: 8 },   // Level
-    { width: 30 },  // Course Name & Code
+    { width: 40 },  // Course Name & Code - increased width for better text wrapping
     { width: 12 },  // CLOs
     { width: 12 },  // Direct
     { width: 12 },  // Indirect
