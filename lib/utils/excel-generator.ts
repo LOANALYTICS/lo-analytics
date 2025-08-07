@@ -440,5 +440,6 @@ export async function generateAssessmentReportExcel(
   worksheet.columns = columnWidths;
 
   // Generate Excel buffer
-  return await workbook.xlsx.writeBuffer() as Buffer;
+  const buffer = await workbook.xlsx.writeBuffer();
+  return Buffer.from(buffer);
 }
