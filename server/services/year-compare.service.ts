@@ -40,11 +40,20 @@ function calculateAverages(courses: any[]) {
   const kr20ValueA = totals.kr20A / count;
   const kr20ValueB = totals.kr20B / count;
 
+  const rawAverages = {
+    accepted: totals.accepted / count,
+    rejected: totals.rejected / count,
+    acceptedB: totals.acceptedB / count,
+    rejectedB: totals.rejectedB / count,
+    kr20A: kr20ValueA,
+    kr20B: kr20ValueB,
+  };
+
   return {
-    accepted: Math.round(totals.accepted / count),
-    rejected: Math.round(totals.rejected / count),
-    acceptedB: Math.round(totals.acceptedB / count),
-    rejectedB: Math.round(totals.rejectedB / count),
+    accepted: rawAverages.accepted.toFixed(1),
+    rejected: rawAverages.rejected.toFixed(1),
+    acceptedB: rawAverages.acceptedB.toFixed(1),
+    rejectedB: rawAverages.rejectedB.toFixed(1),
     acceptedPercentageA: totalA
       ? Math.round((totals.accepted / totalA) * 100)
       : "0",
@@ -59,6 +68,7 @@ function calculateAverages(courses: any[]) {
       : "0",
     kr20A: kr20ValueA.toFixed(2),
     kr20B: kr20ValueB.toFixed(2),
+    raw: rawAverages,
   };
 }
 
@@ -176,24 +186,12 @@ function generateTableHTML(
             .join("")}
           <tr class="row-pair">
             <td rowspan="2" colspan="2" class="border border-gray-300 p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px;">Average</p></td>
-            <td class="border border-gray-300 p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${
-              formatNumber(averages.accepted)
-            }</p></td>
-            <td class="border border-gray-300 p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${
-              formatNumber(averages.rejected)
-            }</p></td>
-            <td rowspan="2" class="border border-gray-300 p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${
-              formatKRAverage(averages.kr20A)
-            }</p></td>
-            <td class="border border-gray-300 p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${
-              formatNumber(averages.acceptedB)
-            }</p></td>
-            <td class="border border-gray-300 p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${
-              formatNumber(averages.rejectedB)
-            }</p></td>
-            <td rowspan="2" class="border border-gray-300 p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${
-              formatKRAverage(averages.kr20B)
-            }</p></td>
+            <td class="border border-gray-300 p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${averages.accepted}</p></td>
+            <td class="border border-gray-300 p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${averages.rejected}</p></td>
+            <td rowspan="2" class="border border-gray-300 p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${averages.kr20A}</p></td>
+            <td class="border border-gray-300 p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${averages.acceptedB}</p></td>
+            <td class="border border-gray-300 p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${averages.rejectedB}</p></td>
+            <td rowspan="2" class="border border-gray-300 p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${averages.kr20B}</p></td>
           </tr>
           <tr>
             <td class="border border-gray-300 p-1 font-bold"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${
@@ -738,24 +736,12 @@ function generateSummaryTableHTML(
             <td rowspan="2" class="border border-gray-300 p-1" style="border-color: #000000 !important;"><p style="text-align: left; margin: 0; margin-bottom: 10px;">${
               isLevel ? `Level ${summary.name}` : `${summary.name}`
             }</p></td>
-            <td class="border border-gray-300 p-1" style="border-color: #000000 !important;"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${
-             formatNumber(summary.averages.accepted)
-            }</p></td>
-            <td class="border border-gray-300 p-1" style="border-color: #000000 !important;"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${
-              formatNumber(summary.averages.rejected)
-            }</p></td>
-            <td rowspan="2" class="border border-gray-300 p-1" style="border-color: #000000 !important;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${
-              formatKRAverage(summary.averages.kr20A)
-            }</p></td>
-            <td class="border border-gray-300 p-1" style="border-color: #000000 !important;"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${
-              formatNumber(summary.averages.acceptedB)
-            }</p></td>
-            <td class="border border-gray-300 p-1" style="border-color: #000000 !important;"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${
-              formatNumber(summary.averages.rejectedB)
-            }</p></td>
-            <td rowspan="2" class="border border-gray-300 p-1" style="border-color: #000000 !important;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${
-              formatKRAverage(summary.averages.kr20B)
-            }</p></td>
+            <td class="border border-gray-300 p-1" style="border-color: #000000 !important;"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${summary.averages.accepted}</p></td>
+            <td class="border border-gray-300 p-1" style="border-color: #000000 !important;"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${summary.averages.rejected}</p></td>
+            <td rowspan="2" class="border border-gray-300 p-1" style="border-color: #000000 !important;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${summary.averages.kr20A}</p></td>
+            <td class="border border-gray-300 p-1" style="border-color: #000000 !important;"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${summary.averages.acceptedB}</p></td>
+            <td class="border border-gray-300 p-1" style="border-color: #000000 !important;"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${summary.averages.rejectedB}</p></td>
+            <td rowspan="2" class="border border-gray-300 p-1" style="border-color: #000000 !important;"><p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${summary.averages.kr20B}</p></td>
           </tr>
           <tr>
             <td class="border border-gray-300 p-1" style="border-color: #000000 !important;"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${
@@ -789,27 +775,27 @@ function generateSummaryTableHTML(
           .join("")}
         <tr class="row-pair">
           <td rowspan="2" colspan="2" class="border border-gray-300 p-1 font-bold" style="border-color: #000000 !important;"><p style="text-align: center; margin: 0; margin-bottom: 10px;">Average</p></td>
-          <td class="border border-gray-300 p-1 font-bold" style="border-color: #000000 !important;"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${Math.round(
-            summaries.reduce((acc, curr) => acc + curr.averages.accepted, 0) /
+          <td class="border border-gray-300 p-1 font-bold" style="border-color: #000000 !important;"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${(
+            summaries.reduce((acc, curr) => acc + curr.averages.raw.accepted, 0) /
               summaries.length
-          )}</p></td>
-          <td class="border border-gray-300 p-1 font-bold" style="border-color: #000000 !important;"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${Math.round(
-            summaries.reduce((acc, curr) => acc + curr.averages.rejected, 0) /
+          ).toFixed(1)}</p></td>
+          <td class="border border-gray-300 p-1 font-bold" style="border-color: #000000 !important;"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${(
+            summaries.reduce((acc, curr) => acc + curr.averages.raw.rejected, 0) /
               summaries.length
-          )}</p></td>
+          ).toFixed(1)}</p></td>
           <td rowspan="2" class="border border-gray-300 p-1 font-bold" style="border-color: #000000 !important;"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${(
-            summaries.reduce((acc, curr) => acc + Number(curr.averages.kr20A || 0), 0) / summaries.length
+            summaries.reduce((acc, curr) => acc + curr.averages.raw.kr20A, 0) / summaries.length
           ).toFixed(2)}</p></td>
-          <td class="border border-gray-300 p-1 font-bold" style="border-color: #000000 !important;"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${Math.round(
-            summaries.reduce((acc, curr) => acc + curr.averages.acceptedB, 0) /
+          <td class="border border-gray-300 p-1 font-bold" style="border-color: #000000 !important;"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${(
+            summaries.reduce((acc, curr) => acc + curr.averages.raw.acceptedB, 0) /
               summaries.length
-          )}</p></td>
-          <td class="border border-gray-300 p-1 font-bold" style="border-color: #000000 !important;"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${Math.round(
-            summaries.reduce((acc, curr) => acc + curr.averages.rejectedB, 0) /
+          ).toFixed(1)}</p></td>
+          <td class="border border-gray-300 p-1 font-bold" style="border-color: #000000 !important;"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${(
+            summaries.reduce((acc, curr) => acc + curr.averages.raw.rejectedB, 0) /
               summaries.length
-          )}</p></td>
+          ).toFixed(1)}</p></td>
           <td rowspan="2" class="border border-gray-300 p-1 font-bold" style="border-color: #000000 !important;"><p style="text-align: center; margin: 0; margin-bottom: 10px;">${(
-            summaries.reduce((acc, curr) => acc + Number(curr.averages.kr20B || 0), 0) / summaries.length
+            summaries.reduce((acc, curr) => acc + curr.averages.raw.kr20B, 0) / summaries.length
           ).toFixed(2)}</p></td>
         </tr>
         <tr>

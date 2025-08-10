@@ -28,11 +28,11 @@ export async function GET(request: Request) {
     const college = (await Collage.findById(collegeId)
       .lean()
       .exec()) as unknown as {
-      logo?: string;
-      english: string;
-      regional?: string;
-      university: string;
-    };
+        logo?: string;
+        english: string;
+        regional?: string;
+        university: string;
+      };
     if (!college) {
       return NextResponse.json(
         { message: "College not found" },
@@ -118,11 +118,10 @@ export async function GET(request: Request) {
         <body>
           <div class="header-container">
             <div class="header">
-              ${
-                college.logo
-                  ? `<img src="${college.logo}" alt="College Logo" class="college-logo"/>`
-                  : ""
-              }
+              ${college.logo
+        ? `<img src="${college.logo}" alt="College Logo" class="college-logo"/>`
+        : ""
+      }
              
             </div>
             <hr style="margin-bottom: 40px;"/>
@@ -130,12 +129,10 @@ export async function GET(request: Request) {
               <h2 style="font-weight:bold;">Courses Comparison Report</h2>
               <hr/>
               <p>${convertNumberToWord(
-                Number(semister)
-              )} Semester ${yearA}(${
-      sectionA.charAt(0).toUpperCase() + sectionA.slice(1).toLowerCase()
-    }) vs ${yearB}(${
-      sectionB.charAt(0).toUpperCase() + sectionB.slice(1).toLowerCase()
-    })</p>
+        Number(semister)
+      )} Semester ${yearA}(${sectionA.charAt(0).toUpperCase() + sectionA.slice(1).toLowerCase()
+      }) vs ${yearB}(${sectionB.charAt(0).toUpperCase() + sectionB.slice(1).toLowerCase()
+      })</p>
             </div>
           </div>
           <div class="tables-container">

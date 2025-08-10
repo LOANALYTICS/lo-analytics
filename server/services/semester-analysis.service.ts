@@ -178,18 +178,12 @@ function calculateAverages(courses: any[]) {
     kr20: kr20Value.toFixed(2),
     raw: rawAverages,
     percentages: {
-      goodQuestions: Math.round((totals.goodQuestions / totalAccepted) * 100),
-      easyQuestions: Math.round((totals.easyQuestions / totalAccepted) * 100),
-      difficultQuestions: Math.round(
-        (totals.difficultQuestions / totalAccepted) * 100
-      ),
-      veryDifficultQuestions: Math.round(
-        (totals.veryDifficultQuestions / totalRejected) * 100
-      ),
-      poorQuestions: Math.round((totals.poorQuestions / totalRejected) * 100),
-      veryEasyQuestions: Math.round(
-        (totals.veryEasyQuestions / totalRejected) * 100
-      ),
+      goodQuestions: ((totals.goodQuestions / totalAccepted) * 100).toFixed(1),
+      easyQuestions: ((totals.easyQuestions / totalAccepted) * 100).toFixed(1),
+      difficultQuestions: ((totals.difficultQuestions / totalAccepted) * 100).toFixed(1),
+      veryDifficultQuestions: ((totals.veryDifficultQuestions / totalRejected) * 100).toFixed(1),
+      poorQuestions: ((totals.poorQuestions / totalRejected) * 100).toFixed(1),
+      veryEasyQuestions: ((totals.veryEasyQuestions / totalRejected) * 100).toFixed(1),
     },
   };
 }
@@ -395,28 +389,22 @@ function generateTableHTML(
           </tr>
           <tr>
             <td class="border border-black p-1 font-bold">
-              <p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${formatPercentage(averages.percentages.goodQuestions)
-    }</p>
+              <p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${averages.percentages.goodQuestions}%</p>
             </td>
             <td class="border border-black p-1 font-bold">
-              <p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${formatPercentage(averages.percentages.easyQuestions)
-    }</p>
+              <p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${averages.percentages.easyQuestions}%</p>
             </td>
             <td class="border border-black p-1 font-bold">
-              <p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${formatPercentage(averages.percentages.difficultQuestions)
-    }</p>
+              <p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${averages.percentages.difficultQuestions}%</p>
             </td>
             <td class="border border-black p-1 font-bold">
-              <p style="text-align: center; margin: 0; margin-bottom: 10px;font-weight: bold;">${formatPercentage(averages.percentages.veryDifficultQuestions)
-    }</p>
+              <p style="text-align: center; margin: 0; margin-bottom: 10px;font-weight: bold;">${averages.percentages.veryDifficultQuestions}%</p>
             </td>
             <td class="border border-black p-1 font-bold">
-              <p style="text-align: center; margin: 0; margin-bottom: 10px;font-weight: bold;">${formatPercentage(averages.percentages.poorQuestions)
-    }</p>
+              <p style="text-align: center; margin: 0; margin-bottom: 10px;font-weight: bold;">${averages.percentages.poorQuestions}%</p>
             </td>
             <td class="border border-black p-1 font-bold">
-              <p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${formatPercentage(averages.percentages.veryEasyQuestions)
-    }</p>
+              <p style="text-align: center; margin: 0; margin-bottom: 10px; font-weight: bold;">${averages.percentages.veryEasyQuestions}%</p>
             </td>
           </tr>
         </tbody>
@@ -1017,28 +1005,22 @@ function generateSummaryTableHTML(
           </tr>
           <tr>
             <td class="border border-black p-1">
-              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${formatPercentage(summary.averages.percentages.goodQuestions)
-          }</p>
+              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${summary.averages.percentages.goodQuestions}%</p>
             </td>
             <td class="border border-black p-1">
-              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${formatPercentage(summary.averages.percentages.easyQuestions)
-          }</p>
+              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${summary.averages.percentages.easyQuestions}%</p>
             </td>
             <td class="border border-black p-1">
-              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${formatPercentage(summary.averages.percentages.difficultQuestions)
-          }</p>
+              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${summary.averages.percentages.difficultQuestions}%</p>
             </td>
             <td class="border border-black p-1">
-              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${formatPercentage(summary.averages.percentages.veryDifficultQuestions)
-          }</p>
+              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${summary.averages.percentages.veryDifficultQuestions}%</p>
             </td>
             <td class="border border-black p-1">
-              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${formatPercentage(summary.averages.percentages.poorQuestions)
-          }</p>
+              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${summary.averages.percentages.poorQuestions}%</p>
             </td>
             <td class="border border-black p-1">
-              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${formatPercentage(summary.averages.percentages.veryEasyQuestions)
-          }</p>
+              <p style="text-align: center; margin: 0; margin-bottom: 10px;">${summary.averages.percentages.veryEasyQuestions}%</p>
             </td>
           </tr>
         `
