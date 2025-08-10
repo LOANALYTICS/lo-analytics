@@ -376,7 +376,7 @@ export default function ItemAnalysisPage() {
               className="flex items-center gap-2 p-0  w-fit h-9 px-4"
               onClick={() => setYearCompareOpen(true)}
             >
-              <span className="font-bold">Year Comparison</span>   <CalendarIcon className="w-4 h-4" />
+              <span className="font-bold">Semester Comparison</span>   <CalendarIcon className="w-4 h-4" />
             </Button>
           </div>
           ): null

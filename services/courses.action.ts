@@ -171,31 +171,6 @@ export async function getCoursesByCreator(
             .sort({ createdAt: -1 })
             .lean() as unknown as ICourse[];
 
-        // Serialize the courses similar to getCourses
-        // return courses.map((course) => ({
-        //     _id: course._id.toString(),
-        //     course_name: course.course_name,
-        //     semister: course.semister,
-        //     department: course.department,
-        //     university_name: course.university_name,
-        //     course_code: course.course_code,
-        //     credit_hours: course.credit_hours,
-        //     level: course.level,
-        //     question_ref: course.question_ref,
-        //     coordinator: course.coordinator
-        //         ? course.coordinator.map((coordinator: any) => ({
-        //               _id: coordinator._id.toString(),
-        //               name: coordinator.name,
-        //           }))
-        //         : [],
-        //     academic_year: course.academic_year,
-        //     students_withdrawn: course.students_withdrawn,
-        //     student_absent: course.student_absent,
-        //     section: course.section,
-        //     createdBy: course.createdBy ? course.createdBy.toString() : undefined,
-        //     students: course.students || [],
-        //     examType: course.examType
-        // }));
         return {
             success: true,
             message: 'Courses fetched successfully',
