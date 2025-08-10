@@ -1,8 +1,7 @@
 "use server";
 import { Course, User } from '@/lib/models';
-import  { ICourse } from '@/server/models/course.model';
+import { ICourse } from '@/server/models/course.model';
 import { Types } from 'mongoose';
-import { NextResponse } from 'next/server';
 
 export async function getCourses(): Promise<any[]> {
     // Fetch courses and populate the coordinators
@@ -23,12 +22,12 @@ export async function getCourses(): Promise<any[]> {
             // Handle coordinator (which is an array of objects) and convert _id to string
             coordinator: course.coordinator
                 ? course.coordinator.map((coordinator: any) => ({
-                      _id: coordinator._id.toString(), // Convert each coordinator's ObjectId to string
-                      name: coordinator.name, // Assuming you want other fields like name
-                  }))
+                    _id: coordinator._id.toString(), // Convert each coordinator's ObjectId to string
+                    name: coordinator.name, // Assuming you want other fields like name
+                }))
                 : [],
             academic_year: course.academic_year,
-        
+
             section: course.section,
             createdBy: course.createdBy ? course.createdBy.toString() : undefined, // Convert createdBy ObjectId to string if present
             students: course.students || [],
@@ -40,17 +39,17 @@ export async function getCourses(): Promise<any[]> {
 
 // Define the input type for course creation
 type CreateCourseInput = {
-  course_name: string;
-  course_code: string;
-  credit_hours: string;
-  department: string;
-  examType: string;
-  semister: number;
-  level: number;
-  section: string;
-  collage: string;
-  academic_year: string;
-  createdBy: string;
+    course_name: string;
+    course_code: string;
+    credit_hours: string;
+    department: string;
+    examType: string;
+    semister: number;
+    level: number;
+    section: string;
+    collage: string;
+    academic_year: string;
+    createdBy: string;
 }
 
 export async function createCourse(data: CreateCourseInput) {
@@ -105,33 +104,33 @@ export async function createCourse(data: CreateCourseInput) {
 }
 
 type Student = {
-  id: string;
-  studentId: string;
-  studentName: string;
+    id: string;
+    studentId: string;
+    studentName: string;
 }
 
 export async function updateCourseStudents(courseId: string, students: Student[]) {
-  try {
+    try {
 
-    const updatedCourse = await Course.findByIdAndUpdate(
-      courseId,
-      { $set: { students: students } },
-      { new: true }
-    ).lean();
+        const updatedCourse = await Course.findByIdAndUpdate(
+            courseId,
+            { $set: { students: students } },
+            { new: true }
+        ).lean();
 
-    if (!updatedCourse) {
-      throw new Error('Course not found');
+        if (!updatedCourse) {
+            throw new Error('Course not found');
+        }
+
+        return {
+            success: true,
+            message: 'Students updated successfully',
+            data: updatedCourse ? true : false
+        };
+    } catch (error) {
+        console.error('Error updating students:', error);
+        throw new Error('Failed to update students');
     }
-
-    return {
-      success: true,
-      message: 'Students updated successfully',
-      data: updatedCourse ? true : false
-    };
-  } catch (error) {
-    console.error('Error updating students:', error);
-    throw new Error('Failed to update students');
-  }
 }
 
 type PaginationParams = {
@@ -141,16 +140,39 @@ type PaginationParams = {
 }
 
 export async function getCoursesByCreator(
-    userId: string, 
+    userId: string,
     params: PaginationParams = {}
 ): Promise<any> {
     try {
         const { page = 1, limit = 10, search = '' } = params;
         const skip = (page - 1) * limit;
 
-        // Build query
-        let query: any = { createdBy: new Types.ObjectId(userId) };
-        
+        // First, get the user to check their role
+        const user = await User.findById(userId).select('role collage');
+
+        if (!user) {
+            throw new Error("User not found");
+        }
+
+        // Build query based on user role
+        let query: any = {};
+
+        if (user.role === 'college_admin') {
+            // If college_admin, get all courses for that college
+            if (!user.collage) {
+                return {
+                    success: true,
+                    message: 'No courses found',
+                    data: [],
+                    pagination: { page, limit, total: 0, totalPages: 0, hasNext: false, hasPrev: false }
+                };
+            }
+            query.collage = user.collage;
+        } else {
+            // For other roles (course_coordinator, etc.), get courses created by them
+            query.createdBy = new Types.ObjectId(userId);
+        }
+
         // Add search functionality
         if (search) {
             query.$or = [
@@ -163,8 +185,8 @@ export async function getCoursesByCreator(
 
         // Get total count for pagination
         const total = await Course.countDocuments(query);
-        
-        // Convert string ID to ObjectId and find courses with pagination
+
+        // Find courses with pagination
         const courses = await Course.find(query)
             .skip(skip)
             .limit(limit)
@@ -186,10 +208,10 @@ export async function getCoursesByCreator(
                 question_ref: course.question_ref,
                 coordinator: course.coordinator
                     ? course.coordinator.map((coordinator: any) => ({
-                          _id: coordinator._id.toString(),
-                          name: coordinator.name,
-                      }))
-                    : [],   
+                        _id: coordinator._id.toString(),
+                        name: coordinator.name,
+                    }))
+                    : [],
                 academic_year: course.academic_year,
                 section: course.section,
                 examType: course.examType,
@@ -210,7 +232,7 @@ export async function getCoursesByCreator(
                 hasPrev: page > 1
             }
         }
-            
+
     } catch (error) {
         console.error('Error fetching courses by creator:', error);
         throw new Error('Failed to fetch courses');
@@ -218,7 +240,7 @@ export async function getCoursesByCreator(
 }
 
 export async function getCoursesByUserRoleForItems(
-    userId: string, 
+    userId: string,
     params: PaginationParams = {}
 ): Promise<any> {
     const { page = 1, limit = 10, search = '' } = params;
@@ -340,12 +362,12 @@ export async function getCourseById(courseId: string) {
             question_ref: course.question_ref,
             coordinator: course.coordinator
                 ? course.coordinator.map((coordinator: any) => ({
-                      _id: coordinator._id.toString(),
-                      name: coordinator.name,
-                  }))
+                    _id: coordinator._id.toString(),
+                    name: coordinator.name,
+                }))
                 : [],
             academic_year: course.academic_year,
-       
+
             section: course.section,
             collage: course.collage.toString(),
             createdBy: course.createdBy ? course.createdBy.toString() : undefined,
@@ -365,12 +387,12 @@ export async function getCourseById(courseId: string) {
 }
 
 export async function getCoursesBySemester(
-    semester: number, 
-    currentCourseId: string, 
+    semester: number,
+    currentCourseId: string,
     courseName: string
 ): Promise<any> {
     try {
-        const courses = await Course.find({ 
+        const courses = await Course.find({
             semister: semester,
             course_name: courseName, // Add course name filter
             _id: { $ne: currentCourseId } // Exclude the current course
