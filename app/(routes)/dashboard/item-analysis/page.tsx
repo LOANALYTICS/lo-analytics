@@ -29,9 +29,11 @@ import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { getCurrentUser } from "@/server/utils/helper";
-import { getCoursesByCreator, getCoursesByUserRoleForItems } from "@/services/courses.action";
 import { toast } from "sonner";
-import {academicYears} from '@/lib/utils/y'
+import { academicYears } from '@/lib/utils/y';
+import { useCoursesByUserRole } from '@/queries/use-courses';
+import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react";
 
 // Form schema
 const formSchema = z.object({
@@ -134,11 +136,28 @@ export default function ItemAnalysisPage() {
   const [filterOpen, setFilterOpen] = useState(false);
   const [compareOpen, setCompareOpen] = useState(false);
   const [yearCompareOpen, setYearCompareOpen] = useState(false);
-  const [courses, setCourses] = useState<any>({ data: [] });
   const [user, setUser] = useState<any>(null);
   const [isAnalysisLoading, setIsAnalysisLoading] = useState(false);
   const [isCompareLoading, setIsCompareLoading] = useState(false);
   const [isYearCompareLoading, setIsYearCompareLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+
+  // TanStack Query for courses
+  const { 
+    data: coursesData, 
+    isLoading: isCoursesLoading, 
+    error: coursesError,
+    refetch: refetchCourses
+  } = useCoursesByUserRole(
+    user?.id || '', 
+    { 
+      page: currentPage, 
+      limit: 9, 
+      search: searchTerm 
+    },
+    { enabled: !!user?.id }
+  );
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -290,8 +309,6 @@ export default function ItemAnalysisPage() {
     const getData = async () => {
       const currentUser = await getCurrentUser();
       setUser(currentUser);
-      const res = await getCoursesByUserRoleForItems(currentUser?.id!);
-      setCourses(res);
     };
     getData();
   }, []);
@@ -306,12 +323,34 @@ export default function ItemAnalysisPage() {
     }
   }, [leftSemester, compareForm]);
 
+  // Handle search with debounce
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setCurrentPage(1); // Reset to first page on search
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
+  const courses = coursesData?.data || [];
+  const pagination = coursesData?.pagination;
+
   return (
     <main className="px-2">
-      <div className="flex justify-between items-center">
-        <h1 className="font-semibold text-lg">
-          Courses - ({courses?.data?.length})
-        </h1>
+      <div className="flex justify-between items-center mb-2">
+        
+        
+       
+        <div className="relative ">
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+        <Input
+          placeholder="Search courses by name, code, department, or year..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="pl-10 min-w-96"
+        />
+      </div>
+
+       
 
         {
           user?.role === "college_admin" || user?.role === "admin" ? (
@@ -342,15 +381,74 @@ export default function ItemAnalysisPage() {
           </div>
           ): null
         }
-       
       </div>
 
+      {/* Search Bar */}
+      
 
-      <section className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-2 mt-4">
-        {courses.data.map((template: any) => (
-          <CourseCard key={template._id} template={template} user={user} />
-        ))}
-      </section>
+      {/* Loading State */}
+      {isCoursesLoading && (
+        <div className="flex justify-center items-center py-8">
+          <Loader2 className="w-6 h-6 animate-spin" />
+          <span className="ml-2">Loading courses...</span>
+        </div>
+      )}
+
+      {/* Error State */}
+      {coursesError && (
+        <div className="text-center py-8 text-red-500">
+          Error loading courses. Please try again.
+        </div>
+      )}
+
+      {/* Courses Grid */}
+      {!isCoursesLoading && !coursesError && (
+        <>
+          <section className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-2">
+            {courses.map((template: any) => (
+              <CourseCard key={template._id} template={template} user={user} />
+            ))}
+          </section>
+
+          {/* Pagination */}
+          {pagination && pagination.totalPages > 1 && (
+          
+            <div className="flex justify-end items-center gap-2 mt-6 ">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                disabled={!pagination.hasPrev}
+              >
+                Previous
+              </Button>
+              
+              <span className="text-xs  ">
+                Page {pagination.page} of {pagination.totalPages} ( {pagination?.total})
+              </span>
+              
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(prev => prev + 1)}
+                disabled={!pagination.hasNext}
+              >
+                Next
+              </Button>
+            </div>
+          
+        
+            
+          )}
+
+          {/* No Results */}
+          {courses.length === 0 && !isCoursesLoading && (
+            <div className="text-center py-8 text-gray-500">
+              {searchTerm ? 'No courses found matching your search.' : 'No courses available.'}
+            </div>
+          )}
+        </>
+      )}
 
       {/* Filter Dialog */}
       <Dialog open={filterOpen} onOpenChange={setFilterOpen}>

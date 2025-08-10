@@ -134,13 +134,42 @@ export async function updateCourseStudents(courseId: string, students: Student[]
   }
 }
 
-export async function getCoursesByCreator(userId: string): Promise<any> {
+type PaginationParams = {
+    page?: number;
+    limit?: number;
+    search?: string;
+}
+
+export async function getCoursesByCreator(
+    userId: string, 
+    params: PaginationParams = {}
+): Promise<any> {
     try {
-        // Convert string ID to ObjectId and find courses
-        const courses = await Course.find({ 
-            createdBy: new Types.ObjectId(userId) 
-        })
-        .lean() as unknown as ICourse[];
+        const { page = 1, limit = 10, search = '' } = params;
+        const skip = (page - 1) * limit;
+
+        // Build query
+        let query: any = { createdBy: new Types.ObjectId(userId) };
+        
+        // Add search functionality
+        if (search) {
+            query.$or = [
+                { course_name: { $regex: search, $options: 'i' } },
+                { course_code: { $regex: search, $options: 'i' } },
+                { department: { $regex: search, $options: 'i' } },
+                { academic_year: { $regex: search, $options: 'i' } }
+            ];
+        }
+
+        // Get total count for pagination
+        const total = await Course.countDocuments(query);
+        
+        // Convert string ID to ObjectId and find courses with pagination
+        const courses = await Course.find(query)
+            .skip(skip)
+            .limit(limit)
+            .sort({ createdAt: -1 })
+            .lean() as unknown as ICourse[];
 
         // Serialize the courses similar to getCourses
         // return courses.map((course) => ({
@@ -187,7 +216,6 @@ export async function getCoursesByCreator(userId: string): Promise<any> {
                       }))
                     : [],   
                 academic_year: course.academic_year,
-             
                 section: course.section,
                 examType: course.examType,
                 krValues: course.krValues !== null ? true : false,
@@ -197,7 +225,15 @@ export async function getCoursesByCreator(userId: string): Promise<any> {
                     studentId: student.studentId.toString(),
                     studentName: student.studentName
                 })) || []
-            }))
+            })),
+            pagination: {
+                page,
+                limit,
+                total,
+                totalPages: Math.ceil(total / limit),
+                hasNext: page < Math.ceil(total / limit),
+                hasPrev: page > 1
+            }
         }
             
     } catch (error) {
@@ -206,7 +242,13 @@ export async function getCoursesByCreator(userId: string): Promise<any> {
     }
 }
 
-export async function getCoursesByUserRoleForItems(userId: string): Promise<any> {
+export async function getCoursesByUserRoleForItems(
+    userId: string, 
+    params: PaginationParams = {}
+): Promise<any> {
+    const { page = 1, limit = 10, search = '' } = params;
+    const skip = (page - 1) * limit;
+
     const user = await User.findById(userId).select('role collage');
 
     if (!user) {
@@ -217,25 +259,50 @@ export async function getCoursesByUserRoleForItems(userId: string): Promise<any>
 
     if (user.role === 'college_admin') {
         if (!user.collage) {
-            return [];
+            return {
+                success: true,
+                message: 'No courses found',
+                data: [],
+                pagination: { page, limit, total: 0, totalPages: 0, hasNext: false, hasPrev: false }
+            };
         }
         query.collage = user.collage;
     } else if (user.role === 'course_coordinator') {
-        //course_coordinator
         query.createdBy = user._id;
     } else {
-        return []; // Ignore admin case 
+        return {
+            success: true,
+            message: 'No courses found',
+            data: [],
+            pagination: { page, limit, total: 0, totalPages: 0, hasNext: false, hasPrev: false }
+        };
     }
+
+    // Add search functionality
+    if (search) {
+        query.$or = [
+            { course_name: { $regex: search, $options: 'i' } },
+            { course_code: { $regex: search, $options: 'i' } },
+            { department: { $regex: search, $options: 'i' } },
+            { academic_year: { $regex: search, $options: 'i' } }
+        ];
+    }
+
+    // Get total count for pagination
+    const total = await Course.countDocuments(query);
 
     const courses = await Course.find(query)
         .populate('collage')
         .populate('coordinator', 'name')
+        .skip(skip)
+        .limit(limit)
+        .sort({ createdAt: -1 })
         .lean();
 
     return {
         success: true,
         message: 'Courses fetched successfully',
-        data:courses.map((course: any) => ({
+        data: courses.map((course: any) => ({
             _id: course._id.toString(),
             course_name: course.course_name,
             semister: course.semister,
@@ -262,7 +329,15 @@ export async function getCoursesByUserRoleForItems(userId: string): Promise<any>
             createdBy: course.createdBy?.toString(),
             students: course.students || [],
             krValues: course.krValues?.toString() || null
-        }))
+        })),
+        pagination: {
+            page,
+            limit,
+            total,
+            totalPages: Math.ceil(total / limit),
+            hasNext: page < Math.ceil(total / limit),
+            hasPrev: page > 1
+        }
     }
 }
 

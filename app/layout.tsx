@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Nunito } from "next/font/google";
 import { Toaster } from "sonner";
+import { Providers } from "@/lib/providers";
 
 // const geistSans = localFont({
 //   src: "./fonts/GeistVF.woff",
@@ -14,7 +15,7 @@ import { Toaster } from "sonner";
 //   variable: "--font-geist-mono",
 //   weight: "100 900",
 // });
-const nunito = Nunito({ subsets: ["latin"],weight:['1000','900','800','700','600','500','400','300','200'] });
+const nunito = Nunito({ subsets: ["latin"], weight: ['1000', '900', '800', '700', '600', '500', '400', '300', '200'] });
 
 export const metadata: Metadata = {
   title: "LOSO Analytics",
@@ -31,8 +32,10 @@ export default function RootLayout({
       <body
         className={`${nunito.className}  antialiased`}
       >
-        <Toaster richColors />
-        {children}
+        <Providers>
+          <Toaster richColors />
+          {children}
+        </Providers>
       </body>
     </html>
   );
