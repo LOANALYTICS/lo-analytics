@@ -23,7 +23,7 @@ export async function GET(request: NextRequest, { params }: any) {
       .populate("collage")
       .populate(
         "krValues",
-        "groupedItemAnalysisResults section KR_20 gradeDistribution collegeInfo studentsAttended studentsPassed"
+        "groupedItemAnalysisResults section KR_20 gradeDistribution collegeInfo studentsAttended studentsPassed createdBy"
       );
 
     if (!courseData || !courseData.krValues) {
@@ -47,6 +47,8 @@ export async function GET(request: NextRequest, { params }: any) {
       section: courseData.section,
       semister: courseData.semister,
       coordinator: userInformation.name,
+      coordinatorRole:userInformation?.role,
+      isClgAdminNCoodirnator: userInformation?._id === courseData?.createdBy?.toString(),
       course_code: courseData.course_code,
       credit_hours: courseData.credit_hours,
       studentsNumber: courseData.students?.length || 0,

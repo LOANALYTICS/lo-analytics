@@ -151,7 +151,7 @@ export function generateHTML(data: any): string {
       .grid-item {
         padding: 1px;
         text-align: start;
-        font-size: 23px;
+        font-size: 32px;
       }
       .header-container {
         margin-bottom: 80px;
@@ -182,10 +182,10 @@ export function generateHTML(data: any): string {
         font-size: 16px;
       }
       .table td p {
-        font-size: 23px;
+        font-size: 32px;
       }
       .table th p {
-        font-size: 23px;
+        font-size: 32px;
       }
       .comments-cell {
         max-width: 500px;
@@ -216,7 +216,7 @@ export function generateHTML(data: any): string {
       </div>
       <hr style="margin-bottom: 40px;"/>
       <div class="header-description">
-        <h2 style="font-size: 30px; font-weight:700;">Item Analysis Report</h2>
+        <h2 style="font-size: 48px; font-weight:700;">Item Analysis Report</h2>
        
       </div>
     </div>
@@ -252,7 +252,9 @@ export function generateHTML(data: any): string {
         </div>
       
         <div class="grid-item">
-          <p><span style="font-weight: bold;">Course Coordinator:</span> ${
+          <p><span style="font-weight: bold;">
+          ${course?.coordinatorRole  === 'college_admin' && !course?.isClgAdminNCoodirnator ? "Admin" : 'Course Coordinator'}
+          :</span> ${
             course?.coordinator || ""
           }</p>
         </div>
@@ -336,17 +338,17 @@ export function generateHTML(data: any): string {
         <th><p style="text-align: center; margin-bottom: 10px;">F</p></th>
       </tr>
       <tr>
-        <td><p style="text-align: center; margin-bottom: 10px; font-size: 23px;">${
+        <td><p style="text-align: center; margin-bottom: 10px; font-size: 32px;">${
           studentsAttended || ""
         }</p></td>
        
 
 
         <td class="split-cell">
-            <div class="cell-row"><p style="text-align: center; margin-bottom: 10px; font-size: 23px;">${
+            <div class="cell-row"><p style="text-align: center; margin-bottom: 10px; font-size: 32px;">${
               studentsPassed || ""
             }</p></div>
-            <div class="cell-row"><p style="text-align: center; margin-bottom: 10px; font-size: 23px;">${
+            <div class="cell-row"><p style="text-align: center; margin-bottom: 10px; font-size: 32px;">${
               studentsPassed && studentsAttended
                 ? ((studentsPassed / studentsAttended) * 100).toFixed(2) + "%"
                 : ""
@@ -357,10 +359,10 @@ export function generateHTML(data: any): string {
           .map(
             (grade: any) => `
           <td class="split-cell">
-            <div class="cell-row"><p style="text-align: center; margin-bottom: 10px; font-size: 23px;">${
+            <div class="cell-row"><p style="text-align: center; margin-bottom: 10px; font-size: 32px;">${
               grade?.count === 0 ? "" : grade?.count
             }</p></div>
-            <div class="cell-row"><p style="text-align: center; margin-bottom: 10px; font-size: 23px;">${
+            <div class="cell-row"><p style="text-align: center; margin-bottom: 10px; font-size: 32px;">${
               Number(Math.round(grade?.studentPercentage || 0).toFixed(1)) === 0
                 ? ""
                 : Number(Math.round(grade?.studentPercentage || 0).toFixed(1)) +

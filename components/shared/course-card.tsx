@@ -78,7 +78,7 @@ export default function CourseCard({ cardOf, href, template, user, isQP }: {
   const handleDownload = async () => {
     try {
       const response = await fetch(`/api/kr-value/download/${template._id}`);
-
+ 
       if (!response.ok) {
         throw new Error('Failed to download KR Report');
       }
