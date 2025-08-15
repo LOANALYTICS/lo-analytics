@@ -169,14 +169,18 @@ export async function POST(request: Request) {
                     total: totalQuestions,
                     percentage: 0,
                     marksScored: 0,
-                    totalMarks: assessmentConfig.weight
+                    totalMarks: totalMarksFromQuestions
                 },
                 cloResults: {}
             };
 
             // Initialize CLO results
             for (const [cloId, questions] of cloMap.entries()) {
-                const cloTotalMarks = Number(((questions.length / totalQuestions) * assessmentConfig.weight).toFixed(2));
+                // Calculate CLO total marks by summing up marks for questions in this CLO
+                const cloTotalMarks = questions.reduce((sum, questionNumber) => {
+                    return sum + (questionMarks[questionNumber] || 0);
+                }, 0);
+                
                 studentResult.cloResults[cloId] = {
                     totalQuestions: questions.length,
                     correctAnswers: 0,
