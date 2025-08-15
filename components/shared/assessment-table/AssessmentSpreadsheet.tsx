@@ -294,11 +294,7 @@ export function AssessmentSpreadsheet({
           ])
         ]
 
-        // Console log the data being sent to direct mode API
-        console.log('=== FRONTEND DATA TO ASSESSMENT-DIRECT ===');
-        console.log('formattedData:', formattedData);
-        console.log('courseId:', courseId);
-        console.log('type:', type);
+
 
         const response = await fetch("/api/assessment-direct", {
           method: "POST",
@@ -317,10 +313,12 @@ export function AssessmentSpreadsheet({
           throw new Error(errorData.message || "Failed to save assessment data")
         }
       }
-
       toast.success("Assessment data saved successfully")
-      // onOpenChange(false)
-      // window.location.reload()
+
+      setTimeout(() => {
+        onOpenChange(false)
+        window.location.reload()
+      }, 500)
     } catch (error) {
       console.error("Failed to save data:", error)
       toast.error(error instanceof Error ? error.message : "Failed to save data")
