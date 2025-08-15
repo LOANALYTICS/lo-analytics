@@ -8,6 +8,7 @@ import { toast } from "sonner"
 import * as XLSX from 'xlsx'
 import { DataSheetGrid, textColumn, keyColumn } from 'react-datasheet-grid'
 import 'react-datasheet-grid/dist/style.css'
+import { Loader2 } from "lucide-react"
 
 interface AssessmentSpreadsheetProps {
   open: boolean
@@ -48,6 +49,7 @@ export function AssessmentSpreadsheet({
   const [originalStudentData, setOriginalStudentData] = useState<Student[]>([])
   const [columns, setColumns] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
   const [isMultipleMode, setIsMultipleMode] = useState(false)
   const gridRef = useRef<any>(null)
   const [rowCount, setRowCount] = useState(0)
@@ -235,6 +237,7 @@ export function AssessmentSpreadsheet({
 
   const handleSave = async () => {
     try {
+      setSaving(true)
       if (isMultipleMode) {
         // For multiple mode, send data directly as JSON
         const rowsData = data.map(row => {
@@ -322,6 +325,8 @@ export function AssessmentSpreadsheet({
     } catch (error) {
       console.error("Failed to save data:", error)
       toast.error(error instanceof Error ? error.message : "Failed to save data")
+    } finally {
+      setSaving(false)
     }
   }
 
@@ -533,7 +538,8 @@ export function AssessmentSpreadsheet({
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button onClick={handleSave}>
+          <Button onClick={handleSave} disabled={saving}>
+            {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Save Results
           </Button>
         </div>
