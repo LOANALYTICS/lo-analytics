@@ -249,6 +249,12 @@ export function AssessmentSpreadsheet({
           ]
         })
 
+        // Console log the data being sent to multiple mode API
+        console.log('=== FRONTEND DATA TO ASSESSMENT-MULTIPLE ===');
+        console.log('rowsData:', rowsData);
+        console.log('courseId:', courseId);
+        console.log('type:', type);
+
         // Send to new multiple mode API
         const response = await fetch("/api/assessment-multiple", {
           method: "POST",
@@ -287,6 +293,12 @@ export function AssessmentSpreadsheet({
             row.q1
           ])
         ]
+
+        // Console log the data being sent to direct mode API
+        console.log('=== FRONTEND DATA TO ASSESSMENT-DIRECT ===');
+        console.log('formattedData:', formattedData);
+        console.log('courseId:', courseId);
+        console.log('type:', type);
 
         const response = await fetch("/api/assessment-direct", {
           method: "POST",

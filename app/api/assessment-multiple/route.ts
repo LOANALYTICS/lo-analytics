@@ -65,6 +65,18 @@ export async function POST(request: Request) {
             }, { status: 400 });
         }
 
+        // Extract question marks from key row (row 1, columns 6+)
+        const keyRow = data[1];
+        const questionMarks: { [key: string]: number } = {};
+        let totalQuestions = 0;
+
+        for (let j = 6; j < keyRow.length; j++) {
+            const questionNumber = j - 5; // Q1 = index 6, so Q1 = 6-5 = 1
+            const marks = Number(keyRow[j]) || 0;
+            questionMarks[`Q${questionNumber}`] = marks;
+            totalQuestions++;
+        }
+
         // Separate student info and answers
         const studentInfo: { name: string; id: string }[] = [];
         const studentAnswers: { studentId: string; answers: { [key: string]: string } }[] = [];
@@ -134,9 +146,8 @@ export async function POST(request: Request) {
             });
         }
 
-        // Calculate total questions
-        const totalQuestions = (Object.values(assessmentConfig.clos) as number[][]).flat().length;
-        const marksPerQuestion = Number((assessmentConfig.weight / totalQuestions).toFixed(2));
+        // Calculate total marks from question marks
+        const totalMarksFromQuestions = Object.values(questionMarks).reduce((sum, marks) => sum + marks, 0);
 
         // Calculate student results
         const studentResults: StudentResult[] = [];
@@ -174,25 +185,25 @@ export async function POST(request: Request) {
                 };
             }
 
-            // Calculate scores based on 1s and 0s
+            // Calculate scores by adding up the actual marks scored for each question
             for (const [cloId, questions] of cloMap.entries()) {
                 for (const questionNumber of questions) {
                     const answer = studentAnswer.answers[questionNumber];
-                    if (answer === '1') {
+                    const marksScored = Number(answer) || 0; // Convert answer to number (e.g., "1.5" -> 1.5)
+
+                    studentResult.cloResults[cloId].marksScored += marksScored;
+                    studentResult.totalScore.marksScored += marksScored;
+
+                    // Count as correct if student got any marks for the question
+                    if (marksScored > 0) {
                         studentResult.cloResults[cloId].correctAnswers++;
                         studentResult.totalScore.correct++;
                     }
                 }
             }
 
-            // Calculate final scores
-            studentResult.totalScore.marksScored = Number((studentResult.totalScore.correct * marksPerQuestion).toFixed(2));
-            studentResult.totalScore.percentage = Number(((studentResult.totalScore.marksScored / assessmentConfig.weight) * 100).toFixed(2));
-
-            // Calculate CLO marks
-            for (const [cloId, cloResult] of Object.entries(studentResult.cloResults)) {
-                cloResult.marksScored = Number((cloResult.correctAnswers * marksPerQuestion).toFixed(2));
-            }
+            // Calculate final percentage
+            studentResult.totalScore.percentage = Number(((studentResult.totalScore.marksScored / totalMarksFromQuestions) * 100).toFixed(2));
 
             studentResults.push(studentResult);
         }
@@ -208,12 +219,14 @@ export async function POST(request: Request) {
             }, { status: 404 });
         }
 
-        // Create question keys (for multiple mode, all answers are "1" since we use 1/0 scoring)
+        // Create question keys using marks from key row as correct answers
         const questionKeys: { questionNumber: string; correctAnswer: string }[] = [];
         for (let i = 1; i <= totalQuestions; i++) {
+            const questionNumber = `Q${i}`;
+            const maxMarks = questionMarks[questionNumber] || 0;
             questionKeys.push({
-                questionNumber: `Q${i}`,
-                correctAnswer: '1' // In multiple mode, correct answer is always "1"
+                questionNumber: questionNumber,
+                correctAnswer: String(maxMarks) // Use the max marks from key row as correct answer
             });
         }
 
