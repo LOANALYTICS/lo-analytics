@@ -432,7 +432,7 @@ export function AssessmentSpreadsheet({
 
   const loadMoreRows = () => {
     if (isMultipleMode) {
-      const newRows = Array(10).fill(null).map(() => { // Load 10 more rows
+      const newRows = Array(20).fill(null).map(() => { // Load 20 more rows
         const emptyRow: RowData = {
           studentId: '',
           studentName: '',
@@ -477,24 +477,9 @@ export function AssessmentSpreadsheet({
           </DialogTitle>
         </DialogHeader>
 
-        <div className="bg-blue-50 p-3 rounded-md border border-blue-200 m-3">
-          <p className="font-medium text-blue-800">
-            Instructions:
-          </p>
-          <ol className="text-sm text-gray-600 list-decimal pl-5 mt-1">
-            {isMultipleMode && (
-              <>
-                <li>Copy entire data from Excel including student info (Ctrl+A, Ctrl+C)</li>
-                <li>Click in the empty spreadsheet below and paste (Ctrl+V)</li>
-              </>
-            )
-            }
-            <li>Click "Save Results" when done</li>
-          </ol>
 
-        </div>
 
-        <div className="spreadsheet-container border border-gray-200 rounded overflow-auto" style={{ height: '440px' }} onScroll={(e) => {
+        <div className="spreadsheet-container border border-gray-200 rounded overflow-auto" style={{ height: '500px' }} onScroll={(e) => {
           const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
           if (scrollHeight - scrollTop <= clientHeight + 10) { // Load more when near the bottom
             loadMoreRows();
@@ -530,6 +515,7 @@ export function AssessmentSpreadsheet({
               addRowsComponent={() => null}
               autoAddRow={true}
               ref={gridRef}
+              height={498.5}
             />
           )}
         </div>
