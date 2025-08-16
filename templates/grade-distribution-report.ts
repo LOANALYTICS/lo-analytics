@@ -258,7 +258,7 @@ function generateLevelTable(levelGroup: LevelGroup, academic_year: string, semes
                 </tr>
                 `).join('')}
                 <tr class="total-row">
-                    <td colspan="2">Total</td>
+                    <td rowspan="2" colspan="2">Total</td>
                     <td class="grade-cell">${levelGroup.total.grades.A.value}</td>
                     <td class="grade-cell">${levelGroup.total.grades.B.value}</td>
                     <td class="grade-cell">${levelGroup.total.grades.C.value}</td>
@@ -267,7 +267,6 @@ function generateLevelTable(levelGroup: LevelGroup, academic_year: string, semes
                     <td rowspan="2">${levelGroup.total.totalStudents}</td>
                 </tr>
                 <tr class="total-row percentage-row">
-                    <td colspan="2"></td>
                     <td class="grade-cell">${levelGroup.total.grades.A.percentage}%</td>
                     <td class="grade-cell">${levelGroup.total.grades.B.percentage}%</td>
                     <td class="grade-cell">${levelGroup.total.grades.C.percentage}%</td>
@@ -275,9 +274,14 @@ function generateLevelTable(levelGroup: LevelGroup, academic_year: string, semes
                     <td class="grade-cell">${levelGroup.total.grades.F.percentage}%</td>
                 </tr>
                 <tr class="overall-row">
-                    <td colspan="2">Overall</td>
-                    <td colspan="4">${totalPassing}<br>${overallPassPercentage}%</td>
-                    <td colspan="2">${totalFailing}<br>${overallFailPercentage}%</td>
+                    <td rowspan="2" colspan="2">Overall</td>
+                    <td colspan="4">${totalPassing}</td>
+                    <td>${totalFailing}</td>
+                    <td rowspan="2"></td>
+                </tr>
+                <tr class="overall-row">
+                    <td colspan="4">${overallPassPercentage}%</td>
+                    <td>${overallFailPercentage}%</td>
                 </tr>
             </tbody>
         </table>
@@ -351,7 +355,7 @@ function generateDepartmentTable(deptGroup: DepartmentGroup, academic_year: stri
                 </tr>
                 `).join('')}
                 <tr class="total-row">
-                    <td rowspan="2">Total</td>
+                    <td rowspan="2" colspan="2">Total</td>
                     <td class="grade-cell">${deptGroup.total.grades.A.value}</td>
                     <td class="grade-cell">${deptGroup.total.grades.B.value}</td>
                     <td class="grade-cell">${deptGroup.total.grades.C.value}</td>
@@ -367,9 +371,14 @@ function generateDepartmentTable(deptGroup: DepartmentGroup, academic_year: stri
                     <td class="grade-cell">${deptGroup.total.grades.F.percentage}%</td>
                 </tr>
                 <tr class="overall-row">
-                    <td colspan="2">Overall</td>
-                    <td colspan="4">${totalPassing}<br>${overallPassPercentage}%</td>
-                    <td colspan="2">${totalFailing}<br>${overallFailPercentage}%</td>
+                    <td rowspan="2" colspan="2">Overall</td>
+                    <td colspan="4">${totalPassing}</td>
+                    <td>${totalFailing}</td>
+                    <td rowspan="2"></td>
+                </tr>
+                <tr class="overall-row">
+                    <td colspan="4">${overallPassPercentage}%</td>
+                    <td>${overallFailPercentage}%</td>
                 </tr>
             </tbody>
         </table>
