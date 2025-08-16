@@ -1,7 +1,6 @@
 "use client";
 
-import AssessmentCard from '@/components/shared/assessment-table/AssessmentCard';
-import SemisterAssessmentReportButtons from '@/components/shared/assessment-table/SemisterAssessmentReportButtons';
+import CourseCard from '@/components/shared/course-card';
 import { getCurrentUser } from '@/server/utils/helper';
 import { useCoursesByCreator } from '@/queries/use-courses';
 import { CourseHeader } from '@/components/shared/course-header';
@@ -9,22 +8,22 @@ import { CoursePagination } from '@/components/shared/course-pagination';
 import { Loader2 } from "lucide-react";
 import { useEffect, useState } from 'react';
 
-export default function ReportsPage() {
+export default function StudentDetailsPage() {
   const [user, setUser] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
 
   // TanStack Query for courses
-  const { 
-    data: coursesData, 
-    isLoading: isCoursesLoading, 
+  const {
+    data: coursesData,
+    isLoading: isCoursesLoading,
     error: coursesError
   } = useCoursesByCreator(
-    user?.id || '', 
-    { 
-      page: currentPage, 
-      limit: 9, 
-      search: searchTerm 
+    user?.id || '',
+    {
+      page: currentPage,
+      limit: 9,
+      search: searchTerm
     },
     { enabled: !!user?.id }
   );
@@ -51,13 +50,11 @@ export default function ReportsPage() {
   return (
     <main className="px-2">
       <CourseHeader
-        title="Reports"
+        title="Courses"
         count={pagination?.total || 0}
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
-      >
-        <SemisterAssessmentReportButtons />
-      </CourseHeader>
+      />
 
       {/* Loading State */}
       {isCoursesLoading && (
@@ -79,11 +76,10 @@ export default function ReportsPage() {
         <>
           <section className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-2">
             {courses.map((course: any) => (
-              <AssessmentCard 
-                standalone={true}
-                key={course._id} 
-                href={`/dashboard/blueprint/assessment-plan/${course._id}`} 
-                course={course} 
+              <CourseCard
+                key={course._id}
+                href={`/dashboard/learning-outcomes/student-details/${course._id}`}
+                template={course}
               />
             ))}
           </section>

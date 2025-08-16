@@ -1,6 +1,7 @@
 "use client";
 
-import CourseCard from '@/components/shared/course-card';
+import AssessmentCard from '@/components/shared/assessment-table/AssessmentCard';
+import SemisterAssessmentReportButtons from '@/components/shared/assessment-table/SemisterAssessmentReportButtons';
 import { getCurrentUser } from '@/server/utils/helper';
 import { useCoursesByCreator } from '@/queries/use-courses';
 import { CourseHeader } from '@/components/shared/course-header';
@@ -8,7 +9,7 @@ import { CoursePagination } from '@/components/shared/course-pagination';
 import { Loader2 } from "lucide-react";
 import { useEffect, useState } from 'react';
 
-export default function LearningOutcomesPage() {
+export default function ReportsPage() {
   const [user, setUser] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -50,11 +51,13 @@ export default function LearningOutcomesPage() {
   return (
     <main className="px-2">
       <CourseHeader
-        title="Learning Outcomes"
+        title="Reports"
         count={pagination?.total || 0}
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
-      />
+      >
+        <SemisterAssessmentReportButtons />
+      </CourseHeader>
 
       {/* Loading State */}
       {isCoursesLoading && (
@@ -76,18 +79,19 @@ export default function LearningOutcomesPage() {
         <>
           <section className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-2">
             {courses.map((course: any) => (
-              <CourseCard 
+              <AssessmentCard 
+                standalone={true}
                 key={course._id} 
-                href={`/dashboard/blueprint/learning-outcomes/${course._id}`} 
-                template={course} 
+                href={`/dashboard/learning-outcomes/assessment-plan/${course._id}`} 
+                course={course} 
               />
             ))}
           </section>
 
           <CoursePagination
+            total={pagination?.total || 0}
             currentPage={pagination?.page || 1}
             totalPages={pagination?.totalPages || 1}
-            total={pagination?.total || 0}
             hasNext={pagination?.hasNext || false}
             hasPrev={pagination?.hasPrev || false}
             onPageChange={setCurrentPage}

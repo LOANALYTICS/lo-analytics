@@ -79,7 +79,7 @@ export default function AssessmentPlanPage() {
             {courses.map((course: any) => (
               <AssessmentCard
                 key={course._id}
-                href={`/dashboard/blueprint/assessment-plan/${course._id}`}
+                href={`/dashboard/learning-outcomes/assessment-plan/${course._id}`}
                 course={course}
               />
             ))}

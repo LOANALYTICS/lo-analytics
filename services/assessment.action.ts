@@ -201,7 +201,7 @@ export async function updateIndirectAssessments(courseId: string, indirectAssess
             { new: true }
         ).lean();
 
-        revalidatePath('/dashboard/blueprint/assessment-plan/[courseId]');
+        revalidatePath('/dashboard/learning-outcomes/assessment-plan/[courseId]');
 
         return {
             success: true,

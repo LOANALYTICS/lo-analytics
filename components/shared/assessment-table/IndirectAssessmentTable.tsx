@@ -131,7 +131,7 @@ console.log(assessments)
           description: "Please initialize assessment plan first by adding assessment types.",
           action: {
             label: "Add student",
-            onClick: () => window.location.href = `/dashboard/blueprint/student-details/${courseId}`
+            onClick: () => window.location.href = `/dashboard/learning-outcomes/student-details/${courseId}`
           }
         });
       } else {

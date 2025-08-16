@@ -10,12 +10,12 @@ const sidebarItems: SidebarItem[] = [
 
   { name: "Question Bank", displayName: "Question Bank", href: "/dashboard/question-bank", icon: SquareLibrary },
   {
-    name: "Learning Outcome", displayName: "Assessments", href: "/dashboard/blueprint", icon: BookOpenCheck,
+    name: "Learning Outcome", displayName: "Learning Outcomes", href: "/dashboard/learning-outcomes", icon: BookOpenCheck,
     others: [
-      { name: "Student Details", href: "/dashboard/blueprint/student-details", icon: UsersRound },
-      { name: "Learning Outcomes", href: "/dashboard/blueprint/learning-outcomes", icon: BookDashed },
-      { name: "Assessment Plan", href: "/dashboard/blueprint/assessment-plan", icon: AsteriskSquare },
-      { name: "Reports", href: "/dashboard/blueprint/reports", icon: FileChartLine },
+      { name: "Student Details", href: "/dashboard/learning-outcomes/student-details", icon: UsersRound },
+      { name: "Clo Mappings", href: "/dashboard/learning-outcomes/clo-mapping", icon: BookDashed },
+      { name: "Assessment Plan", href: "/dashboard/learning-outcomes/assessment-plan", icon: AsteriskSquare },
+      { name: "Reports", href: "/dashboard/learning-outcomes/reports", icon: FileChartLine },
     ]
   },
 ];

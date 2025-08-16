@@ -69,7 +69,7 @@ export async function updateCLOData(courseId: string, cloData: Array<{
             throw new Error('Failed to update CLO data');
         }
 
-        revalidatePath('/dashboard/blueprint/learning-outcomes/[courseId]');
+        revalidatePath('/dashboard/learning-outcomes/clo-mapping/[courseId]');
 
         return {
             success: true,
