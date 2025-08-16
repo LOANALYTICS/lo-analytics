@@ -2,6 +2,7 @@ import { connectToMongoDB } from "@/lib/db";
 import { Assessment, Course } from "@/lib/models";
 import { NextRequest, NextResponse } from "next/server";
 import { IAssessment } from "@/server/models/assessment.model";
+import { generateGradeDistributionHTML } from "@/templates/grade-distribution-report";
 
 interface CourseData {
     _id: string;
@@ -53,12 +54,14 @@ interface DepartmentGroup {
 
 export const dynamic = 'force-dynamic';
 
-export async function POST(request: NextRequest) {
+export async function GET(request: NextRequest) {
     try {
         await connectToMongoDB();
 
-        const body = await request.json();
-        const { academic_year, semester, section } = body;
+        const { searchParams } = new URL(request.url);
+        const academic_year = searchParams.get('academic_year');
+        const semester = searchParams.get('semester');
+        const section = searchParams.get('section');
 
         if (!academic_year || !semester || !section) {
             return NextResponse.json({
@@ -68,7 +71,7 @@ export async function POST(request: NextRequest) {
 
         // Build the filter query
         let filterQuery: any = {
-            semister: semester,
+            semister: parseInt(semester),
             academic_year: academic_year,
             examType: "final"
         };
@@ -86,9 +89,20 @@ export async function POST(request: NextRequest) {
             .lean() as unknown as CourseData[];
 
         if (!courses.length) {
-            return NextResponse.json({
-                message: 'No courses found for the given criteria',
-                data: []
+            return new NextResponse(`
+                <html>
+                    <body>
+                        <h1>No Data Found</h1>
+                        <p>No courses found for the given criteria:</p>
+                        <ul>
+                            <li>Academic Year: ${academic_year}</li>
+                            <li>Semester: ${semester}</li>
+                            <li>Section: ${section}</li>
+                        </ul>
+                    </body>
+                </html>
+            `, {
+                headers: { 'Content-Type': 'text/html' }
             });
         }
 
@@ -109,7 +123,6 @@ export async function POST(request: NextRequest) {
                 };
 
                 if (!assessment || !assessment.assessmentResults) {
-                    // Return with zero values and percentages
                     const grades: GradeDistribution = {
                         'A': { value: 0, percentage: 0 },
                         'B': { value: 0, percentage: 0 },
@@ -134,9 +147,7 @@ export async function POST(request: NextRequest) {
 
                 assessment.assessmentResults.forEach(result => {
                     result.results.forEach(({ studentId, studentName, totalScore }) => {
-                        // Use the field that's actually a numeric ID
                         const actualStudentId = /^\d+$/.test(studentId) ? studentId : studentName;
-
                         const current = overallScores.get(actualStudentId) || { scored: 0, total: 0 };
                         overallScores.set(actualStudentId, {
                             scored: current.scored + totalScore.marksScored,
@@ -145,18 +156,16 @@ export async function POST(request: NextRequest) {
                     });
                 });
 
-                // Calculate grade distribution with combined grades
+                // Calculate grade distribution
                 overallScores.forEach((scores) => {
                     const percentage = (scores.scored / scores.total) * 100;
-
-                    if (percentage >= 90) gradeCounts['A']++; // A+ and A combined
-                    else if (percentage >= 80) gradeCounts['B']++; // B+ and B combined
-                    else if (percentage >= 70) gradeCounts['C']++; // C+ and C combined
-                    else if (percentage >= 60) gradeCounts['D']++; // D+ and D combined
+                    if (percentage >= 90) gradeCounts['A']++;
+                    else if (percentage >= 80) gradeCounts['B']++;
+                    else if (percentage >= 70) gradeCounts['C']++;
+                    else if (percentage >= 60) gradeCounts['D']++;
                     else gradeCounts['F']++;
                 });
 
-                // Calculate total students and percentages
                 const totalStudents = overallScores.size;
                 const grades: GradeDistribution = {
                     'A': {
@@ -268,19 +277,33 @@ export async function POST(request: NextRequest) {
                 total: calculateGroupTotal(courses)
             }));
 
-        return NextResponse.json({
-            message: 'Courses SO averages retrieved successfully',
+        // Generate HTML report
+        const htmlContent = generateGradeDistributionHTML({
             data: {
                 byLevel: levelGroupsData,
-                byDepartment: departmentGroupsData,
-                allCourses: coursesSOAverages
+                byDepartment: departmentGroupsData
+            },
+            academic_year,
+            semester: parseInt(semester),
+            section,
+            college: {
+                logo: '/logo.png',
+                english: 'College of Dentistry',
+                regional: 'كلية طب الأسنان',
+                university: 'University Name'
             }
         });
 
+        return new NextResponse(htmlContent, {
+            headers: {
+                'Content-Type': 'text/html',
+            },
+        });
+
     } catch (error) {
-        console.error('Error getting courses SO averages:', error);
+        console.error('Error generating grade distribution report:', error);
         return NextResponse.json({
-            message: 'Error getting courses SO averages',
+            message: 'Error generating grade distribution report',
             error: error instanceof Error ? error.message : 'Unknown error'
         }, { status: 500 });
     }
