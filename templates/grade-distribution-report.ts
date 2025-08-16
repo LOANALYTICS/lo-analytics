@@ -102,40 +102,7 @@ export function generateGradeDistributionHTML({
                     page-break-after: avoid;
                 }
                 
-                .header {
-                    text-align: center;
-                    margin-bottom: 30px;
-                    border-bottom: 2px solid #333;
-                    padding-bottom: 20px;
-                }
-                
-                .logo {
-                    max-width: 80px;
-                    height: auto;
-                    margin-bottom: 10px;
-                }
-                
-                .college-name {
-                    font-size: 18px;
-                    font-weight: bold;
-                    margin: 5px 0;
-                }
-                
-                .university-name {
-                    font-size: 14px;
-                    margin: 5px 0;
-                }
-                
-                .report-title {
-                    font-size: 16px;
-                    font-weight: bold;
-                    margin: 20px 0 10px 0;
-                }
-                
-                .report-info {
-                    font-size: 12px;
-                    margin-bottom: 20px;
-                }
+
                 
                 table {
                     width: 100%;
@@ -240,15 +207,6 @@ function generateLevelTable(levelGroup: LevelGroup, academic_year: string, semes
 
     return `
     <div class="page">
-        <div class="header">
-            <div class="college-name">College of Dentistry</div>
-            <div class="university-name">University Name</div>
-            <div class="report-title">Grade Distribution Report</div>
-            <div class="report-info">
-                ${semesterText}, ${academic_year} (${sectionText}) - Level ${levelGroup.level}
-            </div>
-        </div>
-        
         <table>
             <colgroup>
                 <col style="width: 40px;">
@@ -262,17 +220,18 @@ function generateLevelTable(levelGroup: LevelGroup, academic_year: string, semes
             </colgroup>
             <thead>
                 <tr>
-                    <th colspan="8" class="level-header">Level ${levelGroup.level}</th>
+                    <th colspan="2" class="level-header">Level ${levelGroup.level}</th>
+                    <th colspan="5" class="level-header">No/Percentage of Students</th>
+                    <th rowspan="2" class="level-header">Total N.<br>of<br>students</th>
                 </tr>
                 <tr>
-                    <th>S No</th>
-                    <th>Course Name & Code</th>
-                    <th class="grade-cell">A</th>
-                    <th class="grade-cell">B</th>
-                    <th class="grade-cell">C</th>
-                    <th class="grade-cell">D</th>
-                    <th class="grade-cell">F</th>
-                    <th>Total N. of students</th>
+                    <th>S<br>No</th>
+                    <th>Course Name<br>& Code</th>
+                    <th>A</th>
+                    <th>B</th>
+                    <th>C</th>
+                    <th>D</th>
+                    <th>F</th>
                 </tr>
             </thead>
             <tbody>
@@ -305,7 +264,7 @@ function generateLevelTable(levelGroup: LevelGroup, academic_year: string, semes
                     <td class="grade-cell">${levelGroup.total.grades.C.value}</td>
                     <td class="grade-cell">${levelGroup.total.grades.D.value}</td>
                     <td class="grade-cell">${levelGroup.total.grades.F.value}</td>
-                    <td>${levelGroup.total.totalStudents}</td>
+                    <td rowspan="2">${levelGroup.total.totalStudents}</td>
                 </tr>
                 <tr class="total-row percentage-row">
                     <td colspan="2"></td>
@@ -314,7 +273,6 @@ function generateLevelTable(levelGroup: LevelGroup, academic_year: string, semes
                     <td class="grade-cell">${levelGroup.total.grades.C.percentage}%</td>
                     <td class="grade-cell">${levelGroup.total.grades.D.percentage}%</td>
                     <td class="grade-cell">${levelGroup.total.grades.F.percentage}%</td>
-                    <td></td>
                 </tr>
                 <tr class="overall-row">
                     <td colspan="2">Overall</td>
@@ -341,15 +299,6 @@ function generateDepartmentTable(deptGroup: DepartmentGroup, academic_year: stri
 
     return `
     <div class="page">
-        <div class="header">
-            <div class="college-name">College of Dentistry</div>
-            <div class="university-name">University Name</div>
-            <div class="report-title">Grade Distribution Report</div>
-            <div class="report-info">
-                ${semesterText}, ${academic_year} (${sectionText}) - ${deptGroup.department}
-            </div>
-        </div>
-        
         <table>
             <colgroup>
                 <col style="width: 40px;">
@@ -363,17 +312,18 @@ function generateDepartmentTable(deptGroup: DepartmentGroup, academic_year: stri
             </colgroup>
             <thead>
                 <tr>
-                    <th colspan="8" class="level-header">${deptGroup.department}</th>
+                    <th rowspan="2" class="level-header">${deptGroup.department}</th>
+                    <th rowspan="2" class="level-header">S<br>No</th>
+                    <th rowspan="2" class="level-header">Course Name<br>& Code</th>
+                    <th colspan="5" class="level-header">No/Percentage of Students</th>
+                    <th rowspan="2" class="level-header">Total N.<br>of<br>students</th>
                 </tr>
                 <tr>
-                    <th>S No</th>
-                    <th>Course Name & Code</th>
-                    <th class="grade-cell">A</th>
-                    <th class="grade-cell">B</th>
-                    <th class="grade-cell">C</th>
-                    <th class="grade-cell">D</th>
-                    <th class="grade-cell">F</th>
-                    <th>Total N. of students</th>
+                    <th>A</th>
+                    <th>B</th>
+                    <th>C</th>
+                    <th>D</th>
+                    <th>F</th>
                 </tr>
             </thead>
             <tbody>
@@ -401,22 +351,20 @@ function generateDepartmentTable(deptGroup: DepartmentGroup, academic_year: stri
                 </tr>
                 `).join('')}
                 <tr class="total-row">
-                    <td colspan="2">Total</td>
+                    <td rowspan="2">Total</td>
                     <td class="grade-cell">${deptGroup.total.grades.A.value}</td>
                     <td class="grade-cell">${deptGroup.total.grades.B.value}</td>
                     <td class="grade-cell">${deptGroup.total.grades.C.value}</td>
                     <td class="grade-cell">${deptGroup.total.grades.D.value}</td>
                     <td class="grade-cell">${deptGroup.total.grades.F.value}</td>
-                    <td>${deptGroup.total.totalStudents}</td>
+                    <td rowspan="2">${deptGroup.total.totalStudents}</td>
                 </tr>
                 <tr class="total-row percentage-row">
-                    <td colspan="2"></td>
                     <td class="grade-cell">${deptGroup.total.grades.A.percentage}%</td>
                     <td class="grade-cell">${deptGroup.total.grades.B.percentage}%</td>
                     <td class="grade-cell">${deptGroup.total.grades.C.percentage}%</td>
                     <td class="grade-cell">${deptGroup.total.grades.D.percentage}%</td>
                     <td class="grade-cell">${deptGroup.total.grades.F.percentage}%</td>
-                    <td></td>
                 </tr>
                 <tr class="overall-row">
                     <td colspan="2">Overall</td>
