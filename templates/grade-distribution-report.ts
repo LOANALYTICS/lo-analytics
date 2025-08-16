@@ -316,13 +316,13 @@ function generateDepartmentTable(deptGroup: DepartmentGroup, academic_year: stri
             </colgroup>
             <thead>
                 <tr>
-                    <th rowspan="2" class="level-header">${deptGroup.department}</th>
-                    <th rowspan="2" class="level-header">S<br>No</th>
-                    <th rowspan="2" class="level-header">Course Name<br>& Code</th>
+                    <th colspan="2" class="level-header">${deptGroup.department}</th>
                     <th colspan="5" class="level-header">No/Percentage of Students</th>
                     <th rowspan="2" class="level-header">Total N.<br>of<br>students</th>
                 </tr>
                 <tr>
+                    <th>S<br>No</th>
+                    <th>Course Name<br>& Code</th>
                     <th>A</th>
                     <th>B</th>
                     <th>C</th>
