@@ -30,12 +30,24 @@ interface LevelGroup {
     level: number;
     courses: CourseSOAverage[];
     total: GroupTotal;
+    overall: {
+        totalPassing: number;
+        totalFailing: number;
+        overallPassPercentage: string;
+        overallFailPercentage: string;
+    };
 }
 
 interface DepartmentGroup {
     department: string;
     courses: CourseSOAverage[];
     total: GroupTotal;
+    overall: {
+        totalPassing: number;
+        totalFailing: number;
+        overallPassPercentage: string;
+        overallFailPercentage: string;
+    };
 }
 
 interface GradeDistributionData {
@@ -196,15 +208,6 @@ function generateLevelTable(levelGroup: LevelGroup, academic_year: string, semes
     const semesterText = semester === 1 ? "First Semester" : "Second Semester";
     const sectionText = section.charAt(0).toUpperCase() + section.slice(1);
 
-    // Calculate overall pass/fail for the level
-    const totalPassing = levelGroup.total.grades.A.value + levelGroup.total.grades.B.value +
-        levelGroup.total.grades.C.value + levelGroup.total.grades.D.value;
-    const totalFailing = levelGroup.total.grades.F.value;
-    const overallPassPercentage = levelGroup.total.totalStudents > 0 ?
-        ((totalPassing / levelGroup.total.totalStudents) * 100).toFixed(1) : '0.0';
-    const overallFailPercentage = levelGroup.total.totalStudents > 0 ?
-        ((totalFailing / levelGroup.total.totalStudents) * 100).toFixed(1) : '0.0';
-
     return `
     <div class="page">
         <table>
@@ -275,13 +278,13 @@ function generateLevelTable(levelGroup: LevelGroup, academic_year: string, semes
                 </tr>
                 <tr class="overall-row">
                     <td rowspan="2" colspan="2">Overall</td>
-                    <td colspan="4">${totalPassing}</td>
-                    <td>${totalFailing}</td>
+                    <td colspan="4">${levelGroup.overall.totalPassing}</td>
+                    <td>${levelGroup.overall.totalFailing}</td>
                     <td rowspan="2"></td>
                 </tr>
                 <tr class="overall-row">
-                    <td colspan="4">${overallPassPercentage}%</td>
-                    <td>${overallFailPercentage}%</td>
+                    <td colspan="4">${levelGroup.overall.overallPassPercentage}%</td>
+                    <td>${levelGroup.overall.overallFailPercentage}%</td>
                 </tr>
             </tbody>
         </table>
@@ -291,15 +294,6 @@ function generateLevelTable(levelGroup: LevelGroup, academic_year: string, semes
 function generateDepartmentTable(deptGroup: DepartmentGroup, academic_year: string, semester: number, section: string): string {
     const semesterText = semester === 1 ? "First Semester" : "Second Semester";
     const sectionText = section.charAt(0).toUpperCase() + section.slice(1);
-
-    // Calculate overall pass/fail for the department
-    const totalPassing = deptGroup.total.grades.A.value + deptGroup.total.grades.B.value +
-        deptGroup.total.grades.C.value + deptGroup.total.grades.D.value;
-    const totalFailing = deptGroup.total.grades.F.value;
-    const overallPassPercentage = deptGroup.total.totalStudents > 0 ?
-        ((totalPassing / deptGroup.total.totalStudents) * 100).toFixed(1) : '0.0';
-    const overallFailPercentage = deptGroup.total.totalStudents > 0 ?
-        ((totalFailing / deptGroup.total.totalStudents) * 100).toFixed(1) : '0.0';
 
     return `
     <div class="page">
@@ -372,13 +366,13 @@ function generateDepartmentTable(deptGroup: DepartmentGroup, academic_year: stri
                 </tr>
                 <tr class="overall-row">
                     <td rowspan="2" colspan="2">Overall</td>
-                    <td colspan="4">${totalPassing}</td>
-                    <td>${totalFailing}</td>
+                    <td colspan="4">${deptGroup.overall.totalPassing}</td>
+                    <td>${deptGroup.overall.totalFailing}</td>
                     <td rowspan="2"></td>
                 </tr>
                 <tr class="overall-row">
-                    <td colspan="4">${overallPassPercentage}%</td>
-                    <td>${overallFailPercentage}%</td>
+                    <td colspan="4">${deptGroup.overall.overallPassPercentage}%</td>
+                    <td>${deptGroup.overall.overallFailPercentage}%</td>
                 </tr>
             </tbody>
         </table>

@@ -254,11 +254,27 @@ export async function GET(request: NextRequest) {
 
         const levelGroupsData: LevelGroup[] = Array.from(levelGroups.entries())
             .sort(([a], [b]) => a - b)
-            .map(([level, courses]) => ({
-                level,
-                courses: courses.sort((a, b) => a.course_name.localeCompare(b.course_name)),
-                total: calculateGroupTotal(courses)
-            }));
+            .map(([level, courses]) => {
+                const total = calculateGroupTotal(courses);
+                const totalPassing = total.grades.A.value + total.grades.B.value + total.grades.C.value + total.grades.D.value;
+                const totalFailing = total.grades.F.value;
+                const overallPassPercentage = total.totalStudents > 0 ? 
+                    ((totalPassing / total.totalStudents) * 100).toFixed(1) : '0.0';
+                const overallFailPercentage = total.totalStudents > 0 ? 
+                    ((totalFailing / total.totalStudents) * 100).toFixed(1) : '0.0';
+                
+                return {
+                    level,
+                    courses: courses.sort((a, b) => a.course_name.localeCompare(b.course_name)),
+                    total,
+                    overall: {
+                        totalPassing,
+                        totalFailing,
+                        overallPassPercentage,
+                        overallFailPercentage
+                    }
+                };
+            });
 
         // Group by department
         const departmentGroups = new Map<string, CourseSOAverage[]>();
@@ -271,11 +287,27 @@ export async function GET(request: NextRequest) {
 
         const departmentGroupsData: DepartmentGroup[] = Array.from(departmentGroups.entries())
             .sort(([a], [b]) => a.localeCompare(b))
-            .map(([department, courses]) => ({
-                department,
-                courses: courses.sort((a, b) => a.course_name.localeCompare(b.course_name)),
-                total: calculateGroupTotal(courses)
-            }));
+            .map(([department, courses]) => {
+                const total = calculateGroupTotal(courses);
+                const totalPassing = total.grades.A.value + total.grades.B.value + total.grades.C.value + total.grades.D.value;
+                const totalFailing = total.grades.F.value;
+                const overallPassPercentage = total.totalStudents > 0 ? 
+                    ((totalPassing / total.totalStudents) * 100).toFixed(1) : '0.0';
+                const overallFailPercentage = total.totalStudents > 0 ? 
+                    ((totalFailing / total.totalStudents) * 100).toFixed(1) : '0.0';
+                
+                return {
+                    department,
+                    courses: courses.sort((a, b) => a.course_name.localeCompare(b.course_name)),
+                    total,
+                    overall: {
+                        totalPassing,
+                        totalFailing,
+                        overallPassPercentage,
+                        overallFailPercentage
+                    }
+                };
+            });
 
         // Generate HTML report
         const htmlContent = generateGradeDistributionHTML({
