@@ -76,6 +76,10 @@ export function generateGradeDistributionHTML({
     college
 }: ReportParams): string {
 
+    // Generate summary tables
+    const levelSummary = generateLevelSummaryTable(data);
+    const departmentSummary = generateDepartmentSummaryTable(data);
+
     // Generate level-wise tables
     const levelTables = data.byLevel.map(levelGroup =>
         generateLevelTable(levelGroup, academic_year, semester, section)
@@ -114,6 +118,18 @@ export function generateGradeDistributionHTML({
                     page-break-after: avoid;
                 }
                 
+                .summary-page {
+                    width: 210mm;
+                    min-height: 297mm;
+                    padding: 20mm;
+                    margin: 0 auto;
+                    background: white;
+                    box-shadow: 0 0 5px rgba(0,0,0,0.1);
+                    page-break-after: always;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                }
 
                 
                 table {
@@ -123,12 +139,22 @@ export function generateGradeDistributionHTML({
                     border: 2px solid #333;
                 }
                 
+                .summary-table {
+                    max-width: 800px;
+                    margin: 20px auto;
+                }
+                
                 th, td {
                     border: 1px solid #333;
                     padding: 8px;
                     text-align: center;
                     font-size: 11px;
                     vertical-align: middle;
+                }
+                
+                .summary-table th, .summary-table td {
+                    padding: 12px 8px;
+                    font-size: 12px;
                 }
                 
                 th {
@@ -144,6 +170,25 @@ export function generateGradeDistributionHTML({
                     font-size: 14px;
                     font-weight: bold;
                     text-align: center;
+                }
+                
+                .header-row {
+                    background-color: #444 !important;
+                    color: white;
+                    font-size: 14px;
+                    font-weight: bold;
+                }
+                
+                .level-row, .dept-row {
+                    background-color: #555;
+                    color: white;
+                    font-weight: bold;
+                }
+                
+                .dept-name {
+                    text-align: left !important;
+                    max-width: 200px;
+                    word-wrap: break-word;
                 }
                 
                 .course-name-col {
@@ -177,7 +222,7 @@ export function generateGradeDistributionHTML({
                         padding: 0;
                     }
                     
-                    .page {
+                    .page, .summary-page {
                         width: auto;
                         height: auto;
                         margin: 0;
@@ -186,7 +231,7 @@ export function generateGradeDistributionHTML({
                         page-break-after: always;
                     }
                     
-                    .page:last-child {
+                    .page:last-child, .summary-page:last-child {
                         page-break-after: avoid;
                     }
                 }
@@ -198,10 +243,532 @@ export function generateGradeDistributionHTML({
             </style>
         </head>
         <body>
+            <div class="summary-page">
+                ${levelSummary}
+                ${departmentSummary}
+            </div>
             ${levelTables}
             ${departmentTables}
         </body>
     </html>`;
+}
+
+// New function to generate Level Summary Report
+export function generateLevelSummaryHTML({
+    data,
+    academic_year,
+    semester,
+    section,
+    college
+}: ReportParams): string {
+    const semesterText = semester === 1 ? "First Semester" : "Second Semester";
+    const sectionText = section.charAt(0).toUpperCase() + section.slice(1);
+
+    // Calculate overall totals
+    const overallTotals = {
+        A: 0, B: 0, C: 0, D: 0, F: 0, totalStudents: 0
+    };
+
+    data.byLevel.forEach(level => {
+        overallTotals.A += level.total.grades.A.value;
+        overallTotals.B += level.total.grades.B.value;
+        overallTotals.C += level.total.grades.C.value;
+        overallTotals.D += level.total.grades.D.value;
+        overallTotals.F += level.total.grades.F.value;
+        overallTotals.totalStudents += level.total.totalStudents;
+    });
+
+    const overallPassing = overallTotals.A + overallTotals.B + overallTotals.C + overallTotals.D;
+    const overallPassPercentage = overallTotals.totalStudents > 0 ?
+        ((overallPassing / overallTotals.totalStudents) * 100).toFixed(1) : '0.0';
+    const overallFailPercentage = overallTotals.totalStudents > 0 ?
+        ((overallTotals.F / overallTotals.totalStudents) * 100).toFixed(1) : '0.0';
+
+    return `
+    <!DOCTYPE html>
+    <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Level Summary Report</title>
+            <style>
+                body { 
+                    font-family: Arial, sans-serif; 
+                    margin: 0;
+                    padding: 20px;
+                    font-size: 12px;
+                }
+                
+                table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin: 20px auto;
+                    border: 2px solid #333;
+                    max-width: 800px;
+                }
+                
+                th, td {
+                    border: 1px solid #333;
+                    padding: 12px 8px;
+                    text-align: center;
+                    font-size: 12px;
+                    vertical-align: middle;
+                }
+                
+                th {
+                    background-color: #666;
+                    color: white;
+                    font-weight: bold;
+                }
+                
+                .header-row {
+                    background-color: #444 !important;
+                    color: white;
+                    font-size: 14px;
+                    font-weight: bold;
+                }
+                
+                .level-row {
+                    background-color: #555;
+                    color: white;
+                    font-weight: bold;
+                }
+                
+                .percentage-row {
+                    font-style: italic;
+                    background-color: #f8f8f8;
+                }
+                
+                .total-row {
+                    background-color: #f0f0f0;
+                    font-weight: bold;
+                }
+                
+                .overall-row {
+                    background-color: #d0d0d0;
+                    font-weight: bold;
+                }
+                
+                @media print {
+                    body {
+                        margin: 0;
+                        padding: 15mm;
+                    }
+                }
+            </style>
+        </head>
+        <body>
+            <table>
+                <thead>
+                    <tr class="header-row">
+                        <th rowspan="2">Level</th>
+                        <th colspan="5">No/Percentage of Students</th>
+                        <th rowspan="2">Total N. of<br>students</th>
+                    </tr>
+                    <tr class="header-row">
+                        <th>A</th>
+                        <th>B</th>
+                        <th>C</th>
+                        <th>D</th>
+                        <th>F</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${data.byLevel.map(level => `
+                    <tr class="level-row">
+                        <td rowspan="2">Level ${level.level}</td>
+                        <td>${level.total.grades.A.value}</td>
+                        <td>${level.total.grades.B.value}</td>
+                        <td>${level.total.grades.C.value}</td>
+                        <td>${level.total.grades.D.value}</td>
+                        <td>${level.total.grades.F.value}</td>
+                        <td rowspan="2">${level.total.totalStudents}</td>
+                    </tr>
+                    <tr class="percentage-row">
+                        <td>${level.total.grades.A.percentage}%</td>
+                        <td>${level.total.grades.B.percentage}%</td>
+                        <td>${level.total.grades.C.percentage}%</td>
+                        <td>${level.total.grades.D.percentage}%</td>
+                        <td>${level.total.grades.F.percentage}%</td>
+                    </tr>
+                    `).join('')}
+                    <tr class="total-row">
+                        <td rowspan="2">Total</td>
+                        <td>${overallTotals.A}</td>
+                        <td>${overallTotals.B}</td>
+                        <td>${overallTotals.C}</td>
+                        <td>${overallTotals.D}</td>
+                        <td>${overallTotals.F}</td>
+                        <td rowspan="2">${overallTotals.totalStudents}</td>
+                    </tr>
+                    <tr class="total-row percentage-row">
+                        <td>${overallTotals.totalStudents > 0 ? ((overallTotals.A / overallTotals.totalStudents) * 100).toFixed(1) : '0.0'}%</td>
+                        <td>${overallTotals.totalStudents > 0 ? ((overallTotals.B / overallTotals.totalStudents) * 100).toFixed(1) : '0.0'}%</td>
+                        <td>${overallTotals.totalStudents > 0 ? ((overallTotals.C / overallTotals.totalStudents) * 100).toFixed(1) : '0.0'}%</td>
+                        <td>${overallTotals.totalStudents > 0 ? ((overallTotals.D / overallTotals.totalStudents) * 100).toFixed(1) : '0.0'}%</td>
+                        <td>${overallTotals.totalStudents > 0 ? ((overallTotals.F / overallTotals.totalStudents) * 100).toFixed(1) : '0.0'}%</td>
+                    </tr>
+                    <tr class="overall-row">
+                        <td rowspan="2">Overall</td>
+                        <td colspan="4">${overallPassing}</td>
+                        <td>${overallTotals.F}</td>
+                        <td rowspan="2"></td>
+                    </tr>
+                    <tr class="overall-row">
+                        <td colspan="4">${overallPassPercentage}%</td>
+                        <td>${overallFailPercentage}%</td>
+                    </tr>
+                </tbody>
+            </table>
+        </body>
+    </html>`;
+}
+
+// New function to generate Department Summary Report
+export function generateDepartmentSummaryHTML({
+    data,
+    academic_year,
+    semester,
+    section,
+    college
+}: ReportParams): string {
+    const semesterText = semester === 1 ? "First Semester" : "Second Semester";
+    const sectionText = section.charAt(0).toUpperCase() + section.slice(1);
+
+    // Calculate overall totals
+    const overallTotals = {
+        A: 0, B: 0, C: 0, D: 0, F: 0, totalStudents: 0
+    };
+
+    data.byDepartment.forEach(dept => {
+        overallTotals.A += dept.total.grades.A.value;
+        overallTotals.B += dept.total.grades.B.value;
+        overallTotals.C += dept.total.grades.C.value;
+        overallTotals.D += dept.total.grades.D.value;
+        overallTotals.F += dept.total.grades.F.value;
+        overallTotals.totalStudents += dept.total.totalStudents;
+    });
+
+    const overallPassing = overallTotals.A + overallTotals.B + overallTotals.C + overallTotals.D;
+    const overallPassPercentage = overallTotals.totalStudents > 0 ?
+        ((overallPassing / overallTotals.totalStudents) * 100).toFixed(1) : '0.0';
+    const overallFailPercentage = overallTotals.totalStudents > 0 ?
+        ((overallTotals.F / overallTotals.totalStudents) * 100).toFixed(1) : '0.0';
+
+    return `
+    <!DOCTYPE html>
+    <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Department Summary Report</title>
+            <style>
+                body { 
+                    font-family: Arial, sans-serif; 
+                    margin: 0;
+                    padding: 20px;
+                    font-size: 12px;
+                }
+                
+                table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin: 20px auto;
+                    border: 2px solid #333;
+                    max-width: 900px;
+                }
+                
+                th, td {
+                    border: 1px solid #333;
+                    padding: 12px 8px;
+                    text-align: center;
+                    font-size: 12px;
+                    vertical-align: middle;
+                }
+                
+                th {
+                    background-color: #666;
+                    color: white;
+                    font-weight: bold;
+                }
+                
+                .header-row {
+                    background-color: #444 !important;
+                    color: white;
+                    font-size: 14px;
+                    font-weight: bold;
+                }
+                
+                .dept-row {
+                    background-color: #555;
+                    color: white;
+                    font-weight: bold;
+                }
+                
+                .dept-name {
+                    text-align: left !important;
+                    max-width: 200px;
+                    word-wrap: break-word;
+                }
+                
+                .percentage-row {
+                    font-style: italic;
+                    background-color: #f8f8f8;
+                }
+                
+                .total-row {
+                    background-color: #f0f0f0;
+                    font-weight: bold;
+                }
+                
+                .overall-row {
+                    background-color: #d0d0d0;
+                    font-weight: bold;
+                }
+                
+                @media print {
+                    body {
+                        margin: 0;
+                        padding: 15mm;
+                    }
+                }
+            </style>
+        </head>
+        <body>
+            <table>
+                <thead>
+                    <tr class="header-row">
+                        <th rowspan="2">Department</th>
+                        <th colspan="5">No/Percentage of Students</th>
+                        <th rowspan="2">Total N. of<br>students</th>
+                    </tr>
+                    <tr class="header-row">
+                        <th>A</th>
+                        <th>B</th>
+                        <th>C</th>
+                        <th>D</th>
+                        <th>F</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${data.byDepartment.map(dept => `
+                    <tr class="dept-row">
+                        <td rowspan="2" class="dept-name">${dept.department}</td>
+                        <td>${dept.total.grades.A.value}</td>
+                        <td>${dept.total.grades.B.value}</td>
+                        <td>${dept.total.grades.C.value}</td>
+                        <td>${dept.total.grades.D.value}</td>
+                        <td>${dept.total.grades.F.value}</td>
+                        <td rowspan="2">${dept.total.totalStudents}</td>
+                    </tr>
+                    <tr class="percentage-row">
+                        <td>${dept.total.grades.A.percentage}%</td>
+                        <td>${dept.total.grades.B.percentage}%</td>
+                        <td>${dept.total.grades.C.percentage}%</td>
+                        <td>${dept.total.grades.D.percentage}%</td>
+                        <td>${dept.total.grades.F.percentage}%</td>
+                    </tr>
+                    `).join('')}
+                    <tr class="total-row">
+                        <td rowspan="2">Total</td>
+                        <td>${overallTotals.A}</td>
+                        <td>${overallTotals.B}</td>
+                        <td>${overallTotals.C}</td>
+                        <td>${overallTotals.D}</td>
+                        <td>${overallTotals.F}</td>
+                        <td rowspan="2">${overallTotals.totalStudents}</td>
+                    </tr>
+                    <tr class="total-row percentage-row">
+                        <td>${overallTotals.totalStudents > 0 ? ((overallTotals.A / overallTotals.totalStudents) * 100).toFixed(1) : '0.0'}%</td>
+                        <td>${overallTotals.totalStudents > 0 ? ((overallTotals.B / overallTotals.totalStudents) * 100).toFixed(1) : '0.0'}%</td>
+                        <td>${overallTotals.totalStudents > 0 ? ((overallTotals.C / overallTotals.totalStudents) * 100).toFixed(1) : '0.0'}%</td>
+                        <td>${overallTotals.totalStudents > 0 ? ((overallTotals.D / overallTotals.totalStudents) * 100).toFixed(1) : '0.0'}%</td>
+                        <td>${overallTotals.totalStudents > 0 ? ((overallTotals.F / overallTotals.totalStudents) * 100).toFixed(1) : '0.0'}%</td>
+                    </tr>
+                    <tr class="overall-row">
+                        <td rowspan="2">Overall</td>
+                        <td colspan="4">${overallPassing}</td>
+                        <td>${overallTotals.F}</td>
+                        <td rowspan="2"></td>
+                    </tr>
+                    <tr class="overall-row">
+                        <td colspan="4">${overallPassPercentage}%</td>
+                        <td>${overallFailPercentage}%</td>
+                    </tr>
+                </tbody>
+            </table>
+        </body>
+    </html>`;
+}
+
+function generateLevelSummaryTable(data: GradeDistributionData): string {
+    // Calculate overall totals
+    const overallTotals = {
+        A: 0, B: 0, C: 0, D: 0, F: 0, totalStudents: 0
+    };
+
+    data.byLevel.forEach(level => {
+        overallTotals.A += level.total.grades.A.value;
+        overallTotals.B += level.total.grades.B.value;
+        overallTotals.C += level.total.grades.C.value;
+        overallTotals.D += level.total.grades.D.value;
+        overallTotals.F += level.total.grades.F.value;
+        overallTotals.totalStudents += level.total.totalStudents;
+    });
+
+    const overallPassing = overallTotals.A + overallTotals.B + overallTotals.C + overallTotals.D;
+    const overallPassPercentage = overallTotals.totalStudents > 0 ?
+        ((overallPassing / overallTotals.totalStudents) * 100).toFixed(1) : '0.0';
+    const overallFailPercentage = overallTotals.totalStudents > 0 ?
+        ((overallTotals.F / overallTotals.totalStudents) * 100).toFixed(1) : '0.0';
+
+    return `
+        <table class="summary-table">
+            <thead>
+                <tr class="header-row">
+                    <th rowspan="2">Level</th>
+                    <th colspan="5">No/Percentage of Students</th>
+                    <th rowspan="2">Total N. of<br>students</th>
+                </tr>
+                <tr class="header-row">
+                    <th>A</th>
+                    <th>B</th>
+                    <th>C</th>
+                    <th>D</th>
+                    <th>F</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${data.byLevel.map(level => `
+                <tr class="level-row">
+                    <td rowspan="2">Level ${level.level}</td>
+                    <td>${level.total.grades.A.value}</td>
+                    <td>${level.total.grades.B.value}</td>
+                    <td>${level.total.grades.C.value}</td>
+                    <td>${level.total.grades.D.value}</td>
+                    <td>${level.total.grades.F.value}</td>
+                    <td rowspan="2">${level.total.totalStudents}</td>
+                </tr>
+                <tr class="percentage-row">
+                    <td>${level.total.grades.A.percentage}%</td>
+                    <td>${level.total.grades.B.percentage}%</td>
+                    <td>${level.total.grades.C.percentage}%</td>
+                    <td>${level.total.grades.D.percentage}%</td>
+                    <td>${level.total.grades.F.percentage}%</td>
+                </tr>
+                `).join('')}
+                <tr class="total-row">
+                    <td rowspan="2">Total</td>
+                    <td>${overallTotals.A}</td>
+                    <td>${overallTotals.B}</td>
+                    <td>${overallTotals.C}</td>
+                    <td>${overallTotals.D}</td>
+                    <td>${overallTotals.F}</td>
+                    <td rowspan="2">${overallTotals.totalStudents}</td>
+                </tr>
+                <tr class="total-row percentage-row">
+                    <td>${overallTotals.totalStudents > 0 ? ((overallTotals.A / overallTotals.totalStudents) * 100).toFixed(1) : '0.0'}%</td>
+                    <td>${overallTotals.totalStudents > 0 ? ((overallTotals.B / overallTotals.totalStudents) * 100).toFixed(1) : '0.0'}%</td>
+                    <td>${overallTotals.totalStudents > 0 ? ((overallTotals.C / overallTotals.totalStudents) * 100).toFixed(1) : '0.0'}%</td>
+                    <td>${overallTotals.totalStudents > 0 ? ((overallTotals.D / overallTotals.totalStudents) * 100).toFixed(1) : '0.0'}%</td>
+                    <td>${overallTotals.totalStudents > 0 ? ((overallTotals.F / overallTotals.totalStudents) * 100).toFixed(1) : '0.0'}%</td>
+                </tr>
+                <tr class="overall-row">
+                    <td rowspan="2">Overall</td>
+                    <td colspan="4">${overallPassing}</td>
+                    <td>${overallTotals.F}</td>
+                    <td rowspan="2"></td>
+                </tr>
+                <tr class="overall-row">
+                    <td colspan="4">${overallPassPercentage}%</td>
+                    <td>${overallFailPercentage}%</td>
+                </tr>
+            </tbody>
+        </table>`;
+}
+
+function generateDepartmentSummaryTable(data: GradeDistributionData): string {
+    // Calculate overall totals
+    const overallTotals = {
+        A: 0, B: 0, C: 0, D: 0, F: 0, totalStudents: 0
+    };
+
+    data.byDepartment.forEach(dept => {
+        overallTotals.A += dept.total.grades.A.value;
+        overallTotals.B += dept.total.grades.B.value;
+        overallTotals.C += dept.total.grades.C.value;
+        overallTotals.D += dept.total.grades.D.value;
+        overallTotals.F += dept.total.grades.F.value;
+        overallTotals.totalStudents += dept.total.totalStudents;
+    });
+
+    const overallPassing = overallTotals.A + overallTotals.B + overallTotals.C + overallTotals.D;
+    const overallPassPercentage = overallTotals.totalStudents > 0 ?
+        ((overallPassing / overallTotals.totalStudents) * 100).toFixed(1) : '0.0';
+    const overallFailPercentage = overallTotals.totalStudents > 0 ?
+        ((overallTotals.F / overallTotals.totalStudents) * 100).toFixed(1) : '0.0';
+
+    return `
+        <table class="summary-table">
+            <thead>
+                <tr class="header-row">
+                    <th rowspan="2">Department</th>
+                    <th colspan="5">No/Percentage of Students</th>
+                    <th rowspan="2">Total N. of<br>students</th>
+                </tr>
+                <tr class="header-row">
+                    <th>A</th>
+                    <th>B</th>
+                    <th>C</th>
+                    <th>D</th>
+                    <th>F</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${data.byDepartment.map(dept => `
+                <tr class="dept-row">
+                    <td rowspan="2" class="dept-name">${dept.department}</td>
+                    <td>${dept.total.grades.A.value}</td>
+                    <td>${dept.total.grades.B.value}</td>
+                    <td>${dept.total.grades.C.value}</td>
+                    <td>${dept.total.grades.D.value}</td>
+                    <td>${dept.total.grades.F.value}</td>
+                    <td rowspan="2">${dept.total.totalStudents}</td>
+                </tr>
+                <tr class="percentage-row">
+                    <td>${dept.total.grades.A.percentage}%</td>
+                    <td>${dept.total.grades.B.percentage}%</td>
+                    <td>${dept.total.grades.C.percentage}%</td>
+                    <td>${dept.total.grades.D.percentage}%</td>
+                    <td>${dept.total.grades.F.percentage}%</td>
+                </tr>
+                `).join('')}
+                <tr class="total-row">
+                    <td rowspan="2">Total</td>
+                    <td>${overallTotals.A}</td>
+                    <td>${overallTotals.B}</td>
+                    <td>${overallTotals.C}</td>
+                    <td>${overallTotals.D}</td>
+                    <td>${overallTotals.F}</td>
+                    <td rowspan="2">${overallTotals.totalStudents}</td>
+                </tr>
+                <tr class="total-row percentage-row">
+                    <td>${overallTotals.totalStudents > 0 ? ((overallTotals.A / overallTotals.totalStudents) * 100).toFixed(1) : '0.0'}%</td>
+                    <td>${overallTotals.totalStudents > 0 ? ((overallTotals.B / overallTotals.totalStudents) * 100).toFixed(1) : '0.0'}%</td>
+                    <td>${overallTotals.totalStudents > 0 ? ((overallTotals.C / overallTotals.totalStudents) * 100).toFixed(1) : '0.0'}%</td>
+                    <td>${overallTotals.totalStudents > 0 ? ((overallTotals.D / overallTotals.totalStudents) * 100).toFixed(1) : '0.0'}%</td>
+                    <td>${overallTotals.totalStudents > 0 ? ((overallTotals.F / overallTotals.totalStudents) * 100).toFixed(1) : '0.0'}%</td>
+                </tr>
+                <tr class="overall-row">
+                    <td rowspan="2">Overall</td>
+                    <td colspan="4">${overallPassing}</td>
+                    <td>${overallTotals.F}</td>
+                    <td rowspan="2"></td>
+                </tr>
+                <tr class="overall-row">
+                    <td colspan="4">${overallPassPercentage}%</td>
+                    <td>${overallFailPercentage}%</td>
+                </tr>
+            </tbody>
+        </table>`;
 }
 
 function generateLevelTable(levelGroup: LevelGroup, academic_year: string, semester: number, section: string): string {

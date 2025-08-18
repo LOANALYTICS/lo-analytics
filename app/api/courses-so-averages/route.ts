@@ -44,12 +44,24 @@ interface LevelGroup {
     level: number;
     courses: CourseSOAverage[];
     total: GroupTotal;
+    overall: {
+        totalPassing: number;
+        totalFailing: number;
+        overallPassPercentage: string;
+        overallFailPercentage: string;
+    };
 }
 
 interface DepartmentGroup {
     department: string;
     courses: CourseSOAverage[];
     total: GroupTotal;
+    overall: {
+        totalPassing: number;
+        totalFailing: number;
+        overallPassPercentage: string;
+        overallFailPercentage: string;
+    };
 }
 
 export const dynamic = 'force-dynamic';
@@ -258,11 +270,11 @@ export async function GET(request: NextRequest) {
                 const total = calculateGroupTotal(courses);
                 const totalPassing = total.grades.A.value + total.grades.B.value + total.grades.C.value + total.grades.D.value;
                 const totalFailing = total.grades.F.value;
-                const overallPassPercentage = total.totalStudents > 0 ? 
+                const overallPassPercentage = total.totalStudents > 0 ?
                     ((totalPassing / total.totalStudents) * 100).toFixed(1) : '0.0';
-                const overallFailPercentage = total.totalStudents > 0 ? 
+                const overallFailPercentage = total.totalStudents > 0 ?
                     ((totalFailing / total.totalStudents) * 100).toFixed(1) : '0.0';
-                
+
                 return {
                     level,
                     courses: courses.sort((a, b) => a.course_name.localeCompare(b.course_name)),
@@ -291,11 +303,11 @@ export async function GET(request: NextRequest) {
                 const total = calculateGroupTotal(courses);
                 const totalPassing = total.grades.A.value + total.grades.B.value + total.grades.C.value + total.grades.D.value;
                 const totalFailing = total.grades.F.value;
-                const overallPassPercentage = total.totalStudents > 0 ? 
+                const overallPassPercentage = total.totalStudents > 0 ?
                     ((totalPassing / total.totalStudents) * 100).toFixed(1) : '0.0';
-                const overallFailPercentage = total.totalStudents > 0 ? 
+                const overallFailPercentage = total.totalStudents > 0 ?
                     ((totalFailing / total.totalStudents) * 100).toFixed(1) : '0.0';
-                
+
                 return {
                     department,
                     courses: courses.sort((a, b) => a.course_name.localeCompare(b.course_name)),
