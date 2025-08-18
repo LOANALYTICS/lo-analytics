@@ -321,11 +321,55 @@ export async function GET(request: NextRequest) {
                 };
             });
 
+        // Calculate level summary
+        const levelSummaryTotals = { A: 0, B: 0, C: 0, D: 0, F: 0, totalStudents: 0 };
+        levelGroupsData.forEach(level => {
+            levelSummaryTotals.A += level.total.grades.A.value;
+            levelSummaryTotals.B += level.total.grades.B.value;
+            levelSummaryTotals.C += level.total.grades.C.value;
+            levelSummaryTotals.D += level.total.grades.D.value;
+            levelSummaryTotals.F += level.total.grades.F.value;
+            levelSummaryTotals.totalStudents += level.total.totalStudents;
+        });
+        const levelOverallPassing = levelSummaryTotals.A + levelSummaryTotals.B + levelSummaryTotals.C + levelSummaryTotals.D;
+        const levelOverallPassPercentage = levelSummaryTotals.totalStudents > 0 ?
+            ((levelOverallPassing / levelSummaryTotals.totalStudents) * 100).toFixed(1) : '0.0';
+        const levelOverallFailPercentage = levelSummaryTotals.totalStudents > 0 ?
+            ((levelSummaryTotals.F / levelSummaryTotals.totalStudents) * 100).toFixed(1) : '0.0';
+
+        // Calculate department summary
+        const departmentSummaryTotals = { A: 0, B: 0, C: 0, D: 0, F: 0, totalStudents: 0 };
+        departmentGroupsData.forEach(dept => {
+            departmentSummaryTotals.A += dept.total.grades.A.value;
+            departmentSummaryTotals.B += dept.total.grades.B.value;
+            departmentSummaryTotals.C += dept.total.grades.C.value;
+            departmentSummaryTotals.D += dept.total.grades.D.value;
+            departmentSummaryTotals.F += dept.total.grades.F.value;
+            departmentSummaryTotals.totalStudents += dept.total.totalStudents;
+        });
+        const departmentOverallPassing = departmentSummaryTotals.A + departmentSummaryTotals.B + departmentSummaryTotals.C + departmentSummaryTotals.D;
+        const departmentOverallPassPercentage = departmentSummaryTotals.totalStudents > 0 ?
+            ((departmentOverallPassing / departmentSummaryTotals.totalStudents) * 100).toFixed(1) : '0.0';
+        const departmentOverallFailPercentage = departmentSummaryTotals.totalStudents > 0 ?
+            ((departmentSummaryTotals.F / departmentSummaryTotals.totalStudents) * 100).toFixed(1) : '0.0';
+
         // Generate HTML report
         const htmlContent = generateGradeDistributionHTML({
             data: {
                 byLevel: levelGroupsData,
-                byDepartment: departmentGroupsData
+                byDepartment: departmentGroupsData,
+                levelSummary: {
+                    ...levelSummaryTotals,
+                    overallPassing: levelOverallPassing,
+                    overallPassPercentage: levelOverallPassPercentage,
+                    overallFailPercentage: levelOverallFailPercentage
+                },
+                departmentSummary: {
+                    ...departmentSummaryTotals,
+                    overallPassing: departmentOverallPassing,
+                    overallPassPercentage: departmentOverallPassPercentage,
+                    overallFailPercentage: departmentOverallFailPercentage
+                }
             },
             academic_year,
             semester: parseInt(semester),
