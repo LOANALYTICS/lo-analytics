@@ -6,11 +6,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { academicYears } from '@/lib/utils/y'
 import { getCurrentUser } from '@/server/utils/helper'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { CalendarIcon, DockIcon, Loader2, SplitIcon, BarChart3Icon } from 'lucide-react'
-import React, { use, useEffect, useState } from 'react'
+import { DockIcon, Loader2, BarChart3Icon } from 'lucide-react'
+import React, { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
+import html2pdf from 'html2pdf.js'
 
 
 const formSchema = z.object({
@@ -25,6 +26,7 @@ type FormValues = z.infer<typeof formSchema>;
 export default function SemisterAssessmentReportButtons() {
   const [isAssessReportOpen, setIsAssessReportOpen] = useState(false)
   const [isGradesDistributionOpen, setIsGradesDistributionOpen] = useState(false)
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false)
   const [user, setUser] = useState<{
     id: string;
     email: string;
@@ -100,32 +102,68 @@ export default function SemisterAssessmentReportButtons() {
   };
 
   const handleGradesDistribution = async (data: FormValues) => {
+    setIsGeneratingPDF(true);
     try {
-      const response = await fetch('/api/courses-so-averages', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
+      const queryParams = new URLSearchParams({
+        academic_year: data.academic_year,
+        semester: data.semester.toString(),
+        section: data.section,
+      });
+
+      const response = await fetch(`/api/courses-so-averages?${queryParams}`, {
+        method: 'GET',
       });
 
       if (response.ok) {
-        const result = await response.json();
-        console.log("Grades Distribution Data:", result);
-        toast.success("Data retrieved successfully");
+        const htmlContent = await response.text();
+
+        // Create a temporary div to hold the HTML content
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = htmlContent;
+        tempDiv.style.position = 'absolute';
+        tempDiv.style.left = '-9999px';
+        tempDiv.style.top = '-9999px';
+        document.body.appendChild(tempDiv);
+
+        // Configure html2pdf options
+        const options = {
+          margin: 0,
+          filename: `grade-distribution-${data.academic_year}-sem${data.semester}-${data.section}.pdf`,
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: {
+            scale: 2,
+            useCORS: true,
+            letterRendering: true
+          },
+          jsPDF: {
+            unit: 'mm',
+            format: 'a4',
+            orientation: 'portrait'
+          }
+        };
+
+        // Generate and download PDF
+        await html2pdf().set(options).from(tempDiv).save();
+
+        // Clean up
+        document.body.removeChild(tempDiv);
+
+        toast.success("PDF generated and downloaded successfully");
         setIsGradesDistributionOpen(false);
       } else {
         // Try to parse error message
         try {
           const errorResult = await response.json();
-          toast.error(errorResult.message || "Failed to get grades distribution");
+          toast.error(errorResult.message || "Failed to generate PDF");
         } catch {
-          toast.error("Failed to get grades distribution");
+          toast.error("Failed to generate PDF");
         }
       }
     } catch (error) {
-      console.error("Grades distribution error:", error);
-      toast.error("Failed to get grades distribution");
+      console.error("PDF generation error:", error);
+      toast.error("Failed to generate PDF");
+    } finally {
+      setIsGeneratingPDF(false);
     }
   };
 
@@ -378,15 +416,15 @@ export default function SemisterAssessmentReportButtons() {
                 <DialogFooter>
                   <Button
                     type="submit"
-                    disabled={false}
+                    disabled={isGeneratingPDF}
                   >
-                    {false ? (
+                    {isGeneratingPDF ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Loading...
+                        Generating PDF...
                       </>
                     ) : (
-                      "Get Data"
+                      "Generate PDF"
                     )}
                   </Button>
                 </DialogFooter>
