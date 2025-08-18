@@ -104,6 +104,8 @@ export function generateGradeDistributionHTML({
     return generateHTMLDocument('Grade Distribution Report', `
         <div class="summary-page">
             ${levelSummary}
+        </div>
+        <div class="summary-page">
             ${departmentSummary}
         </div>
         ${levelTables}
