@@ -623,6 +623,7 @@ export async function compareCourses({
     semister: semister,
     section: { $in: [sectionA, sectionB] },
     academic_year: { $in: [yearA, yearB] },
+    examType:'final'
   })
     .populate("krValues")
     .lean();

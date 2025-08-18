@@ -616,6 +616,7 @@ export async function analyzeSemester({
     collage: collegeObjectId,
     semister: semester,
     academic_year: academicYear,
+    examType:'final'
   })
     .select("course_name course_code level department section krValues")
     .populate({

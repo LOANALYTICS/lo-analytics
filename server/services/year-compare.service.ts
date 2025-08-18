@@ -462,6 +462,7 @@ export async function compareYears({
     collage: collegeObjectId,
     semister: { $in: [semisterA, semisterB] },
     academic_year: { $in: [yearA, yearB] },
+    examType:'final'
   })
     .populate({
       path: "krValues",

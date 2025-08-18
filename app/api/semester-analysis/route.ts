@@ -34,6 +34,7 @@ export async function GET(request: Request) {
       collegeId,
       semester: parseInt(semester),
       academicYear: year,
+      
     });
 
     const htmlContent = `
