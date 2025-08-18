@@ -180,8 +180,6 @@ export function generateGradeDistributionHTML({
                 }
                 
                 .level-row, .dept-row {
-                    background-color: #555;
-                    color: white;
                     font-weight: bold;
                 }
                 
@@ -638,8 +636,8 @@ function generateLevelSummaryTable(data: GradeDistributionData): string {
             </thead>
             <tbody>
                 ${data.byLevel.map(level => `
-                <tr class="level-row">
-                    <td rowspan="2">Level ${level.level}</td>
+                <tr>
+                    <td rowspan="2" style="font-weight: bold;">Level ${level.level}</td>
                     <td>${level.total.grades.A.value}</td>
                     <td>${level.total.grades.B.value}</td>
                     <td>${level.total.grades.C.value}</td>
@@ -724,8 +722,8 @@ function generateDepartmentSummaryTable(data: GradeDistributionData): string {
             </thead>
             <tbody>
                 ${data.byDepartment.map(dept => `
-                <tr class="dept-row">
-                    <td rowspan="2" class="dept-name">${dept.department}</td>
+                <tr>
+                    <td rowspan="2" class="dept-name" style="font-weight: bold;">${dept.department}</td>
                     <td>${dept.total.grades.A.value}</td>
                     <td>${dept.total.grades.B.value}</td>
                     <td>${dept.total.grades.C.value}</td>
