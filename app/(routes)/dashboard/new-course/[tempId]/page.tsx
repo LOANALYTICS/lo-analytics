@@ -1,5 +1,5 @@
 "use client"
-import { useParams, useRouter } from 'next/navigation'
+import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import { getCourseTemplateById } from '@/services/courseTemplate.action'
 import { z } from "zod"
@@ -56,11 +56,15 @@ export default function NewCoursePage() {
     const [user, setUser] = useState<any>(null)
     const params = useParams()
     const router = useRouter()
+    const searchParams = useSearchParams()
     const [isLoading, setIsLoading] = useState(true)
     const [open, setOpen] = useState(false)
     const [isSubmitting, setIsSubmitting] = useState(false)
     const dialogRef = useRef<any>(null)
     const [isUploading, setIsUploading] = useState(false);
+
+    // Check if src parameter is 'lc' - boolean variable
+    const isFromLearningOutcomes = searchParams.get('src') === 'lc';
 
     const form = useForm<FormValues>({
         resolver: zodResolver(formSchema),
@@ -69,7 +73,7 @@ export default function NewCoursePage() {
             course_code: "",
             credit_hours: "",
             department: "",
-            examType: "",
+            examType: isFromLearningOutcomes ? "final":"",
             semister: 0,
             level: 0,
             section: "",
@@ -89,14 +93,13 @@ export default function NewCoursePage() {
 
             try {
                 const template = await getCourseTemplateById(params.tempId as string)
-                console.log(template, "template")
                 if (template) {
                     form.reset({
                         course_name: template.course_name ?? "",
                         course_code: template.course_code ?? "",
                         credit_hours: template.credit_hours ?? "",
                         department: template.department ?? "",
-                        examType: template.examType ?? "",
+                        examType: isFromLearningOutcomes ? 'final' : template.examType ?? "",
                         semister: template.sem ?? "",
                         level: template.level ?? "",
                         section: template.section ?? "",
@@ -150,7 +153,12 @@ export default function NewCoursePage() {
 
             toast.success("Course created successfully");
             setCreatedCourseId(response.data._id);
-            setOpen(true);
+            if(!isFromLearningOutcomes){
+
+                setOpen(true);
+            }else{
+                router.push('/dashboard/learning-outcomes/assessment-plan')
+            }
         } catch (error) {
             console.error(error);
             toast.error("Something went wrong while creating the course");
@@ -212,7 +220,6 @@ export default function NewCoursePage() {
             const contentType = response.headers.get("content-type");
             if (contentType?.includes("application/json")) {
                 const result = await response.json();
-                console.log("File uploaded successfully:", result);
             } else {
                 const htmlContent = await response.text();
                 await generatePDF(htmlContent, `${form.watch("course_code")} - Item Analysis Report.pdf`);
@@ -348,7 +355,7 @@ export default function NewCoursePage() {
                                         defaultValue={field.value?.toString()} // Keep the current value
                                     >
                                         <FormControl>
-                                            <SelectTrigger>
+                                            <SelectTrigger disabled>
                                                 <SelectValue placeholder="Select Level" />
                                             </SelectTrigger>
                                         </FormControl>
@@ -427,9 +434,9 @@ export default function NewCoursePage() {
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Exam Type</FormLabel>
-                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                    <Select  onValueChange={field.onChange} defaultValue={field.value}>
                                         <FormControl>
-                                            <SelectTrigger>
+                                            <SelectTrigger disabled={isFromLearningOutcomes}>
                                                 <SelectValue placeholder="Select Exam Type" />
                                             </SelectTrigger>
                                         </FormControl>

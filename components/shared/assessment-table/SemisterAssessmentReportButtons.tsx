@@ -11,7 +11,7 @@ import React, { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
-import html2pdf from 'html2pdf.js'
+
 
 
 const formSchema = z.object({
@@ -21,6 +21,8 @@ const formSchema = z.object({
 });
 
 type FormValues = z.infer<typeof formSchema>;
+
+
 
 
 export default function SemisterAssessmentReportButtons() {
@@ -117,36 +119,31 @@ export default function SemisterAssessmentReportButtons() {
       if (response.ok) {
         const htmlContent = await response.text();
 
-        // Create a temporary div to hold the HTML content
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = htmlContent;
-        tempDiv.style.position = 'absolute';
-        tempDiv.style.left = '-9999px';
-        tempDiv.style.top = '-9999px';
-        document.body.appendChild(tempDiv);
+        // Create blob URL for better HTML rendering
+        const blob = new Blob([htmlContent], { type: 'text/html' });
+        const url = URL.createObjectURL(blob);
 
-        // Configure html2pdf options
-        const options = {
-          margin: 0,
-          filename: `grade-distribution-${data.academic_year}-sem${data.semester}-${data.section}.pdf`,
-          image: { type: 'jpeg', quality: 0.98 },
-          html2canvas: {
-            scale: 2,
-            useCORS: true,
-            letterRendering: true
-          },
-          jsPDF: {
-            unit: 'mm',
-            format: 'a4',
-            orientation: 'portrait'
-          }
-        };
+        // Open the blob URL in a new window
+        const printWindow = window.open(url, '_blank');
+        if (!printWindow) {
+          toast.error('Please allow popups to generate PDF');
+          URL.revokeObjectURL(url);
+          return;
+        }
 
-        // Generate and download PDF
-        await html2pdf().set(options).from(tempDiv).save();
+        // Wait longer for content to fully load then trigger print
+        setTimeout(() => {
+          printWindow.focus();
+          printWindow.print();
 
-        // Clean up
-        document.body.removeChild(tempDiv);
+          // Clean up and close after printing
+          setTimeout(() => {
+            printWindow.close();
+            URL.revokeObjectURL(url);
+          }, 3000);
+        }, 2000);
+
+        toast.success('Print dialog will open shortly. Choose "Save as PDF" to download.');
 
         toast.success("PDF generated and downloaded successfully");
         setIsGradesDistributionOpen(false);

@@ -131,13 +131,12 @@ function generateHTMLDocument(title: string, content: string): string {
                 }
                 
                 .page {
-                    width: 210mm;
-                    min-height: 297mm;
-                    padding: 20mm;
+                    width: 100%;
+                    padding: 20px;
                     margin: 0 auto;
                     background: white;
-                    box-shadow: 0 0 5px rgba(0,0,0,0.1);
                     page-break-after: always;
+                    page-break-inside: avoid;
                 }
                 
                 .page:last-child {
@@ -145,16 +144,12 @@ function generateHTMLDocument(title: string, content: string): string {
                 }
                 
                 .summary-page {
-                    width: 210mm;
-                    min-height: 297mm;
-                    padding: 20mm;
+                    width: 100%;
+                    padding: 20px;
                     margin: 0 auto;
                     background: white;
-                    box-shadow: 0 0 5px rgba(0,0,0,0.1);
                     page-break-after: always;
-                    display: flex;
-                    flex-direction: column;
-                    justify-content: center;
+                    page-break-inside: avoid;
                 }
 
                 table {
@@ -236,6 +231,12 @@ function generateHTMLDocument(title: string, content: string): string {
                 }
                 
                 @media print {
+                    * {
+                        -webkit-print-color-adjust: exact !important;
+                        color-adjust: exact !important;
+                        print-color-adjust: exact !important;
+                    }
+                    
                     body {
                         margin: 0;
                         padding: 0;
@@ -245,13 +246,61 @@ function generateHTMLDocument(title: string, content: string): string {
                         width: auto;
                         height: auto;
                         margin: 0;
-                        padding: 15mm;
+                        padding: 10mm;
                         box-shadow: none;
                         page-break-after: always;
+                        page-break-inside: avoid;
                     }
                     
                     .page:last-child, .summary-page:last-child {
                         page-break-after: avoid;
+                    }
+                    
+                    .summary-page {
+                        min-height: auto;
+                        display: block;
+                    }
+                    
+                    /* Remove empty space */
+                    .summary-page:empty {
+                        display: none;
+                    }
+                    
+                    .page:empty {
+                        display: none;
+                    }
+                    
+                    th {
+                        background-color: #666 !important;
+                        color: white !important;
+                        -webkit-print-color-adjust: exact !important;
+                    }
+                    
+                    .level-header {
+                        background-color: #444 !important;
+                        color: white !important;
+                        -webkit-print-color-adjust: exact !important;
+                    }
+                    
+                    .header-row {
+                        background-color: #444 !important;
+                        color: white !important;
+                        -webkit-print-color-adjust: exact !important;
+                    }
+                    
+                    .total-row {
+                        background-color: #f0f0f0 !important;
+                        -webkit-print-color-adjust: exact !important;
+                    }
+                    
+                    .overall-row {
+                        background-color: #d0d0d0 !important;
+                        -webkit-print-color-adjust: exact !important;
+                    }
+                    
+                    .percentage-row {
+                        background-color: #f8f8f8 !important;
+                        -webkit-print-color-adjust: exact !important;
                     }
                 }
                 

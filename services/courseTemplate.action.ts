@@ -138,9 +138,29 @@ export async function assignCoordinatorsToCourse(courseId: string, coordinatorId
 }
 
 export async function getCoordinatorCourseTemplates(userId: string): Promise<any[]> {
-  const courses = await courseTemplateModel.find({
-    coordinator: userId
-  }).lean() as any[];
+  // Step 1: Fetch user to check their role and college
+  const user = await User.findById(userId).select('role collage');
+
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  let coursesQuery: any = {};
+
+  // Step 2: Build query based on role
+  if (user.role === 'college_admin') {
+    // If user is college_admin, return all courses from their college
+    if (!user.collage) {
+      return []; // No college assigned
+    }
+    coursesQuery.college = user.collage;
+  } else {
+    // For other roles (coordinators), return only courses assigned to them
+    coursesQuery.coordinator = userId;
+  }
+
+  // Step 3: Fetch courses based on the query
+  const courses = await courseTemplateModel.find(coursesQuery).lean() as any[];
 
   return courses.map((course) => ({
     _id: course._id.toString(),
@@ -285,55 +305,55 @@ export async function deleteCourseTemplateById(id: string) {
 }
 
 export async function bulkUploadCourseTemplates(file: File, collegeId: string) {
-    try {
-        const fileContent = await file.text()
-        const jsonData = JSON.parse(fileContent)
-        
-        const college = await Collage.findById(collegeId).lean() as any
-        if (!college) {
-            return { 
-                success: false, 
-                message: "College not found" 
-            }
-        }
+  try {
+    const fileContent = await file.text()
+    const jsonData = JSON.parse(fileContent)
 
-        // Get college departments
-        const collegeDepartments = college.departments.map((dept: any) => dept.name)
-        
-        // Validate departments in courses
-        const invalidDepartments = new Set<string>()
-        const validCourses = jsonData.courseTemplates.filter((course: any) => {
-            if (!collegeDepartments.includes(course.department)) {
-                invalidDepartments.add(course.department)
-                return false
-            }
-            return true
-        })
-
-        // If there are invalid departments, return error
-        if (invalidDepartments.size > 0) {
-            return {
-                success: false,
-                message: `Invalid departments found: ${Array.from(invalidDepartments).join(', ')}. These departments do not exist in the selected college.`
-            }
-        }
-
-        // Add college ID to each course and create them
-        const courses = validCourses.map((course: any) => ({
-            ...course,
-            college: collegeId
-        }))
-
-        const createdCourses = await courseTemplateModel.insertMany(courses)
-        
-        return { 
-            success: true, 
-            message: `Successfully created ${createdCourses.length} course templates`,
-            data: JSON.parse(JSON.stringify(createdCourses))
-        }
-    } catch (error) {
-        console.error("Error uploading course templates:", error)
-        return { success: false, message: "Failed to upload course templates" }
+    const college = await Collage.findById(collegeId).lean() as any
+    if (!college) {
+      return {
+        success: false,
+        message: "College not found"
+      }
     }
+
+    // Get college departments
+    const collegeDepartments = college.departments.map((dept: any) => dept.name)
+
+    // Validate departments in courses
+    const invalidDepartments = new Set<string>()
+    const validCourses = jsonData.courseTemplates.filter((course: any) => {
+      if (!collegeDepartments.includes(course.department)) {
+        invalidDepartments.add(course.department)
+        return false
+      }
+      return true
+    })
+
+    // If there are invalid departments, return error
+    if (invalidDepartments.size > 0) {
+      return {
+        success: false,
+        message: `Invalid departments found: ${Array.from(invalidDepartments).join(', ')}. These departments do not exist in the selected college.`
+      }
+    }
+
+    // Add college ID to each course and create them
+    const courses = validCourses.map((course: any) => ({
+      ...course,
+      college: collegeId
+    }))
+
+    const createdCourses = await courseTemplateModel.insertMany(courses)
+
+    return {
+      success: true,
+      message: `Successfully created ${createdCourses.length} course templates`,
+      data: JSON.parse(JSON.stringify(createdCourses))
+    }
+  } catch (error) {
+    console.error("Error uploading course templates:", error)
+    return { success: false, message: "Failed to upload course templates" }
+  }
 }
 

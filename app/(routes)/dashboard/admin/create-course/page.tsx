@@ -40,9 +40,24 @@ const formSchema = z.object({
 
 export default function CreateCoursePage() {
 
-    const USER = JSON.parse(localStorage.getItem('user') || '{}')
-
+    const [USER, setUSER] = React.useState<any>({})
     const router = useRouter()
+
+    React.useEffect(() => {
+        const userData = localStorage.getItem('user')
+        console.log('Raw userData from localStorage:', userData);
+        if (userData) {
+            try {
+                const parsedUser = JSON.parse(userData);
+                console.log('Parsed user data:', parsedUser);
+                setUSER(parsedUser);
+            } catch (error) {
+                console.error('Error parsing user data:', error);
+            }
+        } else {
+            console.log('No user data found in localStorage');
+        }
+    }, [])
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -87,11 +102,23 @@ export default function CreateCoursePage() {
     }
     React.useEffect(() => {
         const fetchColleges = async () => {
-            const collegeData = await getCollageByRole(USER?._id);
-            setColleges(collegeData);
+            console.log('USER object:', USER);
+            if (USER?._id) {
+                try {
+                    console.log('Fetching colleges for user:', USER._id);
+                    const collegeData = await getCollageByRole(USER._id);
+                    console.log('College data received:', collegeData);
+                    setColleges(collegeData || []);
+                } catch (error) {
+                    console.error('Error fetching colleges:', error);
+                    setColleges([]);
+                }
+            } else {
+                console.log('No USER._id found, USER:', USER);
+            }
         };
         fetchColleges();
-    }, []);
+    }, [USER]);
 
     const handleCollegeChange = async (value: string) => {
         setSelectedCollege(value);
