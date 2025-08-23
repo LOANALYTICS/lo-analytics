@@ -580,19 +580,19 @@ function generateGradeDistributionChart(title: string, chartData: Array<{ label:
 
     const grades = ['A', 'B', 'C', 'D', 'F'];
     const colors = {
-        'A': '#2563eb', // Blue
-        'B': '#f97316', // Orange  
-        'C': '#eab308', // Yellow
-        'D': '#22c55e', // Green
-        'F': '#ef4444'  // Red
+        'A': '#86efac', // Light green (best grade) - updated
+        'B': '#bef264', // Light lime green  
+        'C': '#fde047', // Light yellow/orange
+        'D': '#fdba74', // Light orange
+        'F': '#fca5a5'  // Light red (worst grade)
     };
 
     // Calculate bar dimensions with adjusted spacing
     const groupSpacing = 15; // Reduced gap between course groups
     const availableWidth = chartWidth - (groupSpacing * (chartData.length - 1));
     const groupWidth = availableWidth / chartData.length;
-    const barWidth = Math.min(10, (groupWidth - 6) / grades.length); // Wider bars (8-10px)
-    const barSpacing = 1; // Small space between bars within a group
+    const barWidth = Math.min(10, (groupWidth - 8) / grades.length); // Wider bars (8-10px)
+    const barSpacing = 3; // Increased space between bars within a group (was 1, now 3)
 
     // Find max percentage for scaling
     const maxPercentage = Math.max(...chartData.flatMap(data =>
@@ -602,7 +602,7 @@ function generateGradeDistributionChart(title: string, chartData: Array<{ label:
 
     // Generate bars
     const bars = chartData.map((data, groupIndex) => {
-        const groupX = margin.left + (groupIndex * (groupWidth + groupSpacing)) + (groupWidth - (grades.length * barWidth + (grades.length - 1) * barSpacing)) / 2;
+        const groupX = margin.left + (groupIndex * (groupWidth + groupSpacing)) + Math.max(5, (groupWidth - (grades.length * barWidth + (grades.length - 1) * barSpacing)) / 2);
 
         return grades.map((grade, gradeIndex) => {
             const percentage = data.grades[grade as keyof GradeDistribution].percentage;
