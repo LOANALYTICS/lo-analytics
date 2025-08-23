@@ -157,21 +157,31 @@ export default function SemisterAssessmentReportButtons() {
             border-spacing: 0 !important;
           }
           
-          td[rowspan], th[rowspan] {
-            vertical-align: top !important;
-            position: relative !important;
-          }
-          
-          td[colspan], th[colspan] {
-            text-align: center !important;
-            position: relative !important;
-          }
-          
-          /* Ensure all cells have content and are visible */
+          /* Center ALL cells vertically and horizontally */
           td, th {
+            vertical-align: middle !important;
+            text-align: center !important;
             min-height: 20px !important;
             box-sizing: border-box !important;
             display: table-cell !important;
+            position: relative !important;
+          }
+          
+          /* Specific handling for rowspan/colspan cells */
+          td[rowspan], th[rowspan] {
+            vertical-align: middle !important;
+            text-align: center !important;
+          }
+          
+          td[colspan], th[colspan] {
+            vertical-align: middle !important;
+            text-align: center !important;
+          }
+          
+          /* Override any existing alignment classes */
+          .dept-name, .course-name-col {
+            text-align: center !important;
+            vertical-align: middle !important;
           }
         </style>
         ${bodyContent}
