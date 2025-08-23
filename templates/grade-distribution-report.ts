@@ -433,15 +433,28 @@ function generateSummaryTable(type: SummaryType, data: GradeDistributionData): s
             </tbody>
         </table>`;
 
-    // Generate chart for summary data
+    // Generate chart for summary data + total
     const chartTitle = `Students Grades Distribution (${headerLabel} Summary)`;
-    const chartData = groups.map(group => {
-        const label = isLevel ? `Level ${(group as LevelGroup).level}` : (group as DepartmentGroup).department;
-        return {
-            label: label,
-            grades: group.total.grades
-        };
-    });
+    const chartData = [
+        ...groups.map(group => {
+            const label = isLevel ? `Level ${(group as LevelGroup).level}` : (group as DepartmentGroup).department;
+            return {
+                label: label,
+                grades: group.total.grades
+            };
+        }),
+        // Add overall total as the last bar
+        {
+            label: 'Total',
+            grades: {
+                A: { value: summary.A, percentage: summary.totalStudents > 0 ? Number(((summary.A / summary.totalStudents) * 100).toFixed(1)) : 0 },
+                B: { value: summary.B, percentage: summary.totalStudents > 0 ? Number(((summary.B / summary.totalStudents) * 100).toFixed(1)) : 0 },
+                C: { value: summary.C, percentage: summary.totalStudents > 0 ? Number(((summary.C / summary.totalStudents) * 100).toFixed(1)) : 0 },
+                D: { value: summary.D, percentage: summary.totalStudents > 0 ? Number(((summary.D / summary.totalStudents) * 100).toFixed(1)) : 0 },
+                F: { value: summary.F, percentage: summary.totalStudents > 0 ? Number(((summary.F / summary.totalStudents) * 100).toFixed(1)) : 0 }
+            }
+        }
+    ];
 
     const chartHtml = generateGradeDistributionChart(chartTitle, chartData);
 
@@ -535,12 +548,19 @@ function generateDetailedTable(type: SummaryType, group: LevelGroup | Department
             </tbody>
         </table>`;
 
-    // Generate chart for this group's courses
+    // Generate chart for this group's courses + total
     const chartTitle = `Students Grades Distribution (${headerLabel})`;
-    const chartData = group.courses.map(course => ({
-        label: course.course_code,
-        grades: course.grades
-    }));
+    const chartData = [
+        ...group.courses.map(course => ({
+            label: course.course_code,
+            grades: course.grades
+        })),
+        // Add total as the last bar
+        {
+            label: 'Total',
+            grades: group.total.grades
+        }
+    ];
 
     const chartHtml = generateGradeDistributionChart(chartTitle, chartData);
 
@@ -551,10 +571,10 @@ function generateDetailedTable(type: SummaryType, group: LevelGroup | Department
     </div>`;
 }
 
-function generateGradeDistributionChart(title: string, chartData: Array<{label: string, grades: GradeDistribution}>): string {
+function generateGradeDistributionChart(title: string, chartData: Array<{ label: string, grades: GradeDistribution }>): string {
     const width = 700;
     const height = 300;
-    const margin = { top: 40, right: 40, bottom: 80, left: 60 };
+    const margin = { top: 40, right: 40, bottom: 60, left: 60 }; // Reduced bottom margin since no rotation
     const chartWidth = width - margin.left - margin.right;
     const chartHeight = height - margin.top - margin.bottom;
 
@@ -567,40 +587,52 @@ function generateGradeDistributionChart(title: string, chartData: Array<{label: 
         'F': '#ef4444'  // Red
     };
 
-    // Calculate bar dimensions
-    const groupWidth = chartWidth / chartData.length;
-    const barWidth = Math.min(8, (groupWidth - 10) / grades.length); // 6-8px width as requested
-    const groupSpacing = 10;
+    // Calculate bar dimensions with adjusted spacing
+    const groupSpacing = 15; // Reduced gap between course groups
+    const availableWidth = chartWidth - (groupSpacing * (chartData.length - 1));
+    const groupWidth = availableWidth / chartData.length;
+    const barWidth = Math.min(10, (groupWidth - 6) / grades.length); // Wider bars (8-10px)
+    const barSpacing = 1; // Small space between bars within a group
 
     // Find max percentage for scaling
-    const maxPercentage = Math.max(...chartData.flatMap(data => 
+    const maxPercentage = Math.max(...chartData.flatMap(data =>
         grades.map(grade => data.grades[grade as keyof GradeDistribution].percentage)
     ));
     const yScale = maxPercentage > 0 ? chartHeight / Math.max(maxPercentage, 100) : chartHeight / 100;
 
     // Generate bars
     const bars = chartData.map((data, groupIndex) => {
-        const groupX = margin.left + (groupIndex * groupWidth) + (groupWidth - (grades.length * barWidth + (grades.length - 1) * 2)) / 2;
-        
+        const groupX = margin.left + (groupIndex * (groupWidth + groupSpacing)) + (groupWidth - (grades.length * barWidth + (grades.length - 1) * barSpacing)) / 2;
+
         return grades.map((grade, gradeIndex) => {
             const percentage = data.grades[grade as keyof GradeDistribution].percentage;
             const barHeight = percentage * yScale;
-            const x = groupX + (gradeIndex * (barWidth + 2));
+            const x = groupX + (gradeIndex * (barWidth + barSpacing));
             const y = height - margin.bottom - barHeight;
+
+            // Format percentage - show 0 for 0.0%, otherwise show without decimal if whole number
+            const percentageText = percentage === 0 ? '0' :
+                percentage % 1 === 0 ? `${percentage.toFixed(0)}` : `${percentage.toFixed(1)}`;
+
+            // Show label for all values (including 0)
+            const showLabel = true;
+            const labelX = x + (barWidth / 2); // Center horizontally on the bar
+            const labelY = percentage === 0 ? height - margin.bottom - 8 : y - 4; // Position 0 labels above x-axis, others above bar
 
             return `
                 <rect x="${x}" y="${y}" width="${barWidth}" height="${barHeight}" 
                       fill="${colors[grade as keyof typeof colors]}" 
                       stroke="#333" stroke-width="0.3" rx="1" ry="1" />
-                <text x="${x + barWidth/2}" y="${y - 3}" text-anchor="middle" 
-                      font-size="8" font-weight="bold" fill="#333">${percentage.toFixed(1)}%</text>
+                <text x="${labelX}" y="${labelY}" text-anchor="middle" 
+                      font-size="7" font-weight="bold" fill="#333" 
+                      transform="rotate(-90, ${labelX}, ${labelY})">${percentageText}</text>
             `;
         }).join('');
     }).join('');
 
     // Generate Y-axis grid lines and labels
     const yAxisSteps = 10;
-    const yAxisLines = Array.from({length: yAxisSteps + 1}, (_, i) => {
+    const yAxisLines = Array.from({ length: yAxisSteps + 1 }, (_, i) => {
         const value = (maxPercentage > 100 ? Math.ceil(maxPercentage / 10) * 10 : 100) * i / yAxisSteps;
         const y = height - margin.bottom - (value * yScale);
         return `
@@ -611,24 +643,27 @@ function generateGradeDistributionChart(title: string, chartData: Array<{label: 
         `;
     }).join('');
 
-    // Generate X-axis labels
+    // Generate X-axis labels (straight, no rotation)
     const xAxisLabels = chartData.map((data, index) => {
-        const x = margin.left + (index * groupWidth) + (groupWidth / 2);
-        const y = height - margin.bottom + 20;
+        const groupX = margin.left + (index * (groupWidth + groupSpacing)) + (groupWidth / 2);
+        const y = height - margin.bottom + 15;
+
+        // Don't truncate labels, just use smaller font if needed
+        const fontSize = data.label.length > 10 ? "7" : "8";
+
         return `
-            <text x="${x}" y="${y}" text-anchor="middle" font-size="9" fill="#333" 
-                  transform="rotate(-45, ${x}, ${y})">${data.label}</text>
+            <text x="${groupX}" y="${y}" text-anchor="middle" font-size="${fontSize}" fill="#333" font-weight="bold">${data.label}</text>
         `;
     }).join('');
 
     // Generate legend
     const legendItems = grades.map((grade, index) => {
-        const x = (width / 2) - (grades.length * 40 / 2) + (index * 40);
+        const x = (width / 2) - (grades.length * 35 / 2) + (index * 35);
         const y = height - 15;
         return `
-            <rect x="${x}" y="${y - 8}" width="10" height="10" 
-                  fill="${colors[grade as keyof typeof colors]}" rx="2" ry="2" />
-            <text x="${x + 15}" y="${y}" font-size="10" fill="#333">${grade}</text>
+            <rect x="${x}" y="${y - 8}" width="8" height="8" 
+                  fill="${colors[grade as keyof typeof colors]}" rx="1" ry="1" />
+            <text x="${x + 12}" y="${y}" font-size="9" fill="#333">${grade}</text>
         `;
     }).join('');
 
@@ -642,8 +677,8 @@ function generateGradeDistributionChart(title: string, chartData: Array<{label: 
                 ${legendItems}
                 
                 <!-- Y-axis title -->
-                <text x="20" y="${height/2}" text-anchor="middle" font-size="11" fill="#333" 
-                      transform="rotate(-90, 20, ${height/2})">Percentage (%)</text>
+                <text x="20" y="${height / 2}" text-anchor="middle" font-size="10" fill="#333" 
+                      transform="rotate(-90, 20, ${height / 2})">Percentage (%)</text>
                 
                 <!-- X-axis line -->
                 <line x1="${margin.left}" x2="${width - margin.right}" 
