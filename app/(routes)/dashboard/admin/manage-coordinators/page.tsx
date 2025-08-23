@@ -47,18 +47,18 @@ export default function ManageCoordinators() {
   const [selectedCoordinator, setSelectedCoordinator] = useState<any>(null)
 
   // TanStack Query for coordinators
-  const { 
-    data: coordinatorsData, 
-    isLoading: isCoordinatorsLoading, 
+  const {
+    data: coordinatorsData,
+    isLoading: isCoordinatorsLoading,
     error: coordinatorsError,
     refetch: refetchCoordinators
   } = useCoordinatorsForManage(
-    user?.id || '', 
-    { 
-      page: currentPage, 
-      limit: 15, 
+    user?.id || '',
+    {
+      page: currentPage,
+      limit: 15,
       search: searchTerm,
-      collegeId: selectedCollege 
+      collegeId: selectedCollege
     },
     { enabled: !!user?.id }
   );
@@ -177,7 +177,7 @@ export default function ManageCoordinators() {
   return (
     <main className="px-2">
       <CourseHeader
-      placeholder="Search by name or email"
+        placeholder="Search by name or email"
         title="Manage Coordinators"
         count={pagination?.total || 0}
         searchTerm={searchTerm}
@@ -241,7 +241,7 @@ export default function ManageCoordinators() {
                 </div>
                 <div className="flex gap-3 items-center">
                   <DynamicDropdownMenu
-                  type={'tools'}
+                    type={'tools'}
                     options={coordinator.collage?.toolAccess || []}
                     state={dropdownState[coordinator._id] || {}} // Pass the state for this coordinator
                     handleCheckedChangeAction={(option, checked) =>
@@ -303,60 +303,60 @@ export default function ManageCoordinators() {
 
       <Dialog open={isOpen?.isOpen} onOpenChange={() => setIsOpen((prev) => ({ ...prev, isOpen: !isOpen }))} >
 
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>{isOpen.type === "delete" ? "Delete Co-ordinator" : "Edit Co-ordinator"}</DialogTitle>
-                </DialogHeader>
-                {
-                  selectedCoordinator && isOpen?.type === 'delete' ? (
-                    <>
-                      <div>
-                        Are you sure you want to delete this Co-ordinator?
-                        {selectedCoordinator && <p className="font-bold"> `Co-ordinator : {selectedCoordinator?.name}`</p>}
-                        <p className="text-sm"><b>Note:</b> This action cannot be undone. </p>
-                      </div>
-                      <div className="flex justify-end gap-2 mt-4">
-                        <Button variant="ghost" onClick={closeModal}>Cancel</Button>
-                        <Button variant="destructive" onClick={handleDeleteCoordinator}>
-                          {isDeleting ? "Deleting..." : "Yes, Delete"}
-                        </Button>
-                      </div>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{isOpen.type === "delete" ? "Delete Co-ordinator" : "Edit Co-ordinator"}</DialogTitle>
+          </DialogHeader>
+          {
+            selectedCoordinator && isOpen?.type === 'delete' ? (
+              <>
+                <div>
+                  Are you sure you want to delete this Co-ordinator?
+                  {selectedCoordinator && <p className="font-bold"> `Co-ordinator : {selectedCoordinator?.name}`</p>}
+                  <p className="text-sm"><b>Note:</b> This action cannot be undone. </p>
+                </div>
+                <div className="flex justify-end gap-2 mt-4">
+                  <Button variant="ghost" onClick={closeModal}>Cancel</Button>
+                  <Button variant="destructive" onClick={handleDeleteCoordinator}>
+                    {isDeleting ? "Deleting..." : "Yes, Delete"}
+                  </Button>
+                </div>
 
-                    </>
-                  ) : (
-                    <>
-                      <div className="border rounded-lg p-2">
-                        <p className="text-sm text-gray-500">Name: {selectedCoordinator?.name}</p>
-                        <p className="text-sm text-gray-500">Email: {selectedCoordinator?.email}</p>
-                        <p className="text-sm text-gray-500">Accociated with college: {selectedCoordinator?.collage?.english as string}</p>
-                        <p className="text-sm text-gray-500"><span className="font-bold">Note: you can only edit name</span></p>
-                      </div>
-                      <div>
-                        <label className="mt-4 font-semibold" htmlFor="updateName">Name to update</label>
-                        <Input
-                          id="updateName"
-                          type="text"
-                          placeholder="Enter Name"
-                          value={updatedName}
-                          onChange={(e) => setUpdatedName(e.target.value)}
-                        />
-                      </div>
+              </>
+            ) : (
+              <>
+                <div className="border rounded-lg p-2">
+                  <p className="text-sm text-gray-500">Name: {selectedCoordinator?.name}</p>
+                  <p className="text-sm text-gray-500">Email: {selectedCoordinator?.email}</p>
+                  <p className="text-sm text-gray-500">Accociated with college: {selectedCoordinator?.collage?.english as string}</p>
+                  <p className="text-sm text-gray-500"><span className="font-bold">Note: you can only edit name</span></p>
+                </div>
+                <div>
+                  <label className="mt-4 font-semibold" htmlFor="updateName">Name to update</label>
+                  <Input
+                    id="updateName"
+                    type="text"
+                    placeholder="Enter Name"
+                    value={updatedName}
+                    onChange={(e) => setUpdatedName(e.target.value)}
+                  />
+                </div>
 
-                      <Button className="" onClick={handleEditCoordinator}>
+                <Button className="" onClick={handleEditCoordinator}>
 
-                        Update
-                      </Button>
-                    </>
-
-
-
-                  )
-                }
+                  Update
+                </Button>
+              </>
 
 
 
-              </DialogContent>
-            </Dialog>
+            )
+          }
+
+
+
+        </DialogContent>
+      </Dialog>
     </main>
   )
 }
