@@ -144,18 +144,47 @@ export default function SemisterAssessmentReportButtons() {
       // Create a container with the styles and body content
       const container = document.createElement("div");
 
-      // Add the styles
-      const styleElement = document.createElement('style');
-      styleElement.textContent = styles;
-      document.head.appendChild(styleElement);
+      // Create a wrapper with all styles inline
+      const wrapper = document.createElement('div');
+      wrapper.innerHTML = `
+        <style>
+          ${styles}
+          
+          /* Fix for html2canvas rowspan/colspan issues */
+          table {
+            table-layout: fixed !important;
+            border-collapse: separate !important;
+            border-spacing: 0 !important;
+          }
+          
+          td[rowspan], th[rowspan] {
+            vertical-align: top !important;
+            position: relative !important;
+          }
+          
+          td[colspan], th[colspan] {
+            text-align: center !important;
+            position: relative !important;
+          }
+          
+          /* Ensure all cells have content and are visible */
+          td, th {
+            min-height: 20px !important;
+            box-sizing: border-box !important;
+            display: table-cell !important;
+          }
+        </style>
+        ${bodyContent}
+      `;
 
-      // Set the body content
-      container.innerHTML = bodyContent;
+      container.appendChild(wrapper);
       container.style.position = 'absolute';
       container.style.left = '-9999px';
       container.style.top = '0';
-      container.style.width = '210mm';
+      container.style.width = '800px';
       container.style.backgroundColor = 'white';
+      container.style.fontFamily = 'Arial, sans-serif';
+      container.style.fontSize = '12px';
       document.body.appendChild(container);
 
       console.log("Tables found:", container.querySelectorAll('table').length);
@@ -210,12 +239,25 @@ export default function SemisterAssessmentReportButtons() {
 
         console.log(`Processing page ${i + 1}/${pages.length}`);
 
+        // Log table structure for debugging
+        const tables = page.querySelectorAll('table');
+        console.log(`Page ${i + 1} has ${tables.length} tables`);
+        if (tables.length > 0) {
+          const firstTable = tables[0];
+          console.log('First table rows:', firstTable.querySelectorAll('tr').length);
+          console.log('Rowspan elements:', firstTable.querySelectorAll('[rowspan]').length);
+        }
+
         // Convert this page to canvas
         const canvas = await html2canvas(page, {
           scale: 2,
           useCORS: true,
           allowTaint: true,
-          backgroundColor: '#ffffff'
+          backgroundColor: '#ffffff',
+          ignoreElements: (element) => {
+            // Don't ignore any elements
+            return false;
+          }
         });
 
         // Add new page if not the first one
@@ -239,7 +281,6 @@ export default function SemisterAssessmentReportButtons() {
 
       // Clean up
       document.body.removeChild(container);
-      document.head.removeChild(styleElement);
 
     } catch (error) {
       console.error("Error generating PDF:", error);
