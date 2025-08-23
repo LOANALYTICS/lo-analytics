@@ -617,7 +617,7 @@ function generateGradeDistributionChart(title: string, chartData: Array<{ label:
             // Show label for all values (including 0)
             const showLabel = true;
             const labelX = x + (barWidth / 2); // Center horizontally on the bar
-            const labelY = percentage === 0 ? height - margin.bottom - 12 : y - 8; // More offset from top
+            const labelY = percentage === 0 ? height - margin.bottom - 20 : y - 15; // More offset from top
 
             // Adjust X position after rotation to center the rotated text properly
             const adjustedX = labelX + 2; // Small offset to center rotated text
@@ -628,7 +628,7 @@ function generateGradeDistributionChart(title: string, chartData: Array<{ label:
                       stroke="#333" stroke-width="0.3" rx="1" ry="1" />
                 <text x="${adjustedX}" y="${labelY}" text-anchor="middle" 
                       font-size="7" font-weight="bold" fill="#333" 
-                      transform="rotate(-90, ${adjustedX}, ${labelY})">${percentageText}</text>
+                      transform="rotate(-90, ${adjustedX}, ${labelY}) translate(0, -3)">${percentageText}</text>
             `;
         }).join('');
     }).join('');
@@ -651,12 +651,40 @@ function generateGradeDistributionChart(title: string, chartData: Array<{ label:
         const groupX = margin.left + (index * (groupWidth + groupSpacing)) + (groupWidth / 2);
         const y = height - margin.bottom + 15;
 
-        // Don't truncate labels, just use smaller font if needed
-        const fontSize = data.label.length > 10 ? "7" : "8";
+        // Smaller font size for course codes/level/department names
+        const fontSize = "6";
 
-        return `
-            <text x="${groupX}" y="${y}" text-anchor="middle" font-size="${fontSize}" fill="#333" font-weight="bold">${data.label}</text>
-        `;
+        // Handle text wrapping if it overflows beyond bar group width
+        const maxCharsPerLine = Math.floor(groupWidth / 4); // Approximate chars that fit
+        const words = data.label.split(' ');
+        let lines = [];
+        let currentLine = '';
+
+        for (const word of words) {
+            if ((currentLine + word).length <= maxCharsPerLine) {
+                currentLine += (currentLine ? ' ' : '') + word;
+            } else {
+                if (currentLine) lines.push(currentLine);
+                currentLine = word;
+            }
+        }
+        if (currentLine) lines.push(currentLine);
+
+        // If still too long, break long words
+        if (lines.some(line => line.length > maxCharsPerLine)) {
+            lines = lines.flatMap(line => {
+                if (line.length <= maxCharsPerLine) return [line];
+                const chunks = [];
+                for (let i = 0; i < line.length; i += maxCharsPerLine) {
+                    chunks.push(line.substring(i, i + maxCharsPerLine));
+                }
+                return chunks;
+            });
+        }
+
+        return lines.map((line, lineIndex) => `
+            <text x="${groupX}" y="${y + (lineIndex * 8)}" text-anchor="middle" font-size="${fontSize}" fill="#333" font-weight="bold">${line}</text>
+        `).join('');
     }).join('');
 
     // Generate legend
