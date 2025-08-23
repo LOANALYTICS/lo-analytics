@@ -178,23 +178,23 @@ function generateHTMLDocument(title: string, content: string): string {
                 }
                 
                 th {
-                    background-color: #666;
-                    color: white;
+                    background-color: #add8e6;
+                    color: black;
                     font-weight: bold;
                     padding: 12px 8px;
                 }
                 
                 .level-header {
-                    background-color: #444 !important;
-                    color: white;
+                    background-color: #b5dce9 !important;
+                    color: black;
                     font-size: 14px;
                     font-weight: bold;
                     text-align: center;
                 }
                 
                 .header-row {
-                    background-color: #444 !important;
-                    color: white;
+                    background-color: #b5dce9 !important;
+                    color: black;
                     font-size: 14px;
                     font-weight: bold;
                 }
@@ -271,20 +271,20 @@ function generateHTMLDocument(title: string, content: string): string {
                     }
                     
                     th {
-                        background-color: #666 !important;
-                        color: white !important;
+                        background-color: #add8e6 !important;
+                        color: black !important;
                         -webkit-print-color-adjust: exact !important;
                     }
                     
                     .level-header {
-                        background-color: #444 !important;
-                        color: white !important;
+                        background-color: #b5dce9 !important;
+                        color: black !important;
                         -webkit-print-color-adjust: exact !important;
                     }
                     
                     .header-row {
-                        background-color: #444 !important;
-                        color: white !important;
+                        background-color: #b5dce9 !important;
+                        color: black !important;
                         -webkit-print-color-adjust: exact !important;
                     }
                     
@@ -642,7 +642,7 @@ function generateGradeDistributionChart(title: string, chartData: Array<{ label:
             <line x1="${margin.left}" x2="${width - margin.right}" y1="${y}" y2="${y}" 
                   stroke="#e5e7eb" stroke-width="0.5" />
             <text x="${margin.left - 5}" y="${y + 3}" text-anchor="end" 
-                  font-size="9" fill="#666">${value.toFixed(0)}%</text>
+                  font-size="9" fill="#212121">${value.toFixed(0)}%</text>
         `;
     }).join('');
 
