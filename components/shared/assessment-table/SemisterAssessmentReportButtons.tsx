@@ -11,6 +11,9 @@ import React, { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
+import html2pdf from 'html2pdf.js'
+import html2canvas from 'html2canvas'
+import { jsPDF } from 'jspdf'
 
 
 
@@ -103,62 +106,160 @@ export default function SemisterAssessmentReportButtons() {
     }
   };
 
+  const fetchGradesData = async (data: FormValues): Promise<string> => {
+    const queryParams = new URLSearchParams({
+      academic_year: data.academic_year,
+      semester: data.semester.toString(),
+      section: data.section,
+    });
+
+    const response = await fetch(`/api/courses-so-averages?${queryParams}`, {
+      method: 'GET',
+    });
+
+    if (!response.ok) {
+      const errorResult = await response.json().catch(() => null);
+      throw new Error(errorResult?.message || "Failed to fetch grades data");
+    }
+
+    return response.text();
+  };
+
+  const generatePDFFromHTML = async (htmlContent: string, filename: string): Promise<void> => {
+    try {
+      // Parse the HTML document and extract the body content
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(htmlContent, 'text/html');
+
+      // Extract the CSS styles from the head
+      const styles = Array.from(doc.head.querySelectorAll('style'))
+        .map(style => style.textContent)
+        .join('\n');
+
+      // Get the body content
+      const bodyContent = doc.body.innerHTML;
+
+      console.log("Extracted body content:", bodyContent.substring(0, 500));
+
+      // Create a container with the styles and body content
+      const container = document.createElement("div");
+
+      // Add the styles
+      const styleElement = document.createElement('style');
+      styleElement.textContent = styles;
+      document.head.appendChild(styleElement);
+
+      // Set the body content
+      container.innerHTML = bodyContent;
+      container.style.position = 'absolute';
+      container.style.left = '-9999px';
+      container.style.top = '0';
+      container.style.width = '210mm';
+      container.style.backgroundColor = 'white';
+      document.body.appendChild(container);
+
+      console.log("Tables found:", container.querySelectorAll('table').length);
+      console.log("Pages found:", container.querySelectorAll('.summary-page, .page').length);
+
+      // Wait for rendering
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      // PDF options
+      const opt = {
+        margin: 5,
+        filename: filename,
+        image: { type: "jpeg", quality: 0.98 },
+        html2canvas: {
+          scale: 2,
+          useCORS: true,
+          allowTaint: true,
+          backgroundColor: '#ffffff',
+        },
+        jsPDF: {
+          unit: "mm",
+          format: "a4",
+          orientation: 'portrait',
+        },
+        pagebreak: {
+          mode: ["css", "legacy"]
+        }
+      };
+
+      console.log("Starting PDF generation...");
+
+      // Find all pages
+      const pages = container.querySelectorAll('.summary-page, .page');
+      console.log("Pages found:", pages.length);
+
+      if (pages.length === 0) {
+        throw new Error('No pages found in the HTML content');
+      }
+
+      // Create PDF using jsPDF directly
+      const { jsPDF } = await import('jspdf');
+      const html2canvas = (await import('html2canvas')).default;
+
+      const pdf = new jsPDF('portrait', 'mm', 'a4');
+      const pageWidth = 210;
+      const pageHeight = 297;
+      const margin = 10;
+
+      // Process each page
+      for (let i = 0; i < pages.length; i++) {
+        const page = pages[i] as HTMLElement;
+
+        console.log(`Processing page ${i + 1}/${pages.length}`);
+
+        // Convert this page to canvas
+        const canvas = await html2canvas(page, {
+          scale: 2,
+          useCORS: true,
+          allowTaint: true,
+          backgroundColor: '#ffffff'
+        });
+
+        // Add new page if not the first one
+        if (i > 0) {
+          pdf.addPage();
+        }
+
+        // Calculate dimensions to fit page
+        const imgData = canvas.toDataURL('image/jpeg', 0.95);
+        const imgWidth = pageWidth - (margin * 2);
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+        // Add image to PDF
+        pdf.addImage(imgData, 'JPEG', margin, margin, imgWidth, Math.min(imgHeight, pageHeight - (margin * 2)));
+      }
+
+      // Save the PDF
+      pdf.save(filename);
+
+      console.log("PDF generated successfully with", pages.length, "pages");
+
+      // Clean up
+      document.body.removeChild(container);
+      document.head.removeChild(styleElement);
+
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      throw error;
+    }
+  };
+
   const handleGradesDistribution = async (data: FormValues) => {
     setIsGeneratingPDF(true);
     try {
-      const queryParams = new URLSearchParams({
-        academic_year: data.academic_year,
-        semester: data.semester.toString(),
-        section: data.section,
-      });
+      const htmlContent = await fetchGradesData(data);
+      const filename = `student-grades-distribution-${data.academic_year}-sem${data.semester}-${data.section}.pdf`;
 
-      const response = await fetch(`/api/courses-so-averages?${queryParams}`, {
-        method: 'GET',
-      });
+      await generatePDFFromHTML(htmlContent, filename);
 
-      if (response.ok) {
-        const htmlContent = await response.text();
-
-        // Create blob URL for better HTML rendering
-        const blob = new Blob([htmlContent], { type: 'text/html' });
-        const url = URL.createObjectURL(blob);
-
-        // Open the blob URL in a new window
-        const printWindow = window.open(url, '_blank');
-        if (!printWindow) {
-          toast.error('Please allow popups to generate PDF');
-          URL.revokeObjectURL(url);
-          return;
-        }
-
-        // Wait longer for content to fully load then trigger print
-        setTimeout(() => {
-          printWindow.focus();
-          printWindow.print();
-
-          // Clean up and close after printing
-          setTimeout(() => {
-            printWindow.close();
-            URL.revokeObjectURL(url);
-          }, 3000);
-        }, 2000);
-
-        toast.success('Print dialog will open shortly. Choose "Save as PDF" to download.');
-
-        toast.success("PDF generated and downloaded successfully");
-        setIsGradesDistributionOpen(false);
-      } else {
-        // Try to parse error message
-        try {
-          const errorResult = await response.json();
-          toast.error(errorResult.message || "Failed to generate PDF");
-        } catch {
-          toast.error("Failed to generate PDF");
-        }
-      }
+      toast.success("PDF downloaded successfully");
+      setIsGradesDistributionOpen(false);
     } catch (error) {
       console.error("PDF generation error:", error);
-      toast.error("Failed to generate PDF");
+      toast.error(error instanceof Error ? error.message : "Failed to generate PDF");
     } finally {
       setIsGeneratingPDF(false);
     }
