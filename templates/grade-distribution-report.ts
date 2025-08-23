@@ -619,16 +619,16 @@ function generateGradeDistributionChart(title: string, chartData: Array<{ label:
             const labelX = x + (barWidth / 2); // Center horizontally on the bar
             const labelY = percentage === 0 ? height - margin.bottom - 20 : y - 15; // More offset from top
 
-            // Adjust X position after rotation to center the rotated text properly
-            const adjustedX = labelX + 2; // Small offset to center rotated text
+            // For rotated text, we need to use the exact center without offset
+            const centerX = labelX;
 
             return `
                 <rect x="${x}" y="${y}" width="${barWidth}" height="${barHeight}" 
                       fill="${colors[grade as keyof typeof colors]}" 
                       stroke="#333" stroke-width="0.3" rx="1" ry="1" />
-                <text x="${adjustedX}" y="${labelY}" text-anchor="middle" 
+                <text x="${centerX}" y="${labelY}" text-anchor="middle" 
                       font-size="7" font-weight="bold" fill="#333" 
-                      transform="rotate(-90, ${adjustedX}, ${labelY}) translate(0, -3)">${percentageText}</text>
+                      transform="rotate(-90, ${centerX}, ${labelY}) translate(-3, 3)">${percentageText}</text>
             `;
         }).join('');
     }).join('');
