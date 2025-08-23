@@ -243,8 +243,8 @@ export async function generateAssessmentReportExcel(
   });
 
   // Helper function to calculate PLO average for a specific course
-  const calculateCoursePloAverage = (courseData: CourseAssessmentData, ploType: 'k' | 's' | 'v', ploIndex: number): { direct: string, indirect: string } => {
-    if (!courseData.assessment?.cloData) return { direct: '', indirect: '' };
+  const calculateCoursePloAverage = (courseData: CourseAssessmentData, ploType: 'k' | 's' | 'v', ploIndex: number): { direct: number | null, indirect: number | null } => {
+    if (!courseData.assessment?.cloData) return { direct: null, indirect: null };
 
     const directValues: number[] = [];
     const indirectValues: number[] = [];
@@ -274,8 +274,8 @@ export async function generateAssessmentReportExcel(
       }
     });
 
-    const directAvg = directValues.length > 0 ? `${(directValues.reduce((sum, val) => sum + val, 0) / directValues.length).toFixed(1)}%` : '';
-    const indirectAvg = indirectValues.length > 0 ? `${(indirectValues.reduce((sum, val) => sum + val, 0) / indirectValues.length).toFixed(1)}%` : '';
+    const directAvg = directValues.length > 0 ? (directValues.reduce((sum, val) => sum + val, 0) / directValues.length) / 100 : null;
+    const indirectAvg = indirectValues.length > 0 ? (indirectValues.reduce((sum, val) => sum + val, 0) / indirectValues.length) / 100 : null;
 
     return { direct: directAvg, indirect: indirectAvg };
   };
@@ -320,7 +320,7 @@ export async function generateAssessmentReportExcel(
     const startRow = currentRow;
 
     // Calculate PLO averages for this course (single values per PLO)
-    const coursePloValues: string[] = [];
+    const coursePloValues: (number | null)[] = [];
     if (firstCourse?.assessment?.cloData?.[0]?.ploMapping) {
       const ploMapping = firstCourse.assessment.cloData[0].ploMapping;
 
@@ -351,23 +351,43 @@ export async function generateAssessmentReportExcel(
       // Find direct achievement
       const directAchievementKey = `clo${cloNumber}`;
       const directAchievement = courseData.achievementData?.find(ach => ach.clo === directAchievementKey);
-      const directValue = directAchievement ? `${Number(directAchievement.percentageAchieving).toFixed(1)}%` : '';
+      const directValue = directAchievement ? Number(directAchievement.percentageAchieving) / 100 : null;
 
       // Find indirect achievement
       const indirectAchievement = courseData.indirectData?.find(indirect =>
         indirect.clo === properCloName || indirect.clo === `CLO ${cloNumber}`
       );
-      const indirectValue = indirectAchievement ? `${Number(indirectAchievement.achievementPercentage).toFixed(1)}%` : '';
+      const indirectValue = indirectAchievement ? Number(indirectAchievement.achievementPercentage) / 100 : null;
 
       const row = worksheet.addRow([
         cloIndex === 0 ? courseIndex + 1 : '', // S No only on first CLO row
         cloIndex === 0 ? courseData.course.level : '', // Level only on first CLO row
         cloIndex === 0 ? `${courseData.course.course_name} ${courseData.course.course_code}` : '', // Course name only on first CLO row
         properCloName, // CLO name
-        directValue, // Direct achievement
-        indirectValue, // Indirect achievement
+        directValue, // Direct achievement (as number)
+        indirectValue, // Indirect achievement (as number)
         ...(cloIndex === 0 ? coursePloValues : Array(coursePloValues.length).fill('')) // PLO values only on first row
       ]);
+
+      // Format percentage columns as percentages
+      if (directValue !== null) {
+        const directCell = row.getCell(5); // Direct column
+        directCell.numFmt = '0.0%';
+      }
+      if (indirectValue !== null) {
+        const indirectCell = row.getCell(6); // Indirect column
+        indirectCell.numFmt = '0.0%';
+      }
+
+      // Format PLO columns as percentages (only on first CLO row)
+      if (cloIndex === 0) {
+        coursePloValues.forEach((value, index) => {
+          if (value !== null) {
+            const ploCell = row.getCell(7 + index); // PLO columns start at column 7
+            ploCell.numFmt = '0.0%';
+          }
+        });
+      }
 
       // Style the row with center alignment and text wrapping
       row.eachCell((cell) => {
