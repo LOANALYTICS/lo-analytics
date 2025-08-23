@@ -2,8 +2,7 @@
 
 import React, { useState, useEffect } from "react"
 import { DynamicDropdownMenu } from "@/components/shared/MultiSelect"
-import { IUser } from "@/server/models/user.model"
-import { deleteCoordinator, editCoordinator, getUsersByRole, getUsersForManage, updatePermissions } from "@/services/users.actions"
+import { deleteCoordinator, editCoordinator, updatePermissions } from "@/services/users.actions"
 import {
   Select,
   SelectContent,
@@ -11,32 +10,32 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { getCollage, getCollageByRole } from "@/services/collage.action"
+import { getCollageByRole } from "@/services/collage.action"
 import { Loader2, Mail, MoreVertical } from "lucide-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
-import { useRouter } from "next/navigation"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { toast } from "sonner"
+import { useCoordinatorsForManage } from "@/queries/use-coordinators"
+import { getCurrentUser } from "@/server/utils/helper"
+import { CourseHeader } from "@/components/shared/course-header"
+import { CoursePagination } from "@/components/shared/course-pagination"
 
 export default function ManageCoordinators() {
   const [updatedName, setUpdatedName] = useState<string>('')
-  const USER = JSON.parse(localStorage.getItem('user') || '{}')
-  const [coordinators, setCoordinators] = useState<IUser[]>([])
+  const [user, setUser] = useState<any>(null)
   const [colleges, setColleges] = useState<{ _id: string; english: string }[]>([])
-  const [selectedCollege, setSelectedCollege] = useState<string>('all'); // State for selected college
+  const [selectedCollege, setSelectedCollege] = useState<string>('all')
+  const [searchTerm, setSearchTerm] = useState("")
+  const [currentPage, setCurrentPage] = useState(1)
   const [dropdownState, setDropdownState] = useState<Record<string, Record<string, boolean>>>({})
-  const [loading, setLoading] = useState<boolean>(false);
   const [isDeleting, setIsDeleting] = useState<boolean>(false)
 
   const [isOpen, setIsOpen] = useState({
     isOpen: false,
     type: "",
   })
-  const setIsOpenHandler = () => {
-    console.log('s')
-  }
 
   const closeModal = () => {
     setIsOpen((prev) => ({ ...prev, isOpen: false }));
@@ -46,38 +45,68 @@ export default function ManageCoordinators() {
     setIsOpen({ isOpen: true, type });
   };
   const [selectedCoordinator, setSelectedCoordinator] = useState<any>(null)
-  const fetchData = async () => {
-    setLoading(true);
-    const coordinatorData = await getUsersForManage(USER?._id);
-    const collegeData = await getCollageByRole(USER?._id);
 
-    setCoordinators(coordinatorData);
-    setColleges(collegeData);
+  // TanStack Query for coordinators
+  const { 
+    data: coordinatorsData, 
+    isLoading: isCoordinatorsLoading, 
+    error: coordinatorsError,
+    refetch: refetchCoordinators
+  } = useCoordinatorsForManage(
+    user?.id || '', 
+    { 
+      page: currentPage, 
+      limit: 15, 
+      search: searchTerm,
+      collegeId: selectedCollege 
+    },
+    { enabled: !!user?.id }
+  );
 
-
-
-
-    // Initialize dropdown state for each coordinator based on their permissions
-    const initialState = coordinatorData.reduce((acc, coordinator) => {
-      acc[coordinator._id] = {
-        "Item Analysis": coordinator.permissions.includes("Item Analysis"),
-        "Question Bank": coordinator.permissions.includes("Question Bank"),
-        "Learning Outcome": coordinator.permissions.includes("Learning Outcome"),
-      }
-      return acc
-    }, {} as Record<string, Record<string, boolean>>)
-
-    setDropdownState(initialState);
-    setLoading(false);
+  const fetchColleges = async () => {
+    if (user?.id) {
+      const collegeData = await getCollageByRole(user.id);
+      setColleges(collegeData);
+    }
   }
+
   useEffect(() => {
-    fetchData();
+    const getData = async () => {
+      const currentUser = await getCurrentUser();
+      setUser(currentUser);
+    };
+    getData();
   }, []);
 
-  // Filter coordinators based on selected college
-  const filteredCoordinators = selectedCollege === 'all'
-    ? coordinators
-    : coordinators.filter((coordinator: any) => coordinator.collage?._id?.toString() === selectedCollege);
+  useEffect(() => {
+    fetchColleges();
+  }, [user]);
+
+  // Handle search with debounce
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setCurrentPage(1); // Reset to first page on search
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchTerm, selectedCollege]);
+
+  const coordinators = coordinatorsData?.data || [];
+  const pagination = coordinatorsData?.pagination;
+
+  // Initialize dropdown state when coordinators data changes
+  useEffect(() => {
+    if (coordinators.length > 0) {
+      const initialState = coordinators.reduce((acc, coordinator) => {
+        acc[coordinator._id] = {
+          "Item Analysis": coordinator.permissions.includes("Item Analysis"),
+          "Question Bank": coordinator.permissions.includes("Question Bank"),
+          "Learning Outcome": coordinator.permissions.includes("Learning Outcome"),
+        }
+        return acc
+      }, {} as Record<string, Record<string, boolean>>)
+      setDropdownState(initialState);
+    }
+  }, [coordinators]);
 
   // Handle changes in the dropdown menu
   const handleCheckedChange = async (coordinatorId: string, option: string, checked: boolean) => {
@@ -113,14 +142,17 @@ export default function ManageCoordinators() {
       if (!rs.success) {
         toast.error('Something went wrong')
         closeModal()
+        setIsDeleting(false)
+        return
       }
       toast.success('Co-ordinator deleted successfully')
-      fetchData()
+      refetchCoordinators()
       setIsDeleting(false)
       closeModal()
     } catch (error) {
       setIsDeleting(false)
-      console.error("Failed to update permissions:", error)
+      console.error("Failed to delete coordinator:", error)
+      toast.error('Something went wrong')
     }
   }
 
@@ -131,9 +163,10 @@ export default function ManageCoordinators() {
       if (!rs.success) {
         toast.error('Something went wrong')
         closeModal()
+        return
       }
       toast.success('Co-ordinator updated successfully')
-      fetchData()
+      refetchCoordinators()
       closeModal()
     } catch (error) {
       console.error(error)
@@ -143,35 +176,51 @@ export default function ManageCoordinators() {
 
   return (
     <main className="px-2">
-      <div className="flex justify-between">
+      <CourseHeader
+      placeholder="Search by name or email"
+        title="Manage Coordinators"
+        count={pagination?.total || 0}
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+      >
+        <Select
+          value={selectedCollege}
+          onValueChange={(value) => setSelectedCollege(value)}
+        >
+          <SelectTrigger className="w-[200px]">
+            <SelectValue placeholder="Filter by College" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Colleges</SelectItem>
+            {colleges.map(college => (
+              <SelectItem key={college._id} value={college._id}>
+                {college.english}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </CourseHeader>
 
-      <h1 className="font-semibold text-lg">Manage Coordinators - ( {filteredCoordinators.length} )</h1>
-      <Select
-              value={selectedCollege}
-              onValueChange={(value) => setSelectedCollege(value)} // Update selected college
-            >
-              <SelectTrigger className="w-[200px]">
-                <SelectValue placeholder="Filter by College" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Colleges</SelectItem>
-                {colleges.map(college => (
-                  <SelectItem key={college._id} value={college._id}>
-                    {college.english}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-      </div>
-      {loading ? (
-        <div className="flex justify-center items-center h-64">
-          <Loader2 className="animate-spin" />
+      {/* Loading State */}
+      {isCoordinatorsLoading && (
+        <div className="flex justify-center items-center py-8">
+          <Loader2 className="w-6 h-6 animate-spin" />
+          <span className="ml-2">Loading coordinators...</span>
         </div>
-      ) : (
+      )}
+
+      {/* Error State */}
+      {coordinatorsError && (
+        <div className="text-center py-8 text-red-500">
+          Error loading coordinators. Please try again.
+        </div>
+      )}
+
+      {/* Coordinators Grid */}
+      {!isCoordinatorsLoading && !coordinatorsError && (
         <>
-   
-          <section className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))]  gap-2 mt-4">
-            {filteredCoordinators.map((coordinator: any) => (
+          <section className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-2 mt-4">
+            {coordinators.map((coordinator: any) => (
               <div
                 key={coordinator._id}
                 className="flex relative justify-between items-center border border-gray-300 shadow-sm px-3 rounded-md p-2"
@@ -232,7 +281,27 @@ export default function ManageCoordinators() {
 
               </div>
             ))}
-            <Dialog open={isOpen?.isOpen} onOpenChange={() => setIsOpen((prev) => ({ ...prev, isOpen: !isOpen }))} >
+          </section>
+
+          <CoursePagination
+            total={pagination?.total || 0}
+            currentPage={pagination?.page || 1}
+            totalPages={pagination?.totalPages || 1}
+            hasNext={pagination?.hasNext || false}
+            hasPrev={pagination?.hasPrev || false}
+            onPageChange={setCurrentPage}
+          />
+
+          {/* No Results */}
+          {coordinators.length === 0 && !isCoordinatorsLoading && (
+            <div className="text-center py-8 text-gray-500">
+              {searchTerm ? 'No coordinators found matching your search.' : 'No coordinators available.'}
+            </div>
+          )}
+        </>
+      )}
+
+      <Dialog open={isOpen?.isOpen} onOpenChange={() => setIsOpen((prev) => ({ ...prev, isOpen: !isOpen }))} >
 
               <DialogContent>
                 <DialogHeader>
@@ -288,9 +357,6 @@ export default function ManageCoordinators() {
 
               </DialogContent>
             </Dialog>
-          </section>
-        </>
-      )}
     </main>
   )
 }

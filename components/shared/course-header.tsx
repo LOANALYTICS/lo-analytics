@@ -3,6 +3,7 @@
 import { CourseSearch } from "./course-search";
 
 interface CourseHeaderProps {
+  placeholder?: string;
   title: string;
   count: number;
   searchTerm: string;
@@ -11,6 +12,7 @@ interface CourseHeaderProps {
 }
 
 export function CourseHeader({ 
+  placeholder,
   title, 
   count, 
   searchTerm, 
@@ -22,6 +24,7 @@ export function CourseHeader({
       <CourseSearch 
         searchTerm={searchTerm} 
         onSearchChange={onSearchChange} 
+        placeholder={placeholder}
       />
       <div className="flex text-nowrap justify-between items-center gap-3">
         <h1 className="font-semibold text-lg">
