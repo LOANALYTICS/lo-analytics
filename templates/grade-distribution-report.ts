@@ -308,6 +308,49 @@ function generateHTMLDocument(title: string, content: string): string {
                     size: A4;
                     margin: 15mm;
                 }
+
+                /* Chart styles */
+                .chart-container {
+                    width: 100%;
+                    margin: 20px 0;
+                    padding: 15px;
+                    background: white;
+                    border: 1px solid #ddd;
+                    border-radius: 4px;
+                }
+
+                .chart-title {
+                    text-align: center;
+                    font-size: 14px;
+                    font-weight: bold;
+                    margin-bottom: 15px;
+                    color: #333;
+                }
+
+                .chart-svg {
+                    width: 100%;
+                    height: auto;
+                }
+
+                .chart-legend {
+                    display: flex;
+                    justify-content: center;
+                    gap: 15px;
+                    margin-top: 10px;
+                    font-size: 10px;
+                }
+
+                .legend-item {
+                    display: flex;
+                    align-items: center;
+                    gap: 4px;
+                }
+
+                .legend-color {
+                    width: 12px;
+                    height: 12px;
+                    border-radius: 2px;
+                }
             </style>
         </head>
         <body>
@@ -322,7 +365,7 @@ function generateSummaryTable(type: SummaryType, data: GradeDistributionData): s
     const summary = isLevel ? data.levelSummary : data.departmentSummary;
     const headerLabel = isLevel ? 'Level' : 'Department';
 
-    return `
+    const tableHtml = `
         <table class="summary-table">
             <thead>
                 <tr class="header-row">
@@ -389,14 +432,27 @@ function generateSummaryTable(type: SummaryType, data: GradeDistributionData): s
                 </tr>
             </tbody>
         </table>`;
+
+    // Generate chart for summary data
+    const chartTitle = `Students Grades Distribution (${headerLabel} Summary)`;
+    const chartData = groups.map(group => {
+        const label = isLevel ? `Level ${(group as LevelGroup).level}` : (group as DepartmentGroup).department;
+        return {
+            label: label,
+            grades: group.total.grades
+        };
+    });
+
+    const chartHtml = generateGradeDistributionChart(chartTitle, chartData);
+
+    return tableHtml + chartHtml;
 }
 
 function generateDetailedTable(type: SummaryType, group: LevelGroup | DepartmentGroup): string {
     const isLevel = type === 'level';
     const headerLabel = isLevel ? `Level ${(group as LevelGroup).level}` : (group as DepartmentGroup).department;
 
-    return `
-    <div class="page">
+    const tableHtml = `
         <table>
             <colgroup>
                 <col style="width: 40px;">
@@ -477,6 +533,128 @@ function generateDetailedTable(type: SummaryType, group: LevelGroup | Department
                     <td>${group.overall.overallFailPercentage}%</td>
                 </tr>
             </tbody>
-        </table>
+        </table>`;
+
+    // Generate chart for this group's courses
+    const chartTitle = `Students Grades Distribution (${headerLabel})`;
+    const chartData = group.courses.map(course => ({
+        label: course.course_code,
+        grades: course.grades
+    }));
+
+    const chartHtml = generateGradeDistributionChart(chartTitle, chartData);
+
+    return `
+    <div class="page">
+        ${tableHtml}
+        ${chartHtml}
     </div>`;
+}
+
+function generateGradeDistributionChart(title: string, chartData: Array<{label: string, grades: GradeDistribution}>): string {
+    const width = 700;
+    const height = 300;
+    const margin = { top: 40, right: 40, bottom: 80, left: 60 };
+    const chartWidth = width - margin.left - margin.right;
+    const chartHeight = height - margin.top - margin.bottom;
+
+    const grades = ['A', 'B', 'C', 'D', 'F'];
+    const colors = {
+        'A': '#2563eb', // Blue
+        'B': '#f97316', // Orange  
+        'C': '#eab308', // Yellow
+        'D': '#22c55e', // Green
+        'F': '#ef4444'  // Red
+    };
+
+    // Calculate bar dimensions
+    const groupWidth = chartWidth / chartData.length;
+    const barWidth = Math.min(8, (groupWidth - 10) / grades.length); // 6-8px width as requested
+    const groupSpacing = 10;
+
+    // Find max percentage for scaling
+    const maxPercentage = Math.max(...chartData.flatMap(data => 
+        grades.map(grade => data.grades[grade as keyof GradeDistribution].percentage)
+    ));
+    const yScale = maxPercentage > 0 ? chartHeight / Math.max(maxPercentage, 100) : chartHeight / 100;
+
+    // Generate bars
+    const bars = chartData.map((data, groupIndex) => {
+        const groupX = margin.left + (groupIndex * groupWidth) + (groupWidth - (grades.length * barWidth + (grades.length - 1) * 2)) / 2;
+        
+        return grades.map((grade, gradeIndex) => {
+            const percentage = data.grades[grade as keyof GradeDistribution].percentage;
+            const barHeight = percentage * yScale;
+            const x = groupX + (gradeIndex * (barWidth + 2));
+            const y = height - margin.bottom - barHeight;
+
+            return `
+                <rect x="${x}" y="${y}" width="${barWidth}" height="${barHeight}" 
+                      fill="${colors[grade as keyof typeof colors]}" 
+                      stroke="#333" stroke-width="0.3" rx="1" ry="1" />
+                <text x="${x + barWidth/2}" y="${y - 3}" text-anchor="middle" 
+                      font-size="8" font-weight="bold" fill="#333">${percentage.toFixed(1)}%</text>
+            `;
+        }).join('');
+    }).join('');
+
+    // Generate Y-axis grid lines and labels
+    const yAxisSteps = 10;
+    const yAxisLines = Array.from({length: yAxisSteps + 1}, (_, i) => {
+        const value = (maxPercentage > 100 ? Math.ceil(maxPercentage / 10) * 10 : 100) * i / yAxisSteps;
+        const y = height - margin.bottom - (value * yScale);
+        return `
+            <line x1="${margin.left}" x2="${width - margin.right}" y1="${y}" y2="${y}" 
+                  stroke="#e5e7eb" stroke-width="0.5" />
+            <text x="${margin.left - 5}" y="${y + 3}" text-anchor="end" 
+                  font-size="9" fill="#666">${value.toFixed(0)}%</text>
+        `;
+    }).join('');
+
+    // Generate X-axis labels
+    const xAxisLabels = chartData.map((data, index) => {
+        const x = margin.left + (index * groupWidth) + (groupWidth / 2);
+        const y = height - margin.bottom + 20;
+        return `
+            <text x="${x}" y="${y}" text-anchor="middle" font-size="9" fill="#333" 
+                  transform="rotate(-45, ${x}, ${y})">${data.label}</text>
+        `;
+    }).join('');
+
+    // Generate legend
+    const legendItems = grades.map((grade, index) => {
+        const x = (width / 2) - (grades.length * 40 / 2) + (index * 40);
+        const y = height - 15;
+        return `
+            <rect x="${x}" y="${y - 8}" width="10" height="10" 
+                  fill="${colors[grade as keyof typeof colors]}" rx="2" ry="2" />
+            <text x="${x + 15}" y="${y}" font-size="10" fill="#333">${grade}</text>
+        `;
+    }).join('');
+
+    return `
+        <div class="chart-container">
+            <div class="chart-title">${title}</div>
+            <svg class="chart-svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
+                ${yAxisLines}
+                ${bars}
+                ${xAxisLabels}
+                ${legendItems}
+                
+                <!-- Y-axis title -->
+                <text x="20" y="${height/2}" text-anchor="middle" font-size="11" fill="#333" 
+                      transform="rotate(-90, 20, ${height/2})">Percentage (%)</text>
+                
+                <!-- X-axis line -->
+                <line x1="${margin.left}" x2="${width - margin.right}" 
+                      y1="${height - margin.bottom}" y2="${height - margin.bottom}" 
+                      stroke="#333" stroke-width="1" />
+                
+                <!-- Y-axis line -->
+                <line x1="${margin.left}" x2="${margin.left}" 
+                      y1="${margin.top}" y2="${height - margin.bottom}" 
+                      stroke="#333" stroke-width="1" />
+            </svg>
+        </div>
+    `;
 }
