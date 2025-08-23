@@ -227,7 +227,7 @@ function generateHTMLDocument(title: string, content: string): string {
                 
                 .percentage-row {
                     font-style: italic;
-                    background-color: #f8f8f8;
+                    background-color: #fff;
                 }
                 
                 @media print {
@@ -299,7 +299,7 @@ function generateHTMLDocument(title: string, content: string): string {
                     }
                     
                     .percentage-row {
-                        background-color: #f8f8f8 !important;
+                        background-color: #fff !important;
                         -webkit-print-color-adjust: exact !important;
                     }
                 }
