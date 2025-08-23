@@ -610,22 +610,25 @@ function generateGradeDistributionChart(title: string, chartData: Array<{ label:
             const x = groupX + (gradeIndex * (barWidth + barSpacing));
             const y = height - margin.bottom - barHeight;
 
-            // Format percentage - show 0 for 0.0%, otherwise show without decimal if whole number
-            const percentageText = percentage === 0 ? '0' :
-                percentage % 1 === 0 ? `${percentage.toFixed(0)}` : `${percentage.toFixed(1)}`;
+            // Format percentage - show 0% for 0.0%, otherwise show without decimal if whole number
+            const percentageText = percentage === 0 ? '0%' :
+                percentage % 1 === 0 ? `${percentage.toFixed(0)}%` : `${percentage.toFixed(1)}%`;
 
             // Show label for all values (including 0)
             const showLabel = true;
             const labelX = x + (barWidth / 2); // Center horizontally on the bar
-            const labelY = percentage === 0 ? height - margin.bottom - 8 : y - 4; // Position 0 labels above x-axis, others above bar
+            const labelY = percentage === 0 ? height - margin.bottom - 12 : y - 8; // More offset from top
+
+            // Adjust X position after rotation to center the rotated text properly
+            const adjustedX = labelX + 2; // Small offset to center rotated text
 
             return `
                 <rect x="${x}" y="${y}" width="${barWidth}" height="${barHeight}" 
                       fill="${colors[grade as keyof typeof colors]}" 
                       stroke="#333" stroke-width="0.3" rx="1" ry="1" />
-                <text x="${labelX}" y="${labelY}" text-anchor="middle" 
+                <text x="${adjustedX}" y="${labelY}" text-anchor="middle" 
                       font-size="7" font-weight="bold" fill="#333" 
-                      transform="rotate(-90, ${labelX}, ${labelY})">${percentageText}</text>
+                      transform="rotate(-90, ${adjustedX}, ${labelY})">${percentageText}</text>
             `;
         }).join('');
     }).join('');
