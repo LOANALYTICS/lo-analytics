@@ -173,11 +173,13 @@ const generatePDFWithJsPDF = async (html: string, fileName: string, orientation:
     const jsPDF = (await import('jspdf')).default;
     const html2canvas = (await import('html2canvas')).default;
 
-    // Create container
+    // Create container with proper scaling for table content
     const container = document.createElement("div");
     container.style.position = 'absolute';
     container.style.left = '-9999px';
-    container.style.width = orientation === 'portrait' ? '800px' : '1200px';
+    container.style.width = 'auto';
+    container.style.minWidth = 'fit-content';
+    container.style.maxWidth = 'none';
     container.innerHTML = html;
     document.body.appendChild(container);
 

@@ -85,7 +85,7 @@ async function generateAchievementChartHTML(achievementData: any, sortedClos: st
           labels: {
             padding: 10,
             font: {
-              size: 10,
+              size: 12,
               weight: 'bold'
             }
           }
@@ -102,7 +102,7 @@ async function generateAchievementChartHTML(achievementData: any, sortedClos: st
                 color: '#000',
                 font: {
                   weight: 'bold',
-                  size: 9
+                  size: 11
                 },
                 yAdjust: -10,
                 xAdjust: -20
@@ -119,7 +119,7 @@ async function generateAchievementChartHTML(achievementData: any, sortedClos: st
                 color: '#000',
                 font: {
                   weight: 'bold',
-                  size: 9
+                  size: 11
                 },
                 yAdjust: -10,
                 xAdjust: 20
@@ -135,7 +135,7 @@ async function generateAchievementChartHTML(achievementData: any, sortedClos: st
           ticks: {
             stepSize: 5,
             font: {
-              size: 9,
+              size: 11,
               weight: 'bold'
             }
           },
@@ -148,7 +148,7 @@ async function generateAchievementChartHTML(achievementData: any, sortedClos: st
             display: true,
             text: 'Percentage',
             font: {
-              size: 10,
+              size: 12,
               weight: 'bold'
             }
           }
@@ -159,7 +159,7 @@ async function generateAchievementChartHTML(achievementData: any, sortedClos: st
           },
           ticks: {
             font: {
-              size: 9,
+              size: 11,
               weight: 'bold'
             }
           },
@@ -167,7 +167,7 @@ async function generateAchievementChartHTML(achievementData: any, sortedClos: st
             display: true,
             text: 'Course Learning Outcomes (CLOs)',
             font: {
-              size: 10,
+              size: 12,
               weight: 'bold'
             }
           }
@@ -176,7 +176,7 @@ async function generateAchievementChartHTML(achievementData: any, sortedClos: st
     }
   }));
 
-  const chartUrl = `https://quickchart.io/chart?c=${chartConfig}&w=600&h=350&format=base64&v=${Date.now()}&backgroundColor=white&devicePixelRatio=2&plugins=chartjs-plugin-annotation`;
+  const chartUrl = `https://quickchart.io/chart?c=${chartConfig}&w=900&h=500&format=base64&v=${Date.now()}&backgroundColor=white&devicePixelRatio=2&plugins=chartjs-plugin-annotation`;
   
   try {
     const response = await fetch(chartUrl);
@@ -281,13 +281,13 @@ export async function generateCloReportHTML(props: CloReportProps): Promise<stri
           .h2_class { 
             text-align: center; 
             margin: 10px 0;
-            font-size: 17px;
+            font-size: 1.8em;
             font-weight:800;
           }
           .chart-title {
             text-align: center;
             margin: 10px 0;
-            font-size: 14px;
+            font-size: 1.3em;
             font-weight: 500;
             font-weight: bold;
           }
@@ -296,10 +296,15 @@ export async function generateCloReportHTML(props: CloReportProps): Promise<stri
             margin-bottom: 15px;
           }
           .logo {
-            width: 100%;
-            max-height: 80px;
+            width: auto;
+            max-width: 100%;
+            max-height: 180px;
+            height: 180px;
             object-fit: contain;
             margin-bottom: 15px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
           }
           .course-details {
             width: 100%;
@@ -316,7 +321,7 @@ export async function generateCloReportHTML(props: CloReportProps): Promise<stri
           .detail-item {
             display: flex;
             gap: 3px;
-            font-size: 16px;
+            font-size: 18px;
             white-space: nowrap;
             flex: 1 1 30%;
           }
@@ -329,24 +334,26 @@ export async function generateCloReportHTML(props: CloReportProps): Promise<stri
             margin: 10px 0; 
           }
           table { 
-            width: 100%; 
+            width: auto; 
+            min-width: 100%;
             border-collapse: collapse; 
             margin-top: 10px;
             font-weight: 500;
+            table-layout: auto;
           }
           th, td { 
             border: 1px solid black;
-            padding: 4px;
-            padding-bottom:10px;
-            font-size: 14px;
-font-weight: 500;
+            padding: 6px;
+            padding-bottom:12px;
+            font-size: 1.2em;
+            font-weight: 500;
             text-align: center;
           }
           tr {
             break-inside: avoid !important;
           }
-            tr th {
-            font-size: 14px;
+                         tr th {
+            font-size: 1.2em;
             font-weight: 700;
             }
           .achievement-row { 
@@ -376,26 +383,31 @@ font-weight: 500;
           tbody:last-child tr:last-child td:last-child {
             border-bottom-right-radius: 4px;
           }
-          .serial-col { width: 40px; }
-          .id-col { width: 80px; }
-          .name-col { width: 150px; }
-          .marks-col { width: 60px; }
+          .serial-col { width: 45px; min-width: 45px; }
+          .id-col { width: 90px; min-width: 90px; }
+          .name-col { width: 220px; min-width: 220px; }
+          .marks-col { width: 65px; min-width: 65px; }
           .clo-header { 
             background-color: #e0e0e0;
             text-transform: uppercase; 
-            font-size: 14px;
-font-weight: 700;
+            font-size: 1.3em;
+            font-weight: 700;
+            width: 75px;
+            min-width: 75px;
           }
           .total-header { 
-            background-color: #d0d0d0; 
+            background-color: #d0d0d0;
+            width: 80px;
+            min-width: 80px;
+            font-size: 1.3em;
           }
           .achievement-label { 
             font-weight: normal; 
             text-align: left;
-            font-size: 14px;
-font-weight: 500;
+            font-size: 1.1em;
+            font-weight: 500;
             vertical-align: middle;
-            padding: 3px;
+            padding: 4px;
             font-family: Arial, sans-serif;
           }
           td p {
@@ -408,17 +420,27 @@ font-weight: 500;
           .chart-container {
             margin-top: 20px;
             text-align: center;
-            min-height: 300px;
+            min-height: 500px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
           }
           .chart-wrapper {
-            display: inline-block;
-            height: 280px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 500px;
+            width: 100%;
           }
           .chart-image {
+            width: auto;
             max-width: 100%;
-            height: auto;
-            max-height: 280px;
+            height: 500px;
+            max-height: 500px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin: 0 auto;
           }
           .assessment-type-label {
             font-weight: bold;
@@ -428,8 +450,8 @@ font-weight: 500;
             border-right: 1px solid black;
             white-space: nowrap;
             height: 100%;
-            font-size: 14px;
-font-weight: 500;
+            font-size: 1.2em;
+            font-weight: 500;
             position: relative;
             text-align: center;
           }
@@ -443,7 +465,7 @@ font-weight: 500;
             width: 30px;
             height: max-content;
             transform-origin: center center;
-            font-size: 11.5px;
+            font-size: 12.5px;
           }
           .table-section {
             flex: 1;
