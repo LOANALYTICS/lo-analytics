@@ -2,7 +2,7 @@
 import { connectToMongoDB } from "@/lib/db";
 import { Assessment, Course } from "@/lib/models";
 import { NextResponse } from "next/server";
-import { generateCloReportHTML } from "@/templates/cloReport"; 
+import { generatePloReportHTML } from "@/templates/ploReport"; 
 interface CourseData {
   course_name: string;
   level: number;
@@ -86,7 +86,7 @@ export async function GET(request: Request) {
         );
 
         // Generate HTML using the template with achievement data
-        const htmlContent = generateCloReportHTML({
+        const htmlContent = generatePloReportHTML({
             cloData: assessment.cloData,
             percentage,
             achievementMap,

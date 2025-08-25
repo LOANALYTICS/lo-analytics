@@ -1,421 +1,579 @@
-export function generateCloReportHTML(data: {
-    cloData: Array<{
-        clo: string;
-        description: string;
-        ploMapping: {
-            k: Array<{ [key: string]: boolean }>;
-            s: Array<{ [key: string]: boolean }>;
-            v: Array<{ [key: string]: boolean }>;
-        };
-    }>;
-    percentage: number;
-    achievementMap: Map<string, number>;
-    course: {
-        course_name: string;
-        level: number;
-        semister: number;
-        department: string;
-        course_code: string;
-        credit_hours: string;
-        coordinator: string;
-    };
-    college: {
-        logo: string;
-        english: string;
-        regional: string;
-        university: string;
-    };
-    indirectAssessmentData?: {
-        indirectAssessments: Array<{
-            clo: string;
-            achievementRate: number;
-            benchmark: string;
-            achievementPercentage: number;
-        }>;
-    };
+import { Chart, registerables } from 'chart.js';
 
-}) {
-    const { cloData, percentage, achievementMap, course, college, indirectAssessmentData } = data;
+// Register Chart.js components
+Chart.register(...registerables);
 
-    // Function to check if a PLO has any data (direct or indirect) across all CLOs
-    const hasAnyData = (ploMappings: Array<Array<{ [key: string]: boolean }>>, ploIndex: number) => {
-        const cloIds = cloData.map((_, index) => `clo${index + 1}`);
+async function generateAchievementChartHTML(achievementData: any, sortedClos: string[], indirectAssessmentData?: any): Promise<string> {
+  const directChartData = sortedClos.map(clo => {
+    const achievement = achievementData[60].find((a: any) => a.clo === clo);
+    const value = achievement ? parseFloat(achievement.percentageAchieving) : 0;
+    return value;
+  });
 
-        // Check for direct data
-        const hasDirectData = ploMappings.some((cloMapping, cloIndex) => {
-            const isChecked = Object.values(cloMapping[ploIndex])[0];
-            if (isChecked) {
-                const achievementValue = achievementMap.get(cloIds[cloIndex]);
-                return achievementValue !== undefined && achievementValue !== null && !isNaN(Number(achievementValue));
+
+  const indirectChartData = indirectAssessmentData ? sortedClos.map(clo => {
+    const assessment = indirectAssessmentData.indirectAssessments.find((a: any) => a.clo.replace(/\s/g, '').toUpperCase() === clo.replace(/\s/g, '').toUpperCase());
+    const value = assessment ? parseFloat(assessment.achievementPercentage) : 0;
+    return value;
+  }) : [];
+
+ 
+  const labels = sortedClos.map(clo => clo.toUpperCase());
+  
+  const chartConfig = encodeURIComponent(JSON.stringify({
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: 'Direct Assessment Achievement',
+          data: directChartData,
+          backgroundColor: 'rgba(54, 162, 235, 0.8)',
+          borderColor: 'rgba(54, 162, 235, 1)',
+          borderWidth: 1,
+          barThickness: 30,
+          borderRadius: 4,
+          categoryPercentage: 0.7,
+          barPercentage: 0.7
+        },
+        {
+          label: 'Indirect Assessment Achievement',
+          data: indirectChartData,
+          backgroundColor: 'rgba(75, 192, 192, 0.8)',
+          borderColor: 'rgba(75, 192, 192, 1)',
+          borderWidth: 1,
+          barThickness: 30,
+          borderRadius: 4,
+          categoryPercentage: 0.7,
+          barPercentage: 0.7
+        },
+        {
+          label: 'Direct Threshold (60%)',
+          data: Array(sortedClos.length).fill(60),
+          type: 'line',
+          borderColor: 'rgba(255, 99, 132, 1)',
+          borderWidth: 2,
+          borderDash: [5, 5],
+          pointRadius: 0,
+          fill: false
+        },
+        {
+          label: `Indirect Threshold (${indirectAssessmentData?.indirectAssessments[0]?.benchmark}%)`,
+          data: Array(sortedClos.length).fill(indirectAssessmentData?.indirectAssessments[0]?.benchmark),
+          type: 'line',
+          borderColor: 'rgba(153, 102, 255, 1)',
+          borderWidth: 2,
+          borderDash: [5, 5],
+          pointRadius: 0,
+          fill: false
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      layout: {
+        overflow:'visible',
+        padding: {
+          top: 20
+        }
+      },
+      plugins: {
+        legend: {
+          display: true,
+          position: 'bottom',
+          labels: {
+            padding: 10,
+            font: {
+              size: 10,
+              weight: 'bold'
             }
-            return false;
-        });
-
-        // Check for indirect data
-        const hasIndirectData = ploMappings.some((cloMapping, cloIndex) => {
-            const isChecked = Object.values(cloMapping[ploIndex])[0];
-            if (isChecked && indirectAssessmentData && indirectAssessmentData.indirectAssessments) {
-                const cloNumber = cloIds[cloIndex].replace('clo', '');
-                const indirectAssessment = indirectAssessmentData.indirectAssessments.find(
-                    assessment => assessment.clo === `CLO ${cloNumber}`
-                );
-                return indirectAssessment !== undefined;
+          }
+        },
+        annotation: {
+          annotations: {
+            ...directChartData.reduce((acc, value, index) => ({
+              ...acc,
+              [`label${index}`]: {
+                type: 'label',
+                xValue: index,
+                yValue: value,
+                content: Math.round(value) + '%',
+                color: '#000',
+                font: {
+                  weight: 'bold',
+                  size: 9
+                },
+                yAdjust: -10,
+                xAdjust: -20
+              }
+              
+            }), {}),
+            ...indirectChartData.reduce((acc, value, index) => ({
+              ...acc,
+              [`indirectLabel${index}`]: {
+                type: 'label',
+                xValue: index,
+                yValue: Number(value) < 50 ? 50 :value,
+                content: Math.round(value) + '%',
+                color: '#000',
+                font: {
+                  weight: 'bold',
+                  size: 9
+                },
+                yAdjust: -10,
+                xAdjust: 20
+              }
+            }), {})
+          }
+        }
+      },
+      scales: {
+        y: {
+          min: 50,
+          max: 105,
+          ticks: {
+            stepSize: 5,
+            font: {
+              size: 9,
+              weight: 'bold'
             }
-            return false;
-        });
-
-        return hasDirectData || hasIndirectData;
-    };
-
-    // Filter active PLOs for each category
-    const activeKPlos = cloData[0].ploMapping.k.map((_, index) => index).filter(index =>
-        hasAnyData(cloData.map(clo => clo.ploMapping.k), index)
-    );
-    const activeSPlos = cloData[0].ploMapping.s.map((_, index) => index).filter(index =>
-        hasAnyData(cloData.map(clo => clo.ploMapping.s), index)
-    );
-    const activeVPlos = cloData[0].ploMapping.v.map((_, index) => index).filter(index =>
-        hasAnyData(cloData.map(clo => clo.ploMapping.v), index)
-    );
-
-    // Helper function to generate PLO cells (only for active PLOs)
-    const generatePloCells = (mapping: Array<{ [key: string]: boolean }>, cloId: string, activePloIndexes: number[]) => {
-        return activePloIndexes.map(ploIndex => {
-            const item = mapping[ploIndex];
-            const isChecked = Object.values(item)[0];
-            let directCell, indirectCell;
-
-            // Direct cell (current logic)
-            if (!isChecked) {
-                directCell = `<td class="plo-cell"></td>`;
-                indirectCell = `<td class="plo-cell"></td>`;
-            } else {
-                const achievementValue = achievementMap.get(cloId);
-                let displayValue = '✓';
-                if (achievementValue !== undefined && achievementValue !== null) {
-                    const numValue = Number(achievementValue);
-                    if (!isNaN(numValue)) {
-                        displayValue = `${numValue.toFixed(1)}%`;
-                    }
-                }
-                directCell = `<td class="plo-cell checked">${displayValue}</td>`;
-
-                // Indirect cell - find corresponding indirect assessment data
-                let indirectValue = '';
-                if (indirectAssessmentData && indirectAssessmentData.indirectAssessments) {
-                    const cloNumber = cloId.replace('clo', '');
-                    const indirectAssessment = indirectAssessmentData.indirectAssessments.find(
-                        assessment => assessment.clo === `CLO ${cloNumber}`
-                    );
-                    if (indirectAssessment) {
-                        indirectValue = `${indirectAssessment.achievementPercentage.toFixed(1)}%`;
-                    }
-                }
-                indirectCell = `<td class="plo-cell checked">${indirectValue}</td>`;
+          },
+          grid: {
+            display: true,
+            color: 'rgba(0, 0, 0, 0.1)',
+            drawTicks: false
+          },
+          title: {
+            display: true,
+            text: 'Percentage',
+            font: {
+              size: 10,
+              weight: 'bold'
             }
-
-            return directCell + indirectCell;
-        }).join('');
-    };
-
-    const tableRows = cloData.map((clo, index) => `
-        <tr>
-            <td class="index-cell">CLO ${index + 1}</td>
-            <td class="clo-cell">${clo.description}</td>
-            ${generatePloCells(clo.ploMapping.k, `clo${index + 1}`, activeKPlos)}
-            ${generatePloCells(clo.ploMapping.s, `clo${index + 1}`, activeSPlos)}
-            ${generatePloCells(clo.ploMapping.v, `clo${index + 1}`, activeVPlos)}
-        </tr>
-    `).join('');
-
-    // Calculate averages for each PLO category
-    const calculateAverage = (mapping: Array<{ [key: string]: boolean }>[], cloIds: string[]) => {
-        const values: number[] = [];
-
-        // For each CLO that has PLO mappings
-        cloIds.forEach((cloId, cloIndex) => {
-            const cloMapping = mapping[cloIndex];
-            if (cloMapping && cloMapping.length > 0) {
-                // Check if any PLO is mapped for this CLO
-                const hasMapping = cloMapping.some(item => Object.values(item)[0] === true);
-                if (hasMapping) {
-                    const achievementValue = achievementMap.get(cloId);
-                    // Only include CLOs that have valid achievement data
-                    if (achievementValue !== undefined && achievementValue !== null && !isNaN(Number(achievementValue))) {
-                        const numValue = Number(achievementValue);
-                        // Include all valid numbers, even 0 (but exclude negative values if any)
-                        if (numValue >= 0) {
-                            values.push(numValue);
-                        }
-                    }
-                }
+          }
+        },
+        x: {
+          grid: {
+            display: false
+          },
+          ticks: {
+            font: {
+              size: 9,
+              weight: 'bold'
             }
-        });
-
-        if (values.length === 0) return '';
-        const average = values.reduce((sum, val) => sum + val, 0) / values.length;
-        return `${average.toFixed(1)}%`;
-    };
-
-    const calculateIndirectAverage = (mapping: Array<{ [key: string]: boolean }>[], cloIds: string[]) => {
-        const values: number[] = [];
-
-        // For each CLO
-        cloIds.forEach((cloId, cloIndex) => {
-            // Check if this CLO has any checked mappings
-            const cloMapping = mapping[cloIndex];
-            if (cloMapping && cloMapping.length > 0) {
-                // Check if any PLO is mapped for this CLO
-                const hasMapping = cloMapping.some(item => Object.values(item)[0] === true);
-                if (hasMapping && indirectAssessmentData && indirectAssessmentData.indirectAssessments) {
-                    const cloNumber = cloId.replace('clo', '');
-                    const indirectAssessment = indirectAssessmentData.indirectAssessments.find(
-                        assessment => assessment.clo === `CLO ${cloNumber}`
-                    );
-                    if (indirectAssessment) {
-                        values.push(indirectAssessment.achievementPercentage);
-                    }
-                }
+          },
+          title: {
+            display: true,
+            text: 'Course Learning Outcomes (CLOs)',
+            font: {
+              size: 10,
+              weight: 'bold'
             }
-        });
+          }
+        }
+      }
+    }
+  }));
 
-        if (values.length === 0) return '';
-        const average = values.reduce((sum, val) => sum + val, 0) / values.length;
-        return `${average.toFixed(1)}%`;
-    };
-
-    // Generate average cells for each individual PLO (only active PLOs)
-    const generateAverageCells = () => {
-        const cloIds = cloData.map((_, index) => `clo${index + 1}`);
-        let cells = '';
-
-        // Calculate average for each active K PLO individually
-        activeKPlos.forEach(ploIndex => {
-            const kPloMapping = cloData.map(clo => [clo.ploMapping.k[ploIndex]]);
-            const kDirectAvg = calculateAverage(kPloMapping, cloIds);
-            const kIndirectAvg = calculateIndirectAverage(kPloMapping, cloIds);
-            cells += `<td class="plo-cell">${kDirectAvg}</td><td class="plo-cell ">${kIndirectAvg}</td>`;
-        });
-
-        // Calculate average for each active S PLO individually
-        activeSPlos.forEach(ploIndex => {
-            const sPloMapping = cloData.map(clo => [clo.ploMapping.s[ploIndex]]);
-            const sDirectAvg = calculateAverage(sPloMapping, cloIds);
-            const sIndirectAvg = calculateIndirectAverage(sPloMapping, cloIds);
-            cells += `<td class="plo-cell">${sDirectAvg}</td><td class="plo-cell ">${sIndirectAvg}</td>`;
-        });
-
-        // Calculate average for each active V PLO individually
-        activeVPlos.forEach(ploIndex => {
-            const vPloMapping = cloData.map(clo => [clo.ploMapping.v[ploIndex]]);
-            const vDirectAvg = calculateAverage(vPloMapping, cloIds);
-            const vIndirectAvg = calculateIndirectAverage(vPloMapping, cloIds);
-            cells += `<td class="plo-cell">${vDirectAvg}</td><td class="plo-cell ">${vIndirectAvg}</td>`;
-        });
-
-        return cells;
-    };
-
-    // Add summary row
-    const summaryRow = `
-        <tr>
-            <td class="index-cell" colspan="2">Average</td>
-            ${generateAverageCells()}
-        </tr>
-    `;
-
+  const chartUrl = `https://quickchart.io/chart?c=${chartConfig}&w=600&h=350&format=base64&v=${Date.now()}&backgroundColor=white&devicePixelRatio=2&plugins=chartjs-plugin-annotation`;
+  
+  try {
+    const response = await fetch(chartUrl);
+    const base64Image = await response.text();
+    
     return `
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="UTF-8">
-            <title>CLO Achievement Report (${percentage}%)</title>
-            <style>
-                @page {
-                    size: A4 landscape;
-                    margin: 0;
-                }
-                html, body {
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  padding: 0;
+      <div class="chart-container">
+        <h3 class="chart-title">CLO Achievement Chart</h3>
+        <div class="chart-wrapper">
+          <img src="data:image/png;base64,${base64Image}" alt="CLO Achievement Chart" class="chart-image">
+        </div>
+      </div>
+    `;
+  } catch (error) {
+    console.error('Error generating chart:', error);
+    return '';
+  }
 }
-                .container {
-                    width: auto !important;
-                    max-width: none !important;
-                    min-width: 0 !important;
-                    margin: 0;
-                    padding: 0;
-                    background: none;
-                }
-                .header { text-align: center; margin-bottom: 30px; }
-                .logo { max-width: 100%; height: auto; }
-                .title { font-size: 24px; margin: 20px 0; }
-                .course-details {
-                display: grid;
-                grid-template-columns: repeat(2, 1fr);
-                gap: 15px;
-                margin-bottom: 10px;
-                border: 1px solid #ddd;
-                
-                padding-left: 15px;
-                padding-right: 15px;
-                padding-top: 10px;
-                padding-bottom: 25px;
-                border-radius: 5px;
-                }
-                .detail-item {
-                    display: flex;
-                    gap: 4px;
-                    font-weight: 600;
-                    font-size: 20px;
-                }
-                .detail-label {
-                    font-weight: 700;
-                }
 
-                table {
-                    width: auto !important;
-                    min-width: 0 !important;
-                    max-width: none !important;
-                    border: 1px solid #ddd;
-                    border-radius: 6px;
-                    overflow: hidden;
-                    border-collapse: collapse;
-                    margin-top: 15px;
-                    page-break-inside: auto;
-                    table-layout: auto;
-                }
-                thead {
-                    display: table-header-group;
-                }
-                tbody {
-                    display: table-row-group;
-                }
-                tr {
-                    page-break-inside: avoid !important;
-                    break-inside: avoid !important;
-                    -webkit-column-break-inside: avoid;
-                    display: table-row;
-                }
-                th {
-                    display: table-cell;
-                }
-                td {
-                    display: table-cell;
-                }
-                th, td {
-                    border: 1px solid #ddd;
-                    padding-left: 6px;
-                    padding-right: 6px;
-                    padding-top: 6px;
-                    padding-bottom: 14px;
-                    text-align: center;
-                    font-size: 15px;
-                    font-weight: 600;
-                }
-                th {
-                    background-color: #f5f5f5;
-                    font-weight: bold;
-                    font-size: 16px;
+export interface CloReportProps {
+  course: {
+    course_name: string;
+    level: number;
+    section: string;
+    academic_year: string;
+    semister: number;
+    department: string;
+    course_code: string;
+    credit_hours: string;
+    coordinator: string;
+  };
+  college: {
+    logo: string;
+    english: string;
+    regional: string;
+    university: string;
+  };
+  assessmentData: {
+    students: Array<{
+      studentId: string;
+      studentName: string;
+      cloScores: {
+        [cloId: string]: {
+          marksScored: number;
+          totalMarks: number;
+        };
+      };
+      totalMarksObtained: number;
+    }>;
+    cloScores: {
+      [cloId: string]: number;
+    };
+    achievementData: {
+      [percentage: string]: Array<{
+        clo: string;
+        achievementGrade: string;
+        percentageAchieving: string;
+      }>;
+    };
+    sortedClos: string[];
+  };
+  indirectAssessmentData?: {
+    indirectAssessments: Array<{
+      clo: string;
+      achievementRate: number;
+      benchmark: string;
+      achievementPercentage: number;
+    }>;
+  };
+}
 
-                }
-                .index-cell {
-                
-                white-space:nowrap;
-                    width: 50px;
-                }
-                .clo-cell {
-                    text-align: left;
-                    width:auto;
-                    min-width: 280px;
-                    max-width:280px
+export async function generateCloReportHTML(props: CloReportProps): Promise<string> {
+  const { course, college, assessmentData, indirectAssessmentData } = props;
+  const { sortedClos, achievementData } = assessmentData;
+  
+  function escapeHTML(str: string): string {
+    return str.replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
 
-                }
-                .plo-cell {
-                    width: 40px;
-                }
-                .plo-cell.checked {
-                    background-color: #e6ffe6;
-                }
-                .plo-header {
-                    font-weight: 600;
-                    background-color: #f0f0f0;
-                }
-                .plo-subheader {
-                    font-weight: 600;
-                    text-transform: capitalize;
-                }
-                .h2_class {font-weight: 700; text-align: center; margin-bottom: 30px;,margin:auto; font-size:20px }
-            </style>
-        </head>
-        <body>
-              <div class="container">
+  // Generate the chart HTML
+  const chartHtml = await generateAchievementChartHTML(achievementData, sortedClos, indirectAssessmentData);
+
+  return `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <style>
+          body { 
+            font-family: Arial, sans-serif; 
+            margin: 0;
+            padding: 0;
+          }
+          .container { 
+            max-width: 100%; 
+            margin: 0 auto; 
+            padding: 20px;
+          }
+          .h2_class { 
+            text-align: center; 
+            margin: 10px 0;
+            font-size: 17px;
+            font-weight:800;
+          }
+          .chart-title {
+            text-align: center;
+            margin: 10px 0;
+            font-size: 14px;
+            font-weight: 500;
+            font-weight: bold;
+          }
+          .header {
+            width: 100%;
+            margin-bottom: 15px;
+          }
+          .logo {
+            width: 100%;
+            max-height: 80px;
+            object-fit: contain;
+            margin-bottom: 15px;
+          }
+          .course-details {
+            width: 100%;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            padding: 8px;
+            padding-bottom:16px !important;
+            border-radius: 3px;
+          }
+          .detail-item {
+            display: flex;
+            gap: 3px;
+            font-size: 16px;
+            white-space: nowrap;
+            flex: 1 1 30%;
+          }
+          .detail-label {
+            font-weight: bold;
+            white-space: nowrap;
+          }
+          .title { 
+            font-size: 18px; 
+            margin: 10px 0; 
+          }
+          table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-top: 10px;
+            font-weight: 500;
+          }
+          th, td { 
+            border: 1px solid black;
+            padding: 4px;
+            padding-bottom:10px;
+            font-size: 14px;
+font-weight: 500;
+            text-align: center;
+          }
+          tr {
+            break-inside: avoid !important;
+          }
+            tr th {
+            font-size: 14px;
+            font-weight: 700;
+            }
+          .achievement-row { 
+            background-color: #8b6b9f; 
+            color: white;
+          }
+          .achievement-row td {
+            border: 1px solid black;
+            padding: 4px;
+            padding-bottom:10px;
+          }
+          .achievement-pair tr:first-child td.achievement-label {
+            border-bottom: 0px solid black;
+          }
+          .achievement-pair tr:last-child td.achievement-label {
+            border-top: 0px solid black;
+          }
+          thead tr:first-child th:first-child {
+            border-top-left-radius: 4px;
+          }
+          thead tr:first-child th:last-child {
+            border-top-right-radius: 4px;
+          }
+          tbody:last-child tr:last-child td:first-child {
+            border-bottom-left-radius: 4px;
+          }
+          tbody:last-child tr:last-child td:last-child {
+            border-bottom-right-radius: 4px;
+          }
+          .serial-col { width: 40px; }
+          .id-col { width: 80px; }
+          .name-col { width: 150px; }
+          .marks-col { width: 60px; }
+          .clo-header { 
+            background-color: #e0e0e0;
+            text-transform: uppercase; 
+            font-size: 14px;
+font-weight: 700;
+          }
+          .total-header { 
+            background-color: #d0d0d0; 
+          }
+          .achievement-label { 
+            font-weight: normal; 
+            text-align: left;
+            font-size: 14px;
+font-weight: 500;
+            vertical-align: middle;
+            padding: 3px;
+            font-family: Arial, sans-serif;
+          }
+          td p {
+            margin: 0;
+          }
+          .student-row {
+            break-inside: avoid !important;
+            display: table-row !important;
+          }
+          .chart-container {
+            margin-top: 20px;
+            text-align: center;
+            min-height: 300px;
+          }
+          .chart-wrapper {
+            display: inline-block;
+            height: 280px;
+          }
+          .chart-image {
+            max-width: 100%;
+            height: auto;
+            max-height: 280px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+          }
+          .assessment-type-label {
+            font-weight: bold;
+            background-color: #8b6b9f;
+            color: white;
+            padding: 3px;
+            border-right: 1px solid black;
+            white-space: nowrap;
+            height: 100%;
+            font-size: 14px;
+font-weight: 500;
+            position: relative;
+            text-align: center;
+          }
+          .vertical-text-container {
+            position: absolute;
+            text-align: center;
+            top: 60%;
+            left: 40%;
+            transform: translate(-50%, -20%) rotate(-90deg);
+            white-space: wrap;
+            width: 30px;
+            height: max-content;
+            transform-origin: center center;
+            font-size: 11.5px;
+          }
+          .table-section {
+            flex: 1;
+            overflow: hidden;
+          }
+          .chart-section {
+            flex-shrink: 0;
+            margin-top: 10px;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="container">
           <div class="header">
             <img src="${college.logo}" alt="College Logo" class="logo">
             <div class="course-details">
-
-                <div class="detail-item">
-                  <span class="detail-label">Department:</span> ${course.department}
+               <div class="detail-item">
+                  <span class="detail-label">Course Name:</span> ${course.course_name} (${course.section.charAt(0).toUpperCase() + course.section.slice(1).toLowerCase()})
                 </div>
-
                 <div class="detail-item">
                   <span class="detail-label">Course Code:</span> ${course.course_code}
                 </div>
-
+             
                 <div class="detail-item">
-                  <span class="detail-label">Course Name:</span> ${course.course_name}
-                </div>
-                 <div class="detail-item">
                   <span class="detail-label">Credit Hours:</span> ${course.credit_hours + 'Hours'}
                 </div>
-
-                  <div class="detail-item">
+                <div class="detail-item">
                   <span class="detail-label">Level:</span> ${course.level || 'NA'}
                 </div>
-
                 <div class="detail-item">
-                  <span class="detail-label">Semester:</span> ${course.semister === 1 ? "First Semester" : "Second Semester"}
+                  <span class="detail-label">Semester:</span> ${course.semister === 1 ? "First Semester" : "Second Semester"} (${course?.academic_year})
                 </div>
-                       <div class="detail-item">
+                <div class="detail-item">
                   <span class="detail-label">Course Co-ordinator:</span> ${course.coordinator}
                 </div>
-                
-                
-               
-              </div>
+            </div>
           </div>
-             <h2 class="h2_class">Program Learning Outcome (PLO) Acheivement Report </h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th rowspan="4" style='font-weight:700; font-size:700;'>CLOs</th>
-                        <th rowspan="4" style='font-weight:700; font-size:700;'>Course Learning Outcome (CLO) Description</th>
-                        <th colspan="${(activeKPlos.length + activeSPlos.length + activeVPlos.length) * 2}" style='font-weight:600;'>Alignement of CLO with Program Learning Outcome (PLO)</th>
-                    </tr>
-                    <tr>
-                        ${activeKPlos.length > 0 ? `<th colspan="${activeKPlos.length * 2}" class="plo-header">Knowledge</th>` : ''}
-                        ${activeSPlos.length > 0 ? `<th colspan="${activeSPlos.length * 2}" class="plo-header">Skills</th>` : ''}
-                        ${activeVPlos.length > 0 ? `<th colspan="${activeVPlos.length * 2}" class="plo-header">Values</th>` : ''}
-                    </tr>
-                    <tr>
-                        ${activeKPlos.map(i => `<th colspan="2" class="plo-header">K${i + 1}</th>`).join('')}
-                        ${activeSPlos.map(i => `<th colspan="2" class="plo-header">S${i + 1}</th>`).join('')}
-                        ${activeVPlos.map(i => `<th colspan="2" class="plo-header">V${i + 1}</th>`).join('')}
-                    </tr>
-                    <tr>
-                        ${activeKPlos.map(() => `<th class=\"plo-subheader\">Direct</th><th class=\"plo-subheader\">Indirect</th>`).join('')}
-                        ${activeSPlos.map(() => `<th class=\"plo-subheader\">Direct</th><th class=\"plo-subheader\">Indirect</th>`).join('')}
-                        ${activeVPlos.map(() => `<th class=\"plo-subheader\">Direct</th><th class=\"plo-subheader\">Indirect</th>`).join('')}
-                    </tr>
-                </thead>
-                <tbody>
-                    ${tableRows}
-                    ${summaryRow}
-                </tbody>
+
+          <h2 class="h2_class">Course Learning Outcome (CLO) Achievement Report</h2>
+
+          <div class="table-section">
+            <table style="border-radius: 3px; overflow: hidden;">
+              <thead>
+                <tr>
+                  <th rowspan="2" class="serial-col">S.No</th>
+                  <th rowspan="2" class="id-col">ID</th>
+                  <th rowspan="2" class="name-col">Name</th>
+                  ${sortedClos.map(clo => `
+                    <th class="clo-header">${clo.replace(/([a-zA-Z]+)(\d+)/, '$1 $2')}</th>
+                  `).join('')}
+                  <th rowspan="2" class="total-header">MARKS OBTAINED</th>
+                </tr>
+                <tr>
+                  ${sortedClos.map(clo => `
+                    <th class="marks-col">${assessmentData.cloScores[clo]}</th>
+                  `).join('')}
+                </tr>
+              </thead>
+              <tbody>
+                ${assessmentData.students.map((student, index) => {
+                  return `
+                  <tr class="student-row">
+                    <td>${index + 1}</td>
+                    <td>${escapeHTML(student.studentId)}</td>
+                    <td>${escapeHTML(student.studentName)}</td>
+                    ${sortedClos.map(clo => {
+                      const totalScore = assessmentData.cloScores[clo];
+                      const threshold = totalScore * 0.6;
+                      const studentScore = student.cloScores[clo]?.marksScored || 0;
+                      const isBelow = studentScore < threshold;
+                      return `<td style="background-color:${isBelow ? '#e6ffe6': 'white'} !important;">${isBelow ? `<p >${studentScore.toFixed(2)}</p>` : `<p>${studentScore.toFixed(2)}</p>`}</td>`;
+                    }).join('')}
+                    <td>${student.totalMarksObtained.toFixed(2)}</td>
+                  </tr>
+                `}).join('')}
+              </tbody>
+          
+
+              <tbody class="achievement-pair">
+                <tr class="achievement-row">
+                  <td rowspan="2" class="assessment-type-label">
+                    <div class="vertical-text-container">Direct Assessment</div>
+                  </td>
+                  <td colspan="2" class="achievement-label">Achievement Grades</td>
+                  ${sortedClos.map(clo => {
+    const totalScore = assessmentData.cloScores[clo];
+    return `<td>${(totalScore * 0.6).toFixed(2)}</td>`;
+  }).join('')}
+                  <td>-</td>
+                </tr>
+                <tr class="achievement-row">
+                  <td colspan="2" class="achievement-label">% of students scoring ≥ 60%</td>
+                  ${sortedClos.map((clo, index) => {
+    return `<td>${Number(achievementData['60'][index].percentageAchieving).toFixed(1)}%</td>`;
+  }).join('')}
+                  <td>-</td>
+                </tr>
+              </tbody>
+
+              ${indirectAssessmentData ? `
+              <tbody class="achievement-pair">
+                <tr class="achievement-row">
+                  <td rowspan="2" class="assessment-type-label">
+                    <div class="vertical-text-container">Indirect Assessment</div>
+                  </td>
+                  <td colspan="2" class="achievement-label">Achievement Rate</td>
+                  ${sortedClos.map(() => `<td>80.00</td>`).join('')}
+                  <td>-</td>
+                </tr>
+                <tr class="achievement-row">
+                  <td colspan="2" class="achievement-label">% of students agreed that they achieved the CLO</td>
+                  ${sortedClos.map(clo => {
+                    const assessment = indirectAssessmentData.indirectAssessments.find(
+                      (a: any) => a.clo.replace(/\s/g, '').toUpperCase() === clo.replace(/\s/g, '').toUpperCase()
+                    );
+                    return `<td>${assessment ? assessment.achievementPercentage.toFixed(1) + '%' : '-'}</td>`;
+                  }).join('')}
+                  <td>-</td>
+                </tr>
+              </tbody>
+              ` : ''}
             </table>
-        </body>
-        </html>
-    `;
-} 
+          </div>
+
+          <div class="chart-section">
+            ${chartHtml}
+          </div>
+        </div>
+      </body>
+    </html>
+  `;
+}
+

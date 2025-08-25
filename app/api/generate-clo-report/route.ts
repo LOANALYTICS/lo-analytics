@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { connectToMongoDB } from '@/lib/db';
 import { Course, Assessment } from '@/lib/models';
-import { generateAssessmentReportHTML } from '@/templates/assessmentReport';
+import { generateCloReportHTML } from '@/templates/cloReport';
 
 interface CourseData {
   course_name: string;
@@ -260,7 +260,7 @@ export async function POST(request: Request) {
     }
 
     // Generate HTML content using the template
-    const htmlContent = await generateAssessmentReportHTML({
+    const htmlContent = await generateCloReportHTML({
       course: {
         course_name: courseData.course_name,
         level: courseData.level,
