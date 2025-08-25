@@ -250,7 +250,7 @@ export default function AssessmentCard({ href, course, standalone }: {
   const handleAssessmentPlan = async (e: any) => {
     try {
       toast.loading("Generating report")
-      const response = await fetch('/api/generate-assessment-report', {
+      const response = await fetch('/api/generate-clo-report/test', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
@@ -316,7 +316,7 @@ const handleCloReport = async (e: any, id: string, ace_year: string, section: st
 
   try {
     toast.loading("Generating report")
-    const response = await fetch(`/api/generate-clo-report?perc=${60}&courseId=${id}&academicYear=${ace_year}&section=${section}&coordinator=${coordinator?.name}`, {
+    const response = await fetch(`/api/generate-plo-report?perc=${60}&courseId=${id}&academicYear=${ace_year}&section=${section}&coordinator=${coordinator?.name}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
