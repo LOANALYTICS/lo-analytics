@@ -97,7 +97,7 @@ function generateFrontPage(academic_year: string, semester: number, section: str
                     <div class="report-details">
                         <p><strong>Academic Year:</strong> ${academic_year}</p>
                         <p><strong>Semester:</strong> ${semester}</p>
-                        <p><strong>Section:</strong> ${section}</p>
+                        <p><strong>Section:</strong> ${section === 'all' ? 'Male/Female' : section}</p>
                     </div>
                 </div>
             </div>
@@ -125,12 +125,12 @@ export function generateGradeDistributionHTML({
     return generateHTMLDocument('Grade Distribution Report', `
         ${frontPage}
         <div class="summary-page">
-        <h2 class="section-title">Levels</h2>
+        <h2 class="section-title">Students Grades Distribution (According to Levels) <br/> <span> ${semester === 1 ? 'First Semester' : 'Second Semester'} (${academic_year}) Section: ${section === 'all' ? 'Male/Female' : section}</span></h2>
             ${levelSummary}
         </div>
         ${levelTables}
         <div class="summary-page">
-            <h2 class="section-title">Departments</h2>
+            <h2 class="section-title">Students Grades Distribution (According to Departments)  <br/> <span> ${semester === 1 ? 'First Semester' : 'Second Semester'} (${academic_year}) Section: ${section === 'all' ? 'Male/Female' : section}</span></h2>
             ${departmentSummary}
         </div>
         ${departmentTables}
@@ -178,9 +178,8 @@ function generateHTMLDocument(title: string, content: string): string {
 
                 .front-page {
                     width: 100%;
-                    height: 100vh;
+                    height: 100%;
                     display: flex;
-                    align-items: center;
                     justify-content: center;
                     background: white;
                     page-break-after: always;
@@ -189,8 +188,8 @@ function generateHTMLDocument(title: string, content: string): string {
 
                 .front-page-content {
                     text-align: center;
-                    max-width: 600px;
-                    padding: 40px;
+                    max-width: 100%;
+                    padding: 10px;
                 }
 
                 .logo-container {
@@ -198,8 +197,9 @@ function generateHTMLDocument(title: string, content: string): string {
                 }
 
                 .front-logo {
-                    max-width: 200px;
-                    max-height: 200px;
+                    width: 100%;
+                    max-width: 100%;
+                    max-height: 100%;
                     object-fit: contain;
                 }
 
@@ -226,14 +226,19 @@ function generateHTMLDocument(title: string, content: string): string {
                 }
 
                 .section-title {
-                    font-size: 24px;
+                    font-size: 20px;
                     font-weight: bold;
                     color: #333;
                     text-align: center;
-                    margin: 20px 0;
-                    padding: 10px;
-                    background-color: #f5f5f5;
-                    border-radius: 4px;
+                    margin: 10px 0;
+                    padding: 5px;
+                }
+                .section-title span {
+                    font-size: 16px;
+                    font-weight: normal;
+                    color: #333;
+                    text-align: center;
+                    padding: 5px;
                 }
 
                 table {
@@ -296,7 +301,7 @@ function generateHTMLDocument(title: string, content: string): string {
                 }
                 
                 .total-row {
-                    background-color: #f0f0f0;
+                    background-color: #fff;
                     font-weight: bold;
                 }
                 
@@ -346,6 +351,8 @@ function generateHTMLDocument(title: string, content: string): string {
                     }
                     
                     .front-page {
+                        width: 100%;
+                        min-width: 100%;
                         min-height: auto;
                         display: block;
                         height: auto;
