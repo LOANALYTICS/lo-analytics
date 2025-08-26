@@ -198,7 +198,7 @@ export default function SemisterAssessmentReportButtons() {
       document.body.appendChild(container);
 
       console.log("Tables found:", container.querySelectorAll('table').length);
-      console.log("Pages found:", container.querySelectorAll('.summary-page, .page').length);
+      console.log("Pages found:", container.querySelectorAll('.front-page, .summary-page, .page').length);
 
       // Wait for rendering
       await new Promise(resolve => setTimeout(resolve, 1000));
@@ -227,7 +227,7 @@ export default function SemisterAssessmentReportButtons() {
       console.log("Starting PDF generation...");
 
       // Find all pages
-      const pages = container.querySelectorAll('.summary-page, .page');
+      const pages = container.querySelectorAll('.front-page, .summary-page, .page');
       console.log("Pages found:", pages.length);
 
       if (pages.length === 0) {
