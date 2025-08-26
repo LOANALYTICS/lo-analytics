@@ -10,6 +10,12 @@ interface CourseData {
     course_code: string;
     level: number;
     department: string;
+    collage?: {
+        logo: string;
+        english: string;
+        regional: string;
+        university: string;
+    };
 }
 
 interface GradeData {
@@ -95,9 +101,10 @@ export async function GET(request: NextRequest) {
             filterQuery.section = section;
         }
 
-        // Get courses
+        // Get courses with college info
         const courses = await Course.find(filterQuery)
-            .select('course_name course_code _id level department')
+            .populate(['collage'])
+            .select('course_name course_code _id level department collage')
             .lean() as unknown as CourseData[];
 
         if (!courses.length) {
@@ -353,6 +360,26 @@ export async function GET(request: NextRequest) {
         const departmentOverallFailPercentage = departmentSummaryTotals.totalStudents > 0 ?
             ((departmentSummaryTotals.F / departmentSummaryTotals.totalStudents) * 100).toFixed(1) : '0.0';
 
+        // Get college data from the first course's collage reference
+        let collegeData = {
+            logo: '/assets/logo.svg',
+            english: 'College Name',
+            regional: 'اسم الكلية',
+            university: 'University Name'
+        };
+        console.log('courses', courses[0].collage);
+        if (courses.length > 0 && courses[0].collage) {
+            collegeData = {
+                logo: courses[0].collage.logo || '/assets/logo.svg',
+                english: courses[0].collage.english || 'College Name',
+                regional: courses[0].collage.regional || 'اسم الكلية',
+                university: courses[0].collage.university || 'University Name'
+            };
+        }
+
+        console.log('courses[0]', courses[0]);
+        console.log('courses[0].collage', courses[0]?.collage);
+        console.log('collegeData', collegeData);
         // Generate HTML report
         const htmlContent = generateGradeDistributionHTML({
             data: {
@@ -374,12 +401,7 @@ export async function GET(request: NextRequest) {
             academic_year,
             semester: parseInt(semester),
             section,
-            college: {
-                logo: '/logo.png',
-                english: 'College of Dentistry',
-                regional: 'كلية طب الأسنان',
-                university: 'University Name'
-            }
+            college: collegeData
         });
 
         return new NextResponse(htmlContent, {
