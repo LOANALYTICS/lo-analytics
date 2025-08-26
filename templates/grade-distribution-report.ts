@@ -85,6 +85,26 @@ interface ReportParams {
 type SummaryType = 'level' | 'department';
 type TableType = 'summary' | 'detailed';
 
+function generateFrontPage(academic_year: string, semester: number, section: string, college: ReportParams['college']): string {
+    return `
+        <div class="front-page">
+            <div class="front-page-content">
+                <div class="logo-container">
+                    ${college.logo ? `<img src="${college.logo}" alt="College Logo" class="front-logo"/>` : ''}
+                </div>
+                <div class="title-container">
+                    <h1 class="main-title">Student Grade Report</h1>
+                    <div class="report-details">
+                        <p><strong>Academic Year:</strong> ${academic_year}</p>
+                        <p><strong>Semester:</strong> ${semester}</p>
+                        <p><strong>Section:</strong> ${section}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
 export function generateGradeDistributionHTML({
     data,
     academic_year,
@@ -92,23 +112,27 @@ export function generateGradeDistributionHTML({
     section,
     college
 }: ReportParams): string {
+    const frontPage = generateFrontPage(academic_year, semester, section, college);
     const levelSummary = generateSummaryTable('level', data);
-    const departmentSummary = generateSummaryTable('department', data);
     const levelTables = data.byLevel.map(levelGroup =>
         generateDetailedTable('level', levelGroup)
     ).join('');
+    const departmentSummary = generateSummaryTable('department', data);
     const departmentTables = data.byDepartment.map(deptGroup =>
         generateDetailedTable('department', deptGroup)
     ).join('');
 
     return generateHTMLDocument('Grade Distribution Report', `
+        ${frontPage}
         <div class="summary-page">
+        <h2 class="section-title">Levels</h2>
             ${levelSummary}
         </div>
+        ${levelTables}
         <div class="summary-page">
+            <h2 class="section-title">Departments</h2>
             ${departmentSummary}
         </div>
-        ${levelTables}
         ${departmentTables}
     `);
 }
@@ -150,6 +174,66 @@ function generateHTMLDocument(title: string, content: string): string {
                     background: white;
                     page-break-after: always;
                     page-break-inside: avoid;
+                }
+
+                .front-page {
+                    width: 100%;
+                    height: 100vh;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    background: white;
+                    page-break-after: always;
+                    page-break-inside: avoid;
+                }
+
+                .front-page-content {
+                    text-align: center;
+                    max-width: 600px;
+                    padding: 40px;
+                }
+
+                .logo-container {
+                    margin-bottom: 40px;
+                }
+
+                .front-logo {
+                    max-width: 200px;
+                    max-height: 200px;
+                    object-fit: contain;
+                }
+
+                .title-container {
+                    margin-bottom: 40px;
+                }
+
+                .main-title {
+                    font-size: 36px;
+                    font-weight: bold;
+                    color: #333;
+                    margin-bottom: 30px;
+                    text-align: center;
+                }
+
+                .report-details {
+                    font-size: 18px;
+                    line-height: 1.6;
+                    color: #555;
+                }
+
+                .report-details p {
+                    margin: 10px 0;
+                }
+
+                .section-title {
+                    font-size: 24px;
+                    font-weight: bold;
+                    color: #333;
+                    text-align: center;
+                    margin: 20px 0;
+                    padding: 10px;
+                    background-color: #f5f5f5;
+                    border-radius: 4px;
                 }
 
                 table {
@@ -261,12 +345,22 @@ function generateHTMLDocument(title: string, content: string): string {
                         display: block;
                     }
                     
+                    .front-page {
+                        min-height: auto;
+                        display: block;
+                        height: auto;
+                    }
+                    
                     /* Remove empty space */
                     .summary-page:empty {
                         display: none;
                     }
                     
                     .page:empty {
+                        display: none;
+                    }
+                    
+                    .front-page:empty {
                         display: none;
                     }
                     
