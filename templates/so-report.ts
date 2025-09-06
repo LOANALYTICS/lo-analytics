@@ -513,9 +513,9 @@ function generatePerformanceCurveChartHTML(performanceCurveData: {
     const barWidth = chartWidth / scoreRanges.length * 0.8; // Wider bars to fill the space
     const barSpacing = chartWidth / scoreRanges.length * 0.2; // Less spacing
     
-    // Generate bars - centered ON tick marks (like Excel)
+    // Generate bars - positioned BETWEEN tick marks (like Excel ranges)
     const bars = scoreRanges.map((range, i) => {
-        // Center bar on tick mark using midpoint
+        // Position bar BETWEEN tick marks - centered in the range
         const x = margin.left + (i * (barWidth + barSpacing)) + barSpacing / 2;
         const barHeight = (range.count / maxCount) * chartHeight;
         const y = height - margin.bottom - barHeight;
@@ -528,11 +528,14 @@ function generatePerformanceCurveChartHTML(performanceCurveData: {
     }).join('');
     
     // Generate normal distribution curve using the calculated data
+    // Map actual x values (60-100) to chart positions
     const curvePoints = normalDistributionData.map((point, i) => {
-        const x = margin.left + (i * (barWidth + barSpacing)) + barWidth / 2;
+        // Calculate x position based on actual score value (60-100)
+        const scoreValue = point.x; // This is 60, 61, 62, 63, etc.
+        const xPosition = margin.left + ((scoreValue - 55) / 5) * (barWidth + barSpacing) + barSpacing / 2;
         const normalizedValue = point.value / Math.max(...normalDistributionData.map(p => p.value));
         const y = height - margin.bottom - (normalizedValue * chartHeight);
-        return { x, y };
+        return { x: xPosition, y };
     });
     
     // Create smooth curve path
@@ -559,10 +562,10 @@ function generatePerformanceCurveChartHTML(performanceCurveData: {
         `;
     }).join('');
     
-    // Add the first tick mark (55)
+    // Add the first tick mark (60)
     const firstTick = `
         <line x1="${margin.left}" y1="${height - margin.bottom}" x2="${margin.left}" y2="${height - margin.bottom + 5}" stroke="#333" stroke-width="1" />
-        <text x="${margin.left}" y="${height - margin.bottom + 20}" text-anchor="middle" font-size="9" fill="#555">55</text>
+        <text x="${margin.left}" y="${height - margin.bottom + 20}" text-anchor="middle" font-size="9" fill="#555">60</text>
     `;
     
     // Y-axis
