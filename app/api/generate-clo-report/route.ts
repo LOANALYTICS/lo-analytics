@@ -259,6 +259,50 @@ export async function POST(request: Request) {
       // Continue with response even if save fails
     }
 
+    // Analyze unique exam types and their results
+    console.log('=== ASSESSMENT ANALYSIS ===');
+    
+    // Get unique exam types
+    const uniqueExamTypes = new Set<string>();
+    assessmentData.assessmentResults.forEach(result => {
+      uniqueExamTypes.add(result.type);
+    });
+    
+    console.log('Unique Exam Types:', Array.from(uniqueExamTypes));
+    
+    // Analyze results for each exam type
+    uniqueExamTypes.forEach(examType => {
+      const examResults = assessmentData.assessmentResults.find(result => result.type === examType);
+      if (examResults) {
+        console.log(`\n--- ${examType.toUpperCase()} RESULTS ---`);
+        console.log(`Number of students: ${examResults.results.length}`);
+        
+        // Calculate statistics for this exam type
+        const percentages = examResults.results.map(student => {
+          const percentage = (student.totalScore.marksScored / student.totalScore.totalMarks) * 100;
+          return percentage;
+        });
+        
+        const mean = percentages.reduce((sum, p) => sum + p, 0) / percentages.length;
+        const variance = percentages.reduce((sum, p) => sum + Math.pow(p - mean, 2), 0) / percentages.length;
+        const standardDeviation = Math.sqrt(variance);
+        
+        console.log(`Mean percentage: ${mean.toFixed(2)}%`);
+        console.log(`Standard deviation: ${standardDeviation.toFixed(2)}%`);
+        console.log(`Min percentage: ${Math.min(...percentages).toFixed(2)}%`);
+        console.log(`Max percentage: ${Math.max(...percentages).toFixed(2)}%`);
+        
+        // Show first few student results as sample
+        console.log('Sample student results:');
+        examResults.results.slice(0, 3).forEach((student, index) => {
+          const percentage = (student.totalScore.marksScored / student.totalScore.totalMarks) * 100;
+          console.log(`  ${index + 1}. ${student.studentName} (${student.studentId}): ${student.totalScore.marksScored}/${student.totalScore.totalMarks} (${percentage.toFixed(2)}%)`);
+        });
+      }
+    });
+    
+    console.log('\n=== END ASSESSMENT ANALYSIS ===\n');
+
     // Generate HTML content using the template
     const htmlContent = await generateCloReportHTML({
       course: {

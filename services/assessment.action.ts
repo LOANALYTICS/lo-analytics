@@ -148,6 +148,23 @@ export async function updateAssessmentPlans(courseId: string, academicYear: stri
             };
         }
 
+        // Validate that students and CLO mappings are configured
+        if (!assessmentDoc.students || assessmentDoc.students.length === 0) {
+            return {
+                success: false,
+                message: 'Please configure students first',
+                data: null
+            };
+        }
+
+        if (!assessmentDoc.cloData || assessmentDoc.cloData.length === 0) {
+            return {
+                success: false,
+                message: 'Please configure CLO mapping first',
+                data: null
+            };
+        }
+
         // Use `type` as the linking key
         const updatedTypes = assessments.map(a => a.type);
 
