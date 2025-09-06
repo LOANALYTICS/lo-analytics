@@ -163,7 +163,25 @@ const generatePDF = async (html: string, fileName: string, orientation: 'portrai
 
                 line-height: 1.2;
                 font-weight: bold;
-                padding: 12px 15px;
+              }
+              
+              /* Summary text styling for page 2 */
+              .summary-section h3 {
+                font-size: 16px !important;
+                font-weight: bold !important;
+                text-align: center !important;
+                margin: 50px 0 !important;
+                color: #333 !important;
+              }
+              .summary-section div {
+                font-size: 14px !important;
+                line-height: 1.4 !important;
+                text-align: left !important;
+              }
+              .summary-section p {
+                font-size: 14px !important;
+                margin: 10px 0 !important;
+                line-height: 1.4 !important;
               }
               .performance-score {
                 font-weight: bold;
@@ -227,11 +245,11 @@ const generatePDF = async (html: string, fileName: string, orientation: 'portrai
       // Skip scaling for the second page (Performance Curve page)
       let scale, pdfWidth, pdfHeight, x, y;
       
-      if (i === 1) { // Second page - full width professional size
-        scale = widthScale; // Use full width scaling
+      if (i === 1) { // Second page - natural scaling, no stretch
+        scale = Math.min(widthScale, heightScale); // Natural aspect ratio
         pdfWidth = (imgProps.width / pxPerMm) * scale;
         pdfHeight = (imgProps.height / pxPerMm) * scale;
-        x = margin; // Start from left margin for full width
+        x = (pageWidth - pdfWidth) / 2; // Center horizontally
         y = margin; // Start from top margin
       } else { // Other pages - apply scaling
         scale = Math.min(widthScale, heightScale);

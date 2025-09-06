@@ -247,37 +247,20 @@ export function generateSOHTML({
 
             <!-- Page 2: Performance Curve Chart and Summary -->
             <div class="page-break page-container">
-                <div class="container content-page">
-                    <h2 class="h2_class">Students Performance Curve</h2>
-                    
-                    <div class="table-chart-container">
-                        <div class="chart-section">
-                            <div class="chart-wrapper">
-                                ${performanceCurveData ? generatePerformanceCurveChartHTML(performanceCurveData) : ''}
-                            </div>
-                        </div>
-                        
+                <div class="container content-page" style="margin: 0; padding: 0; width: 190mm;">
+                    <div style="width: 190mm; height: 280mm; background-color: lightblue;">
                         <div class="summary-section">
-                            <h3 style="text-align: center; margin: 20px 0; font-size: 1.4em; font-weight: bold;">Summary</h3>
-                            <div style="text-align: left; line-height: 1.6; font-size: 14px;">
-                                <p><strong>Comments:</strong></p>
-                                <ul style="margin: 10px 0; padding-left: 20px;">
-                                    <li><strong>Central Tendency:</strong> The highest concentration of scores is at ${performanceCurveData?.statistics.mean || 'N/A'}, suggesting this is close to the mean or mode of the distribution.</li>
-                                    <li><strong>Distribution Shape:</strong> The bell curve overlay implies the scores roughly follow a normal distribution, though slightly left-skewed due to the absence of high-end scores (95–100).</li>
-                                    <li><strong>Spread:</strong> The range is from ${performanceCurveData?.statistics.min || 'N/A'} to ${performanceCurveData?.statistics.max || 'N/A'}, with no extreme outliers. This suggests a relatively tight clustering of performance.</li>
-                                    <li><strong>Performance Insight:</strong>
-                                        <ul style="margin: 5px 0; padding-left: 15px;">
-                                            <li>Majority of students are scoring between 75 and 90, indicating a generally competent cohort.</li>
-                                            <li>The lack of scores below 65 or above 90 may reflect either effective teaching or a well-calibrated assessment</li>
-                                        </ul>
-                                    </li>
-                                    <li><strong>Performance Benchmarking:</strong>
-                                        <ul style="margin: 5px 0; padding-left: 15px;">
-                                            <li>If this curve aligns with expected norms, it supports the validity of your CLOs. But interpret based on our graph data.</li>
-                                            <li>If not, it may prompt a review of item difficulty or grading thresholds. But interpret based on our graph data</li>
-                                        </ul>
-                                    </li>
-                                </ul>
+                            <h3>Summary</h3>
+                            <div>
+                                <p><strong>Central Tendency:</strong> The highest concentration of scores is at ${performanceCurveData?.statistics.mean || 'N/A'}, suggesting this is close to the mean or mode of the distribution.</p>
+                                
+                                <p><strong>Distribution Shape:</strong> The bell curve overlay implies the scores roughly follow a normal distribution, though slightly left-skewed due to the absence of high-end scores (95–100).</p>
+                                
+                                <p><strong>Spread:</strong> The range is from ${performanceCurveData?.statistics.min || 'N/A'} to ${performanceCurveData?.statistics.max || 'N/A'}, with no extreme outliers. This suggests a relatively tight clustering of performance.</p>
+                                
+                                <p><strong>Performance Insight:</strong> Majority of students are scoring between 75 and 90, indicating a generally competent cohort. The lack of scores below 65 or above 90 may reflect either effective teaching or a well-calibrated assessment.</p>
+                                
+                                <p><strong>Performance Benchmarking:</strong> If this curve aligns with expected norms, it supports the validity of your CLOs. If not, it may prompt a review of item difficulty or grading thresholds. Interpret based on our graph data.</p>
                             </div>
                         </div>
                     </div>
@@ -466,9 +449,9 @@ function generatePerformanceCurveChartHTML(performanceCurveData: {
     const ranges = performanceCurveData.ranges;
     const maxCount = Math.max(...ranges.map(r => r.count));
     
-    // Chart dimensions - full professional width
-    const width = 700;
-    const height = 350;
+     // Chart dimensions - FULL PAGE WIDTH
+     const width = 1200;
+     const height = 600;
     const margin = {
         left: 70,
         right: 50,
@@ -495,16 +478,29 @@ function generatePerformanceCurveChartHTML(performanceCurveData: {
         `;
     }).join('');
     
-    // Generate smooth curve (bell curve approximation)
-    const curvePoints = ranges.map((range, i) => {
-        const x = margin.left + (i * (barWidth + barSpacing)) + barWidth / 2;
-        // Simple bell curve approximation based on count
-        const normalizedCount = range.count / maxCount;
-        const y = height - margin.bottom - (normalizedCount * chartHeight);
-        return `${x},${y}`;
-    }).join(' L');
-    
-    const curve = `<path d="M ${curvePoints}" stroke="#E74C3C" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round" />`;
+     // Generate smooth curve (bell curve approximation) with cubic bezier
+     const smoothCurve = ranges.map((range, i) => {
+         const x = margin.left + (i * (barWidth + barSpacing)) + barWidth / 2;
+         const normalizedCount = range.count / maxCount;
+         const y = height - margin.bottom - (normalizedCount * chartHeight);
+         
+         if (i === 0) return `M ${x},${y}`;
+         
+         const prevRange = ranges[i - 1];
+         const prevX = margin.left + ((i - 1) * (barWidth + barSpacing)) + barWidth / 2;
+         const prevNormalizedCount = prevRange.count / maxCount;
+         const prevY = height - margin.bottom - (prevNormalizedCount * chartHeight);
+         
+         // Control points for smooth curve
+         const cp1x = prevX + (x - prevX) / 3;
+         const cp1y = prevY;
+         const cp2x = x - (x - prevX) / 3;
+         const cp2y = y;
+         
+         return `C ${cp1x},${cp1y} ${cp2x},${cp2y} ${x},${y}`;
+     }).join(' ');
+     
+     const curve = `<path d="${smoothCurve}" stroke="#E74C3C" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round" />`;
     
     // Y-axis
     const yAxis = Array.from({ length: Math.ceil(maxCount) + 1 }, (_, i) => {
@@ -516,24 +512,24 @@ function generatePerformanceCurveChartHTML(performanceCurveData: {
         `;
     }).join('');
     
-    return `
-        <div style="width: 100%; height: ${height}px; margin: 0; padding: 0;">
-            <svg width="100%" height="${height}" viewBox="0 0 ${width} ${height}" style="width: 100%; height: ${height}px; display: block;">
-                <text x="${width / 2}" y="25" text-anchor="middle" font-size="18" font-weight="bold" fill="#333">
-                    Students Performance Curve
-                </text>
-                <text x="${width / 2}" y="${height - 15}" text-anchor="middle" font-size="14" fill="#666">
-                    Score Ranges
-                </text>
-                <text x="25" y="${height / 2}" text-anchor="middle" font-size="14" fill="#666" transform="rotate(-90, 25, ${height / 2})">
-                    Number of Students
-                </text>
-                ${yAxis}
-                ${bars}
-                ${curve}
-            </svg>
-        </div>
-    `;
+     return `
+         <div style="width: 100%; height: ${height}px; margin: 0; padding: 0;">
+             <svg width="100%" height="${height}" viewBox="0 0 ${width} ${height}" style="width: 100%; height: ${height}px; display: block; margin: 0; padding: 0;">
+                 <text x="${width / 2}" y="25" text-anchor="middle" font-size="18" font-weight="bold" fill="#333">
+                     Students Performance Curve
+                 </text>
+                 <text x="${width / 2}" y="${height - 15}" text-anchor="middle" font-size="14" fill="#666">
+                     Score Ranges
+                 </text>
+                 <text x="25" y="${height / 2}" text-anchor="middle" font-size="14" fill="#666" transform="rotate(-90, 25, ${height / 2})">
+                     Number of Students
+                 </text>
+                 ${yAxis}
+                 ${bars}
+                 ${curve}
+             </svg>
+         </div>
+     `;
 }
 
 function getColorForGrade(grade: string): string {
