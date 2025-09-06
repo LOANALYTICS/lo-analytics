@@ -140,19 +140,22 @@ const generatePDF = async (html: string, fileName: string, orientation: 'portrai
                 border: 1px solid black;
                 padding: 12px 15px;
                 text-align: center;
-                font-size: 20px;
+                font-size: 32px;
+                font-weight: 500;
               }
               .performance-table th {
                 background-color: #f2f2f2;
                 font-weight: bold;
-                font-size: 22px;
+                font-size: 36px;
                 padding: 15px 20px;
                 white-space: normal;
                 word-wrap: break-word;
                 line-height: 1.2;
               }
               .performance-cell {
-                font-size: 22px;
+                font-size: 32px;
+                font-weight: 500;
+
                 line-height: 1.2;
                 font-weight: bold;
                 padding: 12px 15px;
@@ -163,9 +166,7 @@ const generatePDF = async (html: string, fileName: string, orientation: 'portrai
               .performance-zscore {
                 color: #666;
               }
-              .performance-level {
-                font-style: italic;
-              }
+              
               .low { color: #d32f2f; }
               .average { color: #f57c00; }
               .high { color: #388e3c; }
@@ -218,14 +219,8 @@ const generatePDF = async (html: string, fileName: string, orientation: 'portrai
       const widthScale = maxImgWidth / (imgProps.width / pxPerMm);
       const heightScale = maxImgHeight / (imgProps.height / pxPerMm);
       
-      // Always use width scale to fill the page width, only limit by height if absolutely necessary
-      let scale = widthScale;
-      const scaledHeight = (imgProps.height / pxPerMm) * scale;
-      
-      // Only reduce scale if content would exceed page height significantly
-      if (scaledHeight > maxImgHeight * 1.2) {
-        scale = heightScale * 1.1; // Give 10% extra height tolerance
-      }
+      // Simple approach: use the smaller of the two scales to ensure it fits
+      let scale = Math.min(widthScale, heightScale);
       
       const pdfWidth = (imgProps.width / pxPerMm) * scale;
       const pdfHeight = (imgProps.height / pxPerMm) * scale;
