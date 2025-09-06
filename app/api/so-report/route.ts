@@ -296,9 +296,9 @@ export async function GET(request: Request) {
         // Calculate performance curve data
         const performanceCurveData = calculatePerformanceCurve(overallScores);
         
-        console.log('=== STUDENT PERFORMANCE ANALYSIS ===');
-        console.log(JSON.stringify(performanceAnalysis, null, 2));
-        console.log('=== END ANALYSIS ===\n');
+        // console.log('=== STUDENT PERFORMANCE ANALYSIS ===');
+        // console.log(JSON.stringify(performanceAnalysis, null, 2));
+        // console.log('=== END ANALYSIS ===\n');
 
         // Await the HTML generation
         const htmlContent = await generateSOHTML({

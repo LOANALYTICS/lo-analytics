@@ -252,7 +252,7 @@ export function generateSOHTML({
                         <h2 class="h2_class">Students Performance Curve</h2>
                         
                         <div class="chart-section">
-                            ${generatePerformanceCurveChartHTML(performanceCurveData)}
+                            ${performanceCurveData ? generatePerformanceCurveChartHTML(performanceCurveData, performanceAnalysis) : ''}
                         </div>
                         
                         <div class="summary-section">
@@ -451,13 +451,34 @@ function generatePerformanceCurveChartHTML(performanceCurveData: {
         max: string;
         totalStudents: number;
     };
+}, performanceAnalysis?: {
+    overall: {
+        mean: number;
+        stdDev: number;
+    };
 }): string {
     const ranges = performanceCurveData.ranges;
     const maxCount = Math.max(...ranges.map(r => r.count));
     
-     // Chart dimensions - Professional size
-     const width = 800;
-     const height = 350;
+    // Get mean and stdDev from performance analysis data (overall)
+    const mean = performanceAnalysis?.overall?.mean || parseFloat(performanceCurveData.statistics.mean);
+    const stdDev = performanceAnalysis?.overall?.stdDev || calculateStdDev(performanceCurveData);
+    
+    // Create normal distribution data set using NORM.DIST formula
+    // Formula: NORM.DIST(x, mean, stdDev, false) * 97
+    const normalDistributionData = generateNormalDistributionData(mean, stdDev, ranges);
+    
+    // Console log mean, stdDev and line chart data set
+    console.log('=== CALCULATION VALUES ===');
+    console.log('Mean:', mean);
+    console.log('StdDev:', stdDev);
+    console.log('=== LINE CHART DATA SET ===');
+    console.log(normalDistributionData);
+    console.log('=== END LINE CHART DATA ===');
+    
+    // Chart dimensions - Professional size
+    const width = 800;
+    const height = 350;
     const margin = {
         left: 60,
         right: 40,
@@ -467,11 +488,34 @@ function generatePerformanceCurveChartHTML(performanceCurveData: {
     
     const chartWidth = width - margin.left - margin.right;
     const chartHeight = height - margin.top - margin.bottom;
-    const barWidth = chartWidth / ranges.length * 0.8;
-    const barSpacing = chartWidth / ranges.length * 0.2;
     
-    // Generate bars
-    const bars = ranges.map((range, i) => {
+    // Create custom score ranges to match the reference image (55-100 in steps of 5)
+    const scoreRanges = [
+        { min: 55, max: 60, count: 0 },
+        { min: 60, max: 65, count: 0 },
+        { min: 65, max: 70, count: 0 },
+        { min: 70, max: 75, count: 0 },
+        { min: 75, max: 80, count: 0 },
+        { min: 80, max: 85, count: 0 },
+        { min: 85, max: 90, count: 0 },
+        { min: 90, max: 95, count: 0 },
+        { min: 95, max: 100, count: 0 }
+    ];
+    
+    // Map existing ranges to the new structure
+    ranges.forEach(range => {
+        const targetRange = scoreRanges.find(sr => sr.min === range.min && sr.max === range.max);
+        if (targetRange) {
+            targetRange.count = range.count;
+        }
+    });
+    
+    const barWidth = chartWidth / scoreRanges.length * 0.8; // Wider bars to fill the space
+    const barSpacing = chartWidth / scoreRanges.length * 0.2; // Less spacing
+    
+    // Generate bars - centered ON tick marks (like Excel)
+    const bars = scoreRanges.map((range, i) => {
+        // Center bar on tick mark using midpoint
         const x = margin.left + (i * (barWidth + barSpacing)) + barSpacing / 2;
         const barHeight = (range.count / maxCount) * chartHeight;
         const y = height - margin.bottom - barHeight;
@@ -480,33 +524,46 @@ function generatePerformanceCurveChartHTML(performanceCurveData: {
             <rect x="${x}" y="${y}" width="${barWidth}" height="${barHeight}" 
                   fill="#4A90E2" rx="2" ry="2" stroke="#333" stroke-width="0.5" />
             <text x="${x + barWidth / 2}" y="${y - 5}" text-anchor="middle" font-size="10" font-weight="bold" fill="#333">${range.count}</text>
-            <text x="${x + barWidth / 2}" y="${height - margin.bottom + 15}" text-anchor="middle" font-size="9" font-weight="bold" fill="#555">${range.label}</text>
         `;
     }).join('');
     
-     // Generate smooth curve (bell curve approximation) with cubic bezier
-     const smoothCurve = ranges.map((range, i) => {
-         const x = margin.left + (i * (barWidth + barSpacing)) + barWidth / 2;
-         const normalizedCount = range.count / maxCount;
-         const y = height - margin.bottom - (normalizedCount * chartHeight);
-         
-         if (i === 0) return `M ${x},${y}`;
-         
-         const prevRange = ranges[i - 1];
-         const prevX = margin.left + ((i - 1) * (barWidth + barSpacing)) + barWidth / 2;
-         const prevNormalizedCount = prevRange.count / maxCount;
-         const prevY = height - margin.bottom - (prevNormalizedCount * chartHeight);
-         
-         // Control points for smooth curve
-         const cp1x = prevX + (x - prevX) / 3;
-         const cp1y = prevY;
-         const cp2x = x - (x - prevX) / 3;
-         const cp2y = y;
-         
-         return `C ${cp1x},${cp1y} ${cp2x},${cp2y} ${x},${y}`;
-     }).join(' ');
-     
-     const curve = `<path d="${smoothCurve}" stroke="#E74C3C" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round" />`;
+    // Generate normal distribution curve using the calculated data
+    const curvePoints = normalDistributionData.map((point, i) => {
+        const x = margin.left + (i * (barWidth + barSpacing)) + barWidth / 2;
+        const normalizedValue = point.value / Math.max(...normalDistributionData.map(p => p.value));
+        const y = height - margin.bottom - (normalizedValue * chartHeight);
+        return { x, y };
+    });
+    
+    // Create smooth curve path
+    const curvePath = curvePoints.map((point, i) => {
+        if (i === 0) return `M ${point.x},${point.y}`;
+        
+        const prevPoint = curvePoints[i - 1];
+        const cp1x = prevPoint.x + (point.x - prevPoint.x) / 3;
+        const cp1y = prevPoint.y;
+        const cp2x = point.x - (point.x - prevPoint.x) / 3;
+        const cp2y = point.y;
+        
+        return `C ${cp1x},${cp1y} ${cp2x},${cp2y} ${point.x},${point.y}`;
+    }).join(' ');
+    
+    const curve = `<path d="${curvePath}" stroke="#E74C3C" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round" />`;
+    
+    // Generate x-axis tick marks and labels - show score values (55, 60, 65, 70, 75, 80, 85, 90, 95, 100)
+    const xAxisTicks = scoreRanges.map((range, i) => {
+        const x = margin.left + (i * (barWidth + barSpacing)) + barWidth / 2;
+        return `
+            <line x1="${x}" y1="${height - margin.bottom}" x2="${x}" y2="${height - margin.bottom + 5}" stroke="#333" stroke-width="1" />
+            <text x="${x}" y="${height - margin.bottom + 20}" text-anchor="middle" font-size="9" fill="#555">${range.max}</text>
+        `;
+    }).join('');
+    
+    // Add the first tick mark (55)
+    const firstTick = `
+        <line x1="${margin.left}" y1="${height - margin.bottom}" x2="${margin.left}" y2="${height - margin.bottom + 5}" stroke="#333" stroke-width="1" />
+        <text x="${margin.left}" y="${height - margin.bottom + 20}" text-anchor="middle" font-size="9" fill="#555">55</text>
+    `;
     
     // Y-axis
     const yAxis = Array.from({ length: Math.ceil(maxCount) + 1 }, (_, i) => {
@@ -518,24 +575,65 @@ function generatePerformanceCurveChartHTML(performanceCurveData: {
         `;
     }).join('');
     
-     return `
-         <div style="width: 100%; height: ${height}px; margin: 0; padding: 0;">
-             <svg width="100%" height="${height}" viewBox="0 0 ${width} ${height}" style="width: 100%; height: ${height}px; display: block; margin: 0; padding: 0;">
-                 <text x="${width / 2}" y="25" text-anchor="middle" font-size="14" font-weight="bold" fill="#333">
-                     Students Performance Curve
-                 </text>
-                 <text x="${width / 2}" y="${height - 15}" text-anchor="middle" font-size="12" fill="#666">
-                     Score Ranges
-                 </text>
-                 <text x="25" y="${height / 2}" text-anchor="middle" font-size="12" fill="#666" transform="rotate(-90, 25, ${height / 2})">
-                     Number of Students
-                 </text>
-                 ${yAxis}
-                 ${bars}
-                 ${curve}
-             </svg>
-         </div>
-     `;
+    return `
+        <div style="width: 100%; height: ${height}px; margin: 0; padding: 0;">
+            <svg width="100%" height="${height}" viewBox="0 0 ${width} ${height}" style="width: 100%; height: ${height}px; display: block; margin: 0; padding: 0;">
+                <text x="${width / 2}" y="25" text-anchor="middle" font-size="14" font-weight="bold" fill="#333">
+                    Students Performance Curve
+                </text>
+                <text x="${width / 2}" y="${height - 15}" text-anchor="middle" font-size="12" fill="#666">
+                    Scores
+                </text>
+                <text x="25" y="${height / 2}" text-anchor="middle" font-size="12" fill="#666" transform="rotate(-90, 25, ${height / 2})">
+                    Count
+                </text>
+                ${yAxis}
+                ${bars}
+                ${curve}
+                ${firstTick}
+                ${xAxisTicks}
+            </svg>
+        </div>
+    `;
+}
+
+// Helper function to calculate standard deviation from performance curve data
+function calculateStdDev(performanceCurveData: any): number {
+    // Calculate weighted standard deviation from the ranges
+    const ranges = performanceCurveData.ranges;
+    const mean = parseFloat(performanceCurveData.statistics.mean);
+    
+    let weightedVariance = 0;
+    let totalCount = 0;
+    
+    ranges.forEach((range: any) => {
+        const midpoint = (range.min + range.max) / 2;
+        const variance = Math.pow(midpoint - mean, 2) * range.count;
+        weightedVariance += variance;
+        totalCount += range.count;
+    });
+    
+    return Math.sqrt(weightedVariance / totalCount);
+}
+
+// Helper function to generate normal distribution data using NORM.DIST formula
+function generateNormalDistributionData(mean: number, stdDev: number, ranges: Array<{min: number, max: number, label: string, count: number}>): Array<{x: number, value: number}> {
+    const data: Array<{x: number, value: number}> = [];
+    
+    // Generate points for x values: 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100
+    for (let x = 60; x <= 100; x++) {
+        const value = normalDistribution(x, mean, stdDev) * 97; // NORM.DIST(x, mean, stdDev, false) * 97
+        data.push({ x, value });
+    }
+    
+    return data;
+}
+
+// Normal distribution function (equivalent to NORM.DIST in Excel)
+function normalDistribution(x: number, mean: number, stdDev: number): number {
+    const coefficient = 1 / (stdDev * Math.sqrt(2 * Math.PI));
+    const exponent = -Math.pow(x - mean, 2) / (2 * Math.pow(stdDev, 2));
+    return coefficient * Math.exp(exponent);
 }
 
 function getColorForGrade(grade: string): string {
