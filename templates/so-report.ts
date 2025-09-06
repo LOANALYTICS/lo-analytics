@@ -67,9 +67,9 @@ export function generateSOHTML({
     };
 }) {
     // Console log the performance analysis data
-    console.log('=== PERFORMANCE ANALYSIS IN SO REPORT ===');
-    console.log(JSON.stringify(performanceAnalysis, null, 2));
-    console.log('=== END PERFORMANCE ANALYSIS ===\n');
+    // console.log('=== PERFORMANCE ANALYSIS IN SO REPORT ===');
+    // console.log(JSON.stringify(performanceAnalysis, null, 2));
+    // console.log('=== END PERFORMANCE ANALYSIS ===\n');
 
     // Calculate overall totals
     const totalStudents: number = Object.values(overallGrades).reduce<number>((sum, count) => sum + count, 0);
@@ -286,6 +286,7 @@ export function generateSOHTML({
                     </div>
                     <h2 class="h2_class">Student Performance Analysis</h2>
                 
+                ${performanceAnalysis ? `
                 <table class="performance-table">
                     <thead>
                         <tr>
@@ -293,22 +294,9 @@ export function generateSOHTML({
                             <th>Student ID</th>
                             <th>Student Name</th>
                             ${Object.keys(performanceAnalysis.metadata).map(examType => `
-                                <th colspan="3">${examType}</th>
+                                <th>${examType}</th>
                             `).join('')}
-                            <th colspan="3">Overall</th>
-                        </tr>
-                        <tr>
-                            <th></th>
-                            <th></th>
-                            <th></th>
-                            ${Object.keys(performanceAnalysis.metadata).map(() => `
-                                <th>Score</th>
-                                <th>Z-Score</th>
-                                <th>Level</th>
-                            `).join('')}
-                            <th>Score</th>
-                            <th>Z-Score</th>
-                            <th>Level</th>
+                            <th>Overall</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -322,28 +310,16 @@ export function generateSOHTML({
                                     if (perf) {
                                         return `
                                             <td class="performance-cell">
-                                                <div class="performance-score">${perf.scoreOutOf100.toFixed(1)}</div>
-                                            </td>
-                                            <td class="performance-cell">
-                                                <div class="performance-zscore">${perf.zScore.toFixed(2)}</div>
-                                            </td>
-                                            <td class="performance-cell">
                                                 <div class="performance-level ${perf.performance.toLowerCase()}">${perf.performance}</div>
                                             </td>
                                         `;
                                     } else {
-                                        return `<td></td><td></td><td></td>`;
+                                        return `<td></td>`;
                                     }
                                 }).join('')}
                                 ${(() => {
                                     const overallPerf = student.performance.Overall;
                                     return `
-                                        <td class="performance-cell">
-                                            <div class="performance-score">${overallPerf.scoreOutOf100.toFixed(1)}</div>
-                                        </td>
-                                        <td class="performance-cell">
-                                            <div class="performance-zscore">${overallPerf.zScore.toFixed(2)}</div>
-                                        </td>
                                         <td class="performance-cell">
                                             <div class="performance-level ${overallPerf.performance.toLowerCase()}">${overallPerf.performance}</div>
                                         </td>
@@ -353,6 +329,7 @@ export function generateSOHTML({
                         `).join('')}
                     </tbody>
                 </table>
+                ` : ''}
                 </div>
             </div>
 

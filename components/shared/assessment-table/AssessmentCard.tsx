@@ -120,7 +120,7 @@ const generatePDF = async (html: string, fileName: string, orientation: 'portrai
               .detail-item {
                 display: flex;
                 gap: 5px;
-                font-size: 14px;
+                font-size: 18px;
               }
               .detail-label {
                 font-weight: bold;
@@ -134,20 +134,27 @@ const generatePDF = async (html: string, fileName: string, orientation: 'portrai
                 border: 1px solid black;
                 border-radius: 10px;
                 overflow: hidden;
+                font-size: 20px;
               }
               .performance-table th, .performance-table td {
                 border: 1px solid black;
-                padding: 6px;
+                padding: 10px 4px;
                 text-align: center;
-                font-size: 11px;
+                font-size: 20px;
               }
               .performance-table th {
                 background-color: #f2f2f2;
                 font-weight: bold;
+                font-size: 16px;
+                padding: 12px 4px;
+                white-space: normal;
+                word-wrap: break-word;
+                line-height: 1.2;
               }
               .performance-cell {
-                font-size: 10px;
+                font-size: 20px;
                 line-height: 1.2;
+                font-weight: bold;
               }
               .performance-score {
                 font-weight: bold;
@@ -202,7 +209,7 @@ const generatePDF = async (html: string, fileName: string, orientation: 'portrai
         backgroundColor: '#ffffff'
       });
 
-      // Calculate scale to fit page - be more aggressive with scaling
+      // Calculate scale to fit page - prioritize width scaling for better space usage
       const maxImgWidth = pageWidth - 2 * margin;
       const maxImgHeight = pageHeight - 2 * margin;
       const pxPerMm = canvas.width / (canvas.width / 2.83465);
@@ -210,8 +217,15 @@ const generatePDF = async (html: string, fileName: string, orientation: 'portrai
       const widthScale = maxImgWidth / (imgProps.width / pxPerMm);
       const heightScale = maxImgHeight / (imgProps.height / pxPerMm);
       
-      // Use width scale primarily, only use height scale if content is too tall
-      const scale = heightScale < widthScale ? Math.min(widthScale, heightScale * 1.1) : widthScale;
+      // Always use width scale to fill the page width, only limit by height if absolutely necessary
+      let scale = widthScale;
+      const scaledHeight = (imgProps.height / pxPerMm) * scale;
+      
+      // Only reduce scale if content would exceed page height significantly
+      if (scaledHeight > maxImgHeight * 1.2) {
+        scale = heightScale * 1.1; // Give 10% extra height tolerance
+      }
+      
       const pdfWidth = (imgProps.width / pxPerMm) * scale;
       const pdfHeight = (imgProps.height / pxPerMm) * scale;
       
