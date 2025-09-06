@@ -82,6 +82,7 @@ export function generateSOHTML({
     <html>
         <head>
             <style>
+                /* Basic layout styles - detailed styling handled in AssessmentCard */
                 body { 
                     font-family: Arial, sans-serif; 
                     margin: 0;
@@ -100,80 +101,6 @@ export function generateSOHTML({
                     margin: 10px 0;
                     font-size: 1.8em;
                     font-weight:800;
-                }
-                .header { 
-                    text-align: center; 
-                    margin-bottom: 30px; 
-                }
-                .logo { 
-                    max-width: 100%; 
-                    height: auto; 
-                }
-                table { 
-                    width: 100%;
-                    border-collapse: collapse;
-                    margin-top: 20px;
-                    margin-bottom: 60px;
-                    border: 1px solid black;
-                    border-radius: 10px;
-                    overflow: hidden;
-                }
-                th, td { 
-                    border: 1px solid black;
-                    padding: 8px;
-                    text-align: center;
-                    font-size: 12px;
-                    padding-top: 5px;
-                    padding-bottom: 10px;
-                }
-                th {
-                    background-color: #f2f2f2;
-                    padding-top: 20px;
-                    padding-bottom: 30px;
-                }
-                .total-col {
-                    background-color: #e6e6e6;
-                    font-weight: bold;
-                }
-                .grade-row-group {
-                    break-inside: avoid;
-                    page-break-inside: avoid;
-                }
-                .chart-grid {
-                    display: flex;
-                    flex-wrap: wrap;
-                    gap: 20px;
-                }
-                .chart-wrapper {
-                    break-inside: avoid;
-                    page-break-inside: avoid;
-                }
-                @page {
-                    size: A4;
-                    margin: 2cm;
-                }
-                @media print {
-                    .chart-wrapper:nth-child(2n) {
-                        page-break-after: always;
-                    }
-                }
-                .course-details {
-                    display: grid;
-                    grid-template-columns: repeat(2, 1fr);
-                    gap: 15px;
-                    margin-bottom: 30px;
-                    border: 1px solid #ddd;
-                    padding: 15px;
-                    border-radius: 5px;
-                }
-                .detail-item {
-                    display: flex;
-                    gap: 5px;
-                    font-size: 14px;
-                }
-                .detail-label {
-                    font-weight: bold;
-                    white-space: nowrap;
                 }
                 .page-container {
                     width: 100%;
@@ -220,49 +147,7 @@ export function generateSOHTML({
                     width: auto;
                     height: auto;
                 }
-                .performance-table {
-                    width: 100%;
-                    border-collapse: collapse;
-                    margin-top: 20px;
-                    margin-bottom: 20px;
-                    border: 1px solid black;
-                    border-radius: 10px;
-                    overflow: hidden;
-                }
-                
-                .performance-table td p{
-                    border: 1px solid black;
-                    padding-bottom: 20px !important;
-                    padding-top: 10px !important;
-                    padding-left: 10px !important;
-                    padding-right: 10px !important;
-                    text-align: center;
-                    font-size: 10px;
-                }
-                .performance-table th p {
-                padding-bottom: 20px !important;
-                    padding-top: 10px !important;
-                    padding-left: 10px !important;
-                    padding-right: 10px !important;
-                    text-align: center;
-                    font-size: 13px;
-                    background-color: #f2f2f2;
-                    font-weight: bold;
-                    border: 1px solid black;
-                }
-                .performance-cell {
-                    font-size: 10px;
-                    line-height: 1.2;
-                }
-                .performance-score {
-                    font-weight: bold;
-                }
-                .performance-zscore {
-                    color: #666;
-                }
-                .performance-level {
-                    font-style: italic;
-                }
+                /* Color classes for performance levels */
                 .low { color: #d32f2f; }
                 .average { color: #f57c00; }
                 .high { color: #388e3c; }
