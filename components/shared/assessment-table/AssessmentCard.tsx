@@ -120,7 +120,7 @@ const generatePDF = async (html: string, fileName: string, orientation: 'portrai
               .detail-item {
                 display: flex;
                 gap: 5px;
-                font-size: 18px;
+                font-size: 32px;
               }
               .detail-label {
                 font-weight: bold;
