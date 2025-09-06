@@ -249,6 +249,12 @@ export function generateSOHTML({
             <div class="page-break page-container">
                 <div class="container content-page" style="margin: 0; padding: 0; width: 190mm;">
                     <div style="width: 190mm; height: 280mm; background-color: lightblue;">
+                        <h2 class="h2_class">Students Performance Curve</h2>
+                        
+                        <div class="chart-section">
+                            ${generatePerformanceCurveChartHTML(performanceCurveData)}
+                        </div>
+                        
                         <div class="summary-section">
                             <h3>Summary</h3>
                             <div>
@@ -449,14 +455,14 @@ function generatePerformanceCurveChartHTML(performanceCurveData: {
     const ranges = performanceCurveData.ranges;
     const maxCount = Math.max(...ranges.map(r => r.count));
     
-     // Chart dimensions - FULL PAGE WIDTH
-     const width = 1200;
-     const height = 600;
+     // Chart dimensions - Professional size
+     const width = 800;
+     const height = 350;
     const margin = {
-        left: 70,
-        right: 50,
-        top: 40,
-        bottom: 70
+        left: 60,
+        right: 40,
+        top: 30,
+        bottom: 50
     };
     
     const chartWidth = width - margin.left - margin.right;
@@ -473,8 +479,8 @@ function generatePerformanceCurveChartHTML(performanceCurveData: {
         return `
             <rect x="${x}" y="${y}" width="${barWidth}" height="${barHeight}" 
                   fill="#4A90E2" rx="2" ry="2" stroke="#333" stroke-width="0.5" />
-            <text x="${x + barWidth / 2}" y="${y - 5}" text-anchor="middle" font-size="12" font-weight="bold" fill="#333">${range.count}</text>
-            <text x="${x + barWidth / 2}" y="${height - margin.bottom + 15}" text-anchor="middle" font-size="11" font-weight="bold" fill="#555">${range.label}</text>
+            <text x="${x + barWidth / 2}" y="${y - 5}" text-anchor="middle" font-size="10" font-weight="bold" fill="#333">${range.count}</text>
+            <text x="${x + barWidth / 2}" y="${height - margin.bottom + 15}" text-anchor="middle" font-size="9" font-weight="bold" fill="#555">${range.label}</text>
         `;
     }).join('');
     
@@ -508,20 +514,20 @@ function generatePerformanceCurveChartHTML(performanceCurveData: {
         return `
             <line x1="${margin.left}" x2="${width - margin.right}" y1="${y}" y2="${y}" 
                   stroke="#e0e0e0" stroke-width="1" />
-            <text x="${margin.left - 10}" y="${y + 5}" text-anchor="end" font-size="11" fill="#555">${i}</text>
+            <text x="${margin.left - 10}" y="${y + 5}" text-anchor="end" font-size="9" fill="#555">${i}</text>
         `;
     }).join('');
     
      return `
          <div style="width: 100%; height: ${height}px; margin: 0; padding: 0;">
              <svg width="100%" height="${height}" viewBox="0 0 ${width} ${height}" style="width: 100%; height: ${height}px; display: block; margin: 0; padding: 0;">
-                 <text x="${width / 2}" y="25" text-anchor="middle" font-size="18" font-weight="bold" fill="#333">
+                 <text x="${width / 2}" y="25" text-anchor="middle" font-size="14" font-weight="bold" fill="#333">
                      Students Performance Curve
                  </text>
-                 <text x="${width / 2}" y="${height - 15}" text-anchor="middle" font-size="14" fill="#666">
+                 <text x="${width / 2}" y="${height - 15}" text-anchor="middle" font-size="12" fill="#666">
                      Score Ranges
                  </text>
-                 <text x="25" y="${height / 2}" text-anchor="middle" font-size="14" fill="#666" transform="rotate(-90, 25, ${height / 2})">
+                 <text x="25" y="${height / 2}" text-anchor="middle" font-size="12" fill="#666" transform="rotate(-90, 25, ${height / 2})">
                      Number of Students
                  </text>
                  ${yAxis}
