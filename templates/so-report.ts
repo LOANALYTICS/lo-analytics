@@ -19,7 +19,8 @@ export function generateSOHTML({
     assessmentData,          // Assessment data for each type
     overallGrades,          // Overall grades across all assessments
     course,                 // Course details
-    college                 // College details
+    college,                // College details
+    performanceAnalysis     // Performance analysis data
 }: {
     assessmentData: Record<string, GradeCount>;
     overallGrades: GradeCount;
@@ -40,7 +41,36 @@ export function generateSOHTML({
         regional: string;
         university: string;
     };
+    performanceAnalysis?: {
+        result: Array<{
+            sNo: number;
+            studentId: string;
+            studentName: string;
+            performance: {
+                [examType: string]: {
+                    scoreOutOf100: number;
+                    zScore: number;
+                    performance: string;
+                };
+            };
+        }>;
+        metadata: {
+            [examType: string]: {
+                mean: number;
+                stdDev: number;
+            };
+        };
+        overall: {
+            mean: number;
+            stdDev: number;
+        };
+    };
 }) {
+    // Console log the performance analysis data
+    console.log('=== PERFORMANCE ANALYSIS IN SO REPORT ===');
+    console.log(JSON.stringify(performanceAnalysis, null, 2));
+    console.log('=== END PERFORMANCE ANALYSIS ===\n');
+
     // Calculate overall totals
     const totalStudents: number = Object.values(overallGrades).reduce<number>((sum, count) => sum + count, 0);
 
@@ -52,11 +82,33 @@ export function generateSOHTML({
     <html>
         <head>
             <style>
-                body { font-family: Arial, sans-serif; }
-                .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
-                .h2_class { text-align: center; margin-bottom: 30px;,margin:auto; font-size:16px, font-weight:600 }
-          .header { text-align: center; margin-bottom: 30px; }
-          .logo { max-width: 100%; height: auto; }
+                body { 
+                    font-family: Arial, sans-serif; 
+                    margin: 0;
+                    padding: 0;
+                }
+                .page-break {
+                    page-break-before: always;
+                }
+                .container { 
+                    max-width: 100%; 
+                    margin: 0 auto; 
+                    padding: 20px;
+                }
+                .h2_class { 
+                    text-align: center; 
+                    margin: 10px 0;
+                    font-size: 1.8em;
+                    font-weight:800;
+                }
+                .header { 
+                    text-align: center; 
+                    margin-bottom: 30px; 
+                }
+                .logo { 
+                    max-width: 100%; 
+                    height: auto; 
+                }
                 table { 
                     width: 100%;
                     border-collapse: collapse;
@@ -105,142 +157,294 @@ export function generateSOHTML({
                         page-break-after: always;
                     }
                 }
-                    .course-details {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-bottom: 30px;
-            border: 1px solid #ddd;
-            padding: 15px;
-            border-radius: 5px;
-          }
-          .detail-item {
-            display: flex;
-            gap: 5px;
-            font-size: 14px;
-          }
-          .detail-label {
-            font-weight: bold;
-            white-space: nowrap;
-          }
+                .course-details {
+                    display: grid;
+                    grid-template-columns: repeat(2, 1fr);
+                    gap: 15px;
+                    margin-bottom: 30px;
+                    border: 1px solid #ddd;
+                    padding: 15px;
+                    border-radius: 5px;
+                }
+                .detail-item {
+                    display: flex;
+                    gap: 5px;
+                    font-size: 14px;
+                }
+                .detail-label {
+                    font-weight: bold;
+                    white-space: nowrap;
+                }
+                .page-container {
+                    width: 100%;
+                    height: 100vh;
+                    display: flex;
+                    flex-direction: column;
+                    overflow: hidden;
+                }
+                .content-page {
+                    display: flex;
+                    flex-direction: column;
+                    min-height: 100vh;
+                }
+                .table-chart-container {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 20px;
+                    width: 100%;
+                    height: 100%;
+                    flex: 1;
+                }
+                .table-section {
+                    width: 100%;
+                    flex-shrink: 0;
+                }
+                .chart-section {
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    width: 100%;
+                    flex: 1;
+                    min-height: 300px;
+                }
+                .chart-wrapper {
+                    width: 100%;
+                    height: 100%;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                }
+                .chart-wrapper svg {
+                    max-width: 100%;
+                    max-height: 100%;
+                    width: auto;
+                    height: auto;
+                }
+                .performance-table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin-top: 20px;
+                    margin-bottom: 20px;
+                    border: 1px solid black;
+                    border-radius: 10px;
+                    overflow: hidden;
+                }
+                .performance-table th, .performance-table td {
+                    border: 1px solid black;
+                    padding: 6px;
+                    text-align: center;
+                    font-size: 11px;
+                }
+                .performance-table th {
+                    background-color: #f2f2f2;
+                    font-weight: bold;
+                }
+                .performance-cell {
+                    font-size: 10px;
+                    line-height: 1.2;
+                }
+                .performance-score {
+                    font-weight: bold;
+                }
+                .performance-zscore {
+                    color: #666;
+                }
+                .performance-level {
+                    font-style: italic;
+                }
+                .low { color: #d32f2f; }
+                .average { color: #f57c00; }
+                .high { color: #388e3c; }
             </style>
         </head>
         <body>
-            <div class="container">
-             <div class="header">
-              <img src="${college.logo}" alt="College Logo" class="logo">
-               <div class="course-details">
-             
-                <div class="detail-item">
-                  <span class="detail-label">Course Code:</span> ${course.course_code}
-                </div>
-
-                <div class="detail-item">
-                  <span class="detail-label">Course Name:</span> ${course.course_name} (${course.section.charAt(0).toUpperCase() + course.section.slice(1).toLowerCase()})
-                </div>
-                 <div class="detail-item">
-                  <span class="detail-label">Credit Hours:</span> ${course.credit_hours + 'Hours'}
-                </div>
-
-                  <div class="detail-item">
-                  <span class="detail-label">Level:</span> ${course.level || 'NA'}
-                </div>
-
-                <div class="detail-item">
-                  <span class="detail-label">Semester:</span> ${course.semister === 1 ? "First Semester" : "Second Semester"} (${course?.academic_year})
-                </div>
-                       <div class="detail-item">
-                  <span class="detail-label">Course Co-ordinator:</span> ${course.coordinator}
-                </div>
+            <!-- Page 1: Header + Course Details + Performance Analysis Table -->
+            <div class="page-container">
+                <div class="container">
+                    <div class="header">
+                        <img src="${college.logo}" alt="College Logo" class="logo">
+                        <div class="course-details">
+                            <div class="detail-item">
+                                <span class="detail-label">Course Code:</span> ${course.course_code}
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Course Name:</span> ${course.course_name} (${course.section.charAt(0).toUpperCase() + course.section.slice(1).toLowerCase()})
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Credit Hours:</span> ${course.credit_hours + 'Hours'}
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Level:</span> ${course.level || 'NA'}
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Semester:</span> ${course.semister === 1 ? "First Semester" : "Second Semester"} (${course?.academic_year})
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Course Co-ordinator:</span> ${course.coordinator}
+                            </div>
+                        </div>
+                    </div>
+                    <h2 class="h2_class">Student Performance Analysis</h2>
                 
-                
-               
-              </div>
+                <table class="performance-table">
+                    <thead>
+                        <tr>
+                            <th>S.No</th>
+                            <th>Student ID</th>
+                            <th>Student Name</th>
+                            ${Object.keys(performanceAnalysis.metadata).map(examType => `
+                                <th colspan="3">${examType}</th>
+                            `).join('')}
+                            <th colspan="3">Overall</th>
+                        </tr>
+                        <tr>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            ${Object.keys(performanceAnalysis.metadata).map(() => `
+                                <th>Score</th>
+                                <th>Z-Score</th>
+                                <th>Level</th>
+                            `).join('')}
+                            <th>Score</th>
+                            <th>Z-Score</th>
+                            <th>Level</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${performanceAnalysis.result.map(student => `
+                            <tr>
+                                <td>${student.sNo}</td>
+                                <td>${student.studentId}</td>
+                                <td>${student.studentName}</td>
+                                ${Object.keys(performanceAnalysis.metadata).map(examType => {
+                                    const perf = student.performance[examType];
+                                    if (perf) {
+                                        return `
+                                            <td class="performance-cell">
+                                                <div class="performance-score">${perf.scoreOutOf100.toFixed(1)}</div>
+                                            </td>
+                                            <td class="performance-cell">
+                                                <div class="performance-zscore">${perf.zScore.toFixed(2)}</div>
+                                            </td>
+                                            <td class="performance-cell">
+                                                <div class="performance-level ${perf.performance.toLowerCase()}">${perf.performance}</div>
+                                            </td>
+                                        `;
+                                    } else {
+                                        return `<td></td><td></td><td></td>`;
+                                    }
+                                }).join('')}
+                                ${(() => {
+                                    const overallPerf = student.performance.Overall;
+                                    return `
+                                        <td class="performance-cell">
+                                            <div class="performance-score">${overallPerf.scoreOutOf100.toFixed(1)}</div>
+                                        </td>
+                                        <td class="performance-cell">
+                                            <div class="performance-zscore">${overallPerf.zScore.toFixed(2)}</div>
+                                        </td>
+                                        <td class="performance-cell">
+                                            <div class="performance-level ${overallPerf.performance.toLowerCase()}">${overallPerf.performance}</div>
+                                        </td>
+                                    `;
+                                })()}
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+                </div>
             </div>
-                <h2 style="text-align: center; font-weight: 600; font-size: 16px;">Students Outcome (SO) Report</h2>
-                <table>
-                    <tr>
-                        <th>S.No</th>
-                        <th>Assessment Method</th>
-                        <th>A+</th>
-                        <th>A</th>
-                        <th>B+</th>
-                        <th>B</th>
-                        <th>C+</th>
-                        <th>C</th>
-                        <th>D+</th>
-                        <th>D</th>
-                        <th>F</th>
-                        <th class="total-col">Total Students</th>
-                    </tr>
-                    ${Object.entries(assessmentData).map(([type, grades], index) => {
+
+            <!-- Page 2: SO Report Table and Overall Chart -->
+            <div class="page-break page-container">
+                <div class="container content-page">
+                    <h2 class="h2_class">Students Outcome (SO) Report</h2>
+                    
+                    <div class="table-chart-container">
+                        <table>
+                            <tr>
+                                <th>S.No</th>
+                                <th>Assessment Method</th>
+                                <th>A+</th>
+                                <th>A</th>
+                                <th>B+</th>
+                                <th>B</th>
+                                <th>C+</th>
+                                <th>C</th>
+                                <th>D+</th>
+                                <th>D</th>
+                                <th>F</th>
+                                <th class="total-col">Total Students</th>
+                            </tr>
+                            ${Object.entries(assessmentData).map(([type, grades], index) => {
         const total: number = Object.values(grades).reduce<number>((sum, count) => sum + count, 0);
         return `
-                            <tbody class="grade-row-group">
-                                <tr>
-                                    <td rowspan="2">${index + 1}</td>
-                                    <td rowspan="2">${type}</td>
-                                    <td>${grades['A+']}</td>
-                                    <td>${grades['A']}</td>
-                                    <td>${grades['B+']}</td>
-                                    <td>${grades['B']}</td>
-                                    <td>${grades['C+']}</td>
-                                    <td>${grades['C']}</td>
-                                    <td>${grades['D+']}</td>
-                                    <td>${grades['D']}</td>
-                                    <td>${grades['F']}</td>
-                                    <td class="total-col" rowspan="2">${total}</td>
-                                </tr>
-                                <tr>
-                                    <td>${((grades['A+'] / total) * 100).toFixed(0)}%</td>
-                                    <td>${((grades['A'] / total) * 100).toFixed(0)}%</td>
-                                    <td>${((grades['B+'] / total) * 100).toFixed(0)}%</td>
-                                    <td>${((grades['B'] / total) * 100).toFixed(0)}%</td>
-                                    <td>${((grades['C+'] / total) * 100).toFixed(0)}%</td>
-                                    <td>${((grades['C'] / total) * 100).toFixed(0)}%</td>
-                                    <td>${((grades['D+'] / total) * 100).toFixed(0)}%</td>
-                                    <td>${((grades['D'] / total) * 100).toFixed(0)}%</td>
-                                    <td>${((grades['F'] / total) * 100).toFixed(0)}%</td>
-                                </tr>
-                            </tbody>`;
+                                <tbody class="grade-row-group">
+                                    <tr>
+                                        <td rowspan="2">${index + 1}</td>
+                                        <td rowspan="2">${type}</td>
+                                        <td>${grades['A+']}</td>
+                                        <td>${grades['A']}</td>
+                                        <td>${grades['B+']}</td>
+                                        <td>${grades['B']}</td>
+                                        <td>${grades['C+']}</td>
+                                        <td>${grades['C']}</td>
+                                        <td>${grades['D+']}</td>
+                                        <td>${grades['D']}</td>
+                                        <td>${grades['F']}</td>
+                                        <td class="total-col" rowspan="2">${total}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>${((grades['A+'] / total) * 100).toFixed(0)}%</td>
+                                        <td>${((grades['A'] / total) * 100).toFixed(0)}%</td>
+                                        <td>${((grades['B+'] / total) * 100).toFixed(0)}%</td>
+                                        <td>${((grades['B'] / total) * 100).toFixed(0)}%</td>
+                                        <td>${((grades['C+'] / total) * 100).toFixed(0)}%</td>
+                                        <td>${((grades['C'] / total) * 100).toFixed(0)}%</td>
+                                        <td>${((grades['D+'] / total) * 100).toFixed(0)}%</td>
+                                        <td>${((grades['D'] / total) * 100).toFixed(0)}%</td>
+                                        <td>${((grades['F'] / total) * 100).toFixed(0)}%</td>
+                                    </tr>
+                                </tbody>`;
     }).join('')}
-                    <tr>
-                        <td colspan="2" rowspan="2" style="text-align: right; font-weight: bold;">Overall</td>
-                        <td>${overallGrades['A+']}</td>
-                        <td>${overallGrades['A']}</td>
-                        <td>${overallGrades['B+']}</td>
-                        <td>${overallGrades['B']}</td>
-                        <td>${overallGrades['C+']}</td>
-                        <td>${overallGrades['C']}</td>
-                        <td>${overallGrades['D+']}</td>
-                        <td>${overallGrades['D']}</td>
-                        <td>${overallGrades['F']}</td>
-                        <td class="total-col" rowspan="2">${totalStudents}</td>
-                    </tr>
-                    <tr>
-                     
-                        <td>${((overallGrades['A+'] / totalStudents) * 100).toFixed(0)}%</td>
-                        <td>${((overallGrades['A'] / totalStudents) * 100).toFixed(0)}%</td>
-                        <td>${((overallGrades['B+'] / totalStudents) * 100).toFixed(0)}%</td>
-                        <td>${((overallGrades['B'] / totalStudents) * 100).toFixed(0)}%</td>
-                        <td>${((overallGrades['C+'] / totalStudents) * 100).toFixed(0)}%</td>
-                        <td>${((overallGrades['C'] / totalStudents) * 100).toFixed(0)}%</td>
-                        <td>${((overallGrades['D+'] / totalStudents) * 100).toFixed(0)}%</td>
-                        <td>${((overallGrades['D'] / totalStudents) * 100).toFixed(0)}%</td>
-                        <td>${((overallGrades['F'] / totalStudents) * 100).toFixed(0)}%</td>
-                    </tr>
-                </table>
-                <div class="chart-grid">
-                    ${Object.keys(assessmentData).map(examType => `
-                        <div class="chart-wrapper">
-                            ${generateGradeDistributionChartHTML(assessmentData, examType)}
+                            <tr>
+                                <td colspan="2" rowspan="2" style="text-align: right; font-weight: bold;">Overall</td>
+                                <td>${overallGrades['A+']}</td>
+                                <td>${overallGrades['A']}</td>
+                                <td>${overallGrades['B+']}</td>
+                                <td>${overallGrades['B']}</td>
+                                <td>${overallGrades['C+']}</td>
+                                <td>${overallGrades['C']}</td>
+                                <td>${overallGrades['D+']}</td>
+                                <td>${overallGrades['D']}</td>
+                                <td>${overallGrades['F']}</td>
+                                <td class="total-col" rowspan="2">${totalStudents}</td>
+                            </tr>
+                            <tr>
+                                <td>${((overallGrades['A+'] / totalStudents) * 100).toFixed(0)}%</td>
+                                <td>${((overallGrades['A'] / totalStudents) * 100).toFixed(0)}%</td>
+                                <td>${((overallGrades['B+'] / totalStudents) * 100).toFixed(0)}%</td>
+                                <td>${((overallGrades['B'] / totalStudents) * 100).toFixed(0)}%</td>
+                                <td>${((overallGrades['C+'] / totalStudents) * 100).toFixed(0)}%</td>
+                                <td>${((overallGrades['C'] / totalStudents) * 100).toFixed(0)}%</td>
+                                <td>${((overallGrades['D+'] / totalStudents) * 100).toFixed(0)}%</td>
+                                <td>${((overallGrades['D'] / totalStudents) * 100).toFixed(0)}%</td>
+                                <td>${((overallGrades['F'] / totalStudents) * 100).toFixed(0)}%</td>
+                            </tr>
+                        </table>
+
+                        <div class="chart-section">
+                            <div class="chart-wrapper">
+                                ${generateGradeDistributionChartHTML(overallData, 'Overall')}
+                            </div>
                         </div>
-                    `).join('')}
-                    <div class="chart-wrapper">
-                        ${generateGradeDistributionChartHTML(overallData, 'Overall')}
                     </div>
                 </div>
             </div>
+
+            ${performanceAnalysis ? `
+            ` : ''}
         </body>
     </html>`;
 }
@@ -254,29 +458,32 @@ function generateGradeDistributionChartHTML(assessmentData: Record<string, Grade
         ((filteredData[grade as keyof GradeCount] / total) * 100).toFixed(1)
     );
 
-    const width = 320;
-    const height = 240;
+    // Dynamic sizing - will scale based on available space
+    const baseWidth = 900;  // Larger base width
+    const baseHeight = 400; // Reasonable base height
+    const width = baseWidth;
+    const height = baseHeight;
     const margin = {
-        left: 32,
-        right: 20,
-        top: 32,
-        bottom: 44
+        left: 70,
+        right: 50,
+        top: 40,
+        bottom: 70
     };
-    const barWidth = 22;
-    const spacing = 10;
+    const barWidth = 50;  // Even wider bars
+    const spacing = 25;   // More spacing between bars
     const chartHeight = height - margin.top - margin.bottom;
 
     const bars = grades.map((grade, i) => {
         const value = Number(values[i]);
         const x = margin.left + (i * (barWidth + spacing));
-        const barHeight = (value * 1.6); // Scale height to match y-axis
+        const barHeight = (value * chartHeight / 100); // Scale height to match y-axis
         const y = height - margin.bottom - barHeight;
 
         return `
             <rect x="${x}" y="${y}" width="${barWidth}" height="${barHeight}" 
                   fill="${getColorForGrade(grade)}" rx="4" ry="4" stroke="#333" stroke-width="0.5" />
-            <text x="${x + barWidth/2}" y="${y-7}" text-anchor="middle" font-size="10" font-weight="bold" fill="#333">${value}%</text>
-            <text x="${x + barWidth/2}" y="${height - margin.bottom + 16}" text-anchor="middle" font-size="9" font-weight="bold" fill="#555">${grade}</text>
+            <text x="${x + barWidth/2}" y="${y-10}" text-anchor="middle" font-size="12" font-weight="bold" fill="#333">${value}%</text>
+            <text x="${x + barWidth/2}" y="${height - margin.bottom + 20}" text-anchor="middle" font-size="11" font-weight="bold" fill="#555">${grade}</text>
         `;
     }).join('');
 
@@ -285,24 +492,24 @@ function generateGradeDistributionChartHTML(assessmentData: Record<string, Grade
         const y = height - margin.bottom - (i * (chartHeight/10));
         return `
             <line x1="${margin.left}" x2="${width - margin.right}" y1="${y}" y2="${y}" 
-                  stroke="#e0e0e0" stroke-width="0.8" />
-            <text x="${margin.left - 8}" y="${y + 4}" text-anchor="end" font-size="9" fill="#555">${i * 10}</text>
+                  stroke="#e0e0e0" stroke-width="1" />
+            <text x="${margin.left - 12}" y="${y + 5}" text-anchor="end" font-size="11" fill="#555">${i * 10}</text>
         `;
     }).join('');
 
     // Add legend at bottom
     const legendItems = grades.map((grade, i) => {
-        const x = margin.left + (i * 30);
+        const x = margin.left + (i * 50);
         return `
-            <rect x="${x}" y="${height - 20}" width="8" height="8" fill="${getColorForGrade(grade)}" rx="2" ry="2" />
-            <text x="${x + 11}" y="${height - 13}" font-size="8" fill="#333">${grade}</text>
+            <rect x="${x}" y="${height - 25}" width="12" height="12" fill="${getColorForGrade(grade)}" rx="2" ry="2" />
+            <text x="${x + 16}" y="${height - 16}" font-size="10" fill="#333">${grade}</text>
         `;
     }).join('');
 
     return `
         <div class="chart-wrapper">
             <svg width="${width}" height="${height}">
-                <text x="${width/2}" y="14" text-anchor="middle" font-size="10" font-weight="bold" fill="#333">
+                <text x="${width/2}" y="20" text-anchor="middle" font-size="14" font-weight="bold" fill="#333">
                     ${examType} Grade Distribution
                 </text>
                 ${yAxis}

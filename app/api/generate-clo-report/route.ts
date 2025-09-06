@@ -3,112 +3,7 @@ import { connectToMongoDB } from '@/lib/db';
 import { Course, Assessment } from '@/lib/models';
 import { generateCloReportHTML } from '@/templates/cloReport';
 
-// Function to process assessment data and return student performance analysis
-function processStudentPerformanceAnalysis(assessmentData: AssessmentData) {
-  const uniqueExamTypes = new Set<string>();
-  assessmentData.assessmentResults.forEach(result => uniqueExamTypes.add(result.type));
 
-  const examMetadata: { [examType: string]: { mean: number; stdDev: number } } = {};
-  const examResults: { [examType: string]: any[] } = {};
-  const studentAverages: { [studentId: string]: number[] } = {};
-
-  // Process each exam type
-  uniqueExamTypes.forEach(examType => {
-    const examData = assessmentData.assessmentResults.find(result => result.type === examType);
-    if (!examData?.results.length) return;
-
-    // Calculate scores and statistics
-    const studentScores = examData.results.map(student => {
-      const scoreOutOf100 = (student.totalScore.marksScored / student.totalScore.totalMarks) * 100;
-      return { studentId: student.studentId, studentName: student.studentName, scoreOutOf100 };
-    });
-
-    const scores = studentScores.map(s => s.scoreOutOf100);
-    const mean = scores.reduce((sum, score) => sum + score, 0) / scores.length;
-    const variance = scores.reduce((sum, score) => sum + Math.pow(score - mean, 2), 0) / scores.length;
-    const standardDeviation = Math.sqrt(variance);
-
-    examMetadata[examType] = { mean, stdDev: standardDeviation };
-
-    // Calculate Z-scores and performance
-    const studentScoresWithZ = studentScores.map(student => {
-      const zScore = (student.scoreOutOf100 - mean) / standardDeviation;
-      const performance = zScore < 0 ? 'Low' : zScore <= 1 ? 'Average' : 'High';
-
-      // Collect averages for overall calculation
-      if (!studentAverages[student.studentId]) studentAverages[student.studentId] = [];
-      studentAverages[student.studentId].push(student.scoreOutOf100);
-
-      return {
-        studentId: student.studentId,
-        studentName: student.studentName,
-        scoreOutOf100: student.scoreOutOf100,
-        zScore,
-        performance
-      };
-    });
-
-    examResults[examType] = studentScoresWithZ;
-  });
-
-  // Calculate overall statistics
-  const allStudentAverages = Object.values(studentAverages).map(scores => 
-    scores.reduce((sum, score) => sum + score, 0) / scores.length
-  );
-  const overallMean = allStudentAverages.reduce((sum, avg) => sum + avg, 0) / allStudentAverages.length;
-  const overallVariance = allStudentAverages.reduce((sum, avg) => sum + Math.pow(avg - overallMean, 2), 0) / allStudentAverages.length;
-  const overallStdDev = Math.sqrt(overallVariance);
-
-  // Build result structure
-  const allStudents = new Set<string>();
-  Object.values(examResults).forEach(examStudents => {
-    examStudents.forEach(student => allStudents.add(student.studentId));
-  });
-
-  const result = Array.from(allStudents).map((studentId, index) => {
-    const firstExam = Object.values(examResults)[0];
-    const studentInfo = firstExam.find(s => s.studentId === studentId);
-    const studentName = studentInfo?.studentName || 'Unknown';
-
-    // Build performance object
-    const performance: { [examType: string]: { scoreOutOf100: number; zScore: number; performance: string } } = {};
-    
-    Object.keys(examResults).forEach(examType => {
-      const studentResult = examResults[examType].find(s => s.studentId === studentId);
-      if (studentResult) {
-        performance[examType] = {
-          scoreOutOf100: studentResult.scoreOutOf100,
-          zScore: studentResult.zScore,
-          performance: studentResult.performance
-        };
-      }
-    });
-
-    // Add overall performance
-    const studentAverage = studentAverages[studentId]?.reduce((sum, score) => sum + score, 0) / studentAverages[studentId].length || 0;
-    const overallZScore = (studentAverage - overallMean) / overallStdDev;
-    const overallPerformance = overallZScore < 0 ? 'Low' : overallZScore <= 1 ? 'Average' : 'High';
-
-    performance.Overall = {
-      scoreOutOf100: studentAverage,
-      zScore: overallZScore,
-      performance: overallPerformance
-    };
-
-    return {
-      sNo: index + 1,
-      studentId,
-      studentName,
-      performance
-    };
-  });
-
-  return {
-    result,
-    metadata: examMetadata,
-    overall: { mean: overallMean, stdDev: overallStdDev }
-  };
-}
 
 interface CourseData {
   course_name: string;
@@ -366,12 +261,7 @@ export async function POST(request: Request) {
       // Continue with response even if save fails
     }
 
-    // Process student performance analysis
-    const performanceAnalysis = processStudentPerformanceAnalysis(assessmentData);
-    
-    console.log('=== STUDENT PERFORMANCE ANALYSIS ===');
-    console.log(JSON.stringify(performanceAnalysis, null, 2));
-    console.log('=== END ANALYSIS ===\n');
+  
 
     // Generate HTML content using the template
     const htmlContent = await generateCloReportHTML({
@@ -390,7 +280,7 @@ export async function POST(request: Request) {
       assessmentData: processedData,
       indirectAssessmentData: assessmentData?.indirectAssessments ? {
         indirectAssessments: assessmentData.indirectAssessments
-      } : undefined
+      } : undefined,
     });
 
     // Return the HTML content

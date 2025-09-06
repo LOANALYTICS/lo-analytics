@@ -14,85 +14,222 @@ import { getCurrentUser } from '@/server/utils/helper';
 
 const generatePDF = async (html: string, fileName: string, orientation: 'portrait' | 'landscape' = 'portrait') => {
   try {
-    const html2pdf = (await import("html2pdf.js")).default;
+    const jsPDF = (await import('jspdf')).default;
+    const html2canvas = (await import('html2canvas')).default;
 
-    // Sanitize the HTML by removing any invisible characters (e.g., non-breaking spaces, zero-width spaces)
-    const sanitizedHTML = html
-      .replace(/[\u200B-\u200D\uFEFF]/g, "") // Remove zero-width characters
-      .replace(/&nbsp;/g, " ")  // Remove non-breaking spaces
-      .replace(/['"']/g, "");   // Remove unwanted quotes if any
+    // Split HTML into pages based on page-break divs
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = html;
+    const pages = Array.from(tempDiv.querySelectorAll('.page-container'));
     
-    // Create a container for the sanitized HTML
-    const container = document.createElement("div");
-    container.innerHTML = sanitizedHTML;
-    document.body.appendChild(container);
+    if (pages.length === 0) {
+      // Fallback: treat entire content as one page
+      pages.push(tempDiv);
+    }
 
-    // Add the logo to the container
-    const logo = document.createElement("img");
-    logo.src = "/pdf_logo.png";
-    logo.style.position = "fixed";
-    logo.style.bottom = "20px";
-    logo.style.right = "5px";
-    logo.style.width = "50px";
-    logo.style.height = "50px";
-    logo.style.opacity = "0.5";
-    logo.style.zIndex = "1000";
-    container.appendChild(logo);
+    const pdf = new jsPDF(orientation, 'mm', 'a4');
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const pageHeight = pdf.internal.pageSize.getHeight();
+    const margin = 10;
 
-    // PDF options with landscape orientation
-    const opt = {
-      margin: 0.25,
-      filename: `${fileName}.pdf`,
-      image: { type: "jpeg", quality: 0.98 },
-      html2canvas: {
+    for (let i = 0; i < pages.length; i++) {
+      const page = pages[i] as HTMLElement;
+      
+      // Create container for this page with full HTML including styles
+      const container = document.createElement("div");
+      container.style.position = 'absolute';
+      container.style.left = '-9999px';
+      container.style.top = '0';
+      container.style.width = 'auto';
+      container.style.height = 'auto';
+      container.style.maxWidth = 'none';
+      container.style.maxHeight = 'none';
+      
+      // Create full HTML document with styles for this page
+      const fullHTML = `
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <style>
+              body { 
+                font-family: Arial, sans-serif; 
+                margin: 0;
+                padding: 0;
+              }
+              .page-break {
+                page-break-before: always;
+              }
+              .container { 
+                max-width: 100%; 
+                margin: 0 auto; 
+                padding: 20px;
+              }
+              .h2_class { 
+                text-align: center; 
+                margin: 10px 0;
+                font-size: 1.8em;
+                font-weight:800;
+              }
+              .header { 
+                text-align: center; 
+                margin-bottom: 30px; 
+              }
+              .logo { 
+                max-width: 100%; 
+                height: auto; 
+              }
+              table { 
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 20px;
+                margin-bottom: 60px;
+                border: 1px solid black;
+                border-radius: 10px;
+                overflow: hidden;
+              }
+              th, td { 
+                border: 1px solid black;
+                padding: 8px;
+                text-align: center;
+                font-size: 12px;
+                padding-top: 5px;
+                padding-bottom: 10px;
+              }
+              th {
+                background-color: #f2f2f2;
+                padding-top: 20px;
+                padding-bottom: 30px;
+              }
+              .total-col {
+                background-color: #e6e6e6;
+                font-weight: bold;
+              }
+              .grade-row-group {
+                break-inside: avoid;
+                page-break-inside: avoid;
+              }
+              .course-details {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+                margin-bottom: 30px;
+                border: 1px solid #ddd;
+                padding: 15px;
+                border-radius: 5px;
+              }
+              .detail-item {
+                display: flex;
+                gap: 5px;
+                font-size: 14px;
+              }
+              .detail-label {
+                font-weight: bold;
+                white-space: nowrap;
+              }
+              .performance-table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 20px;
+                margin-bottom: 20px;
+                border: 1px solid black;
+                border-radius: 10px;
+                overflow: hidden;
+              }
+              .performance-table th, .performance-table td {
+                border: 1px solid black;
+                padding: 6px;
+                text-align: center;
+                font-size: 11px;
+              }
+              .performance-table th {
+                background-color: #f2f2f2;
+                font-weight: bold;
+              }
+              .performance-cell {
+                font-size: 10px;
+                line-height: 1.2;
+              }
+              .performance-score {
+                font-weight: bold;
+              }
+              .performance-zscore {
+                color: #666;
+              }
+              .performance-level {
+                font-style: italic;
+              }
+              .low { color: #d32f2f; }
+              .average { color: #f57c00; }
+              .high { color: #388e3c; }
+            </style>
+          </head>
+          <body>
+            ${page.outerHTML}
+          </body>
+        </html>
+      `;
+      
+      container.innerHTML = fullHTML;
+      document.body.appendChild(container);
+
+      // Add logo
+      const logo = document.createElement("img");
+      logo.src = "/pdf_logo.png";
+      logo.style.position = "fixed";
+      logo.style.bottom = "20px";
+      logo.style.right = "5px";
+      logo.style.width = "50px";
+      logo.style.height = "50px";
+      logo.style.opacity = "0.5";
+      logo.style.zIndex = "1000";
+      container.appendChild(logo);
+
+      // Wait for images
+      const images = Array.from(container.getElementsByTagName('img'));
+      await Promise.all(images.map(img => {
+        return new Promise<void>((resolve) => {
+          if (img.complete) resolve();
+          img.onload = () => resolve();
+          img.onerror = () => resolve();
+        });
+      }));
+
+      // Render to canvas
+      const canvas = await html2canvas(container, {
         scale: 2,
         useCORS: true,
-        scrollY: -window.scrollY,
-        removeContainer: true,
         allowTaint: true,
-        imageTimeout: 0,
-      },
-      jsPDF: {
-        unit: "in",
-        format: "a4",
-        orientation: orientation,
-        compress: true,
-      },
-      pagebreak: {
-        mode: ["css", "legacy"],
-        avoid: [".achievement-pair", "thead"],
-      },
-    };
+        backgroundColor: '#ffffff'
+      });
 
-    // Generate the PDF
-    await html2pdf()
-      .set(opt)
-      .from(container)
-      .toPdf()
-      .get("pdf")
-      .then((pdf: any) => {
-        const totalPages = pdf.internal.getNumberOfPages();
-        for (let i = 1; i <= totalPages; i++) {
-          pdf.setPage(i);
-          const logoImg = new Image();
-          logoImg.src = "/pdf_logo.png";
-          pdf.saveGraphicsState();
-          pdf.setGState(new pdf.GState({ opacity: 0.7 }));
-          pdf.addImage(
-            logoImg,
-            "PNG",
-            pdf.internal.pageSize.width - 0.8,
-            pdf.internal.pageSize.height - 0.7,
-            0.5,
-            0.5
-          );
-          pdf.restoreGraphicsState();
-        }
-      })
-      .save();
+      // Calculate scale to fit page - be more aggressive with scaling
+      const maxImgWidth = pageWidth - 2 * margin;
+      const maxImgHeight = pageHeight - 2 * margin;
+      const pxPerMm = canvas.width / (canvas.width / 2.83465);
+      const imgProps = { width: canvas.width, height: canvas.height };
+      const widthScale = maxImgWidth / (imgProps.width / pxPerMm);
+      const heightScale = maxImgHeight / (imgProps.height / pxPerMm);
+      
+      // Use width scale primarily, only use height scale if content is too tall
+      const scale = heightScale < widthScale ? Math.min(widthScale, heightScale * 1.1) : widthScale;
+      const pdfWidth = (imgProps.width / pxPerMm) * scale;
+      const pdfHeight = (imgProps.height / pxPerMm) * scale;
+      
+      // Position at top with minimal margin instead of center
+      const x = (pageWidth - pdfWidth) / 2;
+      const y = margin; // Start from top margin instead of centering
 
-    // Clean up the container after PDF generation
-    document.body.removeChild(container);
+      // Add new page if not first
+      if (i > 0) {
+        pdf.addPage();
+      }
+
+      pdf.addImage(canvas, 'JPEG', x, y, pdfWidth, pdfHeight);
+      document.body.removeChild(container);
+    }
+
+    pdf.save(`${fileName}.pdf`);
+
   } catch (error) {
     console.error("Error generating PDF:", error);
     throw error;
