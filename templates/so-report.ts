@@ -451,7 +451,7 @@ function generatePerformanceCurveChartHTML(performanceCurveData: {
     const scoreRanges = [];
     for (let i = 55; i < 100; i += 5) {
         const match = ranges.find(r => r.min === i && r.max === i + 5);
-        scoreRanges.push({ min: i, max: i + 5, count: match ? match.count : 0 });
+        scoreRanges.push({ min: i, max: i + 5, label: `${i}-${i + 5}`, count: match ? match.count : 0 });
     }
 
     // Chart size
@@ -488,6 +488,27 @@ function generatePerformanceCurveChartHTML(performanceCurveData: {
         `);
     }
 
+    // Generate normal distribution curve (bell curve)
+    const normalDistributionData = generateNormalDistributionData(mean, stdDev, scoreRanges);
+    const maxCurveValue = Math.max(...normalDistributionData.map(p => p.value));
+    
+    const curvePoints = normalDistributionData.map((point, i) => {
+        const x = margin.left + ((point.x - 55) / 5) * xStep;
+        const normalizedValue = point.value / maxCurveValue;
+        const y = height - margin.bottom - (normalizedValue * chartHeight);
+        return { x, y };
+    });
+    
+    const curvePath = curvePoints.map((point, i) => {
+        if (i === 0) return `M ${point.x},${point.y}`;
+        const prevPoint = curvePoints[i - 1];
+        const cp1x = prevPoint.x + (point.x - prevPoint.x) / 3;
+        const cp1y = prevPoint.y;
+        const cp2x = point.x - (point.x - prevPoint.x) / 3;
+        const cp2y = point.y;
+        return `C ${cp1x},${cp1y} ${cp2x},${cp2y} ${point.x},${point.y}`;
+    }).join(' ');
+
     // Y-axis grid & labels
     const yAxis = Array.from({ length: maxCount + 1 }, (_, i) => {
         const y = height - margin.bottom - (i * (chartHeight / maxCount));
@@ -502,6 +523,7 @@ function generatePerformanceCurveChartHTML(performanceCurveData: {
             <svg width="100%" height="${height}" viewBox="0 0 ${width} ${height}">
                 ${yAxis}
                 ${bars}
+                <path d="${curvePath}" stroke="#2E86AB" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
                 ${xAxisTicks.join('')}
                 <text x="${width / 2}" y="${height - 10}" text-anchor="middle" font-size="12">Scores</text>
                 <text x="20" y="${height / 2}" transform="rotate(-90,20,${height / 2})" text-anchor="middle" font-size="12">No of Students</text>
