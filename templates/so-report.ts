@@ -229,15 +229,26 @@ export function generateSOHTML({
                     border-radius: 10px;
                     overflow: hidden;
                 }
-                .performance-table th, .performance-table td {
+                
+                .performance-table td p{
                     border: 1px solid black;
-                    padding: 6px;
+                    padding-bottom: 20px !important;
+                    padding-top: 10px !important;
+                    padding-left: 10px !important;
+                    padding-right: 10px !important;
                     text-align: center;
-                    font-size: 11px;
+                    font-size: 10px;
                 }
-                .performance-table th {
+                .performance-table th p {
+                padding-bottom: 20px !important;
+                    padding-top: 10px !important;
+                    padding-left: 10px !important;
+                    padding-right: 10px !important;
+                    text-align: center;
+                    font-size: 13px;
                     background-color: #f2f2f2;
                     font-weight: bold;
+                    border: 1px solid black;
                 }
                 .performance-cell {
                     font-size: 10px;
@@ -290,41 +301,41 @@ export function generateSOHTML({
                 <table class="performance-table">
                     <thead>
                         <tr>
-                            <th>S.No</th>
-                            <th>Student ID</th>
-                            <th>Student Name</th>
+                            <th><p>S.No</p></th>
+                            <th><p>Student ID</p></th>
+                            <th><p>Student Name</p></th>
                             ${Object.keys(performanceAnalysis.metadata).map(examType => `
-                                <th>${examType}</th>
+                                <th><p>${examType}</p></th>
                             `).join('')}
-                            <th>Overall</th>
+                            <th><p>Overall</p></th>
                         </tr>
                     </thead>
                     <tbody>
                         ${performanceAnalysis.result.map(student => `
                             <tr>
-                                <td>${student.sNo}</td>
-                                <td>${student.studentId}</td>
-                                <td>${student.studentName}</td>
+                                <td><p> ${student.sNo}.</p></td>
+                                <td><p>${student.studentId}</p></td>
+                                <td><p>${student.studentName}</p></td>
                                 ${Object.keys(performanceAnalysis.metadata).map(examType => {
-                                    const perf = student.performance[examType];
-                                    if (perf) {
-                                        return `
+        const perf = student.performance[examType];
+        if (perf) {
+            return `
                                             <td class="performance-cell">
-                                                <div class="performance-level ${perf.performance.toLowerCase()}">${perf.performance}</div>
+                                                <p class="performance-level ${perf.performance.toLowerCase()}">${perf.performance === 'Average' ? 'Avg' : perf.performance}</p>
                                             </td>
                                         `;
-                                    } else {
-                                        return `<td></td>`;
-                                    }
-                                }).join('')}
+        } else {
+            return `<td></td>`;
+        }
+    }).join('')}
                                 ${(() => {
-                                    const overallPerf = student.performance.Overall;
-                                    return `
+            const overallPerf = student.performance.Overall;
+            return `
                                         <td class="performance-cell">
-                                            <div class="performance-level ${overallPerf.performance.toLowerCase()}">${overallPerf.performance}</div>
+                                            <p class="performance-level ${overallPerf.performance.toLowerCase()}">${overallPerf.performance === 'Average' ? 'Avg' : overallPerf.performance}</p>
                                         </td>
                                     `;
-                                })()}
+        })()}
                             </tr>
                         `).join('')}
                     </tbody>
@@ -355,8 +366,8 @@ export function generateSOHTML({
                                 <th class="total-col">Total Students</th>
                             </tr>
                             ${Object.entries(assessmentData).map(([type, grades], index) => {
-        const total: number = Object.values(grades).reduce<number>((sum, count) => sum + count, 0);
-        return `
+            const total: number = Object.values(grades).reduce<number>((sum, count) => sum + count, 0);
+            return `
                                 <tbody class="grade-row-group">
                                     <tr>
                                         <td rowspan="2">${index + 1}</td>
@@ -384,7 +395,7 @@ export function generateSOHTML({
                                         <td>${((grades['F'] / total) * 100).toFixed(0)}%</td>
                                     </tr>
                                 </tbody>`;
-    }).join('')}
+        }).join('')}
                             <tr>
                                 <td colspan="2" rowspan="2" style="text-align: right; font-weight: bold;">Overall</td>
                                 <td>${overallGrades['A+']}</td>
@@ -431,7 +442,7 @@ function generateGradeDistributionChartHTML(assessmentData: Record<string, Grade
     const total = Object.values(filteredData).reduce<number>((sum, count) => sum + count, 0);
 
     const grades = ['A+', 'A', 'B+', 'B', 'C+', 'C', 'D+', 'D', 'F'];
-    const values = grades.map(grade => 
+    const values = grades.map(grade =>
         ((filteredData[grade as keyof GradeCount] / total) * 100).toFixed(1)
     );
 
@@ -459,14 +470,14 @@ function generateGradeDistributionChartHTML(assessmentData: Record<string, Grade
         return `
             <rect x="${x}" y="${y}" width="${barWidth}" height="${barHeight}" 
                   fill="${getColorForGrade(grade)}" rx="4" ry="4" stroke="#333" stroke-width="0.5" />
-            <text x="${x + barWidth/2}" y="${y-10}" text-anchor="middle" font-size="12" font-weight="bold" fill="#333">${value}%</text>
-            <text x="${x + barWidth/2}" y="${height - margin.bottom + 20}" text-anchor="middle" font-size="11" font-weight="bold" fill="#555">${grade}</text>
+            <text x="${x + barWidth / 2}" y="${y - 10}" text-anchor="middle" font-size="12" font-weight="bold" fill="#333">${value}%</text>
+            <text x="${x + barWidth / 2}" y="${height - margin.bottom + 20}" text-anchor="middle" font-size="11" font-weight="bold" fill="#555">${grade}</text>
         `;
     }).join('');
 
     // Y-axis starts at left margin
-    const yAxis = Array.from({length: 11}, (_, i) => {
-        const y = height - margin.bottom - (i * (chartHeight/10));
+    const yAxis = Array.from({ length: 11 }, (_, i) => {
+        const y = height - margin.bottom - (i * (chartHeight / 10));
         return `
             <line x1="${margin.left}" x2="${width - margin.right}" y1="${y}" y2="${y}" 
                   stroke="#e0e0e0" stroke-width="1" />
@@ -486,7 +497,7 @@ function generateGradeDistributionChartHTML(assessmentData: Record<string, Grade
     return `
         <div class="chart-wrapper">
             <svg width="${width}" height="${height}">
-                <text x="${width/2}" y="20" text-anchor="middle" font-size="14" font-weight="bold" fill="#333">
+                <text x="${width / 2}" y="20" text-anchor="middle" font-size="14" font-weight="bold" fill="#333">
                     ${examType} Grade Distribution
                 </text>
                 ${yAxis}
@@ -499,7 +510,7 @@ function generateGradeDistributionChartHTML(assessmentData: Record<string, Grade
 
 function getColorForGrade(grade: string): string {
     switch (grade) {
-        case 'A+': 
+        case 'A+':
             return '#28589c'; // Darker blue
         case 'A':
             return '#417ac9'; // Medium blue
