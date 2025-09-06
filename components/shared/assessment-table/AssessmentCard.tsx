@@ -73,10 +73,15 @@ const generatePDF = async (html: string, fileName: string, orientation: 'portrai
               .header { 
                 text-align: center; 
                 margin-bottom: 30px; 
+                display: flex;
+                flex-direction: column;
+                align-items: center;
               }
               .logo { 
                 max-width: 100%; 
-                height: auto; 
+                height: auto;
+                display: block;
+                margin: 0 auto;
               }
               table { 
                 width: 100%;
