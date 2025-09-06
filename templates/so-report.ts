@@ -248,7 +248,7 @@ export function generateSOHTML({
             <!-- Page 2: Performance Curve Chart and Summary -->
             <div class="page-break page-container">
                 <div class="container content-page" style="margin: 0; padding: 0; width: 190mm;">
-                    <div style="width: 190mm; height: 280mm; background-color: lightblue;">
+                    <div style="width: 190mm; height: 280mm;">
                         <h2 class="h2_class">Students Performance Curve</h2>
                         
                         <div class="chart-section">
@@ -500,13 +500,9 @@ function generatePerformanceCurveChartHTML(performanceCurveData: {
     });
     
     const curvePath = curvePoints.map((point, i) => {
-        if (i === 0) return `M ${point.x},${point.y}`;
-        const prevPoint = curvePoints[i - 1];
-        const cp1x = prevPoint.x + (point.x - prevPoint.x) / 3;
-        const cp1y = prevPoint.y;
-        const cp2x = point.x - (point.x - prevPoint.x) / 3;
-        const cp2y = point.y;
-        return `C ${cp1x},${cp1y} ${cp2x},${cp2y} ${point.x},${point.y}`;
+        return (i === 0)
+            ? `M ${point.x},${point.y}`
+            : `L ${point.x},${point.y}`;
     }).join(' ');
 
     // Y-axis grid & labels
@@ -533,24 +529,7 @@ function generatePerformanceCurveChartHTML(performanceCurveData: {
 }
 
 
-// Helper function to calculate standard deviation from performance curve data
-function calculateStdDev(performanceCurveData: any): number {
-    // Calculate weighted standard deviation from the ranges
-    const ranges = performanceCurveData.ranges;
-    const mean = parseFloat(performanceCurveData.statistics.mean);
-    
-    let weightedVariance = 0;
-    let totalCount = 0;
-    
-    ranges.forEach((range: any) => {
-        const midpoint = (range.min + range.max) / 2;
-        const variance = Math.pow(midpoint - mean, 2) * range.count;
-        weightedVariance += variance;
-        totalCount += range.count;
-    });
-    
-    return Math.sqrt(weightedVariance / totalCount);
-}
+
 
 // Helper function to generate normal distribution data using NORM.DIST formula
 function generateNormalDistributionData(mean: number, stdDev: number, ranges: Array<{min: number, max: number, label: string, count: number}>): Array<{x: number, value: number}> {
