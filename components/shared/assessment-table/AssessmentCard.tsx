@@ -138,23 +138,24 @@ const generatePDF = async (html: string, fileName: string, orientation: 'portrai
               }
               .performance-table th, .performance-table td {
                 border: 1px solid black;
-                padding: 10px 4px;
+                padding: 12px 15px;
                 text-align: center;
                 font-size: 20px;
               }
               .performance-table th {
                 background-color: #f2f2f2;
                 font-weight: bold;
-                font-size: 16px;
-                padding: 12px 4px;
+                font-size: 22px;
+                padding: 15px 20px;
                 white-space: normal;
                 word-wrap: break-word;
                 line-height: 1.2;
               }
               .performance-cell {
-                font-size: 20px;
+                font-size: 22px;
                 line-height: 1.2;
                 font-weight: bold;
+                padding: 12px 15px;
               }
               .performance-score {
                 font-weight: bold;
