@@ -500,12 +500,11 @@ function generatePerformanceCurveChartHTML(performanceCurveData: {
     return `
         <div style="width:100%;height:${height}px;">
             <svg width="100%" height="${height}" viewBox="0 0 ${width} ${height}">
-                <text x="${width / 2}" y="20" text-anchor="middle" font-size="14" font-weight="bold">Students Performance Curve</text>
                 ${yAxis}
                 ${bars}
                 ${xAxisTicks.join('')}
                 <text x="${width / 2}" y="${height - 10}" text-anchor="middle" font-size="12">Scores</text>
-                <text x="20" y="${height / 2}" transform="rotate(-90,20,${height / 2})" text-anchor="middle" font-size="12">Count</text>
+                <text x="20" y="${height / 2}" transform="rotate(-90,20,${height / 2})" text-anchor="middle" font-size="12">No of Students</text>
             </svg>
         </div>
     `;
