@@ -438,167 +438,79 @@ function generateGradeDistributionChartHTML(assessmentData: Record<string, Grade
 }
 
 function generatePerformanceCurveChartHTML(performanceCurveData: {
-    ranges: Array<{
-        min: number;
-        max: number;
-        label: string;
-        count: number;
-    }>;
-    statistics: {
-        mean: string;
-        median: string;
-        min: string;
-        max: string;
-        totalStudents: number;
-    };
-}, performanceAnalysis?: {
-    overall: {
-        mean: number;
-        stdDev: number;
-    };
-}): string {
+    ranges: Array<{ min: number; max: number; label: string; count: number }>;
+    statistics: { mean: string; median: string; min: string; max: string; totalStudents: number };
+}, performanceAnalysis?: { overall: { mean: number; stdDev: number } }): string {
     const ranges = performanceCurveData.ranges;
     const maxCount = Math.max(...ranges.map(r => r.count));
-    
-    // Get mean and stdDev from performance analysis data (overall)
+
     const mean = performanceAnalysis?.overall?.mean || parseFloat(performanceCurveData.statistics.mean);
-    const stdDev = performanceAnalysis?.overall?.stdDev || calculateStdDev(performanceCurveData);
-    
-    // Create normal distribution data set using NORM.DIST formula
-    // Formula: NORM.DIST(x, mean, stdDev, false) * 97
-    const normalDistributionData = generateNormalDistributionData(mean, stdDev, ranges);
-    
-    // Console log mean, stdDev and line chart data set
-    console.log('=== CALCULATION VALUES ===');
-    console.log('Mean:', mean);
-    console.log('StdDev:', stdDev);
-    console.log('=== LINE CHART DATA SET ===');
-    console.log(normalDistributionData);
-    console.log('=== END LINE CHART DATA ===');
-    
-    // Chart dimensions - Professional size
-    const width = 800;
-    const height = 350;
-    const margin = {
-        left: 60,
-        right: 40,
-        top: 30,
-        bottom: 50
-    };
-    
+    const stdDev = performanceAnalysis?.overall?.stdDev || 10; // fallback
+
+    // Make continuous score ranges 55–100 (step 5)
+    const scoreRanges = [];
+    for (let i = 55; i < 100; i += 5) {
+        const match = ranges.find(r => r.min === i && r.max === i + 5);
+        scoreRanges.push({ min: i, max: i + 5, count: match ? match.count : 0 });
+    }
+
+    // Chart size
+    const width = 800, height = 350;
+    const margin = { left: 60, right: 40, top: 30, bottom: 50 };
     const chartWidth = width - margin.left - margin.right;
     const chartHeight = height - margin.top - margin.bottom;
-    
-    // Create custom score ranges to match the reference image (55-100 in steps of 5)
-    const scoreRanges = [
-        { min: 55, max: 60, count: 0 },
-        { min: 60, max: 65, count: 0 },
-        { min: 65, max: 70, count: 0 },
-        { min: 70, max: 75, count: 0 },
-        { min: 75, max: 80, count: 0 },
-        { min: 80, max: 85, count: 0 },
-        { min: 85, max: 90, count: 0 },
-        { min: 90, max: 95, count: 0 },
-        { min: 95, max: 100, count: 0 }
-    ];
-    
-    // Map existing ranges to the new structure
-    ranges.forEach(range => {
-        const targetRange = scoreRanges.find(sr => sr.min === range.min && sr.max === range.max);
-        if (targetRange) {
-            targetRange.count = range.count;
-        }
-    });
-    
-    const barWidth = chartWidth / scoreRanges.length * 0.8; // Wider bars to fill the space
-    const barSpacing = chartWidth / scoreRanges.length * 0.2; // Less spacing
-    
-    // Generate bars - positioned BETWEEN tick marks (like Excel ranges)
+
+    // Scale
+    const xStep = chartWidth / (scoreRanges.length); // distance between boundaries
+    const barWidth = xStep * 0.7; // narrower bars
+
+    // Bars centered at midpoints
     const bars = scoreRanges.map((range, i) => {
-        // Position bar BETWEEN tick marks - centered in the range
-        const x = margin.left + (i * (barWidth + barSpacing)) + barSpacing / 2;
+        const midpoint = (range.min + range.max) / 2;
+        const x = margin.left + (i * xStep) + xStep / 2 - barWidth / 2;
         const barHeight = (range.count / maxCount) * chartHeight;
         const y = height - margin.bottom - barHeight;
-        
         return `
             <rect x="${x}" y="${y}" width="${barWidth}" height="${barHeight}" 
-                  fill="#4A90E2" rx="2" ry="2" stroke="#333" stroke-width="0.5" />
-            <text x="${x + barWidth / 2}" y="${y - 5}" text-anchor="middle" font-size="10" font-weight="bold" fill="#333">${range.count}</text>
+                  fill="#4A90E2" rx="2" ry="2" />
+            <text x="${x + barWidth / 2}" y="${y - 5}" text-anchor="middle" font-size="10" font-weight="bold">${range.count}</text>
         `;
     }).join('');
-    
-    // Generate normal distribution curve using the calculated data
-    // Map actual x values (60-100) to chart positions
-    const curvePoints = normalDistributionData.map((point, i) => {
-        // Calculate x position based on actual score value (60-100)
-        const scoreValue = point.x; // This is 60, 61, 62, 63, etc.
-        const xPosition = margin.left + ((scoreValue - 55) / 5) * (barWidth + barSpacing) + barSpacing / 2;
-        const normalizedValue = point.value / Math.max(...normalDistributionData.map(p => p.value));
-        const y = height - margin.bottom - (normalizedValue * chartHeight);
-        return { x: xPosition, y };
-    });
-    
-    // Create smooth curve path
-    const curvePath = curvePoints.map((point, i) => {
-        if (i === 0) return `M ${point.x},${point.y}`;
-        
-        const prevPoint = curvePoints[i - 1];
-        const cp1x = prevPoint.x + (point.x - prevPoint.x) / 3;
-        const cp1y = prevPoint.y;
-        const cp2x = point.x - (point.x - prevPoint.x) / 3;
-        const cp2y = point.y;
-        
-        return `C ${cp1x},${cp1y} ${cp2x},${cp2y} ${point.x},${point.y}`;
-    }).join(' ');
-    
-    const curve = `<path d="${curvePath}" stroke="#E74C3C" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round" />`;
-    
-    // Generate x-axis tick marks and labels - show score values (55, 60, 65, 70, 75, 80, 85, 90, 95, 100)
-    const xAxisTicks = scoreRanges.map((range, i) => {
-        const x = margin.left + (i * (barWidth + barSpacing)) + barWidth / 2;
-        return `
-            <line x1="${x}" y1="${height - margin.bottom}" x2="${x}" y2="${height - margin.bottom + 5}" stroke="#333" stroke-width="1" />
-            <text x="${x}" y="${height - margin.bottom + 20}" text-anchor="middle" font-size="9" fill="#555">${range.max}</text>
-        `;
-    }).join('');
-    
-    // Add the first tick mark (60)
-    const firstTick = `
-        <line x1="${margin.left}" y1="${height - margin.bottom}" x2="${margin.left}" y2="${height - margin.bottom + 5}" stroke="#333" stroke-width="1" />
-        <text x="${margin.left}" y="${height - margin.bottom + 20}" text-anchor="middle" font-size="9" fill="#555">60</text>
-    `;
-    
-    // Y-axis
-    const yAxis = Array.from({ length: Math.ceil(maxCount) + 1 }, (_, i) => {
+
+    // X-axis ticks at boundaries
+    const xAxisTicks = [];
+    for (let i = 0; i <= scoreRanges.length; i++) {
+        const score = 55 + i * 5;
+        const x = margin.left + i * xStep;
+        xAxisTicks.push(`
+            <line x1="${x}" y1="${height - margin.bottom}" x2="${x}" y2="${height - margin.bottom + 5}" stroke="#333"/>
+            <text x="${x}" y="${height - margin.bottom + 20}" text-anchor="middle" font-size="9">${score}</text>
+        `);
+    }
+
+    // Y-axis grid & labels
+    const yAxis = Array.from({ length: maxCount + 1 }, (_, i) => {
         const y = height - margin.bottom - (i * (chartHeight / maxCount));
         return `
-            <line x1="${margin.left}" x2="${width - margin.right}" y1="${y}" y2="${y}" 
-                  stroke="#e0e0e0" stroke-width="1" />
-            <text x="${margin.left - 10}" y="${y + 5}" text-anchor="end" font-size="9" fill="#555">${i}</text>
+            <line x1="${margin.left}" x2="${width - margin.right}" y1="${y}" y2="${y}" stroke="#e0e0e0"/>
+            <text x="${margin.left - 10}" y="${y + 4}" text-anchor="end" font-size="9">${i}</text>
         `;
     }).join('');
-    
+
     return `
-        <div style="width: 100%; height: ${height}px; margin: 0; padding: 0;">
-            <svg width="100%" height="${height}" viewBox="0 0 ${width} ${height}" style="width: 100%; height: ${height}px; display: block; margin: 0; padding: 0;">
-                <text x="${width / 2}" y="25" text-anchor="middle" font-size="14" font-weight="bold" fill="#333">
-                    Students Performance Curve
-                </text>
-                <text x="${width / 2}" y="${height - 15}" text-anchor="middle" font-size="12" fill="#666">
-                    Scores
-                </text>
-                <text x="25" y="${height / 2}" text-anchor="middle" font-size="12" fill="#666" transform="rotate(-90, 25, ${height / 2})">
-                    Count
-                </text>
+        <div style="width:100%;height:${height}px;">
+            <svg width="100%" height="${height}" viewBox="0 0 ${width} ${height}">
+                <text x="${width / 2}" y="20" text-anchor="middle" font-size="14" font-weight="bold">Students Performance Curve</text>
                 ${yAxis}
                 ${bars}
-                ${curve}
-                ${firstTick}
-                ${xAxisTicks}
+                ${xAxisTicks.join('')}
+                <text x="${width / 2}" y="${height - 10}" text-anchor="middle" font-size="12">Scores</text>
+                <text x="20" y="${height / 2}" transform="rotate(-90,20,${height / 2})" text-anchor="middle" font-size="12">Count</text>
             </svg>
         </div>
     `;
 }
+
 
 // Helper function to calculate standard deviation from performance curve data
 function calculateStdDev(performanceCurveData: any): number {
