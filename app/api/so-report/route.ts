@@ -142,6 +142,52 @@ interface GradeCount {
 
 export const dynamic = 'force-dynamic';
 
+function calculatePerformanceCurve(overallScores: Map<string, { scored: number, total: number }>) {
+    // Define score ranges
+    const ranges = [
+        { min: 0, max: 60, label: '0-60' },
+        { min: 60, max: 65, label: '60-65' },
+        { min: 65, max: 70, label: '65-70' },
+        { min: 70, max: 75, label: '70-75' },
+        { min: 75, max: 80, label: '75-80' },
+        { min: 80, max: 85, label: '80-85' },
+        { min: 85, max: 90, label: '85-90' },
+        { min: 90, max: 95, label: '90-95' },
+        { min: 95, max: 100, label: '95-100' }
+    ];
+
+    // Count students in each range
+    const rangeCounts = ranges.map(range => {
+        let count = 0;
+        overallScores.forEach((scores) => {
+            const percentage = (scores.scored / scores.total) * 100;
+            if (percentage >= range.min && percentage < range.max) {
+                count++;
+            }
+        });
+        return { ...range, count };
+    });
+
+    // Calculate statistics for summary
+    const percentages = Array.from(overallScores.values()).map(scores => (scores.scored / scores.total) * 100);
+    const mean = percentages.reduce((sum, p) => sum + p, 0) / percentages.length;
+    const sorted = percentages.sort((a, b) => a - b);
+    const median = sorted[Math.floor(sorted.length / 2)];
+    const min = Math.min(...percentages);
+    const max = Math.max(...percentages);
+
+    return {
+        ranges: rangeCounts,
+        statistics: {
+            mean: mean.toFixed(1),
+            median: median.toFixed(1),
+            min: min.toFixed(1),
+            max: max.toFixed(1),
+            totalStudents: percentages.length
+        }
+    };
+}
+
 export async function GET(request: Request) {
     try {
         await connectToMongoDB();
@@ -247,6 +293,9 @@ export async function GET(request: Request) {
         // Process student performance analysis
         const performanceAnalysis = processStudentPerformanceAnalysis(assessment);
         
+        // Calculate performance curve data
+        const performanceCurveData = calculatePerformanceCurve(overallScores);
+        
         console.log('=== STUDENT PERFORMANCE ANALYSIS ===');
         console.log(JSON.stringify(performanceAnalysis, null, 2));
         console.log('=== END ANALYSIS ===\n');
@@ -267,7 +316,8 @@ export async function GET(request: Request) {
                 coordinator: coordinator!
               },
               college: courseData.collage,
-              performanceAnalysis: performanceAnalysis
+              performanceAnalysis: performanceAnalysis,
+              performanceCurveData: performanceCurveData
         });
 
         return new NextResponse(htmlContent, {

@@ -224,15 +224,22 @@ const generatePDF = async (html: string, fileName: string, orientation: 'portrai
       const widthScale = maxImgWidth / (imgProps.width / pxPerMm);
       const heightScale = maxImgHeight / (imgProps.height / pxPerMm);
       
-      // Simple approach: use the smaller of the two scales to ensure it fits
-      let scale = Math.min(widthScale, heightScale);
+      // Skip scaling for the second page (Performance Curve page)
+      let scale, pdfWidth, pdfHeight, x, y;
       
-      const pdfWidth = (imgProps.width / pxPerMm) * scale;
-      const pdfHeight = (imgProps.height / pxPerMm) * scale;
-      
-      // Position at top with minimal margin instead of center
-      const x = (pageWidth - pdfWidth) / 2;
-      const y = margin; // Start from top margin instead of centering
+      if (i === 1) { // Second page - full width professional size
+        scale = widthScale; // Use full width scaling
+        pdfWidth = (imgProps.width / pxPerMm) * scale;
+        pdfHeight = (imgProps.height / pxPerMm) * scale;
+        x = margin; // Start from left margin for full width
+        y = margin; // Start from top margin
+      } else { // Other pages - apply scaling
+        scale = Math.min(widthScale, heightScale);
+        pdfWidth = (imgProps.width / pxPerMm) * scale;
+        pdfHeight = (imgProps.height / pxPerMm) * scale;
+        x = (pageWidth - pdfWidth) / 2;
+        y = margin; // Start from top margin for other pages
+      }
 
       // Add new page if not first
       if (i > 0) {
