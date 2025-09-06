@@ -3,6 +3,110 @@ import { connectToMongoDB } from '@/lib/db';
 import { Course, Assessment } from '@/lib/models';
 import { generateCloReportHTML } from '@/templates/cloReport';
 
+// Function to process assessment data and return student performance analysis
+function processStudentPerformanceAnalysis(assessmentData: AssessmentData) {
+  // Get unique exam types
+  const uniqueExamTypes = new Set<string>();
+  assessmentData.assessmentResults.forEach(result => {
+    uniqueExamTypes.add(result.type);
+  });
+
+  // Calculate statistics for each exam type
+  const examMetadata: { [examType: string]: { mean: number; stdDev: number } } = {};
+  const examResults: { [examType: string]: any[] } = {};
+
+  uniqueExamTypes.forEach(examType => {
+    const examData = assessmentData.assessmentResults.find(result => result.type === examType);
+    if (examData && examData.results.length > 0) {
+      // Calculate scores out of 100 for each student
+      const studentScores = examData.results.map(student => {
+        const scoreOutOf100 = (student.totalScore.marksScored / student.totalScore.totalMarks) * 100;
+        return {
+          studentId: student.studentId,
+          studentName: student.studentName,
+          marksScored: student.totalScore.marksScored,
+          totalMarks: student.totalScore.totalMarks,
+          scoreOutOf100: scoreOutOf100
+        };
+      });
+
+      // Calculate mean and standard deviation
+      const scores = studentScores.map(s => s.scoreOutOf100);
+      const mean = scores.reduce((sum, score) => sum + score, 0) / scores.length;
+      const variance = scores.reduce((sum, score) => sum + Math.pow(score - mean, 2), 0) / scores.length;
+      const standardDeviation = Math.sqrt(variance);
+
+      // Store metadata
+      examMetadata[examType] = { mean, stdDev: standardDeviation };
+
+      // Calculate Z-scores and performance levels for each student
+      const studentScoresWithZ = studentScores.map(student => {
+        const zScore = (student.scoreOutOf100 - mean) / standardDeviation;
+        let performance = '';
+        if (zScore < 0) {
+          performance = 'Low';
+        } else if (zScore >= 0 && zScore <= 1) {
+          performance = 'Average';
+        } else if (zScore > 1) {
+          performance = 'High';
+        }
+
+        return {
+          studentId: student.studentId,
+          studentName: student.studentName,
+          scoreOutOf100: student.scoreOutOf100,
+          zScore: zScore,
+          performance: performance
+        };
+      });
+
+      examResults[examType] = studentScoresWithZ;
+    }
+  });
+
+  // Get all unique students across all exams
+  const allStudents = new Set<string>();
+  Object.values(examResults).forEach(examStudents => {
+    examStudents.forEach(student => {
+      allStudents.add(student.studentId);
+    });
+  });
+
+  // Build result structure
+  const result = Array.from(allStudents).map((studentId, index) => {
+    // Get student name from first exam result
+    const firstExam = Object.values(examResults)[0];
+    const studentInfo = firstExam.find(s => s.studentId === studentId);
+    const studentName = studentInfo ? studentInfo.studentName : 'Unknown';
+
+    // Build performance object for this student
+    const performance: { [examType: string]: { scoreOutOf100: number; zScore: number; performance: string } } = {};
+    
+    Object.keys(examResults).forEach(examType => {
+      const studentResult = examResults[examType].find(s => s.studentId === studentId);
+      if (studentResult) {
+        performance[examType] = {
+          scoreOutOf100: studentResult.scoreOutOf100,
+          zScore: studentResult.zScore,
+          performance: studentResult.performance
+        };
+      }
+    });
+
+    return {
+      sNo: index + 1,
+      studentId: studentId,
+      studentName: studentName,
+      performance: performance
+    };
+  });
+
+  return {
+    result: result,
+    metadata: examMetadata
+  };
+}
+
 interface CourseData {
   course_name: string;
   level: number;
@@ -259,49 +363,12 @@ export async function POST(request: Request) {
       // Continue with response even if save fails
     }
 
-    // Analyze unique exam types and their results
-    console.log('=== ASSESSMENT ANALYSIS ===');
+    // Process student performance analysis
+    const performanceAnalysis = processStudentPerformanceAnalysis(assessmentData);
     
-    // Get unique exam types
-    const uniqueExamTypes = new Set<string>();
-    assessmentData.assessmentResults.forEach(result => {
-      uniqueExamTypes.add(result.type);
-    });
-    
-    console.log('Unique Exam Types:', Array.from(uniqueExamTypes));
-    
-    // Analyze results for each exam type
-    uniqueExamTypes.forEach(examType => {
-      const examResults = assessmentData.assessmentResults.find(result => result.type === examType);
-      if (examResults) {
-        console.log(`\n--- ${examType.toUpperCase()} RESULTS ---`);
-        console.log(`Number of students: ${examResults.results.length}`);
-        
-        // Calculate statistics for this exam type
-        const percentages = examResults.results.map(student => {
-          const percentage = (student.totalScore.marksScored / student.totalScore.totalMarks) * 100;
-          return percentage;
-        });
-        
-        const mean = percentages.reduce((sum, p) => sum + p, 0) / percentages.length;
-        const variance = percentages.reduce((sum, p) => sum + Math.pow(p - mean, 2), 0) / percentages.length;
-        const standardDeviation = Math.sqrt(variance);
-        
-        console.log(`Mean percentage: ${mean.toFixed(2)}%`);
-        console.log(`Standard deviation: ${standardDeviation.toFixed(2)}%`);
-        console.log(`Min percentage: ${Math.min(...percentages).toFixed(2)}%`);
-        console.log(`Max percentage: ${Math.max(...percentages).toFixed(2)}%`);
-        
-        // Show first few student results as sample
-        console.log('Sample student results:');
-        examResults.results.slice(0, 3).forEach((student, index) => {
-          const percentage = (student.totalScore.marksScored / student.totalScore.totalMarks) * 100;
-          console.log(`  ${index + 1}. ${student.studentName} (${student.studentId}): ${student.totalScore.marksScored}/${student.totalScore.totalMarks} (${percentage.toFixed(2)}%)`);
-        });
-      }
-    });
-    
-    console.log('\n=== END ASSESSMENT ANALYSIS ===\n');
+    console.log('=== STUDENT PERFORMANCE ANALYSIS ===');
+    console.log(JSON.stringify(performanceAnalysis, null, 2));
+    console.log('=== END ANALYSIS ===\n');
 
     // Generate HTML content using the template
     const htmlContent = await generateCloReportHTML({
