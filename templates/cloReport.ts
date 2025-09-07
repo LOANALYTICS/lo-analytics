@@ -12,12 +12,12 @@ function generateAchievementChartSVG(
   const width = 1200;
   const height = 540;
   // Bottom legend space maintained; slightly wider layout
-  const margin = { top: 40, right: 30, bottom: 110, left: 70 };
+  const margin = { top: 50, right: 30, bottom: 150, left: 70 };
   const plotWidth = width - margin.left - margin.right;
   const plotHeight = height - margin.top - margin.bottom;
 
   const yMin = 50;
-  const yMax = 105;
+  const yMax = 108; // extra headroom so value labels have clear space from top
   const yToPx = (v: number) => {
     const clamped = Math.max(yMin, Math.min(yMax, v));
     const t = (clamped - yMin) / (yMax - yMin);
@@ -56,7 +56,7 @@ function generateAchievementChartSVG(
       const h = margin.top + plotHeight - y;
       bars.push(`<rect x="${x}" y="${y}" width="${barWidth}" height="${Math.max(0, h)}" fill="${colors[si]}" stroke="${borders[si]}" stroke-width="1" rx="4"/>`);
       const valText = Number.isInteger(v) ? String(v) : v.toFixed(1);
-      labelsSvg.push(`<text x="${cx + offsets[si]}" y="${y - 4}" text-anchor="middle" font-family="Arial" font-size="13" font-weight="bold" fill="#000">${valText}%</text>`);
+      labelsSvg.push(`<text x="${cx + offsets[si]}" y="${y - 8}" text-anchor="middle" font-family="Arial" font-size="13" font-weight="bold" fill="#000">${valText}%</text>`);
     });
 
     // X tick label
@@ -100,10 +100,10 @@ function generateAchievementChartSVG(
   addLegendDash('rgba(255,99,132,1)', 'Direct Threshold (60%)');
   addLegendDash('rgba(153,102,255,1)', `Indirect Threshold (${indirectBenchmark}%)`);
 
-  const legend = `<g>${legendItems.join('')}</g>`;
+  const legend = `<g style="font-size: 16px;">${legendItems.join('')}</g>`;
 
   return `
-  <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
+  <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" preserveAspectRatio="xMidYMid meet">
     <rect x="0" y="0" width="${width}" height="${height}" fill="#ffffff"/>
     <g>
       ${gridLines.join('')}
@@ -116,10 +116,10 @@ function generateAchievementChartSVG(
       ${bars.join('')}
       ${labelsSvg.join('')}
     </g>
-    <text x="${margin.left + plotWidth / 2}" y="${margin.top + plotHeight + 40}" text-anchor="middle" font-family="Arial" font-size="18" font-weight="bold">Course Learning Outcomes (CLOs)</text>
+    <text x="${margin.left + plotWidth / 2}" y="${margin.top + plotHeight + 55}" text-anchor="middle" font-family="Arial" font-size="22" font-weight="bold">Course Learning Outcomes (CLOs)</text>
     <!-- Rotated Y-axis label -->
     <g transform="translate(${margin.left - 45}, ${margin.top + plotHeight / 2}) rotate(-90)">
-      <text text-anchor="middle" font-family="Arial" font-size="18" font-weight="bold">Percentage</text>
+      <text text-anchor="middle" font-family="Arial" font-size="22" font-weight="bold">Percentage</text>
     </g>
     ${legend}
   </svg>`;
