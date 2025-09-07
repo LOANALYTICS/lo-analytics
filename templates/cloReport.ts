@@ -321,7 +321,7 @@ export async function generateCloReportHTML(props: CloReportProps): Promise<stri
           .detail-item {
             display: flex;
             gap: 3px;
-            font-size: 18px;
+            font-size: 1.3em;
             white-space: nowrap;
             flex: 1 1 30%;
           }
@@ -516,7 +516,6 @@ export async function generateCloReportHTML(props: CloReportProps): Promise<stri
                   ${sortedClos.map(clo => `
                     <th class="clo-header">${clo.replace(/([a-zA-Z]+)(\d+)/, '$1 $2')}</th>
                   `).join('')}
-                  <th rowspan="2" class="total-header">MARKS OBTAINED</th>
                 </tr>
                 <tr>
                   ${sortedClos.map(clo => `
@@ -538,7 +537,6 @@ export async function generateCloReportHTML(props: CloReportProps): Promise<stri
                       const isBelow = studentScore < threshold;
                       return `<td style="background-color:${isBelow ? '#e6ffe6': 'white'} !important;">${isBelow ? `<p >${studentScore.toFixed(2)}</p>` : `<p>${studentScore.toFixed(2)}</p>`}</td>`;
                     }).join('')}
-                    <td>${student.totalMarksObtained.toFixed(2)}</td>
                   </tr>
                 `}).join('')}
               </tbody>
@@ -554,14 +552,12 @@ export async function generateCloReportHTML(props: CloReportProps): Promise<stri
     const totalScore = assessmentData.cloScores[clo];
     return `<td>${(totalScore * 0.6).toFixed(2)}</td>`;
   }).join('')}
-                  <td>-</td>
                 </tr>
                 <tr class="achievement-row">
                   <td colspan="2" class="achievement-label">% of students scoring ≥ 60%</td>
                   ${sortedClos.map((clo, index) => {
     return `<td>${Number(achievementData['60'][index].percentageAchieving).toFixed(1)}%</td>`;
   }).join('')}
-                  <td>-</td>
                 </tr>
               </tbody>
 
@@ -573,7 +569,6 @@ export async function generateCloReportHTML(props: CloReportProps): Promise<stri
                   </td>
                   <td colspan="2" class="achievement-label">Achievement Rate</td>
                   ${sortedClos.map(() => `<td>80.00</td>`).join('')}
-                  <td>-</td>
                 </tr>
                 <tr class="achievement-row">
                   <td colspan="2" class="achievement-label">% of students agreed that they achieved the CLO</td>
@@ -583,7 +578,6 @@ export async function generateCloReportHTML(props: CloReportProps): Promise<stri
                     );
                     return `<td>${assessment ? assessment.achievementPercentage.toFixed(1) + '%' : '-'}</td>`;
                   }).join('')}
-                  <td>-</td>
                 </tr>
               </tbody>
               ` : ''}
