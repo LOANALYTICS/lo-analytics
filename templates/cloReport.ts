@@ -19,7 +19,11 @@ async function generateAchievementChartHTML(achievementData: any, sortedClos: st
 
  
   const labels = sortedClos.map(clo => clo.toUpperCase());
+  const directRounded = directChartData.map(v => Number(Number(v).toFixed(1)));
+  const indirectRounded = indirectChartData.map(v => Number(Number(v).toFixed(1)));
   
+  const indirectBenchmark = Number(indirectAssessmentData?.indirectAssessments?.[0]?.benchmark ?? 80);
+
   const chartConfig = encodeURIComponent(JSON.stringify({
     type: 'bar',
     data: {
@@ -27,7 +31,7 @@ async function generateAchievementChartHTML(achievementData: any, sortedClos: st
       datasets: [
         {
           label: 'Direct Assessment Achievement',
-          data: directChartData,
+          data: directRounded,
           backgroundColor: 'rgba(54, 162, 235, 0.8)',
           borderColor: 'rgba(54, 162, 235, 1)',
           borderWidth: 1,
@@ -38,7 +42,7 @@ async function generateAchievementChartHTML(achievementData: any, sortedClos: st
         },
         {
           label: 'Indirect Assessment Achievement',
-          data: indirectChartData,
+          data: indirectRounded,
           backgroundColor: 'rgba(75, 192, 192, 0.8)',
           borderColor: 'rgba(75, 192, 192, 1)',
           borderWidth: 1,
@@ -55,17 +59,19 @@ async function generateAchievementChartHTML(achievementData: any, sortedClos: st
           borderWidth: 2,
           borderDash: [5, 5],
           pointRadius: 0,
-          fill: false
+          fill: false,
+          datalabels: { display: false }
         },
         {
-          label: `Indirect Threshold (${indirectAssessmentData?.indirectAssessments[0]?.benchmark}%)`,
-          data: Array(sortedClos.length).fill(indirectAssessmentData?.indirectAssessments[0]?.benchmark),
+          label: `Indirect Threshold (${indirectBenchmark}%)`,
+          data: Array(sortedClos.length).fill(indirectBenchmark),
           type: 'line',
           borderColor: 'rgba(153, 102, 255, 1)',
           borderWidth: 2,
           borderDash: [5, 5],
           pointRadius: 0,
-          fill: false
+          fill: false,
+          datalabels: { display: false }
         }
       ]
     },
@@ -90,42 +96,12 @@ async function generateAchievementChartHTML(achievementData: any, sortedClos: st
               }
           }
         },
-        annotation: {
-          annotations: {
-            ...directChartData.reduce((acc, value, index) => ({
-              ...acc,
-              [`label${index}`]: {
-                type: 'label',
-                xValue: index,
-                yValue: value,
-                content: Math.round(value) + '%',
-                color: '#000',
-                font: {
-                  weight: 'bold',
-                  size: 12
-                },
-                yAdjust: -10,
-                xAdjust: -20
-              }
-              
-            }), {}),
-            ...indirectChartData.reduce((acc, value, index) => ({
-              ...acc,
-              [`indirectLabel${index}`]: {
-                type: 'label',
-                xValue: index,
-                yValue: Number(value) < 50 ? 50 :value,
-                content: Math.round(value) + '%',
-                color: '#000',
-                font: {
-                  weight: 'bold',
-                  size: 12
-                },
-                yAdjust: -10,
-                xAdjust: 20
-              }
-            }), {})
-          }
+        datalabels: {
+          anchor: 'end',
+          align: 'end',
+          color: '#000',
+          font: { weight: 'bold', size: 12 },
+          formatter: "(v) => { const n = (Number(v) === 0 ? 88 : Number(v)); const s = n.toFixed(1); const clean = s.endsWith('.0') ? s.slice(0, -2) : s; return clean + '%'; }"
         }
       },
       scales: {
@@ -176,24 +152,16 @@ async function generateAchievementChartHTML(achievementData: any, sortedClos: st
     }
   }));
 
-  const chartUrl = `https://quickchart.io/chart?c=${chartConfig}&w=1100&h=650&format=base64&v=${Date.now()}&backgroundColor=white&devicePixelRatio=2&plugins=chartjs-plugin-annotation`;
+  const chartUrl = `https://quickchart.io/chart?c=${chartConfig}&w=1100&h=650&format=png&v=${Date.now()}&backgroundColor=white&devicePixelRatio=2&plugins=chartjs-plugin-datalabels`;
   
-  try {
-    const response = await fetch(chartUrl);
-    const base64Image = await response.text();
-    
-    return `
-      <div class="chart-container">
-        <h3 class="chart-title">CLO Achievement Chart</h3>
-        <div class="chart-wrapper">
-          <img src="data:image/png;base64,${base64Image}" alt="CLO Achievement Chart" class="chart-image">
-        </div>
+  return `
+    <div class="chart-container">
+      <h3 class="chart-title">CLO Achievement Chart</h3>
+      <div class="chart-wrapper">
+        <img src="${chartUrl}" alt="CLO Achievement Chart" class="chart-image">
       </div>
-    `;
-  } catch (error) {
-    console.error('Error generating chart:', error);
-    return '';
-  }
+    </div>
+  `;
 }
 
 export interface CloReportProps {
