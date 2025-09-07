@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { connectToMongoDB } from '@/lib/db';
 import { Course, Assessment } from '@/lib/models';
 import { generateCloReportHTML } from '@/templates/cloReport';
+import logger from '@/lib/logger';
 
 
 
