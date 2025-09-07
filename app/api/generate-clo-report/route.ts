@@ -71,6 +71,7 @@ interface AssessmentData {
     benchmark: string;
     achievementPercentage: number;
   }>;
+  benchmark: number;
 }
 
 export const dynamic = 'force-dynamic';
@@ -334,10 +335,7 @@ export async function POST(request: Request) {
 
     // Console log summary before HTML generation
     const { flat, grouped } = buildCloDiagnostics60(processedData, assessmentData);
-    console.log('CLO Summary (60% threshold):');
-    console.dir(flat, { depth: null });
-    console.log('CLO Summary (grouped):');
-    console.dir(grouped, { depth: null });
+
 
     // Save achievement data to MongoDB
     try {
@@ -371,6 +369,8 @@ export async function POST(request: Request) {
       indirectAssessmentData: assessmentData?.indirectAssessments ? {
         indirectAssessments: assessmentData.indirectAssessments
       } : undefined,
+      plogroups: grouped,
+      benchmark: assessmentData.benchmark || 0
     });
 
     // Return the HTML content

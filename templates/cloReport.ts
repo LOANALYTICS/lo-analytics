@@ -159,6 +159,14 @@ async function generateAchievementChartHTML(achievementData: any, sortedClos: st
   `;
 }
 
+type CloDiagnostic = {
+  cloNumber: string;
+  cloText: string;
+  mappedPLOs: string[];
+  achievementGrade: string | number;
+  percentageAchieving: string | number;
+};
+
 export interface CloReportProps {
   course: {
     course_name: string;
@@ -209,10 +217,21 @@ export interface CloReportProps {
       achievementPercentage: number;
     }>;
   };
+  plogroups?: {
+    knowledge: CloDiagnostic[];
+    skills: CloDiagnostic[];
+    values: CloDiagnostic[];
+  };
+  benchmark?: number;
 }
 
 export async function generateCloReportHTML(props: CloReportProps): Promise<string> {
-  const { course, college, assessmentData, indirectAssessmentData } = props;
+  const { course, college, assessmentData, indirectAssessmentData, plogroups, benchmark } = props;
+  if (plogroups) {
+    console.log('Benchmark:', benchmark);
+    // Log PLO groups for verification
+    console.log('PLO Groups:', JSON.stringify(plogroups, null, 2));
+  }
   const { sortedClos, achievementData } = assessmentData;
   
   function escapeHTML(str: string): string {
