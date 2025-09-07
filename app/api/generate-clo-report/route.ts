@@ -74,6 +74,60 @@ interface AssessmentData {
 
 export const dynamic = 'force-dynamic';
 
+// Build 60% threshold CLO diagnostics (simple + robust)
+function buildCloDiagnostics60(processedData: any, assessmentData: any) {
+  const getDigits = (val: any) => {
+    const m = String(val ?? '').match(/\d+/);
+    return m ? m[0] : '';
+  };
+  const toCloKey = (cloVal: any, descVal?: any) => {
+    const n = getDigits(cloVal) || getDigits(descVal);
+    return n ? (`clo${n}`).toLowerCase() : '';
+  };
+  const extractPlo = (arr: Array<Record<string, boolean>> | undefined, prefix: 'K' | 'S' | 'V') => {
+    if (!Array.isArray(arr)) return [] as string[];
+    return arr.flatMap(obj => {
+      return Object.entries(obj || {})
+        .filter(([, v]) => !!v)
+        .map(([k]) => `${prefix}${getDigits(k) || String(k).toUpperCase()}`);
+    });
+  };
+
+  const cloMap: Record<string, { description: string; mapping: string[] }> = {};
+  (assessmentData?.cloData || []).forEach((entry: any) => {
+    const key = toCloKey(entry?.clo, entry?.description);
+    if (!key) return;
+    const mapping = [
+      ...extractPlo(entry?.ploMapping?.k, 'K'),
+      ...extractPlo(entry?.ploMapping?.s, 'S'),
+      ...extractPlo(entry?.ploMapping?.v, 'V')
+    ];
+    cloMap[key] = { description: String(entry?.description ?? ''), mapping };
+  });
+
+  const items = (processedData?.achievementData?.['60'] as any[]) || [];
+  const flat = items.map(d => {
+    const info = cloMap[toCloKey(d?.clo)] || { description: '', mapping: [] };
+    return {
+      cloNumber: d?.clo,
+      cloText: info.description,
+      mappedPLOs: info.mapping,
+      achievementGrade: d?.achievementGrade,
+      percentageAchieving: d?.percentageAchieving
+    };
+  });
+
+  const hasType = (items: string[] | undefined, prefix: 'K' | 'S' | 'V') =>
+    Array.isArray(items) && items.some(t => String(t).toUpperCase().startsWith(prefix));
+  const grouped = {
+    knowledge: flat.filter(d => hasType(d.mappedPLOs, 'K')),
+    skills: flat.filter(d => hasType(d.mappedPLOs, 'S')),
+    values: flat.filter(d => hasType(d.mappedPLOs, 'V')),
+  };
+
+  return { flat, grouped };
+}
+
 export async function POST(request: Request) {
   try {
     await connectToMongoDB();
@@ -248,6 +302,13 @@ export async function POST(request: Request) {
         return aNum - bNum;
       })
     };
+
+    // Console log summary before HTML generation
+    const { flat, grouped } = buildCloDiagnostics60(processedData, assessmentData);
+    console.log('CLO Summary (60% threshold):');
+    console.dir(flat, { depth: null });
+    console.log('CLO Summary (grouped):');
+    console.dir(grouped, { depth: null });
 
     // Save achievement data to MongoDB
     try {

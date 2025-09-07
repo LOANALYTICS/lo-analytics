@@ -51,9 +51,9 @@ export async function updateCLOData(courseId: string, cloData: Array<{
     };
 }>) {
     try {
-        // Transform the data to match the schema format
-        const transformedCLOData = cloData.map(clo => ({
-            clo: clo.clo,
+        // Transform and normalize CLO keys to stable sequential numbering ("1", "2", ...)
+        const transformedCLOData = cloData.map((clo, idx) => ({
+            clo: String(idx + 1),
             description: clo.description,
             ploMapping: clo.ploMapping
         }));
