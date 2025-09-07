@@ -282,6 +282,24 @@ export default function SemisterAssessmentReportButtons() {
 
         // Add image to PDF
         pdf.addImage(imgData, 'JPEG', margin, margin, imgWidth, Math.min(imgHeight, pageHeight - (margin * 2)));
+
+        // Add watermark to each page
+        pdf.saveGraphicsState();
+        (pdf as any).setGState(new (pdf as any).GState({ opacity: 0.3 }));
+
+        const watermarkImg = new Image();
+        watermarkImg.src = "/pdf_logo.png";
+
+        pdf.addImage(
+          watermarkImg,
+          "PNG",
+          pdf.internal.pageSize.width - 25, // 25mm from right
+          pdf.internal.pageSize.height - 25, // 25mm from bottom
+          15, // width in mm
+          15 // height in mm
+        );
+
+        pdf.restoreGraphicsState();
       }
 
       // Save the PDF
