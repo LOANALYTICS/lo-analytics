@@ -52,6 +52,11 @@ export default function AssessmentTable({ initialData, onSave, saving, onUpload,
   const [spreadsheetType, setSpreadsheetType] = useState<string | null>(null);
   const [spreadsheetWeight, setSpreadsheetWeight] = useState<number | null>(null);
   const [selectedAssessmentId, setSelectedAssessmentId] = useState<string | null>(null);
+  
+  // Benchmark state
+  const [isEditingBenchmark, setIsEditingBenchmark] = useState(false);
+  const [benchmarkValue, setBenchmarkValue] = useState('');
+  const [currentBenchmark, setCurrentBenchmark] = useState(60);
   const [assessments, setAssessments] = useState<Assessment[]>(() => {
     if (initialData.length > 0) {
       // Add any missing CLO keys to each assessment
@@ -148,9 +153,80 @@ export default function AssessmentTable({ initialData, onSave, saving, onUpload,
     setSelectedRows([]);
   };
 
+  // Benchmark validation and handlers
+  const isValidBenchmark = benchmarkValue !== '' && 
+    !isNaN(Number(benchmarkValue)) && 
+    Number(benchmarkValue) >= 0 && 
+    Number(benchmarkValue) <= 100;
+
+  const handleSaveBenchmark = () => {
+    if (isValidBenchmark) {
+      setCurrentBenchmark(Number(benchmarkValue));
+      setBenchmarkValue('');
+      setIsEditingBenchmark(false);
+    }
+  };
+
   return (
     <div className="">
-    
+    <div className='flex justify-between items-center mb-2'>
+      <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium">Benchmark:</span>
+          {isEditingBenchmark ? (
+            <div className="flex items-center gap-2">
+              <input
+                type="number"
+                value={benchmarkValue}
+                onChange={(e) => setBenchmarkValue(e.target.value)}
+                min="0"
+                max="100"
+                className="w-20 px-2 py-1 border border-gray-300 rounded text-sm"
+                placeholder="0-100"
+              />
+              <button
+                onClick={handleSaveBenchmark}
+                className="p-1 text-green-600 hover:text-green-800"
+                disabled={!isValidBenchmark}
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </button>
+              <button
+                onClick={() => setIsEditingBenchmark(false)}
+                className="p-1 text-gray-500 hover:text-gray-700"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-semibold text-blue-600">{currentBenchmark}%</span>
+              <button
+                onClick={() => setIsEditingBenchmark(true)}
+                className="p-1 text-gray-500 hover:text-gray-700"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    <Button
+          variant="default"
+          className='w-28 text-[13px] p-1'
+          size="xs"
+          onClick={() => onSave(assessments)}
+        >
+          {saving ? <Loader2Icon className='animate-spin text-white h-6 w-6' /> : 'Save Changes'}
+        </Button>
+
+    </div>
 
       <div className="border-2 border-black rounded-lg">
         <Table>
@@ -170,7 +246,7 @@ export default function AssessmentTable({ initialData, onSave, saving, onUpload,
               </TableHead>
               <TableHead className='border-b border-r border-black'>Assessment Type</TableHead>
               {cloKeys.map((clo) => (
-                <TableHead key={clo} className='border-b border-black'>
+                <TableHead key={clo} className='border-b border-r border-black'>
                   {clo.toUpperCase()}
                 </TableHead>
               ))}
@@ -181,7 +257,7 @@ export default function AssessmentTable({ initialData, onSave, saving, onUpload,
           <TableBody>
             {assessments.map((assessment) => (
               <TableRow key={assessment.id} className='border-b border-black'>
-                <TableCell className='w-10 py-1 '>
+                <TableCell className='w-10 py-0 '>
                   <Checkbox
                     checked={selectedRows.includes(assessment.id)}
                     onCheckedChange={(checked) => {
@@ -193,9 +269,9 @@ export default function AssessmentTable({ initialData, onSave, saving, onUpload,
                     }}
                   />
                 </TableCell>
-                <TableCell className='py-1  border-r border-black'>
+                <TableCell className='py-0  border-r border-black'>
                   <Input
-                    className='border-none bg-transparent focus-visible:ring-0  focus-visible:ring-offset-0'
+                    className='h-8 border-none bg-transparent focus-visible:ring-0  focus-visible:ring-offset-0'
                     value={assessment.type}
                     placeholder='Enter Assessment Type'
                     onChange={(e) => setAssessments(prev => prev.map(a =>
@@ -204,7 +280,7 @@ export default function AssessmentTable({ initialData, onSave, saving, onUpload,
                   />
                 </TableCell>
                 {cloKeys.map((clo) => (
-                  <TableCell key={clo} className='py-1 border-b border-r border-black'>
+                  <TableCell key={clo} className='py-0 border-b border-r border-black'>
                     <div className="flex items-center flex-wrap gap-1 p-1  min-h-[40px]">
                       {assessment.clos[clo as keyof Assessment['clos']].map((num, idx) => (
                         <span key={idx} className="bg-blue-100 group relative h-5 w-5 rounded text-xs flex items-center justify-center gap-1">
@@ -216,7 +292,7 @@ export default function AssessmentTable({ initialData, onSave, saving, onUpload,
                         </span>
                       ))}
                       <Input
-                        className="border-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 p-1 flex-1 min-w-[60px]"
+                        className=" h-8 border-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-1 py-0 flex-1 min-w-[60px]"
                         placeholder="Enter number"
                         value={tempInputs[`${assessment.id}-${clo}`] || ''}
                         onChange={(e) => {
@@ -256,24 +332,26 @@ export default function AssessmentTable({ initialData, onSave, saving, onUpload,
                     </div>
                   </TableCell>
                 ))}
-                <TableCell className='py-1 '>
+                <TableCell className='py-0 border-r border-black '>
                   <Input
+                        className="h-8 border-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-1 py-0 flex-1 min-w-12 "
+
                     type="number"
                     value={assessment.weight}
-                    className='min-w-12'
                     onChange={(e) => setAssessments(prev => prev.map(a =>
                       a.id === assessment.id ? { ...a, weight: Number(e.target.value) } : a
                     ))}
                   />
                 </TableCell>
-                <TableCell className='py-1'>
+                <TableCell className='py-0'>
                   <div className="flex gap-2">
-                    <Button variant="outline" size="sm" onClick={() => onUpload(assessment.type)}>
-                      <Upload className="h-4 w-4" />
+                    <Button className='border-none p-2' variant="outline" size="xs" onClick={() => onUpload(assessment.type)}>
+                      <Upload className="h-3 w-3 " />
                     </Button>
                     <Button 
                       variant="outline" 
-                      size="sm" 
+                      className='border-none p-2'
+                      size="xs" 
                       onClick={() => {
                         setSpreadsheetOpen(true)
                         setSpreadsheetType(assessment.type)
@@ -281,7 +359,7 @@ export default function AssessmentTable({ initialData, onSave, saving, onUpload,
                         setSelectedAssessmentId(assessment.id)
                       }}
                     >
-                      <Plus className="h-4 w-4" />
+                      <Plus className="h-2 w-2" />
                     </Button>
                   </div>
                 </TableCell>
@@ -291,8 +369,8 @@ export default function AssessmentTable({ initialData, onSave, saving, onUpload,
               <TableCell colSpan={cloKeys.length + 2} className='py-4 border-r border-black'>
                 Total
               </TableCell>
-              <TableCell colSpan={2} className='py-1 font-semibold '>
-                <span className='border px-4 py-2 rounded-lg -ml-2 font-bold'>
+              <TableCell colSpan={2} className='py-0 font-semibold '>
+                <span className=' px-3 py-2 rounded-lg -ml-2 font-bold'>
                 {assessments.reduce((sum, assessment) => sum + assessment.weight, 0)}
                 </span>
               </TableCell>
@@ -301,18 +379,18 @@ export default function AssessmentTable({ initialData, onSave, saving, onUpload,
         </Table>
       </div>
 
-      <div className="flex justify-between items-center mt-4">
-        <div className='flex gap-4 items-center'>
-        <Button onClick={addNewRow}>
-          <Plus className="h-4 w-4 mr-2" />
-          Add Row
+      <div className="flex justify-between items-center mt-2">
+        <div className='flex gap-2 items-center'>
+        <Button onClick={addNewRow} variant="outline" size="xs" className='flex items-center gap-1' >
+          <Plus className="h-3 w-3 p-px" />
+          <p className='text-xs mt-0.5 font-semibold'>Add Row</p>
         </Button>
           
               {selectedRows.length > 0 && (
                 <div className="flex justify-end">
-                  <Button variant="destructive" onClick={deleteSelectedRows}>
-                    <Trash className="h-4 w-4 mr-2" />
-                    Delete Selected
+                  <Button variant="destructive" onClick={deleteSelectedRows} size="xs" className='flex items-center gap-1'>
+                    <Trash className="h-3 w-3 p-px " />
+                    <p className='text-xs mt-0.5 font-semibold'>Delete Selected</p>
                   </Button>
                 </div>
               )}
@@ -322,13 +400,7 @@ export default function AssessmentTable({ initialData, onSave, saving, onUpload,
      
 
 
-        <Button
-          variant="default"
-          className='w-40'
-          onClick={() => onSave(assessments)}
-        >
-          {saving ? <Loader2Icon className='animate-spin text-white h-6 w-6' /> : 'Save Changes'}
-        </Button>
+      
       </div>
 
       <AssessmentSpreadsheet
