@@ -75,7 +75,7 @@ function generateAchievementChartSVG(
   const yTicks: string[] = [];
   for (let y = yMin; y <= yMax; y += 5) {
     const py = yToPx(y);
-    yTicks.push(`<text x="${margin.left - 8}" y="${py + 4}" text-anchor="end" font-family="Arial" font-size="16" font-weight="bold">${y}</text>`);
+    yTicks.push(`<text x="${margin.left - 8}" y="${py + 4}" text-anchor="end" font-family="Arial" font-size="18" font-weight="bold">${y}</text>`);
   }
 
   // Bottom-centered legend with four entries: direct, indirect, and thresholds
@@ -86,11 +86,11 @@ function generateAchievementChartSVG(
 
   const addLegendRectAt = (x: number, y: number, colorFill: string, colorStroke: string, label: string) => {
     legendItems.push(`<rect x="${x}" y="${y - 12}" width="16" height="12" fill="${colorFill}" stroke="${colorStroke}"/>`);
-    legendItems.push(`<text x="${x + 22}" y="${y}" font-family="Arial" font-size="18" font-weight="bold">${label}</text>`);
+    legendItems.push(`<text x="${x + 22}" y="${y}" font-family="Arial" font-size="20" font-weight="bold">${label}</text>`);
   };
   const addLegendDashAt = (x: number, y: number, stroke: string, label: string) => {
     legendItems.push(`<line x1="${x}" y1="${y - 6}" x2="${x + 26}" y2="${y - 6}" stroke="${stroke}" stroke-width="2" stroke-dasharray="5,5"/>`);
-    legendItems.push(`<text x="${x + 32}" y="${y}" font-family="Arial" font-size="18" font-weight="bold">${label}</text>`);
+    legendItems.push(`<text x="${x + 32}" y="${y}" font-family="Arial" font-size="20" font-weight="bold">${label}</text>`);
   };
 
   // first row
