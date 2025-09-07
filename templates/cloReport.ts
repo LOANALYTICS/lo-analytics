@@ -9,8 +9,8 @@ function generateAchievementChartSVG(
   indirect: number[],
   indirectBenchmark: number
 ): string {
-  const width = 1200;
-  const height = 540;
+  const width = 1400;
+  const height = 620;
   // Bottom legend space maintained; slightly wider layout
   const margin = { top: 50, right: 30, bottom: 150, left: 70 };
   const plotWidth = width - margin.left - margin.right;
@@ -27,7 +27,7 @@ function generateAchievementChartSVG(
   const groupCount = labels.length;
   const groupSpacing = plotWidth / Math.max(1, groupCount);
   // Make bars fill the group more and remove gap between direct/indirect
-  const barWidth = Math.min(40, Math.max(22, groupSpacing * 0.36));
+  const barWidth = Math.min(52, Math.max(28, groupSpacing * 0.42));
   const seriesGap = 0; // no gap between the two bars in a group
 
   const xForGroup = (i: number) => margin.left + i * groupSpacing + groupSpacing / 2;
@@ -56,19 +56,19 @@ function generateAchievementChartSVG(
       const h = margin.top + plotHeight - y;
       bars.push(`<rect x="${x}" y="${y}" width="${barWidth}" height="${Math.max(0, h)}" fill="${colors[si]}" stroke="${borders[si]}" stroke-width="1" rx="4"/>`);
       const valText = Number.isInteger(v) ? String(v) : v.toFixed(1);
-      labelsSvg.push(`<text x="${cx + offsets[si]}" y="${y - 8}" text-anchor="middle" font-family="Arial" font-size="13" font-weight="bold" fill="#000">${valText}%</text>`);
+      labelsSvg.push(`<text x="${cx + offsets[si]}" y="${y - 10}" text-anchor="middle" font-family="Arial" font-size="14" font-weight="bold" fill="#000">${valText}%</text>`);
     });
 
     // X tick label
-    labelsSvg.push(`<text x="${cx}" y="${margin.top + plotHeight + 20}" text-anchor="middle" font-family="Arial" font-size="13" font-weight="bold">${label}</text>`);
+    labelsSvg.push(`<text x="${cx}" y="${margin.top + plotHeight + 20}" text-anchor="middle" font-family="Arial" font-size="14" font-weight="bold">${label}</text>`);
   });
 
   const threshold60Y = yToPx(60);
   const thresholdIndirectY = yToPx(indirectBenchmark);
   const dash = '5,5';
   const thresholds = `
-    <line x1="${margin.left}" y1="${threshold60Y}" x2="${margin.left + plotWidth}" y2="${threshold60Y}" stroke="rgba(255,99,132,1)" stroke-width="2" stroke-dasharray="${dash}"/>
-    <line x1="${margin.left}" y1="${thresholdIndirectY}" x2="${margin.left + plotWidth}" y2="${thresholdIndirectY}" stroke="rgba(153,102,255,1)" stroke-width="2" stroke-dasharray="${dash}"/>
+    <line x1="${margin.left}" y1="${threshold60Y}" x2="${margin.left + plotWidth}" y2="${threshold60Y}" stroke="rgba(255,99,132,0.9)" stroke-width="3" stroke-dasharray="${dash}"/>
+    <line x1="${margin.left}" y1="${thresholdIndirectY}" x2="${margin.left + plotWidth}" y2="${thresholdIndirectY}" stroke="rgba(153,102,255,0.9)" stroke-width="3" stroke-dasharray="${dash}"/>
   `;
 
   // Y-axis ticks
@@ -116,7 +116,7 @@ function generateAchievementChartSVG(
       ${bars.join('')}
       ${labelsSvg.join('')}
     </g>
-    <text x="${margin.left + plotWidth / 2}" y="${margin.top + plotHeight + 55}" text-anchor="middle" font-family="Arial" font-size="22" font-weight="bold">Course Learning Outcomes (CLOs)</text>
+    <text x="${margin.left + plotWidth / 2}" y="${margin.top + plotHeight + 60}" text-anchor="middle" font-family="Arial" font-size="24" font-weight="bold">Course Learning Outcomes (CLOs)</text>
     <!-- Rotated Y-axis label -->
     <g transform="translate(${margin.left - 45}, ${margin.top + plotHeight / 2}) rotate(-90)">
       <text text-anchor="middle" font-family="Arial" font-size="22" font-weight="bold">Percentage</text>
