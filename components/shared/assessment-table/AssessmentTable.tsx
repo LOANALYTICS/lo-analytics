@@ -69,7 +69,6 @@ export default function AssessmentTable({ onSave, saving, onUpload, numberOfClos
       try {
         setLoading(true);
         const result = await getAssessmentByCourse(courseId);
-        console.log(result, "result");
         setExists(result.exists);
         
         if (result.success && result.data) {
@@ -115,7 +114,6 @@ export default function AssessmentTable({ onSave, saving, onUpload, numberOfClos
       loadAssessmentData();
     }
   }, [courseId, numberOfClos]);
-  console.log((assessments), ":skd");
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [tempInputs, setTempInputs] = useState<{ [key: string]: string }>({});
   const [spreadsheetOpen, setSpreadsheetOpen] = useState(false);
@@ -148,7 +146,7 @@ export default function AssessmentTable({ onSave, saving, onUpload, numberOfClos
         const updatedAssessments = prev.map(assessment => {
           if (assessment.id === id) {
             if (!assessment.clos[clo].includes(number)) {
-              console.log(`Adding number ${number} to ${clo}`); 
+              // console.log(`Adding number ${number} to ${clo}`); 
               return {
                 ...assessment,
                 clos: {
@@ -162,7 +160,7 @@ export default function AssessmentTable({ onSave, saving, onUpload, numberOfClos
           }
           return assessment;
         });
-        console.log('Updated Assessments:', updatedAssessments);
+        // console.log('Updated Assessments:', updatedAssessments);
         return updatedAssessments;
       });
       return ''; 
@@ -473,7 +471,7 @@ export default function AssessmentTable({ onSave, saving, onUpload, numberOfClos
          open={spreadsheetOpen}
          onOpenChange={setSpreadsheetOpen}
          onSave={(data) => {
-           console.log('Spreadsheet data:', data)
+          //  console.log('Spreadsheet data:', data)
            setSpreadsheetOpen(false)
          }}
          

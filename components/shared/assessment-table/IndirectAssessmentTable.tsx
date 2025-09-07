@@ -19,7 +19,7 @@ const generateEmptyAssessments = (count: number): IndirectAssessment[] => {
   return Array.from({ length: count }, (_, index) => ({
     clo: `CLO ${index + 1}`,
     achievementRate: '',
-    benchmark: '80%',
+    benchmark: '80',
     achievementPercentage: 0
   }));
 };
@@ -48,7 +48,7 @@ export default function IndirectAssessmentTable({numberOfClos, courseId}: {numbe
   const [assessments, setAssessments] = useState<IndirectAssessment[]>([]);
   const [loading, setLoading] = useState(false);
   const [editingBenchmark, setEditingBenchmark] = useState(false);
-  const [benchmarkInput, setBenchmarkInput] = useState('80%');
+  const [benchmarkInput, setBenchmarkInput] = useState('80');
 
   useEffect(() => {
     const fetchIndirectAssessments = async () => {
@@ -56,20 +56,19 @@ export default function IndirectAssessmentTable({numberOfClos, courseId}: {numbe
         const response = await getIndirectAssessments(courseId);
         if (response.data && response.data.length > 0) {
           setAssessments(response.data);
-          setBenchmarkInput(response.data[0]?.benchmark || '80%');
+          setBenchmarkInput(response.data[0]?.benchmark || '80');
         } else {
           setAssessments(generateEmptyAssessments(numberOfClos));
-          setBenchmarkInput('80%');
+          setBenchmarkInput('80');
         }
       } catch (error) {
         console.error('Error fetching indirect assessments:', error);
         setAssessments(generateEmptyAssessments(numberOfClos));
-        setBenchmarkInput('80%');
+        setBenchmarkInput('80');
       }
     };
     fetchIndirectAssessments();
   }, [numberOfClos, courseId]);
-console.log(assessments)
   const { averageRate, averagePercentage } = calculateOverall(assessments);
 
   const handleRateChange = (index: number, value: string) => {
@@ -104,6 +103,7 @@ console.log(assessments)
   const handleBenchmarkSave = () => {
     setEditingBenchmark(false);
     setAssessments(assessments => assessments.map(a => ({ ...a, benchmark: benchmarkInput })));
+
   };
 
   const handleSave = async () => {

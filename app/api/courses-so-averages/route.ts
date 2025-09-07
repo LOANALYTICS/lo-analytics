@@ -367,7 +367,6 @@ export async function GET(request: NextRequest) {
             regional: 'اسم الكلية',
             university: 'University Name'
         };
-        console.log('courses', courses[0].collage);
         if (courses.length > 0 && courses[0].collage) {
             collegeData = {
                 logo: courses[0].collage.logo || '/assets/logo.svg',
@@ -377,9 +376,6 @@ export async function GET(request: NextRequest) {
             };
         }
 
-        console.log('courses[0]', courses[0]);
-        console.log('courses[0].collage', courses[0]?.collage);
-        console.log('collegeData', collegeData);
         // Generate HTML report
         const htmlContent = generateGradeDistributionHTML({
             data: {

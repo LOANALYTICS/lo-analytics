@@ -63,7 +63,6 @@ export default function StudentTable({data, courseId} : {data: any, courseId: st
 
   const saveToDatabase = async (updatedStudents: Student[]) => {
     try {
-      console.log(updatedStudents, "updatedCourseStudent")
       await updateAssessmentStudents(courseId, updatedStudents);
       toast.success('Changes saved successfully');
     } catch (error) {

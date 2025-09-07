@@ -46,10 +46,10 @@ export async function POST(request: Request) {
         }
 
         // Console log the received data
-        console.log('=== MULTIPLE MODE DATA ===');
-        console.log('Course ID:', courseId);
-        console.log('Assessment Type:', type);
-        console.log('Data length:', data.length);
+        // console.log('=== MULTIPLE MODE DATA ===');
+        // console.log('Course ID:', courseId);
+        // console.log('Assessment Type:', type);
+        // console.log('Data length:', data.length);
 
         // Get assessment data for the course
         const assessmentResponse = await getAssessmentByCourse(courseId);
@@ -106,10 +106,10 @@ export async function POST(request: Request) {
             }
         }
 
-        console.log('=== STUDENT INFO ===');
-        console.log(studentInfo);
-        console.log('=== STUDENT ANSWERS ===');
-        console.log(studentAnswers);
+        // console.log('=== STUDENT INFO ===');
+        // console.log(studentInfo);
+        // console.log('=== STUDENT ANSWERS ===');
+        // console.log(studentAnswers);
 
         // Validate student IDs
         const dataStudentIds = studentInfo.map(s => s.id).filter(id => id);
@@ -212,8 +212,8 @@ export async function POST(request: Request) {
             studentResults.push(studentResult);
         }
 
-        console.log('=== CALCULATED RESULTS ===');
-        console.log(studentResults);
+        // console.log('=== CALCULATED RESULTS ===');
+        // console.log(studentResults);
 
         // Update database
         const assessment = await Assessment.findOne({ course: courseId });
@@ -257,7 +257,6 @@ export async function POST(request: Request) {
         assessment.markModified('assessmentResults');
 
         await assessment.save();
-        console.log('Assessment saved successfully');
 
         return NextResponse.json({
             message: "Successfully processed and stored assessment data",

@@ -45,11 +45,9 @@ export default function CreateCoursePage() {
 
     React.useEffect(() => {
         const userData = localStorage.getItem('user')
-        console.log('Raw userData from localStorage:', userData);
         if (userData) {
             try {
                 const parsedUser = JSON.parse(userData);
-                console.log('Parsed user data:', parsedUser);
                 setUSER(parsedUser);
             } catch (error) {
                 console.error('Error parsing user data:', error);
@@ -102,12 +100,9 @@ export default function CreateCoursePage() {
     }
     React.useEffect(() => {
         const fetchColleges = async () => {
-            console.log('USER object:', USER);
             if (USER?._id) {
                 try {
-                    console.log('Fetching colleges for user:', USER._id);
                     const collegeData = await getCollageByRole(USER._id);
-                    console.log('College data received:', collegeData);
                     setColleges(collegeData || []);
                 } catch (error) {
                     console.error('Error fetching colleges:', error);

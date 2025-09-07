@@ -39,7 +39,6 @@ export default function ContactForm() {
   const onSubmit = async (data: FormValues) => {
     try {
       const res = await axios.post("/api/mail", data);
-      console.log(res);
     } catch (error) {
       console.error(error);
     }

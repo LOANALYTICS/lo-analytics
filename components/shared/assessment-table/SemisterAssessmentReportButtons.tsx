@@ -139,7 +139,6 @@ export default function SemisterAssessmentReportButtons() {
       // Get the body content
       const bodyContent = doc.body.innerHTML;
 
-      console.log("Extracted body content:", bodyContent.substring(0, 500));
 
       // Create a container with the styles and body content
       const container = document.createElement("div");
@@ -197,8 +196,8 @@ export default function SemisterAssessmentReportButtons() {
       container.style.fontSize = '12px';
       document.body.appendChild(container);
 
-      console.log("Tables found:", container.querySelectorAll('table').length);
-      console.log("Pages found:", container.querySelectorAll('.front-page, .summary-page, .page').length);
+      // console.log("Tables found:", container.querySelectorAll('table').length);
+      // console.log("Pages found:", container.querySelectorAll('.front-page, .summary-page, .page').length);
 
       // Wait for rendering
       await new Promise(resolve => setTimeout(resolve, 1000));
@@ -224,11 +223,9 @@ export default function SemisterAssessmentReportButtons() {
         }
       };
 
-      console.log("Starting PDF generation...");
 
       // Find all pages
       const pages = container.querySelectorAll('.front-page, .summary-page, .page');
-      console.log("Pages found:", pages.length);
 
       if (pages.length === 0) {
         throw new Error('No pages found in the HTML content');
@@ -247,15 +244,13 @@ export default function SemisterAssessmentReportButtons() {
       for (let i = 0; i < pages.length; i++) {
         const page = pages[i] as HTMLElement;
 
-        console.log(`Processing page ${i + 1}/${pages.length}`);
 
         // Log table structure for debugging
         const tables = page.querySelectorAll('table');
-        console.log(`Page ${i + 1} has ${tables.length} tables`);
         if (tables.length > 0) {
           const firstTable = tables[0];
-          console.log('First table rows:', firstTable.querySelectorAll('tr').length);
-          console.log('Rowspan elements:', firstTable.querySelectorAll('[rowspan]').length);
+          // console.log('First table rows:', firstTable.querySelectorAll('tr').length);
+          // console.log('Rowspan elements:', firstTable.querySelectorAll('[rowspan]').length);
         }
 
         // Convert this page to canvas
