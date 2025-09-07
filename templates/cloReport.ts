@@ -84,10 +84,10 @@ async function generateAchievementChartHTML(achievementData: any, sortedClos: st
           position: 'bottom',
           labels: {
             padding: 10,
-            font: {
-              size: 12,
-              weight: 'bold'
-            }
+              font: {
+                size: 12,
+                weight: 'bold'
+              }
           }
         },
         annotation: {
@@ -102,7 +102,7 @@ async function generateAchievementChartHTML(achievementData: any, sortedClos: st
                 color: '#000',
                 font: {
                   weight: 'bold',
-                  size: 11
+                  size: 12
                 },
                 yAdjust: -10,
                 xAdjust: -20
@@ -119,7 +119,7 @@ async function generateAchievementChartHTML(achievementData: any, sortedClos: st
                 color: '#000',
                 font: {
                   weight: 'bold',
-                  size: 11
+                  size: 12
                 },
                 yAdjust: -10,
                 xAdjust: 20
@@ -134,10 +134,10 @@ async function generateAchievementChartHTML(achievementData: any, sortedClos: st
           max: 105,
           ticks: {
             stepSize: 5,
-            font: {
-              size: 11,
-              weight: 'bold'
-            }
+              font: {
+                size: 12,
+                weight: 'bold'
+              }
           },
           grid: {
             display: true,
@@ -148,7 +148,7 @@ async function generateAchievementChartHTML(achievementData: any, sortedClos: st
             display: true,
             text: 'Percentage',
             font: {
-              size: 12,
+              size: 16,
               weight: 'bold'
             }
           }
@@ -158,16 +158,16 @@ async function generateAchievementChartHTML(achievementData: any, sortedClos: st
             display: false
           },
           ticks: {
-            font: {
-              size: 11,
-              weight: 'bold'
-            }
+              font: {
+                size: 12,
+                weight: 'bold'
+              }
           },
           title: {
             display: true,
             text: 'Course Learning Outcomes (CLOs)',
             font: {
-              size: 12,
+              size: 16,
               weight: 'bold'
             }
           }
@@ -176,7 +176,7 @@ async function generateAchievementChartHTML(achievementData: any, sortedClos: st
     }
   }));
 
-  const chartUrl = `https://quickchart.io/chart?c=${chartConfig}&w=900&h=500&format=base64&v=${Date.now()}&backgroundColor=white&devicePixelRatio=2&plugins=chartjs-plugin-annotation`;
+  const chartUrl = `https://quickchart.io/chart?c=${chartConfig}&w=1100&h=650&format=base64&v=${Date.now()}&backgroundColor=white&devicePixelRatio=2&plugins=chartjs-plugin-annotation`;
   
   try {
     const response = await fetch(chartUrl);
@@ -420,7 +420,7 @@ export async function generateCloReportHTML(props: CloReportProps): Promise<stri
           .chart-container {
             margin-top: 20px;
             text-align: center;
-            min-height: 500px;
+            min-height: 650px;
             width: 100%;
             display: flex;
             flex-direction: column;
@@ -431,16 +431,18 @@ export async function generateCloReportHTML(props: CloReportProps): Promise<stri
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 500px;
+            height: 650px;
             width: 100%;
           }
           .chart-image {
-            width: auto;
+            width: 75%;
             max-width: 100%;
-            height: 500px;
-            max-height: 500px;
+            height: auto;
+            max-height: 650px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
             margin: 0 auto;
+            object-fit: contain;
+            aspect-ratio: 1100/650;
           }
           .assessment-type-label {
             font-weight: bold;
