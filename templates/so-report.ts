@@ -112,12 +112,8 @@ export function generateSOHTML({
                     margin: 0 auto; 
                     padding: 20px;
                 }
-                .h2_class { 
-                    text-align: center; 
-                    margin: 10px 0;
-                    font-size: 1.8em;
-                    font-weight:800;
-                }
+                
+                
                 .page-container {
                     width: 100%;
                     height: 100vh;
@@ -196,7 +192,7 @@ export function generateSOHTML({
                             </div>
                         </div>
                     </div>
-                    <h2 class="h2_class">Student Performance Analysis</h2>
+                    <h2 class="h2_classp">Student Performance Analysis</h2>
                 
                 ${performanceAnalysis ? `
                 <table class="performance-table">
@@ -472,7 +468,16 @@ function generatePerformanceCurveChartHTML(performanceCurveData: {
         const y = height - margin.bottom - barHeight;
         return `
             <rect x="${x}" y="${y}" width="${barWidth}" height="${barHeight}" 
-                  fill="#4A90E2" rx="2" ry="2" />
+                  fill="#4A90E2" rx="4" ry="4" />
+        `;
+    }).join('');
+
+    // Bar text labels (separate from bars to control z-index)
+    const barTexts = scoreRanges.map((range, i) => {
+        const x = margin.left + (i * xStep) + xStep / 2 - barWidth / 2;
+        const barHeight = (range.count / maxCount) * chartHeight;
+        const y = height - margin.bottom - barHeight;
+        return `
             <text x="${x + barWidth / 2}" y="${y - 5}" text-anchor="middle" font-size="10" font-weight="bold">${range.count}</text>
         `;
     }).join('');
@@ -520,8 +525,9 @@ function generatePerformanceCurveChartHTML(performanceCurveData: {
                 ${yAxis}
                 ${bars}
                 <path d="${curvePath}" stroke="#2E86AB" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                ${barTexts}
                 ${xAxisTicks.join('')}
-                <text x="${width / 2}" y="${height - 10}" text-anchor="middle" font-size="12">Scores</text>
+                <text x="${width / 2}" y="${height - 10}" text-anchor="middle" font-size="12">Grade Distribution</text>
                 <text x="20" y="${height / 2}" transform="rotate(-90,20,${height / 2})" text-anchor="middle" font-size="12">No of Students</text>
             </svg>
         </div>

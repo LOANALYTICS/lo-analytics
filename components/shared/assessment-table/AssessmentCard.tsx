@@ -66,10 +66,16 @@ const generatePDF = async (html: string, fileName: string, orientation: 'portrai
               }
               .h2_class { 
                 text-align: center; 
-                margin: 10px 0;
-                font-size: 1.8em;
+                margin: 10px 40px;
+                font-size: 1em;
                 font-weight:800;
               }
+                    .h2_classp { 
+                    text-align: center; 
+                    margin: 10px 0px;
+                    font-size: 2.5em;
+                    font-weight:800;
+                }
               .header { 
                 text-align: center; 
                 margin-bottom: 30px; 
@@ -134,7 +140,7 @@ const generatePDF = async (html: string, fileName: string, orientation: 'portrai
               .performance-table {
                 width: 100%;
                 border-collapse: collapse;
-                margin-top: 20px;
+                margin-top: 40px;
                 margin-bottom: 20px;
                 border: 1px solid black;
                 border-radius: 10px;
