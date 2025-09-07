@@ -12,6 +12,26 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { getCurrentUser } from '@/server/utils/helper';
 
+// Reusable function to add watermark to PDF
+const addWatermarkToPDF = (pdf: any) => {
+  pdf.saveGraphicsState();
+  (pdf as any).setGState(new (pdf as any).GState({ opacity: 0.3 }));
+
+  const watermarkImg = new Image();
+  watermarkImg.src = "/favicon.png";
+
+  pdf.addImage(
+    watermarkImg,
+    "PNG",
+    pdf.internal.pageSize.width - 15, // 15mm from right
+    pdf.internal.pageSize.height - 15, // 15mm from bottom
+    10, // width in mm
+    10 // height in mm
+  );
+
+  pdf.restoreGraphicsState();
+};
+
 const generatePDF = async (html: string, fileName: string, orientation: 'portrait' | 'landscape' = 'portrait') => {
   try {
     const jsPDF = (await import('jspdf')).default;
@@ -210,18 +230,6 @@ const generatePDF = async (html: string, fileName: string, orientation: 'portrai
       container.innerHTML = fullHTML;
       document.body.appendChild(container);
 
-      // Add logo
-      const logo = document.createElement("img");
-      logo.src = "/pdf_logo.png";
-      logo.style.position = "fixed";
-      logo.style.bottom = "20px";
-      logo.style.right = "5px";
-      logo.style.width = "50px";
-      logo.style.height = "50px";
-      logo.style.opacity = "0.5";
-      logo.style.zIndex = "1000";
-      container.appendChild(logo);
-
       // Wait for images
       const images = Array.from(container.getElementsByTagName('img'));
       await Promise.all(images.map(img => {
@@ -271,6 +279,10 @@ const generatePDF = async (html: string, fileName: string, orientation: 'portrai
       }
 
       pdf.addImage(canvas, 'JPEG', x, y, pdfWidth, pdfHeight);
+      
+      // Add watermark to each page
+      addWatermarkToPDF(pdf);
+      
       document.body.removeChild(container);
     }
 
@@ -342,6 +354,9 @@ const generateLandscapePDFSinglePage = async (html: string, fileName: string) =>
 
     pdf.addImage(canvas, 'JPEG', x, y, pdfWidth, pdfHeight);
 
+    // Add watermark
+    addWatermarkToPDF(pdf);
+
     pdf.save(`${fileName}.pdf`);
     document.body.removeChild(container);
 
@@ -407,6 +422,9 @@ const generatePDFWithJsPDF = async (html: string, fileName: string, orientation:
       const xOffset = margin + (imgWidth - scaledWidth) / 2;
       pdf.addImage(canvas, 'JPEG', xOffset, margin, scaledWidth, scaledHeight);
     }
+
+    // Add watermark
+    addWatermarkToPDF(pdf);
 
     pdf.save(`${fileName}.pdf`);
     document.body.removeChild(container);
