@@ -79,26 +79,28 @@ function generateAchievementChartSVG(
   }
 
   // Bottom-centered legend with four entries: direct, indirect, and thresholds
-  const legendGroupY = height - 20; // near bottom
+  const legendGroupY = height - 38; // lift legend by 12px from original to avoid clipping
   const legendItems: string[] = [];
-  let lx = margin.left + 120; // start a bit in from left
-  const ly = legendGroupY;
+  const col1x = margin.left + 120;
+  const col2x = margin.left + Math.floor(plotWidth / 2) + 40;
 
-  const addLegendRect = (colorFill: string, colorStroke: string, label: string) => {
-    legendItems.push(`<rect x="${lx}" y="${ly - 12}" width="16" height="12" fill="${colorFill}" stroke="${colorStroke}"/>`);
-    legendItems.push(`<text x="${lx + 22}" y="${ly}" font-family="Arial" font-size="18" font-weight="bold">${label}</text>`);
-    lx += 20 + label.length * 7.2 + 36; // rough width advance
+  const addLegendRectAt = (x: number, y: number, colorFill: string, colorStroke: string, label: string) => {
+    legendItems.push(`<rect x="${x}" y="${y - 12}" width="16" height="12" fill="${colorFill}" stroke="${colorStroke}"/>`);
+    legendItems.push(`<text x="${x + 22}" y="${y}" font-family="Arial" font-size="18" font-weight="bold">${label}</text>`);
   };
-  const addLegendDash = (stroke: string, label: string) => {
-    legendItems.push(`<line x1="${lx}" y1="${ly - 6}" x2="${lx + 26}" y2="${ly - 6}" stroke="${stroke}" stroke-width="2" stroke-dasharray="5,5"/>`);
-    legendItems.push(`<text x="${lx + 32}" y="${ly}" font-family="Arial" font-size="18" font-weight="bold">${label}</text>`);
-    lx += 30 + label.length * 7.2 + 36;
+  const addLegendDashAt = (x: number, y: number, stroke: string, label: string) => {
+    legendItems.push(`<line x1="${x}" y1="${y - 6}" x2="${x + 26}" y2="${y - 6}" stroke="${stroke}" stroke-width="2" stroke-dasharray="5,5"/>`);
+    legendItems.push(`<text x="${x + 32}" y="${y}" font-family="Arial" font-size="18" font-weight="bold">${label}</text>`);
   };
 
-  addLegendRect('rgba(54,162,235,0.8)', 'rgba(54,162,235,1)', 'Direct Assessment Achievement');
-  addLegendRect('rgba(75,192,192,0.8)', 'rgba(75,192,192,1)', 'Indirect Assessment Achievement');
-  addLegendDash('rgba(255,99,132,1)', 'Direct Threshold (60%)');
-  addLegendDash('rgba(153,102,255,1)', `Indirect Threshold (${indirectBenchmark}%)`);
+  // first row
+  const ly1 = legendGroupY;
+  addLegendRectAt(col1x, ly1, 'rgba(54,162,235,0.8)', 'rgba(54,162,235,1)', 'Direct Assessment Achievement');
+  addLegendRectAt(col2x, ly1, 'rgba(75,192,192,0.8)', 'rgba(75,192,192,1)', 'Indirect Assessment Achievement');
+  // second row
+  const ly2 = legendGroupY + 28;
+  addLegendDashAt(col1x, ly2, 'rgba(255,99,132,1)', 'Direct Threshold (60%)');
+  addLegendDashAt(col2x, ly2, 'rgba(153,102,255,1)', `Indirect Threshold (${indirectBenchmark}%)`);
 
   const legend = `<g style="font-size: 20px;">${legendItems.join('')}</g>`;
 
@@ -116,7 +118,7 @@ function generateAchievementChartSVG(
       ${bars.join('')}
       ${labelsSvg.join('')}
     </g>
-    <text x="${margin.left + plotWidth / 2}" y="${margin.top + plotHeight + 60}" text-anchor="middle" font-family="Arial" font-size="28" font-weight="bold">Course Learning Outcomes (CLOs)</text>
+    <text x="${margin.left + plotWidth / 2}" y="${margin.top + plotHeight + 68}" text-anchor="middle" font-family="Arial" font-size="28" font-weight="bold">Course Learning Outcomes (CLOs)</text>
     <!-- Rotated Y-axis label -->
     <g transform="translate(${margin.left - 45}, ${margin.top + plotHeight / 2}) rotate(-90)">
       <text text-anchor="middle" font-family="Arial" font-size="26" font-weight="bold">Percentage</text>
