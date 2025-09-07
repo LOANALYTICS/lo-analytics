@@ -1,7 +1,129 @@
 import { Chart, registerables } from 'chart.js';
 
-// Register Chart.js components
+// Register Chart.js components (kept for compatibility elsewhere)
 Chart.register(...registerables);
+
+function generateAchievementChartSVG(
+  labels: string[],
+  direct: number[],
+  indirect: number[],
+  indirectBenchmark: number
+): string {
+  const width = 1100;
+  const height = 650;
+  // Increase bottom margin to accommodate legend under the chart
+  const margin = { top: 40, right: 30, bottom: 110, left: 70 };
+  const plotWidth = width - margin.left - margin.right;
+  const plotHeight = height - margin.top - margin.bottom;
+
+  const yMin = 50;
+  const yMax = 105;
+  const yToPx = (v: number) => {
+    const clamped = Math.max(yMin, Math.min(yMax, v));
+    const t = (clamped - yMin) / (yMax - yMin);
+    return margin.top + (1 - t) * plotHeight;
+  };
+
+  const groupCount = labels.length;
+  const groupSpacing = plotWidth / Math.max(1, groupCount);
+  const barWidth = 30; // matches previous
+  const barGap = 10;
+  const seriesGap = 14; // gap between the two bars in a group
+
+  const xForGroup = (i: number) => margin.left + i * groupSpacing + groupSpacing / 2;
+
+  const gridLines: string[] = [];
+  for (let y = yMin; y <= yMax; y += 5) {
+    const py = yToPx(y);
+    gridLines.push(`<line x1="${margin.left}" y1="${py}" x2="${margin.left + plotWidth}" y2="${py}" stroke="rgba(0,0,0,0.1)"/>`);
+  }
+
+  const xAxis = `<line x1="${margin.left}" y1="${margin.top + plotHeight}" x2="${margin.left + plotWidth}" y2="${margin.top + plotHeight}" stroke="#000" stroke-width="1"/>`;
+  const yAxis = `<line x1="${margin.left}" y1="${margin.top}" x2="${margin.left}" y2="${margin.top + plotHeight}" stroke="#000" stroke-width="1"/>`;
+
+  const bars: string[] = [];
+  const labelsSvg: string[] = [];
+
+  labels.forEach((label, i) => {
+    const cx = xForGroup(i);
+    const values = [direct[i] ?? 0, indirect[i] ?? 0];
+    const colors = ['rgba(54, 162, 235, 0.8)', 'rgba(75, 192, 192, 0.8)'];
+    const borders = ['rgba(54, 162, 235, 1)', 'rgba(75, 192, 192, 1)'];
+    const offsets = [-barWidth / 2 - seriesGap / 2, barWidth / 2 + seriesGap / 2];
+    values.forEach((v, si) => {
+      const x = cx + offsets[si] - barWidth / 2;
+      const y = yToPx(v);
+      const h = margin.top + plotHeight - y;
+      bars.push(`<rect x="${x}" y="${y}" width="${barWidth}" height="${Math.max(0, h)}" fill="${colors[si]}" stroke="${borders[si]}" stroke-width="1" rx="4"/>`);
+      const valText = Number.isInteger(v) ? String(v) : v.toFixed(1);
+      labelsSvg.push(`<text x="${cx + offsets[si]}" y="${y - 4}" text-anchor="middle" font-family="Arial" font-size="12" font-weight="bold" fill="#000">${valText}%</text>`);
+    });
+
+    // X tick label
+    labelsSvg.push(`<text x="${cx}" y="${margin.top + plotHeight + 20}" text-anchor="middle" font-family="Arial" font-size="12" font-weight="bold">${label}</text>`);
+  });
+
+  const threshold60Y = yToPx(60);
+  const thresholdIndirectY = yToPx(indirectBenchmark);
+  const dash = '5,5';
+  const thresholds = `
+    <line x1="${margin.left}" y1="${threshold60Y}" x2="${margin.left + plotWidth}" y2="${threshold60Y}" stroke="rgba(255,99,132,1)" stroke-width="2" stroke-dasharray="${dash}"/>
+    <line x1="${margin.left}" y1="${thresholdIndirectY}" x2="${margin.left + plotWidth}" y2="${thresholdIndirectY}" stroke="rgba(153,102,255,1)" stroke-width="2" stroke-dasharray="${dash}"/>
+  `;
+
+  // Y-axis ticks
+  const yTicks: string[] = [];
+  for (let y = yMin; y <= yMax; y += 5) {
+    const py = yToPx(y);
+    yTicks.push(`<text x="${margin.left - 8}" y="${py + 4}" text-anchor="end" font-family="Arial" font-size="12" font-weight="bold">${y}</text>`);
+  }
+
+  // Bottom-centered legend with four entries: direct, indirect, and thresholds
+  const legendGroupY = height - 20; // near bottom
+  const legendItems: string[] = [];
+  let lx = margin.left + 120; // start a bit in from left
+  const ly = legendGroupY;
+
+  const addLegendRect = (colorFill: string, colorStroke: string, label: string) => {
+    legendItems.push(`<rect x="${lx}" y="${ly - 11}" width="14" height="10" fill="${colorFill}" stroke="${colorStroke}"/>`);
+    legendItems.push(`<text x="${lx + 20}" y="${ly}" font-family="Arial" font-size="12" font-weight="bold">${label}</text>`);
+    lx += 20 + label.length * 7 + 30; // rough width advance
+  };
+  const addLegendDash = (stroke: string, label: string) => {
+    legendItems.push(`<line x1="${lx}" y1="${ly - 6}" x2="${lx + 24}" y2="${ly - 6}" stroke="${stroke}" stroke-width="2" stroke-dasharray="5,5"/>`);
+    legendItems.push(`<text x="${lx + 30}" y="${ly}" font-family="Arial" font-size="12" font-weight="bold">${label}</text>`);
+    lx += 30 + label.length * 7 + 30;
+  };
+
+  addLegendRect('rgba(54,162,235,0.8)', 'rgba(54,162,235,1)', 'Direct Assessment Achievement');
+  addLegendRect('rgba(75,192,192,0.8)', 'rgba(75,192,192,1)', 'Indirect Assessment Achievement');
+  addLegendDash('rgba(255,99,132,1)', 'Direct Threshold (60%)');
+  addLegendDash('rgba(153,102,255,1)', `Indirect Threshold (${indirectBenchmark}%)`);
+
+  const legend = `<g>${legendItems.join('')}</g>`;
+
+  return `
+  <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
+    <rect x="0" y="0" width="${width}" height="${height}" fill="#ffffff"/>
+    <g>
+      ${gridLines.join('')}
+      ${xAxis}
+      ${yAxis}
+      ${yTicks.join('')}
+    </g>
+    ${thresholds}
+    <g>
+      ${bars.join('')}
+      ${labelsSvg.join('')}
+    </g>
+    <text x="${margin.left + plotWidth / 2}" y="${margin.top + plotHeight + 40}" text-anchor="middle" font-family="Arial" font-size="16" font-weight="bold">Course Learning Outcomes (CLOs)</text>
+    <!-- Rotated Y-axis label -->
+    <g transform="translate(${margin.left - 45}, ${margin.top + plotHeight / 2}) rotate(-90)">
+      <text text-anchor="middle" font-family="Arial" font-size="16" font-weight="bold">Percentage</text>
+    </g>
+    ${legend}
+  </svg>`;
+}
 
 async function generateAchievementChartHTML(achievementData: any, sortedClos: string[], indirectAssessmentData?: any): Promise<string> {
   const directChartData = sortedClos.map(clo => {
@@ -23,142 +145,13 @@ async function generateAchievementChartHTML(achievementData: any, sortedClos: st
   const indirectRounded = indirectChartData.map(v => Number(Number(v).toFixed(1)));
   
   const indirectBenchmark = Number(indirectAssessmentData?.indirectAssessments?.[0]?.benchmark ?? 80);
+  const svg = generateAchievementChartSVG(labels, directRounded, indirectRounded, indirectBenchmark);
 
-  const chartConfig = encodeURIComponent(JSON.stringify({
-    type: 'bar',
-    data: {
-      labels: labels,
-      datasets: [
-        {
-          label: 'Direct Assessment Achievement',
-          data: directRounded,
-          backgroundColor: 'rgba(54, 162, 235, 0.8)',
-          borderColor: 'rgba(54, 162, 235, 1)',
-          borderWidth: 1,
-          barThickness: 30,
-          borderRadius: 4,
-          categoryPercentage: 0.7,
-          barPercentage: 0.7
-        },
-        {
-          label: 'Indirect Assessment Achievement',
-          data: indirectRounded,
-          backgroundColor: 'rgba(75, 192, 192, 0.8)',
-          borderColor: 'rgba(75, 192, 192, 1)',
-          borderWidth: 1,
-          barThickness: 30,
-          borderRadius: 4,
-          categoryPercentage: 0.7,
-          barPercentage: 0.7
-        },
-        {
-          label: 'Direct Threshold (60%)',
-          data: Array(sortedClos.length).fill(60),
-          type: 'line',
-          borderColor: 'rgba(255, 99, 132, 1)',
-          borderWidth: 2,
-          borderDash: [5, 5],
-          pointRadius: 0,
-          fill: false,
-          datalabels: { display: false }
-        },
-        {
-          label: `Indirect Threshold (${indirectBenchmark}%)`,
-          data: Array(sortedClos.length).fill(indirectBenchmark),
-          type: 'line',
-          borderColor: 'rgba(153, 102, 255, 1)',
-          borderWidth: 2,
-          borderDash: [5, 5],
-          pointRadius: 0,
-          fill: false,
-          datalabels: { display: false }
-        }
-      ]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      layout: {
-        overflow:'visible',
-        padding: {
-          top: 20
-        }
-      },
-      plugins: {
-        legend: {
-          display: true,
-          position: 'bottom',
-          labels: {
-            padding: 10,
-              font: {
-                size: 12,
-                weight: 'bold'
-              }
-          }
-        },
-        datalabels: {
-          anchor: 'end',
-          align: 'end',
-          color: '#000',
-          font: { weight: 'bold', size: 12 },
-          formatter: "(v) => { const n = (Number(v) === 0 ? 88 : Number(v)); const s = n.toFixed(1); const clean = s.endsWith('.0') ? s.slice(0, -2) : s; return clean + '%'; }"
-        }
-      },
-      scales: {
-        y: {
-          min: 50,
-          max: 105,
-          ticks: {
-            stepSize: 5,
-              font: {
-                size: 12,
-                weight: 'bold'
-              }
-          },
-          grid: {
-            display: true,
-            color: 'rgba(0, 0, 0, 0.1)',
-            drawTicks: false
-          },
-          title: {
-            display: true,
-            text: 'Percentage',
-            font: {
-              size: 16,
-              weight: 'bold'
-            }
-          }
-        },
-        x: {
-          grid: {
-            display: false
-          },
-          ticks: {
-              font: {
-                size: 12,
-                weight: 'bold'
-              }
-          },
-          title: {
-            display: true,
-            text: 'Course Learning Outcomes (CLOs)',
-            font: {
-              size: 16,
-              weight: 'bold'
-            }
-          }
-        }
-      }
-    }
-  }));
-
-  const chartUrl = `https://quickchart.io/chart?c=${chartConfig}&w=1100&h=650&format=png&v=${Date.now()}&backgroundColor=white&devicePixelRatio=2&plugins=chartjs-plugin-datalabels`;
-  
   return `
     <div class="chart-container">
       <h3 class="chart-title">CLO Achievement Chart</h3>
       <div class="chart-wrapper">
-        <img src="${chartUrl}" alt="CLO Achievement Chart" class="chart-image">
+        ${svg}
       </div>
     </div>
   `;
