@@ -17,6 +17,7 @@ interface AssessmentDoc {
         studentName: string;
         examResults: any[];
     }[];
+    benchmark?: number;
 }
 
 interface CourseDoc {
@@ -237,11 +238,19 @@ export async function updateIndirectAssessments(courseId: string, indirectAssess
 
 export async function getIndirectAssessments(courseId: string) {
     try {
-        const assessment = await Assessment.findOne({ course: courseId }).select('indirectAssessments').lean() as unknown as IndirectAssessmentDoc;
+        const assessment = await Assessment.findOne({ course: courseId }).select('indirectAssessments').lean();
+        
+        if (!assessment) {
+            return {
+                success: true,
+                data: [],
+                message: 'No assessment found for this course'
+            };
+        }
         
         return {
             success: true,
-            data: JSON.parse(JSON.stringify(assessment?.indirectAssessments)) || [],
+            data: JSON.parse(JSON.stringify((assessment as any).indirectAssessments || [])),
             message: 'Indirect assessments retrieved successfully'
         };
     } catch (error) {

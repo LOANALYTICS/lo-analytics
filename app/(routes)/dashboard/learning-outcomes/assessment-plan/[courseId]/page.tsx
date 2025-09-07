@@ -2,7 +2,7 @@
 
 import AssessmentTable from '@/components/shared/assessment-table/AssessmentTable'
 import { Button } from '@/components/ui/button'
-import { getAssessmentByCourse, updateAssessmentPlans } from '@/services/assessment.action';
+import { updateAssessmentPlans } from '@/services/assessment.action';
 import { getCourseById } from '@/services/courses.action';
 import { getCLOData } from '@/services/blueprint/learning-outcome.action';
 import { ThumbsUp } from 'lucide-react';
@@ -19,7 +19,6 @@ import IndirectAssessmentTable from '@/components/shared/assessment-table/Indire
 export default function AssessmentPlanPage() {
   const params = useParams();
   const courseId = params.courseId as string;
-  const [assessmentData, setAssessmentData] = useState([]);
   const [course, setCourse] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -37,24 +36,12 @@ export default function AssessmentPlanPage() {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const [assessmentResponse, courseResponse, cloData] = await Promise.all([
-          getAssessmentByCourse(courseId),
+        const [courseResponse, cloData] = await Promise.all([
           getCourseById(courseId),
           getCLOData(courseId)
         ]);
         
         setNumberOfClos(cloData?.length || 3);
-        
-        if (assessmentResponse.success && assessmentResponse.data?.assessments) {
-          const formattedData = assessmentResponse.data.assessments.map((item: any) => ({
-            id: item.id || item._id?.toString(),
-            type: item.type,
-            clos: item.clos || {},
-            weight: item.weight
-          }));
-          setAssessmentData(formattedData);
-     
-        }
         setCourse(courseResponse);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -220,7 +207,6 @@ export default function AssessmentPlanPage() {
         <AssessmentTable 
         courseId={courseId}
         saving={saving}
-        initialData={assessmentData}
         onSave={handleSave}
         onUpload={(type: string) => {
           setSelectedType(type);
