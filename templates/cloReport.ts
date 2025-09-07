@@ -56,11 +56,11 @@ function generateAchievementChartSVG(
       const h = margin.top + plotHeight - y;
       bars.push(`<rect x="${x}" y="${y}" width="${barWidth}" height="${Math.max(0, h)}" fill="${colors[si]}" stroke="${borders[si]}" stroke-width="1" rx="4"/>`);
       const valText = Number.isInteger(v) ? String(v) : v.toFixed(1);
-      labelsSvg.push(`<text x="${cx + offsets[si]}" y="${y - 10}" text-anchor="middle" font-family="Arial" font-size="14" font-weight="bold" fill="#000">${valText}%</text>`);
+      labelsSvg.push(`<text x="${cx + offsets[si]}" y="${y - 12}" text-anchor="middle" font-family="Arial" font-size="18" font-weight="bold" fill="#000">${valText}%</text>`);
     });
 
     // X tick label
-    labelsSvg.push(`<text x="${cx}" y="${margin.top + plotHeight + 20}" text-anchor="middle" font-family="Arial" font-size="14" font-weight="bold">${label}</text>`);
+    labelsSvg.push(`<text x="${cx}" y="${margin.top + plotHeight + 20}" text-anchor="middle" font-family="Arial" font-size="18" font-weight="bold">${label}</text>`);
   });
 
   const threshold60Y = yToPx(60);
@@ -75,7 +75,7 @@ function generateAchievementChartSVG(
   const yTicks: string[] = [];
   for (let y = yMin; y <= yMax; y += 5) {
     const py = yToPx(y);
-    yTicks.push(`<text x="${margin.left - 8}" y="${py + 4}" text-anchor="end" font-family="Arial" font-size="13" font-weight="bold">${y}</text>`);
+    yTicks.push(`<text x="${margin.left - 8}" y="${py + 4}" text-anchor="end" font-family="Arial" font-size="16" font-weight="bold">${y}</text>`);
   }
 
   // Bottom-centered legend with four entries: direct, indirect, and thresholds
@@ -85,13 +85,13 @@ function generateAchievementChartSVG(
   const ly = legendGroupY;
 
   const addLegendRect = (colorFill: string, colorStroke: string, label: string) => {
-    legendItems.push(`<rect x="${lx}" y="${ly - 11}" width="14" height="10" fill="${colorFill}" stroke="${colorStroke}"/>`);
-    legendItems.push(`<text x="${lx + 20}" y="${ly}" font-family="Arial" font-size="13" font-weight="bold">${label}</text>`);
+    legendItems.push(`<rect x="${lx}" y="${ly - 12}" width="16" height="12" fill="${colorFill}" stroke="${colorStroke}"/>`);
+    legendItems.push(`<text x="${lx + 22}" y="${ly}" font-family="Arial" font-size="18" font-weight="bold">${label}</text>`);
     lx += 20 + label.length * 7.2 + 36; // rough width advance
   };
   const addLegendDash = (stroke: string, label: string) => {
-    legendItems.push(`<line x1="${lx}" y1="${ly - 6}" x2="${lx + 24}" y2="${ly - 6}" stroke="${stroke}" stroke-width="2" stroke-dasharray="5,5"/>`);
-    legendItems.push(`<text x="${lx + 30}" y="${ly}" font-family="Arial" font-size="13" font-weight="bold">${label}</text>`);
+    legendItems.push(`<line x1="${lx}" y1="${ly - 6}" x2="${lx + 26}" y2="${ly - 6}" stroke="${stroke}" stroke-width="2" stroke-dasharray="5,5"/>`);
+    legendItems.push(`<text x="${lx + 32}" y="${ly}" font-family="Arial" font-size="18" font-weight="bold">${label}</text>`);
     lx += 30 + label.length * 7.2 + 36;
   };
 
@@ -100,7 +100,7 @@ function generateAchievementChartSVG(
   addLegendDash('rgba(255,99,132,1)', 'Direct Threshold (60%)');
   addLegendDash('rgba(153,102,255,1)', `Indirect Threshold (${indirectBenchmark}%)`);
 
-  const legend = `<g style="font-size: 16px;">${legendItems.join('')}</g>`;
+  const legend = `<g style="font-size: 20px;">${legendItems.join('')}</g>`;
 
   return `
   <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" preserveAspectRatio="xMidYMid meet">
@@ -116,10 +116,10 @@ function generateAchievementChartSVG(
       ${bars.join('')}
       ${labelsSvg.join('')}
     </g>
-    <text x="${margin.left + plotWidth / 2}" y="${margin.top + plotHeight + 60}" text-anchor="middle" font-family="Arial" font-size="24" font-weight="bold">Course Learning Outcomes (CLOs)</text>
+    <text x="${margin.left + plotWidth / 2}" y="${margin.top + plotHeight + 60}" text-anchor="middle" font-family="Arial" font-size="28" font-weight="bold">Course Learning Outcomes (CLOs)</text>
     <!-- Rotated Y-axis label -->
     <g transform="translate(${margin.left - 45}, ${margin.top + plotHeight / 2}) rotate(-90)">
-      <text text-anchor="middle" font-family="Arial" font-size="22" font-weight="bold">Percentage</text>
+      <text text-anchor="middle" font-family="Arial" font-size="26" font-weight="bold">Percentage</text>
     </g>
     ${legend}
   </svg>`;
