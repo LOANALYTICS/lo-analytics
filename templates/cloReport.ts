@@ -218,9 +218,27 @@ export interface CloReportProps {
     }>;
   };
   plogroups?: {
-    knowledge: CloDiagnostic[];
-    skills: CloDiagnostic[];
-    values: CloDiagnostic[];
+    knowledge: Array<{
+      cloNumber: string;
+      cloText: string;
+      mappedPLOs: string[];
+      direct: { achievementGrade: string; percentageAchieving: string };
+      indirect: { achievementGrade: string; percentageAchieving: string };
+    }>;
+    skills: Array<{
+      cloNumber: string;
+      cloText: string;
+      mappedPLOs: string[];
+      direct: { achievementGrade: string; percentageAchieving: string };
+      indirect: { achievementGrade: string; percentageAchieving: string };
+    }>;
+    values: Array<{
+      cloNumber: string;
+      cloText: string;
+      mappedPLOs: string[];
+      direct: { achievementGrade: string; percentageAchieving: string };
+      indirect: { achievementGrade: string; percentageAchieving: string };
+    }>;
   };
   benchmark?: number;
 }

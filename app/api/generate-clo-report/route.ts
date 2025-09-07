@@ -96,6 +96,13 @@ function buildCloDiagnostics60(processedData: unknown, assessmentData: unknown) 
     achievementGrade: string | number;
     percentageAchieving: string | number;
   };
+  type Combined = {
+    cloNumber: string;
+    cloText: string;
+    mappedPLOs: string[];
+    direct: { achievementGrade: string; percentageAchieving: string };
+    indirect: { achievementGrade: string; percentageAchieving: string };
+  };
 
   const digitRe = /\d+/;
   const getDigits = (val: unknown): string => {
@@ -146,16 +153,78 @@ function buildCloDiagnostics60(processedData: unknown, assessmentData: unknown) 
     };
   });
 
-  const hasType = (arr: string[] | undefined, prefix: 'K' | 'S' | 'V'): boolean =>
+  const hasTypeFlat = (arr: string[] | undefined, prefix: 'K' | 'S' | 'V'): boolean =>
     Array.isArray(arr) && arr.some((t) => t.toUpperCase().startsWith(prefix));
 
   const grouped = {
-    knowledge: flat.filter((d) => hasType(d.mappedPLOs, 'K')),
-    skills: flat.filter((d) => hasType(d.mappedPLOs, 'S')),
-    values: flat.filter((d) => hasType(d.mappedPLOs, 'V')),
+    knowledge: flat.filter((d) => hasTypeFlat(d.mappedPLOs, 'K')),
+    skills: flat.filter((d) => hasTypeFlat(d.mappedPLOs, 'S')),
+    values: flat.filter((d) => hasTypeFlat(d.mappedPLOs, 'V')),
   };
 
-  return { flat, grouped };
+  // Build indirect diagnostics from indirectAssessments if present
+  const indirectArr = ((assessmentData as any)?.indirectAssessments as Array<{ clo: string; achievementPercentage: number }>) || [];
+  const flatIndirect: Diagnostic[] = indirectArr.map((ia) => {
+    const key = toCloKey(ia?.clo);
+    const info = key && cloMap[key] ? cloMap[key] : { description: '', mapping: [] };
+    return {
+      cloNumber: key || String(ia?.clo ?? ''),
+      cloText: info.description,
+      mappedPLOs: info.mapping,
+      achievementGrade: '',
+      percentageAchieving: typeof ia?.achievementPercentage === 'number' ? ia.achievementPercentage.toFixed(2) : String(ia?.achievementPercentage ?? ''),
+    };
+  });
+  // Combine into simple per-CLO objects with direct and indirect
+  const byKey: Record<string, {
+    cloNumber: string;
+    cloText: string;
+    mappedPLOs: string[];
+    direct: { achievementGrade: string; percentageAchieving: string };
+    indirect: { achievementGrade: string; percentageAchieving: string };
+  }> = {};
+  const toStr = (v: unknown) => typeof v === 'number' ? v.toFixed(2) : String(v ?? '');
+  for (const d of flat) {
+    const key = toCloKey(d.cloNumber);
+    if (!key) continue;
+    byKey[key] = {
+      cloNumber: d.cloNumber,
+      cloText: d.cloText,
+      mappedPLOs: d.mappedPLOs,
+      direct: {
+        achievementGrade: toStr(d.achievementGrade),
+        percentageAchieving: toStr(d.percentageAchieving),
+      },
+      indirect: { achievementGrade: '', percentageAchieving: '' },
+    };
+  }
+  for (const i of flatIndirect) {
+    const key = toCloKey(i.cloNumber) || toCloKey(i.cloText);
+    if (!key) continue;
+    if (!byKey[key]) {
+      byKey[key] = {
+        cloNumber: i.cloNumber,
+        cloText: i.cloText,
+        mappedPLOs: i.mappedPLOs,
+        direct: { achievementGrade: '', percentageAchieving: '' },
+        indirect: { achievementGrade: '', percentageAchieving: '' },
+      };
+    }
+    byKey[key].indirect = {
+      achievementGrade: '',
+      percentageAchieving: toStr(i.percentageAchieving),
+    };
+    if (!byKey[key].cloText) byKey[key].cloText = i.cloText;
+    if (!byKey[key].mappedPLOs?.length) byKey[key].mappedPLOs = i.mappedPLOs;
+  }
+  const combined = Object.values(byKey);
+  const hasTypeCombined = (arr: string[] | undefined, prefix: 'K' | 'S' | 'V'): boolean =>
+    Array.isArray(arr) && arr.some((t) => t.toUpperCase().startsWith(prefix));
+  return {
+    knowledge: combined.filter(c => hasTypeCombined(c.mappedPLOs, 'K')),
+    skills: combined.filter(c => hasTypeCombined(c.mappedPLOs, 'S')),
+    values: combined.filter(c => hasTypeCombined(c.mappedPLOs, 'V')),
+  };
 }
 
 export async function POST(request: Request) {
@@ -334,7 +403,7 @@ export async function POST(request: Request) {
     };
 
     // Console log summary before HTML generation
-    const { flat, grouped } = buildCloDiagnostics60(processedData, assessmentData);
+    const plogroups = buildCloDiagnostics60(processedData, assessmentData);
 
 
     // Save achievement data to MongoDB
@@ -369,7 +438,7 @@ export async function POST(request: Request) {
       indirectAssessmentData: assessmentData?.indirectAssessments ? {
         indirectAssessments: assessmentData.indirectAssessments
       } : undefined,
-      plogroups: grouped,
+      plogroups,
       benchmark: assessmentData.benchmark || 0
     });
 
