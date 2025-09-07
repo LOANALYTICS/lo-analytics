@@ -1,12 +1,13 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Trash, Upload, Plus, X, Loader2Icon } from 'lucide-react'
 import { AssessmentSpreadsheet } from './AssessmentSpreadsheet'
+import { updateBenchmark, getAssessmentByCourse } from '@/services/assessment.action'
 
 interface Assessment {
   id: string;
@@ -56,7 +57,25 @@ export default function AssessmentTable({ initialData, onSave, saving, onUpload,
   // Benchmark state
   const [isEditingBenchmark, setIsEditingBenchmark] = useState(false);
   const [benchmarkValue, setBenchmarkValue] = useState('');
-  const [currentBenchmark, setCurrentBenchmark] = useState(60);
+  const [currentBenchmark, setCurrentBenchmark] = useState(0);
+  const [isSavingBenchmark, setIsSavingBenchmark] = useState(false);
+
+  // Load initial benchmark value
+  useEffect(() => {
+    const loadInitialBenchmark = async () => {
+      try {
+        const result = await getAssessmentByCourse(courseId);
+        if (result.success && result.data && result.data.benchmark) {
+          setCurrentBenchmark(result.data.benchmark);
+        }
+      } catch (error) {
+        console.error('Error loading initial benchmark:', error);
+      }
+    };
+    
+    loadInitialBenchmark();
+  }, [courseId]);
+
   const [assessments, setAssessments] = useState<Assessment[]>(() => {
     if (initialData.length > 0) {
       // Add any missing CLO keys to each assessment
@@ -159,11 +178,23 @@ export default function AssessmentTable({ initialData, onSave, saving, onUpload,
     Number(benchmarkValue) >= 0 && 
     Number(benchmarkValue) <= 100;
 
-  const handleSaveBenchmark = () => {
+  const handleSaveBenchmark = async () => {
     if (isValidBenchmark) {
-      setCurrentBenchmark(Number(benchmarkValue));
-      setBenchmarkValue('');
-      setIsEditingBenchmark(false);
+      setIsSavingBenchmark(true);
+      try {
+        const result = await updateBenchmark(courseId, Number(benchmarkValue));
+        if (result.success) {
+          setCurrentBenchmark(Number(benchmarkValue));
+          setBenchmarkValue('');
+          setIsEditingBenchmark(false);
+        } else {
+          console.error('Failed to save benchmark:', result.message);
+        }
+      } catch (error) {
+        console.error('Error saving benchmark:', error);
+      } finally {
+        setIsSavingBenchmark(false);
+      }
     }
   };
 
@@ -186,12 +217,16 @@ export default function AssessmentTable({ initialData, onSave, saving, onUpload,
               />
               <button
                 onClick={handleSaveBenchmark}
-                className="p-1 text-green-600 hover:text-green-800"
-                disabled={!isValidBenchmark}
+                className="p-1 text-green-600 hover:text-green-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={!isValidBenchmark || isSavingBenchmark}
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
+                {isSavingBenchmark ? (
+                  <Loader2Icon className="w-4 h-4 animate-spin" />
+                ) : (
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                )}
               </button>
               <button
                 onClick={() => setIsEditingBenchmark(false)}

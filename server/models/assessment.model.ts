@@ -70,6 +70,7 @@ export interface IAssessment extends Document {
             v: Array<{ [key: string]: boolean }>;
         };
     }[];
+    benchmark: number;
 }
 
 export const assessmentSchema = new Schema<IAssessment>({
@@ -138,5 +139,6 @@ export const assessmentSchema = new Schema<IAssessment>({
             s: [{ type: Object, required: true }],
             v: [{ type: Object, required: true }]
         }
-    }]
+    }],
+    benchmark: { type: Number, default: 60 }
 }, { timestamps: true, strict: false }); 

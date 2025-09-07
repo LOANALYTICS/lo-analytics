@@ -218,7 +218,7 @@ export async function updateIndirectAssessments(courseId: string, indirectAssess
             { new: true }
         ).lean();
 
-        revalidatePath('/dashboard/learning-outcomes/assessment-plan/[courseId]');
+        revalidatePath(`/dashboard/learning-outcomes/assessment-plan/${courseId}`);
 
         return {
             success: true,
@@ -247,6 +247,49 @@ export async function getIndirectAssessments(courseId: string) {
     } catch (error) {
         console.error('Error getting indirect assessments:', error);
         throw new Error('Failed to get indirect assessments');
+    }
+}
+
+export async function updateBenchmark(courseId: string, benchmarkValue: number) {
+    try {
+        // First check if assessment exists for this course
+        let assessment = await Assessment.findOne({ course: courseId });
+        
+        if (!assessment) {
+            // If assessment doesn't exist, create a new one with the benchmark
+            assessment = await Assessment.create({
+                course: courseId,
+                benchmark: benchmarkValue,
+                students: [],
+                assessments: [],
+                indirectAssessments: [],
+                assessmentResults: [],
+                cloData: []
+            });
+        } else {
+            // If assessment exists, update the benchmark
+            assessment = await Assessment.findOneAndUpdate(
+                { course: courseId },
+                { $set: { benchmark: benchmarkValue } },
+                { new: true }
+            );
+        }
+
+        if (!assessment) {
+            throw new Error('Failed to update benchmark');
+        }
+
+        revalidatePath(`/dashboard/learning-outcomes/assessment-plan/${courseId}`);
+        
+        return {
+            success: true,
+            message: 'Benchmark updated successfully',
+            data: JSON.parse(JSON.stringify(assessment))
+        };
+
+    } catch (error) {
+        console.error('Error updating benchmark:', error);
+        throw new Error('Failed to update benchmark');
     }
 }
 
