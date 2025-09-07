@@ -75,54 +75,82 @@ interface AssessmentData {
 export const dynamic = 'force-dynamic';
 
 // Build 60% threshold CLO diagnostics (simple + robust)
-function buildCloDiagnostics60(processedData: any, assessmentData: any) {
-  const getDigits = (val: any) => {
-    const m = String(val ?? '').match(/\d+/);
+function buildCloDiagnostics60(processedData: unknown, assessmentData: unknown) {
+  type PloRow = Record<string, boolean>;
+  type CloEntry = {
+    clo: string;
+    description: string;
+    ploMapping?: { k?: PloRow[]; s?: PloRow[]; v?: PloRow[] };
+  };
+  type AchievementItem = {
+    clo: string;
+    achievementGrade: string | number;
+    percentageAchieving: string | number;
+  };
+  type Diagnostic = {
+    cloNumber: string;
+    cloText: string;
+    mappedPLOs: string[];
+    achievementGrade: string | number;
+    percentageAchieving: string | number;
+  };
+
+  const digitRe = /\d+/;
+  const getDigits = (val: unknown): string => {
+    const m = String(val ?? '').match(digitRe);
     return m ? m[0] : '';
   };
-  const toCloKey = (cloVal: any, descVal?: any) => {
+  const toCloKey = (cloVal: unknown, descVal?: unknown): string => {
     const n = getDigits(cloVal) || getDigits(descVal);
     return n ? (`clo${n}`).toLowerCase() : '';
   };
-  const extractPlo = (arr: Array<Record<string, boolean>> | undefined, prefix: 'K' | 'S' | 'V') => {
-    if (!Array.isArray(arr)) return [] as string[];
-    return arr.flatMap(obj => {
-      return Object.entries(obj || {})
-        .filter(([, v]) => !!v)
-        .map(([k]) => `${prefix}${getDigits(k) || String(k).toUpperCase()}`);
-    });
+  const extractPlo = (rows: PloRow[] | undefined, prefix: 'K' | 'S' | 'V'): string[] => {
+    if (!Array.isArray(rows)) return [];
+    const out: string[] = [];
+    for (const row of rows) {
+      for (const [k, v] of Object.entries(row || {})) {
+        if (v) out.push(`${prefix}${getDigits(k) || String(k).toUpperCase()}`);
+      }
+    }
+    // de-duplicate while preserving order
+    return Array.from(new Set(out));
   };
 
   const cloMap: Record<string, { description: string; mapping: string[] }> = {};
-  (assessmentData?.cloData || []).forEach((entry: any) => {
-    const key = toCloKey(entry?.clo, entry?.description);
-    if (!key) return;
-    const mapping = [
-      ...extractPlo(entry?.ploMapping?.k, 'K'),
-      ...extractPlo(entry?.ploMapping?.s, 'S'),
-      ...extractPlo(entry?.ploMapping?.v, 'V')
-    ];
-    cloMap[key] = { description: String(entry?.description ?? ''), mapping };
-  });
+  const cloDataArr = (assessmentData as any)?.cloData as CloEntry[] | undefined;
+  if (Array.isArray(cloDataArr)) {
+    for (const entry of cloDataArr) {
+      const key = toCloKey(entry?.clo, entry?.description);
+      if (!key) continue;
+      const mapping = [
+        ...extractPlo(entry?.ploMapping?.k, 'K'),
+        ...extractPlo(entry?.ploMapping?.s, 'S'),
+        ...extractPlo(entry?.ploMapping?.v, 'V'),
+      ];
+      cloMap[key] = { description: String(entry?.description ?? ''), mapping };
+    }
+  }
 
-  const items = (processedData?.achievementData?.['60'] as any[]) || [];
-  const flat = items.map(d => {
-    const info = cloMap[toCloKey(d?.clo)] || { description: '', mapping: [] };
+  const items = ((processedData as any)?.achievementData?.['60'] as AchievementItem[]) || [];
+  const flat: Diagnostic[] = items.map((d) => {
+    const key = toCloKey(d?.clo);
+    const info = (key && cloMap[key]) ? cloMap[key] : { description: '', mapping: [] };
     return {
       cloNumber: d?.clo,
       cloText: info.description,
       mappedPLOs: info.mapping,
       achievementGrade: d?.achievementGrade,
-      percentageAchieving: d?.percentageAchieving
+      percentageAchieving: d?.percentageAchieving,
     };
   });
 
-  const hasType = (items: string[] | undefined, prefix: 'K' | 'S' | 'V') =>
-    Array.isArray(items) && items.some(t => String(t).toUpperCase().startsWith(prefix));
+  const hasType = (arr: string[] | undefined, prefix: 'K' | 'S' | 'V'): boolean =>
+    Array.isArray(arr) && arr.some((t) => t.toUpperCase().startsWith(prefix));
+
   const grouped = {
-    knowledge: flat.filter(d => hasType(d.mappedPLOs, 'K')),
-    skills: flat.filter(d => hasType(d.mappedPLOs, 'S')),
-    values: flat.filter(d => hasType(d.mappedPLOs, 'V')),
+    knowledge: flat.filter((d) => hasType(d.mappedPLOs, 'K')),
+    skills: flat.filter((d) => hasType(d.mappedPLOs, 'S')),
+    values: flat.filter((d) => hasType(d.mappedPLOs, 'V')),
   };
 
   return { flat, grouped };
