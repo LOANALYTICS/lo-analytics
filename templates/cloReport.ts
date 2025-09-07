@@ -222,6 +222,7 @@ export interface CloReportProps {
       cloNumber: string;
       cloText: string;
       mappedPLOs: string[];
+      weightage: number | null;
       direct: { achievementGrade: string; percentageAchieving: string };
       indirect: { achievementGrade: string; percentageAchieving: string };
     }>;
@@ -229,6 +230,7 @@ export interface CloReportProps {
       cloNumber: string;
       cloText: string;
       mappedPLOs: string[];
+      weightage: number | null;
       direct: { achievementGrade: string; percentageAchieving: string };
       indirect: { achievementGrade: string; percentageAchieving: string };
     }>;
@@ -236,6 +238,7 @@ export interface CloReportProps {
       cloNumber: string;
       cloText: string;
       mappedPLOs: string[];
+      weightage: number | null;
       direct: { achievementGrade: string; percentageAchieving: string };
       indirect: { achievementGrade: string; percentageAchieving: string };
     }>;

@@ -140,6 +140,16 @@ function buildCloDiagnostics60(processedData: unknown, assessmentData: unknown) 
     }
   }
 
+  // Build weightage map from processedData.cloScores (total marks per CLO)
+  const weightageMap: Record<string, number> = {};
+  const rawCloScores = (processedData as any)?.cloScores as Record<string, number> | undefined;
+  if (rawCloScores && typeof rawCloScores === 'object') {
+    for (const [k, v] of Object.entries(rawCloScores)) {
+      const key = toCloKey(k);
+      if (key) weightageMap[key] = Number(v);
+    }
+  }
+
   const items = ((processedData as any)?.achievementData?.['60'] as AchievementItem[]) || [];
   const flat: Diagnostic[] = items.map((d) => {
     const key = toCloKey(d?.clo);
@@ -180,6 +190,7 @@ function buildCloDiagnostics60(processedData: unknown, assessmentData: unknown) 
     cloNumber: string;
     cloText: string;
     mappedPLOs: string[];
+    weightage: number | null;
     direct: { achievementGrade: string; percentageAchieving: string };
     indirect: { achievementGrade: string; percentageAchieving: string };
   }> = {};
@@ -191,6 +202,7 @@ function buildCloDiagnostics60(processedData: unknown, assessmentData: unknown) 
       cloNumber: d.cloNumber,
       cloText: d.cloText,
       mappedPLOs: d.mappedPLOs,
+      weightage: key in weightageMap ? weightageMap[key] : null,
       direct: {
         achievementGrade: toStr(d.achievementGrade),
         percentageAchieving: toStr(d.percentageAchieving),
@@ -206,6 +218,7 @@ function buildCloDiagnostics60(processedData: unknown, assessmentData: unknown) 
         cloNumber: i.cloNumber,
         cloText: i.cloText,
         mappedPLOs: i.mappedPLOs,
+        weightage: key in weightageMap ? weightageMap[key] : null,
         direct: { achievementGrade: '', percentageAchieving: '' },
         indirect: { achievementGrade: '', percentageAchieving: '' },
       };
