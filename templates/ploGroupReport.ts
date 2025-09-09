@@ -125,7 +125,7 @@ export async function generatePloGroupReportHTML(props: PloGroupReportProps): Pr
           .clo-row { page-break-inside: avoid !important; break-inside: avoid !important; }
           
           /* Adjust column widths to make table bigger - match header and row cells */
-          th.sno, td.sno { width: 40px; min-width: 40px; max-width: 40px; }
+          th.sno, td.sno { width: 60px; min-width: 60px; max-width: 60px; }
           th.weight, td.weight { width: 80px; min-width: 80px; max-width: 80px; }
           th.plos, td.plos { width: 80px; min-width: 80px; max-width: 80px; }
           th.method, td.method { width: 72px; min-width: 72px; max-width: 72px; }
