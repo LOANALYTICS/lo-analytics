@@ -73,7 +73,7 @@ function buildGroupSection(title: string, items: PloGroupItem[], directTarget: n
     const serial = `${(index + 1).toFixed(1)}`; // e.g., 1.1, 1.2 per group
 
     rows.push(`
-      <tr class="clo-row">
+      <tr class="clo-row clo-row-direct row-${escapeHTML(serial)}">
         <td rowspan="2" class="sno">${escapeHTML(serial)}</td>
         <td rowspan="2" class="clo-text">${escapeHTML(item.cloText)}</td>
         <td rowspan="2" class="weight">${item.weightage !== null ? escapeHTML(String(item.weightage)) : '-'}</td>
@@ -83,7 +83,7 @@ function buildGroupSection(title: string, items: PloGroupItem[], directTarget: n
         <td class="actual">${fmtPct(directActual)}</td>
         <td class="comment">${escapeHTML(diffComment(directActual, directTarget))}</td>
       </tr>
-      <tr class="clo-row">
+      <tr class="clo-row clo-row-indirect row-${escapeHTML(serial)}">
         <td class="method">Indirect</td>
         <td class="target">≥ ${indirectTarget}% of students should agree that they achieved the CLO</td>
         <td class="actual">${fmtPct(indirectActual)}</td>
