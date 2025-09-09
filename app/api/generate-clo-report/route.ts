@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { connectToMongoDB } from '@/lib/db';
 import { Course, Assessment } from '@/lib/models';
 import { generateCloReportHTML } from '@/templates/cloReport';
+import { generatePloGroupReportHTML } from '@/templates/ploGroupReport';
 import logger from '@/lib/logger';
 
 
@@ -455,11 +456,28 @@ export async function POST(request: Request) {
       benchmark: assessmentData.benchmark || 0
     });
 
-    // Return the HTML content
-    return new NextResponse(htmlContent, {
-      headers: {
-        'Content-Type': 'text/html',
+    // Generate PLO Group HTML using plogroups and benchmark
+    const ploHtml = await generatePloGroupReportHTML({
+      course: {
+        course_name: courseData.course_name,
+        level: courseData.level,
+        section: courseData?.section,
+        academic_year: courseData?.academic_year,
+        semister: courseData.semister,
+        department: courseData.department,
+        course_code: courseData.course_code,
+        credit_hours: courseData.credit_hours,
+        coordinator: coordinator
       },
+      college: courseData.collage,
+      plogroups,
+      benchmark: assessmentData.benchmark || 0
+    });
+
+    // Always return both HTML strings together
+    return NextResponse.json({
+      cloHtml: htmlContent,
+      ploHtml,
     });
 
   } catch (error) {
