@@ -42,7 +42,9 @@ export async function generatePloPdfFromHtml(html: string, fileName: string, sav
       th.weight, td.weight { width: 110px; min-width: 110px; max-width: 110px; }
       th.plos, td.plos { width: 80px; min-width: 80px; max-width: 80px; }
       th.method, td.method { width: 72px; min-width: 72px; max-width: 72px; }
-      .target, .actual, .comment { word-wrap: break-word; }
+done      th.assessment-results { width: 180px; min-width: 180px; max-width: 180px; }
+      th.target, td.target, th.actual, td.actual { width: 90px; min-width: 90px; max-width: 90px; }
+      .comment { word-wrap: break-word; }
     `;
     
     // Set the enhanced HTML with all styles

@@ -129,7 +129,9 @@ export async function generatePloGroupReportHTML(props: PloGroupReportProps): Pr
           th.weight, td.weight { width: 110px; min-width: 110px; max-width: 110px; }
           th.plos, td.plos { width: 80px; min-width: 80px; max-width: 80px; }
           th.method, td.method { width: 72px; min-width: 72px; max-width: 72px; }
-          .target, .actual, .comment { word-wrap: break-word; }
+          th.assessment-results { width: 180px; min-width: 180px; max-width: 180px; }
+          th.target, td.target, th.actual, td.actual { width: 90px; min-width: 90px; max-width: 90px; }
+          .comment { word-wrap: break-word; }
           
           /* Add page break control */
           @media print {
@@ -150,12 +152,12 @@ export async function generatePloGroupReportHTML(props: PloGroupReportProps): Pr
                 <th rowspan="2" class="weight">Weightage of each CLO</th>
                 <th rowspan="2" class="plos">Related PLOs Code</th>
                 <th rowspan="2" class="method">Assessment Methods</th>
-                <th colspan="2">Assessment Results</th>
+                <th colspan="2" class="assessment-results">Assessment Results</th>
                 <th rowspan="2">Comment on Assessment Results</th>
               </tr>
               <tr class="subhead">
-                <th>Targeted Level</th>
-                <th>Actual Level</th>
+                <th class="target">Targeted Level</th>
+                <th class="actual">Actual Level</th>
               </tr>
             </thead>
 
