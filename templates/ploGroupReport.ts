@@ -114,7 +114,7 @@ export async function generatePloGroupReportHTML(props: PloGroupReportProps): Pr
 
           table { width: 100%; border-collapse: collapse; table-layout: fixed; }
           th, td { border: 1px solid #000; padding: 8px; font-size: 14px; text-align: center; }
-          td.clo-text { text-align: left; }
+          th.clo-text, td.clo-text { text-align: left; width: 280px; min-width: 280px; max-width: 280px; }
           thead th { background: #4b2e83; color: #fff; font-weight: 700; font-size: 15px; }
           thead .subhead th { background: #5e3a9f; color: #fff; }
           .group-header td { background: #e0f3ff; font-weight: 700; text-align: left; font-size: 15px; }
@@ -128,10 +128,10 @@ export async function generatePloGroupReportHTML(props: PloGroupReportProps): Pr
           th.sno, td.sno { width: 60px; min-width: 60px; max-width: 60px; }
           th.weight, td.weight { width: 110px; min-width: 110px; max-width: 110px; }
           th.plos, td.plos { width: 80px; min-width: 80px; max-width: 80px; }
-          th.method, td.method { width: 72px; min-width: 72px; max-width: 72px; }
+          th.method, td.method { width: 80px; min-width: 80px; max-width: 80px; }
           th.assessment-results { width: 180px; min-width: 180px; max-width: 180px; }
           th.target, td.target, th.actual, td.actual { width: 90px; min-width: 90px; max-width: 90px; }
-          .comment { word-wrap: break-word; }
+          .comment { word-wrap: break-word;width: 100px; min-width: 100px; max-width: 100px; }
           
           /* Add page break control */
           @media print {
@@ -148,17 +148,18 @@ export async function generatePloGroupReportHTML(props: PloGroupReportProps): Pr
             <thead>
               <tr>
                 <th rowspan="2" class="sno">S.No</th>
-                <th rowspan="2">Course Learning Outcomes (CLOs)</th>
+                <th rowspan="2" class="clo-text">Course Learning Outcomes (CLOs)</th>
                 <th rowspan="2" class="weight">Weightage of each CLO</th>
                 <th rowspan="2" class="plos">Related PLOs Code</th>
                 <th rowspan="2" class="method">Assessment Methods</th>
                 <th colspan="2" class="assessment-results">Assessment Results</th>
-                <th rowspan="2">Comment on Assessment Results</th>
+                <th rowspan="2" class="comment">Comment on Assessment Results</th>
               </tr>
               <tr class="subhead">
                 <th class="target">Targeted Level</th>
                 <th class="actual">Actual Level</th>
               </tr>
+
             </thead>
 
             ${buildGroupSection('Knowledge and Understanding', plogroups.knowledge || [], benchmark)}

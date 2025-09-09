@@ -34,17 +34,17 @@ export async function generatePloPdfFromHtml(html: string, fileName: string, sav
       
       /* Ensure proper cell alignment and structure */
       th, td { border: 1px solid #000; padding: 8px; font-size: 14px; text-align: center; vertical-align: middle; box-sizing: border-box; }
-      td.clo-text { text-align: left; }
+      th.clo-text, td.clo-text { text-align: left; width: 280px; min-width: 280px; max-width: 280px; }
       td[rowspan] { vertical-align: middle; }
       
       /* Ensure proper column widths - match header and row cells */
       th.sno, td.sno, th:first-child, td:first-child { width: 60px; min-width: 60px; max-width: 60px; }
       th.weight, td.weight { width: 110px; min-width: 110px; max-width: 110px; }
       th.plos, td.plos { width: 80px; min-width: 80px; max-width: 80px; }
-      th.method, td.method { width: 72px; min-width: 72px; max-width: 72px; }
-done      th.assessment-results { width: 180px; min-width: 180px; max-width: 180px; }
-      th.target, td.target, th.actual, td.actual { width: 90px; min-width: 90px; max-width: 90px; }
-      .comment { word-wrap: break-word; }
+      th.method, td.method { width: 120px; min-width: 120px; max-width: 120px; }
+done      th.assessment-results { width: 240px; min-width: 240px; max-width: 240px; }
+      th.target, td.target, th.actual, td.actual { width: 120px; min-width: 120px; max-width: 120px; }
+      .comment { word-wrap: break-word;width: 120px; min-width: 120px; max-width: 120px; }
     `;
     
     // Set the enhanced HTML with all styles
