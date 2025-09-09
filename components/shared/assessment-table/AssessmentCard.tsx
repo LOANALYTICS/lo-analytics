@@ -77,20 +77,32 @@ export default function AssessmentCard({ href, course, standalone }: {
       });
       
       // Generate CLO PDF and capture data instead of saving
-      const cloPdfData = await generatePDFWithJsPDF(cloContainer.innerHTML, `${course?.course_code} CLO Report`, 'portrait') as string;
+      console.log('Generating CLO PDF');
+      const cloPdfData = await generatePDFWithJsPDF(cloContainer.innerHTML, `${course?.course_code} CLO Report`, 'portrait', false) as string;
+      console.log('CLO PDF generated successfully');
       document.body.removeChild(cloContainer);
-      pdfDataArray.push(cloPdfData);
+      if (cloPdfData) {
+        console.log('Adding CLO PDF data to array');
+        pdfDataArray.push(cloPdfData);
+        console.log(`PDF data array now has ${pdfDataArray.length} items`);
+      } else {
+        console.error('CLO PDF data is null or undefined');
+      }
       
       // Generate PLO PDF and capture data instead of saving
       try {
-        // Create temporary container for PLO HTML
-        const ploContainer = document.createElement('div');
-        ploContainer.innerHTML = ploHtml;
-        document.body.appendChild(ploContainer);
-        
+        // Generate PLO PDF directly from HTML string
+        console.log('Generating PLO PDF');
         const ploPdfData = await generatePloPdfFromHtml(ploHtml, `${course?.course_code} PLO Report`, false) as string;
-        document.body.removeChild(ploContainer);
-        pdfDataArray.push(ploPdfData);
+        console.log('PLO PDF generated successfully');
+        
+        if (ploPdfData) {
+          console.log('Adding PLO PDF data to array');
+          pdfDataArray.push(ploPdfData);
+          console.log(`PDF data array now has ${pdfDataArray.length} items`);
+        } else {
+          console.error('PLO PDF data is null or undefined');
+        }
       } catch (ploError) {
         console.error("Error generating PLO report:", ploError);
         toast.error('Failed to generate PLO report');
@@ -100,6 +112,11 @@ export default function AssessmentCard({ href, course, standalone }: {
       if (pdfDataArray.length > 0) {
         toast.loading("Merging reports");
         try {
+          console.log(`Attempting to merge ${pdfDataArray.length} PDFs`);
+          console.log(`CLO PDF data length: ${pdfDataArray[0]?.length || 0}`);
+          if (pdfDataArray.length > 1) {
+            console.log(`PLO PDF data length: ${pdfDataArray[1]?.length || 0}`);
+          }
           await mergePDFs(pdfDataArray, `${course?.course_code} Combined Reports`);
           toast.success('Combined reports generated successfully');
         } catch (mergeError) {
