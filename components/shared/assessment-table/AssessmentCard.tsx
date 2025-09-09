@@ -29,9 +29,9 @@ export default function AssessmentCard({ href, course, standalone }: {
     fetchCoordinator()
   }, [course._id]);
 
-  const handleAssessmentPlan = async (e: any) => {
+   const handleAssessmentPlan = async (e: any) => {
     try {
-      toast.loading("Generating report")
+      toast.loading("Generating CLO report")
       const response = await fetch('/api/generate-clo-report', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -47,18 +47,19 @@ export default function AssessmentCard({ href, course, standalone }: {
         return
       };
   
-      const { cloHtml, ploHtml } = await response.json();
-   
+      // Parse JSON response with both HTML contents
+      const data = await response.json();
+      const { cloHtml, ploHtml } = data;
       
-      // Create temporary container
-      const tempContainer = document.createElement('div');
-      tempContainer.innerHTML = cloHtml;
-      document.body.appendChild(tempContainer);
+      // Create temporary container for CLO HTML
+      const cloContainer = document.createElement('div');
+      cloContainer.innerHTML = cloHtml;
+      document.body.appendChild(cloContainer);
   
-      // Wait for Plotly chart to render
+      // Wait for Plotly chart to render in CLO report
       await new Promise((resolve) => {
         const checkChart = setInterval(() => {
-          const chartDiv = tempContainer.querySelector('#achievementChart');
+          const chartDiv = cloContainer.querySelector('#achievementChart');
           if (chartDiv && chartDiv.querySelector('.main-svg')) {
             clearInterval(checkChart);
             resolve(true);
@@ -71,14 +72,29 @@ export default function AssessmentCard({ href, course, standalone }: {
         }, 5000);
       });
       
-      await generatePDFWithJsPDF(tempContainer.innerHTML, `${course?.course_code} CLO Report`);
-      document.body.removeChild(tempContainer);
-
-      // Generate PLO summary PDF in one call using the new utility
-      await generatePloPdfFromHtml(ploHtml, `${course?.course_code} PLO Summary`);
-
+      // Generate CLO PDF
+      await generatePDFWithJsPDF(cloContainer.innerHTML, `${course?.course_code} CLO Report`);
+      document.body.removeChild(cloContainer);
+      toast.success('CLO Report generated successfully');
+      
+      // Generate PLO PDF
+      toast.loading("Generating PLO report");
+      try {
+        // Create temporary container for PLO HTML
+        const ploContainer = document.createElement('div');
+        ploContainer.innerHTML = ploHtml;
+        document.body.appendChild(ploContainer);
+        
+        await generatePloPdfFromHtml(ploHtml, `${course?.course_code} PLO Report`);
+        document.body.removeChild(ploContainer);
+        toast.success('PLO Report generated successfully');
+      } catch (ploError) {
+        console.error("Error generating PLO report:", ploError);
+        toast.error('Failed to generate PLO report');
+      }
+      
       toast.dismiss();
-      toast.success('Both reports generated successfully');
+
   
     } catch (error: any) {
       console.error("Error generating report:", error);
@@ -89,6 +105,7 @@ export default function AssessmentCard({ href, course, standalone }: {
       }
     }
   }
+  
   
  
 const handleCloReport = async (e: any, id: string, ace_year: string, section: string) => {
