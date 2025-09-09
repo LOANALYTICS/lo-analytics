@@ -39,7 +39,7 @@ export async function generatePloPdfFromHtml(html: string, fileName: string, sav
       
       /* Ensure proper column widths - match header and row cells */
       th.sno, td.sno, th:first-child, td:first-child { width: 60px; min-width: 60px; max-width: 60px; }
-      th.weight, td.weight { width: 80px; min-width: 80px; max-width: 80px; }
+      th.weight, td.weight { width: 110px; min-width: 110px; max-width: 110px; }
       th.plos, td.plos { width: 80px; min-width: 80px; max-width: 80px; }
       th.method, td.method { width: 72px; min-width: 72px; max-width: 72px; }
       .target, .actual, .comment { word-wrap: break-word; }
