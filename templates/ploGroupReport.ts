@@ -113,21 +113,31 @@ export async function generatePloGroupReportHTML(props: PloGroupReportProps): Pr
           .container { max-width: 100%; margin: 0 auto; padding: 20px; }
 
           table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-          th, td { border: 1px solid #000; padding: 8px; font-size: 12px; text-align: center; }
+          th, td { border: 1px solid #000; padding: 8px; font-size: 14px; text-align: center; }
           td.clo-text { text-align: left; }
-          thead th { background: #4b2e83; color: #fff; font-weight: 700; }
+          thead th { background: #4b2e83; color: #fff; font-weight: 700; font-size: 15px; }
           thead .subhead th { background: #5e3a9f; color: #fff; }
-          .group-header td { background: #e0f3ff; font-weight: 700; text-align: left; }
+          .group-header td { background: #e0f3ff; font-weight: 700; text-align: left; font-size: 15px; }
 
-          /* Keep each logical pair on one page if possible */
-          tr, .group-block { break-inside: avoid; page-break-inside: avoid; }
-          .group-block .clo-row { break-inside: avoid; page-break-inside: avoid; }
-
-          .sno { width: 48px; }
+          /* Improved pagination - ensure rows don't break across pages */
+          tr { page-break-inside: avoid !important; break-inside: avoid !important; }
+          tbody.group-block { page-break-inside: avoid !important; break-inside: avoid !important; }
+          .clo-row { page-break-inside: avoid !important; break-inside: avoid !important; }
+          
+          /* Adjust column widths to make table bigger */
+          .sno { width: 40px; }
           .weight { width: 80px; }
           .plos { width: 80px; }
           .method { width: 72px; }
           .target, .actual, .comment { word-wrap: break-word; }
+          
+          /* Add page break control */
+          @media print {
+            .group-block { page-break-before: auto; }
+            tr { page-break-inside: avoid !important; }
+            thead { display: table-header-group; }
+            tfoot { display: table-footer-group; }
+          }
         </style>
       </head>
       <body>

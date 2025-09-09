@@ -7,6 +7,7 @@ export async function generatePloPdfFromHtml(html: string, fileName: string, sav
     const element = document.createElement("div");
     element.innerHTML = html;
     element.style.padding = "20px";
+    element.style.width = "1000px"; // Set a fixed width to ensure proper rendering
     document.body.appendChild(element);
 
     // Parse the HTML and inline styles if available
@@ -15,11 +16,23 @@ export async function generatePloPdfFromHtml(html: string, fileName: string, sav
       const parsed = parser.parseFromString(html, 'text/html');
       const styleTags = Array.from(parsed.head?.querySelectorAll('style') || []);
       const inlineCss = styleTags.map(s => s.textContent || '').join('\n');
+      
+      // Enhanced base CSS with better print handling
       const baseCss = `
         * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         html, body { background: #fff; margin: 0; padding: 0; }
-        table { background: #fff; border-collapse: collapse; }
+        table { background: #fff; border-collapse: collapse; width: 100%; }
+        
+        /* Enhanced pagination control */
+        @media print {
+          tr { page-break-inside: avoid !important; }
+          tbody { page-break-inside: avoid !important; }
+          thead { display: table-header-group; }
+          tfoot { display: table-footer-group; }
+          .group-block { page-break-inside: avoid !important; }
+        }
       `;
+      
       element.innerHTML = `<style>${baseCss}\n${inlineCss}</style>${parsed.body ? parsed.body.innerHTML : html}`;
     } catch (error) {
       console.error("Parsing HTML failed:", error);
@@ -30,15 +43,23 @@ export async function generatePloPdfFromHtml(html: string, fileName: string, sav
       await (document as any).fonts?.ready;
     } catch {}
 
-    await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+    await new Promise(r => setTimeout(r, 500)); // Longer timeout for better rendering
 
-    // Convert HTML to canvas
+    // Convert HTML to canvas with higher quality settings
     const canvas = await html2canvas(element, {
-      scale: 2,
+      scale: 3, // Higher scale for better quality
       useCORS: true,
       logging: false,
       backgroundColor: "#ffffff",
-      allowTaint: true
+      allowTaint: true,
+      windowWidth: 1000, // Match the container width
+      onclone: (clonedDoc) => {
+        // Additional styling for the cloned document
+        const clonedElement = clonedDoc.body.firstChild as HTMLElement;
+        if (clonedElement) {
+          clonedElement.style.width = "1000px";
+        }
+      }
     });
 
     // Create PDF
@@ -51,7 +72,7 @@ export async function generatePloPdfFromHtml(html: string, fileName: string, sav
     };
 
     // Calculate dimensions
-    const imgWidth = 190;
+    const imgWidth = 190; // Slightly wider to maximize page usage
     const pageHeight = 287; // Reduced from 297 to account for margins
     const imgHeight = (canvas.height * imgWidth) / canvas.width;
     let heightLeft = imgHeight;
