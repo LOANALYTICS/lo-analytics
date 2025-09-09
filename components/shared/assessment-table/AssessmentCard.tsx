@@ -11,8 +11,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { getCurrentUser } from '@/server/utils/helper';
-import { generatePloPdfFromHtml } from '@/lib/utils/plo-pdf';
 import { generatePDF, generateLandscapePDFSinglePage, generatePDFWithJsPDF } from '@/lib/utils/pdf';
+import { generatePloPdfFromHtml } from '@/lib/utils/plo-pdf';
+import { mergePDFs } from '@/lib/utils/pdf-merger';
 
 export default function AssessmentCard({ href, course, standalone }: { 
   href: string, 
@@ -31,7 +32,7 @@ export default function AssessmentCard({ href, course, standalone }: {
 
    const handleAssessmentPlan = async (e: any) => {
     try {
-      toast.loading("Generating CLO report")
+      toast.loading("Generating reports")
       const response = await fetch('/api/generate-clo-report', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -50,6 +51,9 @@ export default function AssessmentCard({ href, course, standalone }: {
       // Parse JSON response with both HTML contents
       const data = await response.json();
       const { cloHtml, ploHtml } = data;
+      
+      // Array to store PDF data
+      const pdfDataArray: string[] = [];
       
       // Create temporary container for CLO HTML
       const cloContainer = document.createElement('div');
@@ -72,29 +76,39 @@ export default function AssessmentCard({ href, course, standalone }: {
         }, 5000);
       });
       
-      // Generate CLO PDF
-      await generatePDFWithJsPDF(cloContainer.innerHTML, `${course?.course_code} CLO Report`);
+      // Generate CLO PDF and capture data instead of saving
+      const cloPdfData = await generatePDFWithJsPDF(cloContainer.innerHTML, `${course?.course_code} CLO Report`, 'portrait') as string;
       document.body.removeChild(cloContainer);
-      toast.success('CLO Report generated successfully');
+      pdfDataArray.push(cloPdfData);
       
-      // Generate PLO PDF
-      toast.loading("Generating PLO report");
+      // Generate PLO PDF and capture data instead of saving
       try {
         // Create temporary container for PLO HTML
         const ploContainer = document.createElement('div');
         ploContainer.innerHTML = ploHtml;
         document.body.appendChild(ploContainer);
         
-        await generatePloPdfFromHtml(ploHtml, `${course?.course_code} PLO Report`);
+        const ploPdfData = await generatePloPdfFromHtml(ploHtml, `${course?.course_code} PLO Report`, false) as string;
         document.body.removeChild(ploContainer);
-        toast.success('PLO Report generated successfully');
+        pdfDataArray.push(ploPdfData);
       } catch (ploError) {
         console.error("Error generating PLO report:", ploError);
         toast.error('Failed to generate PLO report');
       }
       
+      // Merge and save PDFs
+      if (pdfDataArray.length > 0) {
+        toast.loading("Merging reports");
+        try {
+          await mergePDFs(pdfDataArray, `${course?.course_code} Combined Reports`);
+          toast.success('Combined reports generated successfully');
+        } catch (mergeError) {
+          console.error("Error merging PDFs:", mergeError);
+          toast.error('Failed to merge reports');
+        }
+      }
+      
       toast.dismiss();
-
   
     } catch (error: any) {
       console.error("Error generating report:", error);

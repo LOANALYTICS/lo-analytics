@@ -1,7 +1,7 @@
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 
-export async function generatePloPdfFromHtml(html: string, fileName: string): Promise<void> {
+export async function generatePloPdfFromHtml(html: string, fileName: string, saveImmediately: boolean = true): Promise<string | void> {
   try {
     // Create a temporary div to hold the HTML content
     const element = document.createElement("div");
@@ -97,11 +97,16 @@ export async function generatePloPdfFromHtml(html: string, fileName: string): Pr
       }
     }
 
-    // Download PDF
-    pdf.save(`${fileName}.pdf`);
-
     // Clean up
     document.body.removeChild(element);
+    
+    // Either save immediately or return the PDF data
+    if (saveImmediately) {
+      pdf.save(`${fileName}.pdf`);
+      return;
+    } else {
+      return pdf.output('datauristring');
+    }
   } catch (error) {
     console.error("Error generating PLO PDF:", error);
     throw error;

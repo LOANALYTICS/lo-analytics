@@ -350,7 +350,7 @@ export const generateLandscapePDFSinglePage = async (html: string, fileName: str
   }
 };
 
-export const generatePDFWithJsPDF = async (html: string, fileName: string, orientation: 'portrait' | 'landscape' = 'portrait') => {
+export const generatePDFWithJsPDF = async (html: string, fileName: string, orientation: 'portrait' | 'landscape' = 'portrait', saveImmediately: boolean = true) => {
   try {
     const jsPDF = (await import('jspdf')).default;
     const html2canvas = (await import('html2canvas')).default;
@@ -410,8 +410,15 @@ export const generatePDFWithJsPDF = async (html: string, fileName: string, orien
     // Add watermark
     addWatermarkToPDF(pdf);
 
-    pdf.save(`${fileName}.pdf`);
     document.body.removeChild(container);
+    
+    // Either save immediately or return the PDF data
+    if (saveImmediately) {
+      pdf.save(`${fileName}.pdf`);
+      return null;
+    } else {
+      return pdf.output('datauristring');
+    }
 
   } catch (error) {
     console.error("Error generating PDF:", error);
