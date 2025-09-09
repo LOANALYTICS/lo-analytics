@@ -82,56 +82,54 @@ export async function generatePloPdfFromHtml(html: string, fileName: string, sav
         throw new Error("Table or header not found in the HTML");
       }
       
-      // We'll render the header manually on the first page only
-      // No need to hide the original thead as we're creating a separate rendering
-      
+      // We'll include the real THEAD only once with the first content block to avoid jsPDF.scale issues
       let currentY = margin;
       let pageNum = 1;
+      let firstHeaderInlined = false;
       
-      // First, add the header to the first page with proper table structure
-      // Create a temporary container with just the header in a proper table
-      const headerContainer = document.createElement('div');
-      const headerTable = document.createElement('table');
-      headerTable.style.width = '100%';
-      headerTable.style.borderCollapse = 'collapse';
-      headerTable.style.tableLayout = 'fixed';
-      const clonedThead = thead.cloneNode(true) as HTMLElement;
-      clonedThead.style.display = 'table-header-group'; // Ensure the cloned header is visible
-      headerTable.appendChild(clonedThead);
-      headerContainer.appendChild(headerTable);
-      document.body.appendChild(headerContainer);
-      
-      const headerCanvas = await html2canvas(headerContainer, {
-        scale: 2,
-        useCORS: true,
-        logging: false,
-        backgroundColor: "#ffffff",
-        allowTaint: true,
-      });
-      
-      document.body.removeChild(headerContainer);
-      
-      const headerWidthMM = contentWidth;
-      const headerHeightMM = (headerCanvas.height * headerWidthMM) / headerCanvas.width;
-      
-      // Add header to the first page
-      try {
-        const headerDataUrl = headerCanvas.toDataURL("image/jpeg", 0.95);
-        pdf.addImage(
-          headerDataUrl,
-          "JPEG",
-          margin,
-          currentY,
-          headerWidthMM,
-          headerHeightMM
-        );
-        console.log("Header added successfully"); // Add logging to confirm header was added
-      } catch (error) {
-        console.error("Error adding header image:", error);
-        // Continue without the header if there's an error
+      // Add table header at the very top before any group headers
+      if (!firstHeaderInlined) {
+        const headerContainer = document.createElement('div');
+        const headerTable = document.createElement('table');
+        headerTable.style.width = '100%';
+        headerTable.style.borderCollapse = 'collapse';
+        headerTable.style.tableLayout = 'fixed';
+        const theadClone = thead.cloneNode(true) as HTMLElement;
+        (theadClone as HTMLElement).style.display = 'table-header-group';
+        headerTable.appendChild(theadClone);
+        headerContainer.appendChild(headerTable);
+        document.body.appendChild(headerContainer);
+        
+        const headerCanvas = await html2canvas(headerContainer, {
+          scale: 2,
+          useCORS: true,
+          logging: false,
+          backgroundColor: "#ffffff",
+          allowTaint: true,
+        });
+        
+        document.body.removeChild(headerContainer);
+        
+        const headerWidthMM = contentWidth;
+        const headerHeightMM = (headerCanvas.height * headerWidthMM) / headerCanvas.width;
+        
+        // Add header to the first page
+        try {
+          const headerDataUrl = headerCanvas.toDataURL("image/png");
+          pdf.addImage(
+            headerDataUrl,
+            "PNG",
+            margin,
+            currentY,
+            headerWidthMM,
+            headerHeightMM
+          );
+          currentY += headerHeightMM;
+          firstHeaderInlined = true;
+        } catch (error) {
+          console.warn("Error adding header image, will inline with first content:", error);
+        }
       }
-      
-      currentY += headerHeightMM;
       
       // Process each tbody section (knowledge, skills, values)
       for (let i = 0; i < tbody.length; i++) {
@@ -210,6 +208,7 @@ export async function generatePloPdfFromHtml(html: string, fileName: string, sav
           
           // Clone the table structure to maintain proper formatting
           const tempTbody = document.createElement('tbody');
+          // Header already added at the top, no need to inline here
           tempTbody.appendChild(directRow.cloneNode(true));
           tempTbody.appendChild(indirectRow.cloneNode(true));
           tempTable.appendChild(tempTbody);
