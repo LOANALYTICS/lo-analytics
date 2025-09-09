@@ -59,7 +59,7 @@ function diffComment(actual: number | null, target: number): string {
   return "The actual Level equals the Target Level";
 }
 
-function buildGroupSection(title: string, items: PloGroupItem[], directTarget: number): string {
+function buildGroupSection(title: string, items: PloGroupItem[], directTarget: number, groupNumber: number): string {
   const indirectTarget = 80; // Indirect targeted level is constant 80%
 
   const rows: string[] = [];
@@ -70,7 +70,7 @@ function buildGroupSection(title: string, items: PloGroupItem[], directTarget: n
     const directActual = Number.isFinite(directActualNum) ? directActualNum : null;
     const indirectActual = Number.isFinite(indirectActualNum) ? indirectActualNum : null;
 
-    const serial = `${(index + 1).toFixed(1)}`; // e.g., 1.1, 1.2 per group
+    const serial = `${groupNumber}.${index + 1}`; // e.g., 1.1, 1.2 for group 1, 2.1, 2.2 for group 2
 
     rows.push(`
       <tr class="clo-row clo-row-direct row-${escapeHTML(serial)}">
@@ -162,9 +162,9 @@ export async function generatePloGroupReportHTML(props: PloGroupReportProps): Pr
 
             </thead>
 
-            ${buildGroupSection('Knowledge and Understanding', plogroups.knowledge || [], benchmark)}
-            ${buildGroupSection('Skills', plogroups.skills || [], benchmark)}
-            ${buildGroupSection('Values', plogroups.values || [], benchmark)}
+            ${buildGroupSection('1.Knowledge and Understanding', plogroups.knowledge || [], benchmark, 1)}
+            ${buildGroupSection('2.Skills', plogroups.skills || [], benchmark, 2)}
+            ${buildGroupSection('3.Values', plogroups.values || [], benchmark, 3)}
           </table>
         </div>
       </body>
