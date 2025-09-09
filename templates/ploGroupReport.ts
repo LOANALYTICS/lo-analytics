@@ -124,11 +124,11 @@ export async function generatePloGroupReportHTML(props: PloGroupReportProps): Pr
           tbody.group-block { page-break-inside: avoid !important; break-inside: avoid !important; }
           .clo-row { page-break-inside: avoid !important; break-inside: avoid !important; }
           
-          /* Adjust column widths to make table bigger */
-          .sno { width: 40px; }
-          .weight { width: 80px; }
-          .plos { width: 80px; }
-          .method { width: 72px; }
+          /* Adjust column widths to make table bigger - match header and row cells */
+          th.sno, td.sno { width: 40px; min-width: 40px; max-width: 40px; }
+          th.weight, td.weight { width: 80px; min-width: 80px; max-width: 80px; }
+          th.plos, td.plos { width: 80px; min-width: 80px; max-width: 80px; }
+          th.method, td.method { width: 72px; min-width: 72px; max-width: 72px; }
           .target, .actual, .comment { word-wrap: break-word; }
           
           /* Add page break control */
@@ -145,11 +145,11 @@ export async function generatePloGroupReportHTML(props: PloGroupReportProps): Pr
           <table>
             <thead>
               <tr>
-                <th rowspan="2">S.No</th>
+                <th rowspan="2" class="sno">S.No</th>
                 <th rowspan="2">Course Learning Outcomes (CLOs)</th>
-                <th rowspan="2">Weightage of each CLO</th>
-                <th rowspan="2">Related PLOs Code</th>
-                <th rowspan="2">Assessment Methods</th>
+                <th rowspan="2" class="weight">Weightage of each CLO</th>
+                <th rowspan="2" class="plos">Related PLOs Code</th>
+                <th rowspan="2" class="method">Assessment Methods</th>
                 <th colspan="2">Assessment Results</th>
                 <th rowspan="2">Comment on Assessment Results</th>
               </tr>

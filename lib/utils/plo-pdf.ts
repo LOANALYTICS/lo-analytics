@@ -28,8 +28,8 @@ export async function generatePloPdfFromHtml(html: string, fileName: string, sav
       /* Group-level page break control */
       tbody.group-block { page-break-inside: avoid !important; break-inside: avoid !important; }
       
-      /* Table header repetition - disabled to prevent headers on all pages */
-      thead { display: table-header-group; display: none; }
+      /* Table header repetition - only on first page */
+      thead { display: table-header-group; visibility: visible !important; }
       tfoot { display: table-footer-group; }
       
       /* Ensure proper cell alignment and structure */
@@ -37,11 +37,11 @@ export async function generatePloPdfFromHtml(html: string, fileName: string, sav
       td.clo-text { text-align: left; }
       td[rowspan] { vertical-align: middle; }
       
-      /* Ensure proper column widths */
-      th:first-child, td:first-child, .sno { width: 40px; min-width: 40px; max-width: 40px; }
-      .weight { width: 80px; min-width: 80px; max-width: 80px; }
-      .plos { width: 80px; min-width: 80px; max-width: 80px; }
-      .method { width: 72px; min-width: 72px; max-width: 72px; }
+      /* Ensure proper column widths - match header and row cells */
+      th.sno, td.sno, th:first-child, td:first-child { width: 40px; min-width: 40px; max-width: 40px; }
+      th.weight, td.weight { width: 80px; min-width: 80px; max-width: 80px; }
+      th.plos, td.plos { width: 80px; min-width: 80px; max-width: 80px; }
+      th.method, td.method { width: 72px; min-width: 72px; max-width: 72px; }
       .target, .actual, .comment { word-wrap: break-word; }
     `;
     
@@ -82,6 +82,9 @@ export async function generatePloPdfFromHtml(html: string, fileName: string, sav
         throw new Error("Table or header not found in the HTML");
       }
       
+      // We'll render the header manually on the first page only
+      // No need to hide the original thead as we're creating a separate rendering
+      
       let currentY = margin;
       let pageNum = 1;
       
@@ -92,7 +95,9 @@ export async function generatePloPdfFromHtml(html: string, fileName: string, sav
       headerTable.style.width = '100%';
       headerTable.style.borderCollapse = 'collapse';
       headerTable.style.tableLayout = 'fixed';
-      headerTable.appendChild(thead.cloneNode(true));
+      const clonedThead = thead.cloneNode(true) as HTMLElement;
+      clonedThead.style.display = 'table-header-group'; // Ensure the cloned header is visible
+      headerTable.appendChild(clonedThead);
       headerContainer.appendChild(headerTable);
       document.body.appendChild(headerContainer);
       
@@ -120,8 +125,9 @@ export async function generatePloPdfFromHtml(html: string, fileName: string, sav
           headerWidthMM,
           headerHeightMM
         );
+        console.log("Header added successfully"); // Add logging to confirm header was added
       } catch (error) {
-        console.warn("Error adding header image, skipping:", error);
+        console.error("Error adding header image:", error);
         // Continue without the header if there's an error
       }
       
