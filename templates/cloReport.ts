@@ -248,11 +248,7 @@ export interface CloReportProps {
 
 export async function generateCloReportHTML(props: CloReportProps): Promise<string> {
   const { course, college, assessmentData, indirectAssessmentData, plogroups, benchmark } = props;
-  if (plogroups) {
-    console.log('Benchmark:', benchmark);
-    // Log PLO groups for verification
-    console.log('PLO Groups:', JSON.stringify(plogroups, null, 2));
-  }
+  
   const { sortedClos, achievementData } = assessmentData;
   
   function escapeHTML(str: string): string {

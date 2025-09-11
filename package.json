@@ -10,6 +10,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@ai-sdk/google": "^2.0.13",
     "@hookform/resolvers": "^3.9.1",
     "@radix-ui/react-checkbox": "^1.1.2",
     "@radix-ui/react-dialog": "^1.1.5",
@@ -30,6 +31,7 @@
     "@tiptap/react": "^2.10.3",
     "@tiptap/starter-kit": "^2.10.3",
     "@types/react-window": "^1.8.8",
+    "ai": "^5.0.39",
     "axios": "^1.7.7",
     "bcryptjs": "^3.0.2",
     "chart.js": "^4.4.7",
@@ -62,7 +64,7 @@
     "uuid": "^11.0.2",
     "winston": "^3.17.0",
     "xlsx": "^0.18.5",
-    "zod": "^3.23.8"
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
