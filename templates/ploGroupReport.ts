@@ -71,7 +71,7 @@ function buildGroupSection(title: string, items: PloGroupItem[], directTarget: n
     const indirectActual = Number.isFinite(indirectActualNum) ? indirectActualNum : null;
 
     const serial = `${groupNumber}.${index + 1}`; // e.g., 1.1, 1.2 for group 1, 2.1, 2.2 for group 2
-
+ 
     rows.push(`
       <tr class="clo-row clo-row-direct row-${escapeHTML(serial)}">
         <td rowspan="2" class="sno">${escapeHTML(serial)}</td>
@@ -113,11 +113,11 @@ export async function generatePloGroupReportHTML(props: PloGroupReportProps): Pr
           .container { max-width: 100%; margin: 0 auto; padding: 20px; }
 
           table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-          th, td { border: 1px solid #000; padding: 8px; font-size: 14px; text-align: center; }
+          th, td { border: 1px solid #000; padding: 8px; font-size: 16px; text-align: center; }
           th.clo-text, td.clo-text { text-align: left; width: 280px; min-width: 280px; max-width: 280px; }
-          thead th { background: #4b2e83; color: #fff; font-weight: 700; font-size: 15px; }
-          thead .subhead th { background: #5e3a9f; color: #fff; }
-          .group-header td { background: #e0f3ff; font-weight: 700; text-align: left; font-size: 15px; }
+          thead th { background: #4b2e83; color: #fff; font-weight: 700; font-size: 16px; }
+          thead .subhead th { background: #5e3a9f; color: #fff; font-size: 16px; }
+          .group-header td { background: #e0f3ff; font-weight: 700; text-align: left; font-size: 16px; }
 
           /* Improved pagination - ensure rows don't break across pages */
           tr { page-break-inside: avoid !important; break-inside: avoid !important; }
@@ -139,6 +139,10 @@ export async function generatePloGroupReportHTML(props: PloGroupReportProps): Pr
             tr { page-break-inside: avoid !important; }
             thead { display: table-header-group; }
             tfoot { display: table-footer-group; }
+            /* Ensure consistent font sizes across all pages */
+            th, td { font-size: 16px !important; }
+            thead th { font-size: 16px !important; }
+            .group-header td { font-size: 16px !important; }
           }
         </style>
       </head>
