@@ -33,6 +33,11 @@ export interface PloGroupReportProps {
   };
   plogroups: PloGroups;
   benchmark: number; // Direct targeted level to display (e.g., 60/70/80/90)
+  comments?: {
+    strengthPoints: string[];
+    weaknessPoints: string[];
+    recommendations: string[];
+  };
 }
 
 function escapeHTML(str: string): string {
@@ -100,8 +105,89 @@ function buildGroupSection(title: string, items: PloGroupItem[], directTarget: n
   `;
 }
 
+function generateCommentsAndSignaturePage(comments?: { strengthPoints: string[]; weaknessPoints: string[]; recommendations: string[] }): string {
+  if (!comments) {
+    return `
+      <div class="comments-page">
+        <div class="comments-content">
+          <h3>AI Analysis Comments</h3>
+          <p class="error-message">Error with AI analysis - comments not available</p>
+        </div>
+        <div class="signatures-bottom">
+          <div class="signature-row">
+            <div class="signature-item">
+              <div class="signature-label">Course Coordinator</div>
+              <div class="signature-line"></div>
+              <div class="signature-name">Dr.</div>
+            </div>
+            <div class="signature-item">
+              <div class="signature-label">Quality Coordinator</div>
+              <div class="signature-line"></div>
+              <div class="signature-name">Dr.</div>
+            </div>
+            <div class="signature-item">
+              <div class="signature-label">Head of the Department</div>
+              <div class="signature-line"></div>
+              <div class="signature-name">Dr.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  const strengthPointsHtml = comments.strengthPoints?.map(point => `<li>${escapeHTML(point)}</li>`).join('') || '';
+  const weaknessPointsHtml = comments.weaknessPoints?.map(point => `<li>${escapeHTML(point)}</li>`).join('') || '';
+  const recommendationsHtml = comments.recommendations?.map(rec => `<li>${escapeHTML(rec)}</li>`).join('') || '';
+
+  return `
+    <div class="comments-page">
+      <div class="comments-content">
+        <h3>AI Analysis Comments</h3>
+        ${strengthPointsHtml ? `
+          <div class="comment-category">
+            <h4>Strengths:</h4>
+            <ul>${strengthPointsHtml}</ul>
+          </div>
+        ` : ''}
+        ${weaknessPointsHtml ? `
+          <div class="comment-category">
+            <h4>Weaknesses:</h4>
+            <ul>${weaknessPointsHtml}</ul>
+          </div>
+        ` : ''}
+        ${recommendationsHtml ? `
+          <div class="comment-category">
+            <h4>Recommendations:</h4>
+            <ul>${recommendationsHtml}</ul>
+          </div>
+        ` : ''}
+      </div>
+      <div class="signatures-bottom">
+        <div class="signature-row">
+          <div class="signature-item">
+            <div class="signature-label">Course Coordinator</div>
+            <div class="signature-line"></div>
+            <div class="signature-name">Dr.</div>
+          </div>
+          <div class="signature-item">
+            <div class="signature-label">Quality Coordinator</div>
+            <div class="signature-line"></div>
+            <div class="signature-name">Dr.</div>
+          </div>
+          <div class="signature-item">
+            <div class="signature-label">Head of the Department</div>
+            <div class="signature-line"></div>
+            <div class="signature-name">Dr.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
 export async function generatePloGroupReportHTML(props: PloGroupReportProps): Promise<string> {
-  const { course, college, plogroups, benchmark } = props;
+  const { course, college, plogroups, benchmark, comments } = props;
 
   return `
     <!DOCTYPE html>
@@ -132,6 +218,100 @@ export async function generatePloGroupReportHTML(props: PloGroupReportProps): Pr
           th.assessment-results { width: 180px; min-width: 180px; max-width: 180px; }
           th.target, td.target, th.actual, td.actual { width: 90px; min-width: 90px; max-width: 90px; }
           .comment { word-wrap: break-word;width: 100px; min-width: 100px; max-width: 100px; }
+          
+          /* Comments and Signature Page Styles */
+          .comments-page {
+            page-break-before: always !important;
+            break-before: always !important;
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            box-sizing: border-box;
+          }
+          
+          .comments-content {
+            flex: 0 0 auto;
+          }
+          
+          .comments-content h3 {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #4b2e83;
+            text-align: left;
+          }
+          
+          .comment-category {
+            margin-bottom: 20px;
+          }
+          
+          .comment-category h4 {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #333;
+          }
+          
+          .comment-category ul {
+            margin: 0;
+            padding-left: 20px;
+          }
+          
+          .comment-category li {
+            font-size: 14px;
+            margin-bottom: 5px;
+            line-height: 1.4;
+          }
+          
+          .error-message {
+            color: #d32f2f;
+            font-style: italic;
+            font-size: 14px;
+          }
+          
+          .signatures-bottom {
+            flex: 1 1 auto;
+            display: flex;
+            align-items: flex-end;
+            padding-bottom: 50px;
+          }
+          
+          .signature-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            width: 100%;
+          }
+          
+          .signature-item {
+            text-align: center;
+            flex: 1;
+            margin: 0 10px;
+          }
+          
+          .signature-label {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #333;
+          }
+          
+          .signature-line {
+            border-bottom: 1px solid #000;
+            height: 1px;
+            margin: 20px 0 5px 0;
+            min-height: 30px;
+          }
+          
+          .signature-name {
+            font-size: 14px;
+            font-weight: bold;
+            margin-top: 5px;
+          }
           
           /* Add page break control */
           @media print {
@@ -170,6 +350,8 @@ export async function generatePloGroupReportHTML(props: PloGroupReportProps): Pr
             ${buildGroupSection('2.Skills', plogroups.skills || [], benchmark, 2)}
             ${buildGroupSection('3.Values', plogroups.values || [], benchmark, 3)}
           </table>
+          
+          ${generateCommentsAndSignaturePage(comments)}
         </div>
       </body>
     </html>

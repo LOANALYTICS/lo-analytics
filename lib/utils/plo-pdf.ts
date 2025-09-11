@@ -45,6 +45,22 @@ export async function generatePloPdfFromHtml(html: string, fileName: string, sav
 done      th.assessment-results { width: 240px; min-width: 240px; max-width: 240px; }
       th.target, td.target, th.actual, td.actual { width: 120px; min-width: 120px; max-width: 120px; }
       .comment { word-wrap: break-word;width: 120px; min-width: 120px; max-width: 120px; }
+      
+      /* Comments and Signature Page Styles */
+      .comments-page { page-break-before: always !important; break-before: always !important; page-break-inside: avoid !important; break-inside: avoid !important; width: 100%; height: 100vh; display: flex; flex-direction: column; padding: 20px; box-sizing: border-box; }
+      .comments-content { flex: 0 0 auto; }
+      .comments-content h3 { font-size: 18px; font-weight: bold; margin-bottom: 15px; color: #4b2e83; text-align: left; }
+      .comment-category { margin-bottom: 20px; }
+      .comment-category h4 { font-size: 16px; font-weight: bold; margin-bottom: 8px; color: #333; }
+      .comment-category ul { margin: 0; padding-left: 20px; }
+      .comment-category li { font-size: 14px; margin-bottom: 5px; line-height: 1.4; }
+      .error-message { color: #d32f2f; font-style: italic; font-size: 14px; }
+      .signatures-bottom { flex: 1 1 auto; display: flex; align-items: flex-end; padding-bottom: 50px; }
+      .signature-row { display: flex; justify-content: space-between; align-items: flex-end; width: 100%; }
+      .signature-item { text-align: center; flex: 1; margin: 0 10px; }
+      .signature-label { font-size: 14px; font-weight: bold; margin-bottom: 5px; color: #333; }
+      .signature-line { border-bottom: 1px solid #000; height: 1px; margin: 20px 0 5px 0; min-height: 30px; }
+      .signature-name { font-size: 14px; font-weight: bold; margin-top: 5px; }
     `;
     
     // Set the enhanced HTML with all styles
@@ -73,6 +89,10 @@ done      th.assessment-results { width: 240px; min-width: 240px; max-width: 240
     const margin = 10; // margin in mm
     const contentWidth = pageWidth - (margin * 2); // content width in mm
     
+    // Shared variables for positioning
+    let currentY = margin;
+    let pageNum = 1;
+    
     // Function to process the table with proper headers and rows
     const processTable = async () => {
       // Get the table and its components
@@ -85,8 +105,6 @@ done      th.assessment-results { width: 240px; min-width: 240px; max-width: 240
       }
       
       // We'll include the real THEAD only once with the first content block to avoid jsPDF.scale issues
-      let currentY = margin;
-      let pageNum = 1;
       let firstHeaderInlined = false;
       
       // Add table header at the very top before any group headers
@@ -266,6 +284,49 @@ done      th.assessment-results { width: 240px; min-width: 240px; max-width: 240
     
     // Process the table with headers and rows
     const totalPages = await processTable();
+    
+    // Process comments and signature page
+    const processCommentsPage = async () => {
+      const commentsPage = element.querySelector('.comments-page');
+      if (!commentsPage) {
+        console.log('No comments page found');
+        return;
+      }
+      
+      // Always start comments page on a new page
+      pdf.addPage();
+      currentY = margin;
+      
+      // Render comments page
+      const commentsCanvas = await html2canvas(commentsPage as HTMLElement, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: "#ffffff",
+        allowTaint: true,
+      });
+      
+      const commentsWidthMM = contentWidth;
+      const commentsHeightMM = (commentsCanvas.height * commentsWidthMM) / commentsCanvas.width;
+      
+      // Add comments page to PDF
+      try {
+        const commentsDataUrl = commentsCanvas.toDataURL("image/jpeg", 0.95);
+        pdf.addImage(
+          commentsDataUrl,
+          "JPEG",
+          margin,
+          currentY,
+          commentsWidthMM,
+          commentsHeightMM
+        );
+        currentY += commentsHeightMM;
+      } catch (error) {
+        console.warn("Error adding comments page image, skipping:", error);
+      }
+    };
+    
+    await processCommentsPage();
     
     // Skip logo addition to avoid jsPDF.scale errors
     // This prevents the 'Invalid argument passed to jsPDF.scale' error

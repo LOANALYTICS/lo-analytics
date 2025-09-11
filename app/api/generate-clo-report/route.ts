@@ -421,10 +421,12 @@ export async function POST(request: Request) {
     const plogroups = buildCloDiagnostics60(processedData, assessmentData);
 
     // Add AI analysis
+    let aiAnalysis: { strengthPoints: string[]; weaknessPoints: string[]; recommendations: string[] } | undefined;
     try {
       console.log('🤖 Starting AI analysis for CLO report...');
-      const aiAnalysis = await analyzeReport('clo-report', { plogroups });
-      console.log('✅ AI Analysis Result:', JSON.stringify(aiAnalysis, null, 2));
+      const result = await analyzeReport('clo-report', { plogroups });
+      aiAnalysis = result as { strengthPoints: string[]; weaknessPoints: string[]; recommendations: string[] };
+      console.log('✅ AI Analysis Result:',aiAnalysis, JSON.stringify(aiAnalysis, null, 2));
     } catch (error) {
       console.error('❌ AI Analysis Error:', error);
     }
@@ -480,7 +482,8 @@ export async function POST(request: Request) {
       },
       college: courseData.collage,
       plogroups,
-      benchmark: assessmentData.benchmark || 0
+      benchmark: assessmentData.benchmark || 0,
+      comments:aiAnalysis
     });
 
     // Always return both HTML strings together
