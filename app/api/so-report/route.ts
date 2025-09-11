@@ -35,7 +35,7 @@ function processStudentPerformanceAnalysis(assessmentData: IAssessment) {
     // Calculate Z-scores and performance
     const studentScoresWithZ = studentScores.map(student => {
       const zScore = (student.scoreOutOf100 - mean) / standardDeviation;
-      const performance = zScore < 0 ? 'Low' : zScore <= 1 ? 'Average' : 'High';
+      const performance = zScore < -1 ? 'Low' : zScore <= 1 ? 'Average' : 'High';
 
       // Collect averages for overall calculation
       if (!studentAverages[student.studentId]) studentAverages[student.studentId] = [];
@@ -89,7 +89,7 @@ function processStudentPerformanceAnalysis(assessmentData: IAssessment) {
     // Add overall performance
     const studentAverage = studentAverages[studentId]?.reduce((sum, score) => sum + score, 0) / studentAverages[studentId].length || 0;
     const overallZScore = (studentAverage - overallMean) / overallStdDev;
-    const overallPerformance = overallZScore < 0 ? 'Low' : overallZScore <= 1 ? 'Average' : 'High';
+    const overallPerformance = overallZScore < -1 ? 'Low' : overallZScore <= 1 ? 'Average' : 'High';
 
     performance.Overall = {
       scoreOutOf100: studentAverage,
