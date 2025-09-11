@@ -21,7 +21,8 @@ export function generateSOHTML({
     course,                 // Course details
     college,                // College details
     performanceAnalysis,    // Performance analysis data
-    performanceCurveData    // Performance curve data
+    performanceCurveData,    // Performance curve data
+    comments                 // Optional AI comments (so-report schema)
 }: {
     assessmentData: Record<string, GradeCount>;
     overallGrades: GradeCount;
@@ -80,6 +81,13 @@ export function generateSOHTML({
             max: string;
             totalStudents: number;
         };
+    };
+    comments?: {
+        centralTendency: string;
+        distributionShape: string;
+        spread: string;
+        performanceInsight: string;
+        performanceBenchmarking: string;
     };
 }) {
     // Console log the performance analysis data
@@ -163,6 +171,19 @@ export function generateSOHTML({
                 .low { color: #d32f2f; }
                 .average { color: #f57c00; }
                 .high { color: #388e3c; }
+
+                /* AI Comments styling */
+                .ai-comments {
+                    page-break-before: always;
+                    width: 100%;
+                    padding: 20px;
+                    box-sizing: border-box;
+                }
+                .ai-comments h2 { margin: 0 0 12px 0; font-size: 22px; }
+                .ai-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+                .ai-card { border: 1px solid #ddd; border-radius: 6px; padding: 12px; background: #fafafa; }
+                .ai-card h3 { margin: 0 0 8px 0; font-size: 16px; color: #333; }
+                .ai-card p { margin: 0; line-height: 1.45; font-size: 14px; }
             </style>
         </head>
         <body>
@@ -254,15 +275,19 @@ export function generateSOHTML({
                         <div class="summary-section">
                             <h3>Summary</h3>
                             <div>
-                                <p><strong>Central Tendency:</strong> The highest concentration of scores is at ${performanceCurveData?.statistics.mean || 'N/A'}, suggesting this is close to the mean or mode of the distribution.</p>
-                                
-                                <p><strong>Distribution Shape:</strong> The bell curve overlay implies the scores roughly follow a normal distribution, though slightly left-skewed due to the absence of high-end scores (95–100).</p>
-                                
-                                <p><strong>Spread:</strong> The range is from ${performanceCurveData?.statistics.min || 'N/A'} to ${performanceCurveData?.statistics.max || 'N/A'}, with no extreme outliers. This suggests a relatively tight clustering of performance.</p>
-                                
-                                <p><strong>Performance Insight:</strong> Majority of students are scoring between 75 and 90, indicating a generally competent cohort. The lack of scores below 65 or above 90 may reflect either effective teaching or a well-calibrated assessment.</p>
-                                
-                                <p><strong>Performance Benchmarking:</strong> If this curve aligns with expected norms, it supports the validity of your CLOs. If not, it may prompt a review of item difficulty or grading thresholds. Interpret based on our graph data.</p>
+                                ${comments ? `
+                                <p><strong>Central Tendency:</strong> ${comments.centralTendency}</p>
+                                <p><strong>Distribution Shape:</strong> ${comments.distributionShape}</p>
+                                <p><strong>Spread:</strong> ${comments.spread}</p>
+                                <p><strong>Performance Insight:</strong> ${comments.performanceInsight}</p>
+                                <p><strong>Performance Benchmarking:</strong> ${comments.performanceBenchmarking}</p>
+                                ` : `
+                                <p><strong>Central Tendency:</strong> ${performanceCurveData?.statistics.mean || 'N/A'} (default)</p>
+                                <p><strong>Distribution Shape:</strong> Normal-like (default)</p>
+                                <p><strong>Spread:</strong> ${performanceCurveData?.statistics.min || 'N/A'} to ${performanceCurveData?.statistics.max || 'N/A'} (default)</p>
+                                <p><strong>Performance Insight:</strong> Defaults shown (no AI available)</p>
+                                <p><strong>Performance Benchmarking:</strong> Defaults shown (no AI available)</p>
+                                `}
                             </div>
                         </div>
                     </div>

@@ -338,7 +338,7 @@ export async function GET(request: Request) {
                 }
             };
             
-            const aiAnalysis = await analyzeReport('so-report', soAnalysisData);
+            var aiAnalysis = await analyzeReport('so-report', soAnalysisData);
             console.log('✅ SO Report AI Analysis Result:', JSON.stringify(aiAnalysis, null, 2));
         } catch (error) {
             console.error('❌ SO Report AI Analysis Error:', error);
@@ -365,7 +365,8 @@ export async function GET(request: Request) {
               },
               college: courseData.collage,
               performanceAnalysis: performanceAnalysis,
-              performanceCurveData: performanceCurveData
+              performanceCurveData: performanceCurveData,
+              comments: typeof aiAnalysis === 'object' ? aiAnalysis : undefined
         });
 
         return new NextResponse(htmlContent, {
