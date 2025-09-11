@@ -3,6 +3,7 @@ import { Assessment, Course } from "@/lib/models";
 import { NextResponse } from "next/server";
 import { IAssessment } from "@/server/models/assessment.model";
 import { generateSOHTML } from "@/templates/so-report";
+import { analyzeReport } from "../../../ai/analyze-report";
 
 // Function to process assessment data and return student performance analysis
 function processStudentPerformanceAnalysis(assessmentData: IAssessment) {
@@ -141,6 +142,13 @@ interface GradeCount {
 }
 
 export const dynamic = 'force-dynamic';
+
+// Normal distribution function (equivalent to NORM.DIST in Excel)
+function normalDistribution(x: number, mean: number, stdDev: number): number {
+    const coefficient = 1 / (stdDev * Math.sqrt(2 * Math.PI));
+    const exponent = -Math.pow(x - mean, 2) / (2 * Math.pow(stdDev, 2));
+    return coefficient * Math.exp(exponent);
+}
 
 function calculatePerformanceCurve(overallScores: Map<string, { scored: number, total: number }>) {
     // Define score ranges
@@ -295,6 +303,46 @@ export async function GET(request: Request) {
         
         // Calculate performance curve data
         const performanceCurveData = calculatePerformanceCurve(overallScores);
+        
+        // Add AI analysis for SO report
+        try {
+            console.log('🤖 Starting AI analysis for SO report...');
+            
+            // Generate proper bell curve data (same as in template)
+            const mean = performanceAnalysis.overall.mean;
+            const stdDev = performanceAnalysis.overall.stdDev;
+            
+            // Generate normal distribution data points (60-100 range, step 1)
+            const normalDistributionData = [];
+            for (let x = 60; x <= 100; x++) {
+                const value = normalDistribution(x, mean, stdDev) * 97; // Same formula as template
+                normalDistributionData.push({ x, value });
+            }
+            
+            // Prepare chart-focused data for AI analysis
+            const soAnalysisData = {
+                histogram: {
+                    scoreRanges: performanceCurveData.ranges,
+                    totalStudents: performanceCurveData.statistics.totalStudents,
+                    mean: parseFloat(performanceCurveData.statistics.mean),
+                    median: parseFloat(performanceCurveData.statistics.median),
+                    min: parseFloat(performanceCurveData.statistics.min),
+                    max: parseFloat(performanceCurveData.statistics.max)
+                },
+                bellCurve: {
+                    distribution: "normal",
+                    mean: mean,
+                    standardDeviation: stdDev,
+                    skewness: "slightly_left_skewed",
+                    dataPoints: normalDistributionData // The actual bell curve data points
+                }
+            };
+            
+            const aiAnalysis = await analyzeReport('so-report', soAnalysisData);
+            console.log('✅ SO Report AI Analysis Result:', JSON.stringify(aiAnalysis, null, 2));
+        } catch (error) {
+            console.error('❌ SO Report AI Analysis Error:', error);
+        }
         
         // console.log('=== STUDENT PERFORMANCE ANALYSIS ===');
         // console.log(JSON.stringify(performanceAnalysis, null, 2));
