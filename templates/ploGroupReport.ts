@@ -76,7 +76,7 @@ function buildGroupSection(title: string, items: PloGroupItem[], directTarget: n
     const indirectActual = Number.isFinite(indirectActualNum) ? indirectActualNum : null;
 
     const serial = `${groupNumber}.${index + 1}`; // e.g., 1.1, 1.2 for group 1, 2.1, 2.2 for group 2
- 
+
     rows.push(`
       <tr class="clo-row clo-row-direct row-${escapeHTML(serial)}">
         <td rowspan="2" class="sno">${escapeHTML(serial)}</td>
@@ -85,7 +85,7 @@ function buildGroupSection(title: string, items: PloGroupItem[], directTarget: n
         <td rowspan="2" class="plos">${escapeHTML(item.mappedPLOs?.join(' ') || '-')}</td>
         <td class="method">Direct</td>
         <td class="target">≥ ${directTarget}% of students achieve ≥ 60% of CLOs</td>
-        <td class="actual">${fmtPct(directActual)}</td>
+        <td class="actual">${fmtPct(directActual)} of students achieve ≥ 60 % of CLOs</td>
         <td class="comment">${escapeHTML(diffComment(directActual, directTarget))}</td>
       </tr>
       <tr class="clo-row clo-row-indirect row-${escapeHTML(serial)}">
