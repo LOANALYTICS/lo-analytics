@@ -20,51 +20,76 @@ const soReportSchema = z.object({
 export const promptConfigs = [
   {
     slug: 'clo-report',
-    prompt: `You are an educational assessment expert analyzing Course Learning Outcomes (CLOs) data. 
+    prompt: `You are an educational assessment expert analyzing Course Learning Outcomes (CLOs) data following international quality assurance standards for higher education.
 
 Given the following CLO groups data: {{data}}
 
-Please analyze this data and provide a comprehensive assessment in the following structure:
+Please analyze this data and provide a concise assessment following quality assurance guidelines:
 
 **Analysis Guidelines:**
-1. Look for achievement levels vs target levels
-2. Identify patterns in direct vs indirect assessment results
-3. Consider student satisfaction scores and their implications
-4. Evaluate the balance between different types of CLOs (knowledge, skills, values, etc.)
-5. Look for areas of exceptional performance and areas needing improvement
+1. Compare achievement levels against target benchmarks
+2. Evaluate direct vs indirect assessment alignment
+3. Assess curriculum balance across knowledge, skills, and values domains
+4. Identify performance gaps and excellence areas
+5. Ensure compliance with quality assurance standards
 
 **Output Requirements:**
-- Provide specific, actionable insights
-- Base recommendations on actual data patterns
-- Consider both quantitative metrics and qualitative implications
-- Focus on practical improvement strategies
+- Keep each point SHORT and DESCRIPTIVE (maximum 2 sentences)
+- Focus on specific, measurable observations
+- Base recommendations on actual data evidence
+- Follow quality assurance best practices
+- Ensure points are actionable and implementable
 
-Return your analysis in the specified JSON format with strength points, weakness points, and recommendations.`,
+**Format Guidelines:**
+- Strengths: Highlight what is working well
+- Weaknesses: Identify specific improvement areas
+- Recommendations: Provide clear, actionable steps
+
+**Example Format:**
+Distribution Shape:
+- The curve presents a symmetrical bell-shaped pattern, closely resembling a normal distribution.
+- This shape suggests a balanced assessment where student scores are evenly distributed around a central value, without significant skewness.
+
+Performance Insight:
+- There is a complete absence of scores below 70 and above 85, indicating no representation of either low-performing or top-performing students.
+- This distribution can be used to define performance tiers: 70–75: Developing proficiency, 75–80: Competent, 80–85: Approaching mastery.
+
+Assessment Quality:
+- The bell-shaped curve indicates effective assessment design with appropriate difficulty levels.
+- These tiers can be mapped to Course Learning Outcomes (CLOs) to evaluate how well students are achieving expected competencies and to identify areas needing reinforcement or enrichment.
+
+Return your analysis in the specified JSON format with concise strength points, weakness points, and recommendations following this example format.`,
     schema: cloReportSchema,
     description: "Analyzes CLO (Course Learning Outcomes) data to identify strengths, weaknesses, and recommendations"
   },
   {
     slug: 'so-report',
-    prompt: `You are a statistical analysis expert examining student performance data from histogram and bell curve distributions.
+    prompt: `You are a statistical analysis expert examining student performance data following international quality assurance standards for higher education.
 
 Given the following performance data: {{data}}
 
-Please analyze this data and provide insights in the following areas:
+Please analyze this data and provide concise insights following quality assurance guidelines:
 
 **Analysis Guidelines:**
-1. **Central Tendency**: Identify where most scores cluster (mean, median, mode)
-2. **Distribution Shape**: Analyze if the data follows normal distribution, identify skewness
-3. **Spread**: Examine the range, standard deviation, and identify any outliers
-4. **Performance Insight**: Interpret what the distribution tells us about student performance
-5. **Performance Benchmarking**: Compare against expected norms and provide recommendations
+1. **Central Tendency**: Identify score clustering patterns (mean, median, mode)
+2. **Distribution Shape**: Analyze normal distribution compliance and skewness
+3. **Performance Spread**: Examine range, standard deviation, and outliers
+4. **Assessment Validity**: Evaluate distribution implications for learning outcomes
+5. **Quality Benchmarking**: Compare against quality assurance standards
 
-**Key Considerations:**
-- Look for patterns in score distribution
-- Identify if there are gaps in performance ranges
-- Consider implications for assessment validity
-- Suggest improvements based on distribution analysis
+**Output Requirements:**
+- Keep each point SHORT and DESCRIPTIVE (maximum 2 sentences)
+- Focus on specific, measurable statistical observations
+- Base recommendations on actual data evidence
+- Follow quality assurance best practices
+- Ensure points are actionable and implementable
 
-Return your analysis in the specified JSON format covering all five analytical areas.`,
+**Format Guidelines:**
+- Strengths: Highlight effective assessment patterns
+- Weaknesses: Identify specific statistical concerns
+- Recommendations: Provide clear, actionable improvement steps
+
+Return your analysis in the specified JSON format with concise strength points, weakness points, and recommendations.`,
     schema: soReportSchema,
     description: "Analyzes student performance data from histograms and bell curves to provide statistical insights"
   }
