@@ -91,7 +91,7 @@ function buildGroupSection(title: string, items: PloGroupItem[], directTarget: n
       <tr class="clo-row clo-row-indirect row-${escapeHTML(serial)}">
         <td class="method">Indirect</td>
         <td class="target">≥ ${indirectTarget}% of students should agree that they achieved the CLO</td>
-        <td class="actual">${fmtPct(indirectActual)}</td>
+        <td class="actual">${fmtPct(indirectActual)} of students agreed that they achieved the CLO</td>
         <td class="comment">${escapeHTML(diffComment(indirectActual, indirectTarget))}</td>
       </tr>
     `);
@@ -200,7 +200,7 @@ export async function generatePloGroupReportHTML(props: PloGroupReportProps): Pr
 
           table { width: 100%; border-collapse: collapse; table-layout: fixed; }
           th, td { border: 1px solid #000; padding: 8px; font-size: 16px; text-align: center; }
-          th.clo-text, td.clo-text { text-align: left; width: 280px; min-width: 280px; max-width: 280px; }
+          th.clo-text, td.clo-text { text-align: left; width: 200px; min-width: 200px; max-width: 200px; }
           thead th { background: #4b2e83; color: #fff; font-weight: 700; font-size: 16px; }
           thead .subhead th { background: #5e3a9f; color: #fff; font-size: 16px; }
           .group-header td { background: #e0f3ff; font-weight: 700; text-align: left; font-size: 16px; }
@@ -210,14 +210,14 @@ export async function generatePloGroupReportHTML(props: PloGroupReportProps): Pr
           tbody.group-block { page-break-inside: avoid !important; break-inside: avoid !important; }
           .clo-row { page-break-inside: avoid !important; break-inside: avoid !important; }
           
-          /* Adjust column widths to make table bigger - match header and row cells */
-          th.sno, td.sno { width: 60px; min-width: 60px; max-width: 60px; }
-          th.weight, td.weight { width: 110px; min-width: 110px; max-width: 110px; }
-          th.plos, td.plos { width: 80px; min-width: 80px; max-width: 80px; }
-          th.method, td.method { width: 80px; min-width: 80px; max-width: 80px; }
-          th.assessment-results { width: 180px; min-width: 180px; max-width: 180px; }
-          th.target, td.target, th.actual, td.actual { width: 90px; min-width: 90px; max-width: 90px; }
-          .comment { word-wrap: break-word;width: 100px; min-width: 100px; max-width: 100px; }
+          /* Adjust column widths to fit PDF page - optimized for printing */
+          th.sno, td.sno { width: 50px; min-width: 50px; max-width: 50px; }
+          th.weight, td.weight { width: 80px; min-width: 80px; max-width: 80px; }
+          th.plos, td.plos { width: 60px; min-width: 60px; max-width: 60px; }
+          th.method, td.method { width: 70px; min-width: 70px; max-width: 70px; }
+          th.assessment-results { width: 160px; min-width: 160px; max-width: 160px; }
+          th.target, td.target, th.actual, td.actual { width: 80px; min-width: 80px; max-width: 80px; }
+          .comment { word-wrap: break-word;width: 80px; min-width: 80px; max-width: 80px; }
           
           /* Comments and Signature Page Styles */
           .comments-page {
