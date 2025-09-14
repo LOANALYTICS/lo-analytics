@@ -136,9 +136,9 @@ function generateCommentsAndSignaturePage(comments?: { strengthPoints: string[];
     `;
   }
 
-  const strengthPointsHtml = comments.strengthPoints?.map(point => `<li>${escapeHTML(point)}</li>`).join('') || '';
-  const weaknessPointsHtml = comments.weaknessPoints?.map(point => `<li>${escapeHTML(point)}</li>`).join('') || '';
-  const recommendationsHtml = comments.recommendations?.map(rec => `<li>${escapeHTML(rec)}</li>`).join('') || '';
+  const strengthPointsHtml = comments.strengthPoints?.map(point => `<li>• ${escapeHTML(point)}</li>`).join('') || '';
+  const weaknessPointsHtml = comments.weaknessPoints?.map(point => `<li>• ${escapeHTML(point)}</li>`).join('') || '';
+  const recommendationsHtml = comments.recommendations?.map(rec => `<li>• ${escapeHTML(rec)}</li>`).join('') || '';
 
   return `
     <div class="comments-page">
