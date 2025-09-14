@@ -483,13 +483,14 @@ export async function POST(request: Request) {
       college: courseData.collage,
       plogroups,
       benchmark: assessmentData.benchmark || 0,
-      comments:aiAnalysis
+      comments: undefined // AI comments will be generated separately
     });
 
-    // Always return both HTML strings together
+    // Return HTML strings and plogroups for AI analysis
     return NextResponse.json({
       cloHtml: htmlContent,
       ploHtml,
+      plogroups
     });
 
   } catch (error) {

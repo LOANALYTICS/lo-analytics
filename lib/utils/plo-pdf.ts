@@ -42,25 +42,11 @@ export async function generatePloPdfFromHtml(html: string, fileName: string, sav
       th.weight, td.weight { width: 110px; min-width: 110px; max-width: 110px; }
       th.plos, td.plos { width: 80px; min-width: 80px; max-width: 80px; }
       th.method, td.method { width: 120px; min-width: 120px; max-width: 120px; }
-done      th.assessment-results { width: 240px; min-width: 240px; max-width: 240px; }
+      th.assessment-results { width: 240px; min-width: 240px; max-width: 240px; }
       th.target, td.target, th.actual, td.actual { width: 120px; min-width: 120px; max-width: 120px; }
       .comment { word-wrap: break-word;width: 120px; min-width: 120px; max-width: 120px; }
       
-      /* Comments and Signature Page Styles */
-      .comments-page { page-break-before: always !important; break-before: always !important; page-break-inside: avoid !important; break-inside: avoid !important; width: 100%; height: 100vh; display: flex; flex-direction: column; padding: 20px; box-sizing: border-box; }
-      .comments-content { flex: 0 0 auto; }
-      .comments-content h3 { font-size: 18px; font-weight: bold; margin-bottom: 15px; color: #4b2e83; text-align: left; }
-      .comment-category { margin-bottom: 20px; }
-      .comment-category h4 { font-size: 16px; font-weight: bold; margin-bottom: 8px; color: #333; }
-      .comment-category ul { margin: 0; padding-left: 20px; }
-      .comment-category li { font-size: 14px; margin-bottom: 5px; line-height: 1.4; }
-      .error-message { color: #d32f2f; font-style: italic; font-size: 14px; }
-      .signatures-bottom { flex: 1 1 auto; display: flex; align-items: flex-end; padding-bottom: 50px; }
-      .signature-row { display: flex; justify-content: space-between; align-items: flex-end; width: 100%; }
-      .signature-item { text-align: center; flex: 1; margin: 0 10px; }
-      .signature-label { font-size: 14px; font-weight: bold; margin-bottom: 5px; color: #333; }
-      .signature-line { border-bottom: 1px solid #000; height: 1px; margin: 20px 0 5px 0; min-height: 30px; }
-      .signature-name { font-size: 14px; font-weight: bold; margin-top: 5px; }
+      /* Comments styles removed - handled in separate function */
     `;
     
     // Set the enhanced HTML with all styles
@@ -285,48 +271,7 @@ done      th.assessment-results { width: 240px; min-width: 240px; max-width: 240
     // Process the table with headers and rows
     const totalPages = await processTable();
     
-    // Process comments and signature page
-    const processCommentsPage = async () => {
-      const commentsPage = element.querySelector('.comments-page');
-      if (!commentsPage) {
-        console.log('No comments page found');
-        return;
-      }
-      
-      // Always start comments page on a new page
-      pdf.addPage();
-      currentY = margin;
-      
-      // Render comments page
-      const commentsCanvas = await html2canvas(commentsPage as HTMLElement, {
-        scale: 2,
-        useCORS: true,
-        logging: false,
-        backgroundColor: "#ffffff",
-        allowTaint: true,
-      });
-      
-      const commentsWidthMM = contentWidth;
-      const commentsHeightMM = (commentsCanvas.height * commentsWidthMM) / commentsCanvas.width;
-      
-      // Add comments page to PDF
-      try {
-        const commentsDataUrl = commentsCanvas.toDataURL("image/jpeg", 0.95);
-        pdf.addImage(
-          commentsDataUrl,
-          "JPEG",
-          margin,
-          currentY,
-          commentsWidthMM,
-          commentsHeightMM
-        );
-        currentY += commentsHeightMM;
-      } catch (error) {
-        console.warn("Error adding comments page image, skipping:", error);
-      }
-    };
-    
-    await processCommentsPage();
+    // Comments page processing removed - will be handled separately
     
     // Skip logo addition to avoid jsPDF.scale errors
     // This prevents the 'Invalid argument passed to jsPDF.scale' error
@@ -345,6 +290,170 @@ done      th.assessment-results { width: 240px; min-width: 240px; max-width: 240
     }
   } catch (error) {
     console.error("Error generating PLO PDF:", error);
+    throw error;
+  }
+}
+
+export async function generateCommentsPdfFromHtml(html: string, fileName: string, saveImmediately: boolean = true): Promise<string | void> {
+  try {
+    // Create a temporary div to hold the HTML content
+    const element = document.createElement("div");
+    element.style.padding = "20px";
+    element.style.width = "1000px";
+    
+    // Parse the HTML and enhance with additional styles
+    const parser = new DOMParser();
+    const parsed = parser.parseFromString(html, 'text/html');
+    const styleTags = Array.from(parsed.head?.querySelectorAll('style') || []);
+    const inlineCss = styleTags.map(s => s.textContent || '').join('\n');
+    
+    // Comments-specific CSS
+    const commentsCss = `
+      * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      html, body { background: #fff; margin: 0; padding: 0; }
+      
+      /* Comments and Signature Page Styles */
+      .comments-page { 
+        page-break-before: always !important; 
+        break-before: always !important; 
+        page-break-inside: avoid !important; 
+        break-inside: avoid !important; 
+        width: 100%; 
+        height: 100vh; 
+        display: flex; 
+        flex-direction: column; 
+        padding: 20px; 
+        box-sizing: border-box; 
+      }
+      .comments-content { flex: 0 0 auto; }
+      .comments-content h3 { 
+        font-size: 18px; 
+        font-weight: bold; 
+        margin-bottom: 15px; 
+        color: #4b2e83; 
+        text-align: left; 
+      }
+      .comment-category { margin-bottom: 20px; }
+      .comment-category h4 { 
+        font-size: 16px; 
+        font-weight: bold; 
+        margin-bottom: 8px; 
+        color: #333; 
+      }
+      .comment-category ul { margin: 0; padding-left: 20px; }
+      .comment-category li { 
+        font-size: 14px; 
+        margin-bottom: 5px; 
+        line-height: 1.4; 
+      }
+      .error-message { 
+        color: #d32f2f; 
+        font-style: italic; 
+        font-size: 14px; 
+      }
+      .signatures-bottom { 
+        flex: 1 1 auto; 
+        display: flex; 
+        align-items: flex-end; 
+        padding-bottom: 50px; 
+      }
+      .signature-row { 
+        display: flex; 
+        justify-content: space-between; 
+        align-items: flex-end; 
+        width: 100%; 
+      }
+      .signature-item { 
+        text-align: center; 
+        flex: 1; 
+        margin: 0 10px; 
+      }
+      .signature-label { 
+        font-size: 14px; 
+        font-weight: bold; 
+        margin-bottom: 5px; 
+        color: #333; 
+      }
+      .signature-line { 
+        border-bottom: 1px solid #000; 
+        height: 1px; 
+        margin: 20px 0 5px 0; 
+        min-height: 30px; 
+      }
+      .signature-name { 
+        font-size: 14px; 
+        font-weight: bold; 
+        margin-top: 5px; 
+      }
+    `;
+    
+    // Set the enhanced HTML with all styles
+    element.innerHTML = `<style>${commentsCss}\n${inlineCss}</style>${parsed.body ? parsed.body.innerHTML : html}`;
+    document.body.appendChild(element);
+    
+    // Wait for fonts and rendering
+    try {
+      await (document as any).fonts?.ready;
+    } catch {}
+    
+    await new Promise(r => setTimeout(r, 500));
+    
+    // Create PDF
+    const pdf = new jsPDF({
+      orientation: "portrait",
+      unit: "mm",
+      format: "a4",
+    }) as jsPDF & {
+      GState: new (options: { opacity: number }) => any;
+    };
+    
+    // Calculate dimensions for A4 page
+    const pageWidth = 210; // A4 width in mm
+    const pageHeight = 297; // A4 height in mm
+    const margin = 10; // margin in mm
+    const contentWidth = pageWidth - (margin * 2); // content width in mm
+    
+    // Render comments page
+    const commentsCanvas = await html2canvas(element, {
+      scale: 2,
+      useCORS: true,
+      logging: false,
+      backgroundColor: "#ffffff",
+      allowTaint: true,
+    });
+    
+    const commentsWidthMM = contentWidth;
+    const commentsHeightMM = (commentsCanvas.height * commentsWidthMM) / commentsCanvas.width;
+    
+    // Add comments page to PDF
+    try {
+      const commentsDataUrl = commentsCanvas.toDataURL("image/jpeg", 0.95);
+      pdf.addImage(
+        commentsDataUrl,
+        "JPEG",
+        margin,
+        margin,
+        commentsWidthMM,
+        commentsHeightMM
+      );
+    } catch (error) {
+      console.warn("Error adding comments page image:", error);
+      throw error;
+    }
+    
+    // Clean up
+    document.body.removeChild(element);
+
+    // Either save immediately or return the PDF data
+    if (saveImmediately) {
+      pdf.save(`${fileName}.pdf`);
+      return;
+    } else {
+      // Return data URI string for further processing
+      return pdf.output('datauristring');
+    }
+  } catch (error) {
+    console.error("Error generating Comments PDF:", error);
     throw error;
   }
 }

@@ -351,6 +351,120 @@ export async function generatePloGroupReportHTML(props: PloGroupReportProps): Pr
             ${buildGroupSection('3.Values', plogroups.values || [], benchmark, 3)}
           </table>
           
+          <!-- Comments removed - handled separately -->
+        </div>
+      </body>
+    </html>
+  `;
+}
+
+export async function generateCommentsReportHTML(comments: { strengthPoints: string[]; weaknessPoints: string[]; recommendations: string[] }): Promise<string> {
+  return `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <meta charset="utf-8" />
+        <style>
+          body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
+          .container { max-width: 100%; margin: 0 auto; padding: 20px; }
+          
+          /* Comments and Signature Page Styles */
+          .comments-page {
+            page-break-before: always !important;
+            break-before: always !important;
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+            width: 100%;
+            height: 1380px;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            box-sizing: border-box;
+          }
+          
+          .comments-content {
+            flex: 0 0 auto;
+          }
+          
+          .comments-content h3 {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #4b2e83;
+            text-align: left;
+          }
+          
+          .comment-category {
+            margin-bottom: 20px;
+          }
+          
+          .comment-category h4 {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #333;
+          }
+          
+          .comment-category ul {
+            margin: 0;
+            padding-left: 20px;
+          }
+          
+          .comment-category li {
+            font-size: 14px;
+            margin-bottom: 5px;
+            line-height: 1.4;
+          }
+          
+          .error-message {
+            color: #d32f2f;
+            font-style: italic;
+            font-size: 14px;
+          }
+          
+          .signatures-bottom {
+            flex: 1 1 auto;
+            display: flex;
+            align-items: flex-end;
+            padding-bottom: 50px;
+          }
+          
+          .signature-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            width: 100%;
+          }
+          
+          .signature-item {
+            text-align: center;
+            flex: 1;
+            margin: 0 10px;
+          }
+          
+          .signature-label {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #333;
+          }
+          
+          .signature-line {
+            border-bottom: 1px solid #000;
+            height: 1px;
+            margin: 20px 0 5px 0;
+            min-height: 30px;
+          }
+          
+          .signature-name {
+            font-size: 14px;
+            font-weight: bold;
+            margin-top: 5px;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="container">
           ${generateCommentsAndSignaturePage(comments)}
         </div>
       </body>

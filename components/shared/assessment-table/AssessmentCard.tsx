@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { getCurrentUser } from '@/server/utils/helper';
 import { generatePDF, generateLandscapePDFSinglePage, generatePDFWithJsPDF } from '@/lib/utils/pdf';
-import { generatePloPdfFromHtml } from '@/lib/utils/plo-pdf';
+import { generatePloPdfFromHtml, generateCommentsPdfFromHtml } from '@/lib/utils/plo-pdf';
 import { mergePDFs } from '@/lib/utils/pdf-merger';
 
 export default function AssessmentCard({ href, course, standalone }: { 
@@ -48,9 +48,9 @@ export default function AssessmentCard({ href, course, standalone }: {
         return
       };
   
-      // Parse JSON response with both HTML contents
+      // Parse JSON response with HTML contents and plogroups for AI analysis
       const data = await response.json();
-      const { cloHtml, ploHtml } = data;
+      const { cloHtml, ploHtml, plogroups } = data;
       
       // Array to store PDF data
       const pdfDataArray: string[] = [];
@@ -107,6 +107,43 @@ export default function AssessmentCard({ href, course, standalone }: {
         console.error("Error generating PLO report:", ploError);
         toast.error('Failed to generate PLO report');
       }
+
+      // Generate AI Analysis Report (third report)
+      try {
+        toast.loading("Generating AI Analysis Report");
+        console.log('Calling AI analysis route...');
+        
+        const aiResponse = await fetch('/api/generate-ai-analysis', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            plogroups
+          }),
+        });
+
+        if (!aiResponse.ok) {
+          console.error('AI analysis failed');
+          toast.error('AI analysis failed');
+        } else {
+          const aiData = await aiResponse.json();
+          const { commentsHtml } = aiData;
+          
+          console.log('Generating AI Analysis PDF');
+          const aiPdfData = await generateCommentsPdfFromHtml(commentsHtml, `${course?.course_code} AI Analysis Report`, false) as string;
+          console.log('AI Analysis PDF generated successfully');
+          
+          if (aiPdfData) {
+            console.log('Adding AI Analysis PDF data to array');
+            pdfDataArray.push(aiPdfData);
+            console.log(`PDF data array now has ${pdfDataArray.length} items`);
+          } else {
+            console.error('AI Analysis PDF data is null or undefined');
+          }
+        }
+      } catch (aiError) {
+        console.error("Error generating AI analysis report:", aiError);
+        toast.error('Failed to generate AI analysis report');
+      }
       
       // Merge and save PDFs
       if (pdfDataArray.length > 0) {
@@ -116,6 +153,9 @@ export default function AssessmentCard({ href, course, standalone }: {
           console.log(`CLO PDF data length: ${pdfDataArray[0]?.length || 0}`);
           if (pdfDataArray.length > 1) {
             console.log(`PLO PDF data length: ${pdfDataArray[1]?.length || 0}`);
+          }
+          if (pdfDataArray.length > 2) {
+            console.log(`AI Analysis PDF data length: ${pdfDataArray[2]?.length || 0}`);
           }
           await mergePDFs(pdfDataArray, `${course?.course_code} Combined Reports`);
           toast.success('Combined reports generated successfully');
