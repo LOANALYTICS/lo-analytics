@@ -239,7 +239,7 @@ export function generateSOHTML({
         if (perf) {
             return `
                                             <td class="performance-cell">
-                                                <p class="performance-level ${perf.performance.toLowerCase()}">${perf.performance === 'Average' ? 'Avg' : perf.performance}</p>
+                                                <p class="performance-level ${perf.performance.toLowerCase()}">${perf.performance === 'Average' ? 'Average' : perf.performance}</p>
                                             </td>
                                         `;
         } else {
@@ -250,7 +250,7 @@ export function generateSOHTML({
             const overallPerf = student.performance.Overall;
             return `
                                         <td class="performance-cell">
-                                            <p class="performance-level ${overallPerf.performance.toLowerCase()}">${overallPerf.performance === 'Average' ? 'Avg' : overallPerf.performance}</p>
+                                            <p class="performance-level ${overallPerf.performance.toLowerCase()}">${overallPerf.performance === 'Average' ? 'Average' : overallPerf.performance}</p>
                                         </td>
                                     `;
         })()}
