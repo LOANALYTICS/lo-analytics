@@ -162,6 +162,7 @@ function generateCommentsAndSignaturePage(comments?: { strengthPoints: string[];
             <ul>${recommendationsHtml}</ul>
           </div>
         ` : ''}
+        <p>Note: Based on NCAA Guidelines</p>
       </div>
       <div class="signatures-bottom">
         <div class="signature-row">

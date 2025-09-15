@@ -288,6 +288,8 @@ export function generateSOHTML({
                                 <p><strong>Performance Insight:</strong> Defaults shown (no AI available)</p>
                                 <p><strong>Performance Benchmarking:</strong> Defaults shown (no AI available)</p>
                                 `}
+        <p>Note: Based on NCAA Guidelines</p>
+
                             </div>
                         </div>
                     </div>
