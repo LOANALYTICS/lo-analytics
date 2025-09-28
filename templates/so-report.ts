@@ -88,6 +88,7 @@ export function generateSOHTML({
         spread: string;
         performanceInsight: string;
         performanceBenchmarking: string;
+        normalDistributionData?: Array<{ x: number; value: number }>;
     };
 }) {
     // Console log the performance analysis data
@@ -269,7 +270,7 @@ export function generateSOHTML({
                         <h2 class="h2_class">Students Performance Curve</h2>
                         
                         <div class="chart-section">
-                            ${performanceCurveData ? generatePerformanceCurveChartHTML(performanceCurveData, performanceAnalysis) : ''}
+                            ${performanceCurveData ? generatePerformanceCurveChartHTML(performanceCurveData, performanceAnalysis, comments?.normalDistributionData) : ''}
                         </div>
                         
                         <div class="summary-section">
@@ -462,12 +463,9 @@ function generateGradeDistributionChartHTML(assessmentData: Record<string, Grade
 function generatePerformanceCurveChartHTML(performanceCurveData: {
     ranges: Array<{ min: number; max: number; label: string; count: number }>;
     statistics: { mean: string; median: string; min: string; max: string; totalStudents: number };
-}, performanceAnalysis?: { overall: { mean: number; stdDev: number } }): string {
+}, performanceAnalysis?: { overall: { mean: number; stdDev: number } }, normalDistributionData?: Array<{ x: number; value: number }>): string {
     const ranges = performanceCurveData.ranges;
     const maxCount = Math.max(...ranges.map(r => r.count));
-
-    const mean = performanceAnalysis?.overall?.mean || parseFloat(performanceCurveData.statistics.mean);
-    const stdDev = performanceAnalysis?.overall?.stdDev || 10; // fallback
 
     // Make continuous score ranges 55–100 (step 5)
     const scoreRanges = [];
@@ -519,16 +517,36 @@ function generatePerformanceCurveChartHTML(performanceCurveData: {
         `);
     }
 
-    // Generate normal distribution curve (bell curve)
-    const normalDistributionData = generateNormalDistributionData(mean, stdDev, scoreRanges);
-    const maxCurveValue = Math.max(...normalDistributionData.map(p => p.value));
+    // Use the normal distribution data from route if provided, otherwise generate locally
+    let curveData;
+    if (normalDistributionData && normalDistributionData.length > 0) {
+        curveData = normalDistributionData;
+        console.log('Using curve data from route:', curveData.slice(0, 5)); // Log first 5 points
+    } else {
+        const mean = performanceAnalysis?.overall?.mean || parseFloat(performanceCurveData.statistics.mean);
+        const stdDev = performanceAnalysis?.overall?.stdDev || 10;
+        curveData = generateNormalDistributionData(mean, stdDev, scoreRanges);
+        console.log('Generated curve data locally:', curveData.slice(0, 5)); // Log first 5 points
+    }
 
-    const curvePoints = normalDistributionData.map((point, i) => {
-        const x = margin.left + ((point.x - 55) / 5) * xStep;
-        const normalizedValue = point.value / maxCurveValue;
-        const y = height - margin.bottom - (normalizedValue * chartHeight);
-        return { x, y };
+    // Find the maximum curve value for proper scaling
+    const maxCurveValue = Math.max(...curveData.map(p => p.value));
+    console.log('Max curve value:', maxCurveValue, 'Max bar count:', maxCount);
+
+    // Map curve points to chart coordinates using proper x-y axis mapping
+    const curvePoints = curveData.map((point) => {
+        // Map x (score) to chart x-coordinate (55-100 range maps to chart width)
+        const xPercent = (point.x - 55) / (100 - 55); // Normalize to 0-1
+        const chartX = margin.left + (xPercent * chartWidth);
+        
+        // Map y (curve value) to chart y-coordinate using same scale as bars
+        const yPercent = point.value / maxCount; // Use same scale as bars, not maxCurveValue
+        const chartY = height - margin.bottom - (yPercent * chartHeight);
+        
+        return { x: chartX, y: chartY };
     });
+
+    console.log('First few curve points:', curvePoints.slice(0, 5));
 
     const curvePath = curvePoints.map((point, i) => {
         return (i === 0)
@@ -563,7 +581,7 @@ function generatePerformanceCurveChartHTML(performanceCurveData: {
 
 
 
-// Helper function to generate normal distribution data using NORM.DIST formula
+// Helper function to generate normal distribution data using NORM.DIST formula (fallback)
 function generateNormalDistributionData(mean: number, stdDev: number, ranges: Array<{ min: number, max: number, label: string, count: number }>): Array<{ x: number, value: number }> {
     const data: Array<{ x: number, value: number }> = [];
 

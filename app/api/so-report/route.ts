@@ -362,6 +362,12 @@ export async function GET(request: Request) {
             console.log("normalDistributionData",normalDistributionData, )
             
             aiAnalysis = await analyzeReport('so-report', soAnalysisData);
+            
+            // Add the normal distribution data to the AI analysis result
+            if (typeof aiAnalysis === 'object' && aiAnalysis !== null) {
+                aiAnalysis.normalDistributionData = normalDistributionData;
+            }
+            
             console.log('✅ SO Report AI Analysis Result:', JSON.stringify(aiAnalysis, null, 2));
         } catch (error) {
             console.error('❌ SO Report AI Analysis Error:', error);
