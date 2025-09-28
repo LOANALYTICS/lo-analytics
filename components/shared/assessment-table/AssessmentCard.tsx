@@ -157,6 +157,8 @@ export default function AssessmentCard({ href, course, standalone }: {
             console.log(`AI Analysis PDF data length: ${pdfDataArray[2]?.length || 0}`);
           }
           await mergePDFs(pdfDataArray, `${course?.course_code} Combined Reports`);
+      toast.dismiss();
+
           toast.success('Combined reports generated successfully');
         } catch (mergeError) {
           console.error("Error merging PDFs:", mergeError);

@@ -7,7 +7,8 @@ function generateAchievementChartSVG(
   labels: string[],
   direct: number[],
   indirect: number[],
-  indirectBenchmark: number
+  indirectBenchmark: number,
+  directBenchmark: number = 60
 ): string {
   const width = 1400;
   const height = 620;
@@ -63,11 +64,11 @@ function generateAchievementChartSVG(
     labelsSvg.push(`<text x="${cx}" y="${margin.top + plotHeight + 20}" text-anchor="middle" font-family="Arial" font-size="18" font-weight="bold">${label}</text>`);
   });
 
-  const threshold60Y = yToPx(60);
+  const thresholdDirectY = yToPx(directBenchmark);
   const thresholdIndirectY = yToPx(indirectBenchmark);
   const dash = '5,5';
   const thresholds = `
-    <line x1="${margin.left}" y1="${threshold60Y}" x2="${margin.left + plotWidth}" y2="${threshold60Y}" stroke="rgba(255,99,132,0.9)" stroke-width="3" stroke-dasharray="${dash}"/>
+    <line x1="${margin.left}" y1="${thresholdDirectY}" x2="${margin.left + plotWidth}" y2="${thresholdDirectY}" stroke="rgba(255,99,132,0.9)" stroke-width="3" stroke-dasharray="${dash}"/>
     <line x1="${margin.left}" y1="${thresholdIndirectY}" x2="${margin.left + plotWidth}" y2="${thresholdIndirectY}" stroke="rgba(153,102,255,0.9)" stroke-width="3" stroke-dasharray="${dash}"/>
   `;
 
@@ -99,7 +100,7 @@ function generateAchievementChartSVG(
   addLegendRectAt(col2x, ly1, 'rgba(75,192,192,0.8)', 'rgba(75,192,192,1)', 'Indirect Assessment Achievement');
   // second row
   const ly2 = legendGroupY + 28;
-  addLegendDashAt(col1x, ly2, 'rgba(255,99,132,1)', 'Direct Threshold (60%)');
+  addLegendDashAt(col1x, ly2, 'rgba(255,99,132,1)', `Direct Threshold (${directBenchmark}%)`);
   addLegendDashAt(col2x, ly2, 'rgba(153,102,255,1)', `Indirect Threshold (${indirectBenchmark}%)`);
 
   const legend = `<g style="font-size: 20px;">${legendItems.join('')}</g>`;
@@ -127,7 +128,7 @@ function generateAchievementChartSVG(
   </svg>`;
 }
 
-async function generateAchievementChartHTML(achievementData: any, sortedClos: string[], indirectAssessmentData?: any): Promise<string> {
+async function generateAchievementChartHTML(achievementData: any, sortedClos: string[], benchmark: any, indirectAssessmentData?: any): Promise<string> {
   const directChartData = sortedClos.map(clo => {
     const achievement = achievementData[60].find((a: any) => a.clo === clo);
     const value = achievement ? parseFloat(achievement.percentageAchieving) : 0;
@@ -141,13 +142,14 @@ async function generateAchievementChartHTML(achievementData: any, sortedClos: st
     return value;
   }) : [];
 
- 
+
   const labels = sortedClos.map(clo => clo.toUpperCase());
   const directRounded = directChartData.map(v => Number(Number(v).toFixed(1)));
   const indirectRounded = indirectChartData.map(v => Number(Number(v).toFixed(1)));
-  
+
   const indirectBenchmark = Number(indirectAssessmentData?.indirectAssessments?.[0]?.benchmark ?? 80);
-  const svg = generateAchievementChartSVG(labels, directRounded, indirectRounded, indirectBenchmark);
+  const directBenchmark = Number(benchmark ?? 60);
+  const svg = generateAchievementChartSVG(labels, directRounded, indirectRounded, indirectBenchmark, directBenchmark);
 
   return `
     <div class="chart-container">
@@ -248,9 +250,9 @@ export interface CloReportProps {
 
 export async function generateCloReportHTML(props: CloReportProps): Promise<string> {
   const { course, college, assessmentData, indirectAssessmentData, plogroups, benchmark } = props;
-  
+
   const { sortedClos, achievementData } = assessmentData;
-  
+
   function escapeHTML(str: string): string {
     return str.replace(/&/g, "&amp;")
       .replace(/</g, "&lt;")
@@ -260,7 +262,7 @@ export async function generateCloReportHTML(props: CloReportProps): Promise<stri
   }
 
   // Generate the chart HTML
-  const chartHtml = await generateAchievementChartHTML(achievementData, sortedClos, indirectAssessmentData);
+  const chartHtml = await generateAchievementChartHTML(achievementData, sortedClos, benchmark, indirectAssessmentData);
 
   return `
     <!DOCTYPE html>
@@ -526,18 +528,18 @@ export async function generateCloReportHTML(props: CloReportProps): Promise<stri
               </thead>
               <tbody>
                 ${assessmentData.students.map((student, index) => {
-                  return `
+    return `
                   <tr class="student-row">
                     <td>${index + 1}</td>
                     <td>${escapeHTML(student.studentId)}</td>
                     <td>${escapeHTML(student.studentName)}</td>
                     ${sortedClos.map(clo => {
-                      const totalScore = assessmentData.cloScores[clo];
-                      const threshold = totalScore * 0.6;
-                      const studentScore = student.cloScores[clo]?.marksScored || 0;
-                      const isBelow = studentScore < threshold;
-                      return `<td style="background-color:${isBelow ? '#e6ffe6': 'white'} !important;">${isBelow ? `<p >${studentScore.toFixed(2)}</p>` : `<p>${studentScore.toFixed(2)}</p>`}</td>`;
-                    }).join('')}
+      const totalScore = assessmentData.cloScores[clo];
+      const threshold = totalScore * 0.6;
+      const studentScore = student.cloScores[clo]?.marksScored || 0;
+      const isBelow = studentScore < threshold;
+      return `<td style="background-color:${isBelow ? '#e6ffe6' : 'white'} !important;">${isBelow ? `<p >${studentScore.toFixed(2)}</p>` : `<p>${studentScore.toFixed(2)}</p>`}</td>`;
+    }).join('')}
                   </tr>
                 `}).join('')}
               </tbody>
@@ -550,15 +552,15 @@ export async function generateCloReportHTML(props: CloReportProps): Promise<stri
                   </td>
                   <td colspan="2" class="achievement-label">Achievement Grades</td>
                   ${sortedClos.map(clo => {
-    const totalScore = assessmentData.cloScores[clo];
-    return `<td>${(totalScore * 0.6).toFixed(2)}</td>`;
-  }).join('')}
+      const totalScore = assessmentData.cloScores[clo];
+      return `<td>${(totalScore * 0.6).toFixed(2)}</td>`;
+    }).join('')}
                 </tr>
                 <tr class="achievement-row">
                   <td colspan="2" class="achievement-label">% of students scoring ≥ 60%</td>
                   ${sortedClos.map((clo, index) => {
-    return `<td>${Number(achievementData['60'][index].percentageAchieving).toFixed(1)}%</td>`;
-  }).join('')}
+      return `<td>${Number(achievementData['60'][index].percentageAchieving).toFixed(1)}%</td>`;
+    }).join('')}
                 </tr>
               </tbody>
 
@@ -574,11 +576,11 @@ export async function generateCloReportHTML(props: CloReportProps): Promise<stri
                 <tr class="achievement-row">
                   <td colspan="2" class="achievement-label">% of students agreed that they achieved the CLO</td>
                   ${sortedClos.map(clo => {
-                    const assessment = indirectAssessmentData.indirectAssessments.find(
-                      (a: any) => a.clo.replace(/\s/g, '').toUpperCase() === clo.replace(/\s/g, '').toUpperCase()
-                    );
-                    return `<td>${assessment ? assessment.achievementPercentage.toFixed(1) + '%' : '-'}</td>`;
-                  }).join('')}
+      const assessment = indirectAssessmentData.indirectAssessments.find(
+        (a: any) => a.clo.replace(/\s/g, '').toUpperCase() === clo.replace(/\s/g, '').toUpperCase()
+      );
+      return `<td>${assessment ? assessment.achievementPercentage.toFixed(1) + '%' : '-'}</td>`;
+    }).join('')}
                 </tr>
               </tbody>
               ` : ''}
