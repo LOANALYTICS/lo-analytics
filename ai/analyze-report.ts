@@ -19,7 +19,7 @@ export async function analyzeReport(slug: string, data: any) {
     
     // Generate structured output using Gemini Flash
     const result = await generateObject({
-      model: google('gemini-1.5-flash'),
+      model: google('gemini-2.5-flash'),
       prompt,
       schema: config.schema,
       temperature: 0.3, // Lower temperature for more consistent analysis

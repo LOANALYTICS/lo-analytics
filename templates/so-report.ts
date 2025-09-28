@@ -288,7 +288,6 @@ export function generateSOHTML({
                                 <p><strong>Performance Insight:</strong> Defaults shown (no AI available)</p>
                                 <p><strong>Performance Benchmarking:</strong> Defaults shown (no AI available)</p>
                                 `}
-        <p>Note: Based on NCAA Guidelines</p>
 
                             </div>
                         </div>
@@ -523,14 +522,14 @@ function generatePerformanceCurveChartHTML(performanceCurveData: {
     // Generate normal distribution curve (bell curve)
     const normalDistributionData = generateNormalDistributionData(mean, stdDev, scoreRanges);
     const maxCurveValue = Math.max(...normalDistributionData.map(p => p.value));
-    
+
     const curvePoints = normalDistributionData.map((point, i) => {
         const x = margin.left + ((point.x - 55) / 5) * xStep;
         const normalizedValue = point.value / maxCurveValue;
         const y = height - margin.bottom - (normalizedValue * chartHeight);
         return { x, y };
     });
-    
+
     const curvePath = curvePoints.map((point, i) => {
         return (i === 0)
             ? `M ${point.x},${point.y}`
@@ -565,15 +564,15 @@ function generatePerformanceCurveChartHTML(performanceCurveData: {
 
 
 // Helper function to generate normal distribution data using NORM.DIST formula
-function generateNormalDistributionData(mean: number, stdDev: number, ranges: Array<{min: number, max: number, label: string, count: number}>): Array<{x: number, value: number}> {
-    const data: Array<{x: number, value: number}> = [];
-    
+function generateNormalDistributionData(mean: number, stdDev: number, ranges: Array<{ min: number, max: number, label: string, count: number }>): Array<{ x: number, value: number }> {
+    const data: Array<{ x: number, value: number }> = [];
+
     // Generate points for x values: 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100
     for (let x = 60; x <= 100; x++) {
         const value = normalDistribution(x, mean, stdDev) * 97; // NORM.DIST(x, mean, stdDev, false) * 97
         data.push({ x, value });
     }
-    
+
     return data;
 }
 

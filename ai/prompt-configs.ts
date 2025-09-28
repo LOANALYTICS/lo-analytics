@@ -31,7 +31,7 @@ Please analyze this data and provide a concise assessment following quality assu
 2. Evaluate direct vs indirect assessment alignment
 3. Assess curriculum balance across knowledge, skills, and values domains
 4. Identify performance gaps and excellence areas
-5. Ensure compliance with quality assurance standards
+5. Ensure compliance with NCAAA Saudi quality assurance standards
 
 **Output Requirements:**
 - Keep each point SHORT and DESCRIPTIVE (maximum 2 sentences)
@@ -46,22 +46,24 @@ Please analyze this data and provide a concise assessment following quality assu
 - Recommendations: Provide clear, actionable steps
 
 **Example Format:**
-Distribution Shape:
-- The curve presents a symmetrical bell-shaped pattern, closely resembling a normal distribution.
-- This shape suggests a balanced assessment where student scores are evenly distributed around a central value, without significant skewness.
+Strengths:
+- Students demonstrated high proficiency in critical thinking and problem-solving tasks.
+- The majority of learners met or exceeded knowledge benchmarks in all modules.
 
-Performance Insight:
-- There is a complete absence of scores below 70 and above 85, indicating no representation of either low-performing or top-performing students.
-- This distribution can be used to define performance tiers: 70–75: Developing proficiency, 75–80: Competent, 80–85: Approaching mastery.
+Weaknesses:
+- Practical skill application is inconsistent across students.
+- Assessment alignment with soft skills is weak in certain courses.
 
-Assessment Quality:
-- The bell-shaped curve indicates effective assessment design with appropriate difficulty levels.
-- These tiers can be mapped to Course Learning Outcomes (CLOs) to evaluate how well students are achieving expected competencies and to identify areas needing reinforcement or enrichment.
+Recommendations:
+- Incorporate more hands-on projects to strengthen practical skills.
+- Review and revise assessments to better measure soft skills outcomes.
 
-Return your analysis in the specified JSON format with concise strength points, weakness points, and recommendations following this example format.`,
+**Note:** Follow NCAAA Saudi guidelines and provide analysis as a human educational assessment expert would.`,
+
     schema: cloReportSchema,
     description: "Analyzes CLO (Course Learning Outcomes) data to identify strengths, weaknesses, and recommendations"
   },
+  
   {
     slug: 'so-report',
     prompt: `You are a statistical analysis expert examining student performance data following international quality assurance standards for higher education.
@@ -71,11 +73,11 @@ Given the following performance data: {{data}}
 Please analyze this data and provide concise insights following quality assurance guidelines:
 
 **Analysis Guidelines:**
-1. **Central Tendency**: Identify score clustering patterns (mean, median, mode)
-2. **Distribution Shape**: Analyze normal distribution compliance and skewness
-3. **Performance Spread**: Examine range, standard deviation, and outliers
-4. **Assessment Validity**: Evaluate distribution implications for learning outcomes
-5. **Quality Benchmarking**: Compare against quality assurance standards
+1. Central Tendency: Identify score clustering patterns (mean, median, mode)
+2. Distribution Shape: Analyze normal distribution compliance and skewness
+3. Performance Spread: Examine range, standard deviation, and outliers
+4. Assessment Validity: Evaluate distribution implications for learning outcomes
+5. Quality Benchmarking: Compare against NCAAA Saudi quality assurance standards
 
 **Output Requirements:**
 - Keep each point SHORT and DESCRIPTIVE (maximum 2 sentences)
@@ -89,7 +91,21 @@ Please analyze this data and provide concise insights following quality assuranc
 - Weaknesses: Identify specific statistical concerns
 - Recommendations: Provide clear, actionable improvement steps
 
-Return your analysis in the specified JSON format with concise strength points, weakness points, and recommendations.`,
+**Example Format:**
+Distribution Shape:
+- The curve presents a symmetrical bell-shaped pattern, closely resembling a normal distribution.
+- This shape suggests a balanced assessment where student scores are evenly distributed around a central value, without significant skewness.
+
+Performance Insight:
+- There is a complete absence of scores below 70 and above 85, indicating no representation of either low-performing or top-performing students.
+- These tiers can be mapped to Course Learning Outcomes (CLOs) to evaluate how well students are achieving expected competencies and to identify areas needing reinforcement or enrichment.
+
+Assessment Quality:
+- The bell-shaped curve indicates effective assessment design with appropriate difficulty levels.
+- Performance tiers can be used to define actionable improvement steps for assessments.
+
+**Note:** Follow NCAAA Saudi guidelines and provide analysis as a human statistical assessment expert would.`,
+
     schema: soReportSchema,
     description: "Analyzes student performance data from histograms and bell curves to provide statistical insights"
   }

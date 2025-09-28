@@ -150,6 +150,8 @@ function normalDistribution(x: number, mean: number, stdDev: number): number {
     return coefficient * Math.exp(exponent);
 }
 
+
+
 function calculatePerformanceCurve(overallScores: Map<string, { scored: number, total: number }>) {
     // Define score ranges
     const ranges = [
@@ -165,24 +167,42 @@ function calculatePerformanceCurve(overallScores: Map<string, { scored: number, 
     ];
 
     // Count students in each range
-    const rangeCounts = ranges.map(range => {
-        let count = 0;
-        overallScores.forEach((scores) => {
-            const percentage = (scores.scored / scores.total) * 100;
-            if (percentage >= range.min && percentage < range.max) {
-                count++;
-            }
-        });
-        return { ...range, count };
+    const rangeCounts = ranges.map((range, index) => {
+    let count = 0;
+    overallScores.forEach((scores) => {
+        const percentage = (scores.scored / scores.total) * 100;
+
+        // For the last range, include the max value
+        const isLastRange = index === ranges.length - 1;
+        if (
+            percentage >= range.min &&
+            (isLastRange ? percentage <= range.max : percentage < range.max)
+        ) {
+            count++;
+        }
     });
+    return { ...range, count };
+});
 
     // Calculate statistics for summary
     const percentages = Array.from(overallScores.values()).map(scores => (scores.scored / scores.total) * 100);
+    console.log('-------percentages',percentages)
     const mean = percentages.reduce((sum, p) => sum + p, 0) / percentages.length;
+    console.log('-------mean',mean)
+
     const sorted = percentages.sort((a, b) => a - b);
     const median = sorted[Math.floor(sorted.length / 2)];
+    console.log('-------median', median)
+
     const min = Math.min(...percentages);
     const max = Math.max(...percentages);
+    console.log( 'data',{
+            mean: mean.toFixed(1),
+            median: median.toFixed(1),
+            min: min.toFixed(1),
+            max: max.toFixed(1),
+            totalStudents: percentages.length
+        }, rangeCounts)
 
     return {
         ranges: rangeCounts,
@@ -312,6 +332,7 @@ export async function GET(request: Request) {
             // Generate proper bell curve data (same as in template)
             const mean = performanceAnalysis.overall.mean;
             const stdDev = performanceAnalysis.overall.stdDev;
+            console.log('----- std', mean,stdDev)
             
             // Generate normal distribution data points (60-100 range, step 1)
             const normalDistributionData = [];
@@ -338,6 +359,7 @@ export async function GET(request: Request) {
                     dataPoints: normalDistributionData // The actual bell curve data points
                 }
             };
+            console.log("normalDistributionData",normalDistributionData, )
             
             aiAnalysis = await analyzeReport('so-report', soAnalysisData);
             console.log('✅ SO Report AI Analysis Result:', JSON.stringify(aiAnalysis, null, 2));

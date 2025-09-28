@@ -110,8 +110,8 @@ function generateCommentsAndSignaturePage(comments?: { strengthPoints: string[];
     return `
       <div class="comments-page">
         <div class="comments-content">
-          <h3>AI Analysis Comments</h3>
-          <p class="error-message">Error with AI analysis - comments not available</p>
+          <h3>Comments</h3>
+          <p class="error-message">comments not available</p>
         </div>
         <div class="signatures-bottom">
           <div class="signature-row">
@@ -162,7 +162,6 @@ function generateCommentsAndSignaturePage(comments?: { strengthPoints: string[];
             <ul>${recommendationsHtml}</ul>
           </div>
         ` : ''}
-        <p>Note: Based on NCAA Guidelines</p>
       </div>
       <div class="signatures-bottom">
         <div class="signature-row">

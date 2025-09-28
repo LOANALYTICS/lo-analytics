@@ -110,8 +110,7 @@ export default function AssessmentCard({ href, course, standalone }: {
 
       // Generate AI Analysis Report (third report)
       try {
-        toast.loading("Generating AI Analysis Report");
-        console.log('Calling AI analysis route...');
+        toast.loading("Generating reports");
         
         const aiResponse = await fetch('/api/generate-ai-analysis', {
           method: 'POST',
@@ -122,8 +121,8 @@ export default function AssessmentCard({ href, course, standalone }: {
         });
 
         if (!aiResponse.ok) {
-          console.error('AI analysis failed');
-          toast.error('AI analysis failed');
+          console.error('analysis failed');
+          toast.error('analysis failed');
         } else {
           const aiData = await aiResponse.json();
           const { commentsHtml } = aiData;
