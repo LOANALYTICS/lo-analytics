@@ -25,10 +25,11 @@ export default function AssessmentCard({ href, course, standalone }: {
     fetchCoordinator()
   }, [course._id]);
 
-  const handleAssessmentPlan = async (e: any) => {
+  const handleAssessmentPlan = async () => {
+    const toastId = toast.loading("Generating report...");
+
     try {
       // Step 1: Calculate CLO report data
-      toast.loading("Calculating report data...")
       const dataResponse = await fetch('/api/clo-report-data', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -46,12 +47,13 @@ export default function AssessmentCard({ href, course, standalone }: {
       const reportData = await dataResponse.json();
 
       // Step 2: Generate AI analysis using streaming
-      toast.loading("Generating AI analysis...")
-      let aiComments;
-      
+      let aiComments = {
+        strengthPoints: ["Assessment data shows consistent performance patterns"],
+        weaknessPoints: ["Some areas may need additional focus"],
+        recommendations: ["Continue monitoring student progress"]
+      };
+
       try {
-        console.log('🚀 Starting streaming AI analysis for CLO...');
-        
         const response = await fetch('/api/ai-stream', {
           method: 'POST',
           headers: {
@@ -63,62 +65,46 @@ export default function AssessmentCard({ href, course, standalone }: {
           }),
         });
 
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
+        if (response.ok && response.body) {
+          const reader = response.body.getReader();
+          const decoder = new TextDecoder();
+          let finalResult = {};
 
-        if (!response.body) {
-          throw new Error('No response body');
-        }
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
 
-        const reader = response.body.getReader();
-        const decoder = new TextDecoder();
-        let finalResult = {};
+            const chunk = decoder.decode(value, { stream: true });
+            const lines = chunk.split('\n');
 
-        while (true) {
-          const { done, value } = await reader.read();
-          
-          if (done) break;
+            for (const line of lines) {
+              if (line.startsWith('data: ')) {
+                try {
+                  const jsonStr = line.substring(6);
+                  const parsed = JSON.parse(jsonStr);
 
-          const chunk = decoder.decode(value, { stream: true });
-          const lines = chunk.split('\n');
-
-          for (const line of lines) {
-            if (line.startsWith('data: ')) {
-              try {
-                const jsonStr = line.substring(6);
-                const parsed = JSON.parse(jsonStr);
-                
-                if (parsed.type === 'partial' && parsed.data) {
-                  finalResult = { ...finalResult, ...parsed.data };
-                  toast.loading("AI analysis streaming...");
-                } else if (parsed.type === 'complete' && parsed.data) {
-                  finalResult = parsed.data;
-                  break;
-                } else if (parsed.type === 'error') {
-                  throw new Error(parsed.error);
+                  if (parsed.type === 'partial' && parsed.data) {
+                    finalResult = { ...finalResult, ...parsed.data };
+                  } else if (parsed.type === 'complete' && parsed.data) {
+                    finalResult = parsed.data;
+                    break;
+                  }
+                } catch (parseError) {
+                  continue;
                 }
-              } catch (parseError) {
-                continue;
               }
             }
           }
-        }
 
-        aiComments = finalResult;
-        console.log('✅ Streaming AI analysis completed for CLO');
-        
+          if (finalResult && Object.keys(finalResult).length > 0) {
+            aiComments = finalResult as typeof aiComments;
+          }
+        }
       } catch (aiError) {
-        console.warn('❌ Streaming AI failed for CLO, using defaults:', aiError);
-        aiComments = {
-          strengthPoints: ["Assessment data shows consistent performance patterns"],
-          weaknessPoints: ["Some areas may need additional focus"],
-          recommendations: ["Continue monitoring student progress"]
-        };
+        console.warn('AI analysis failed, using defaults:', aiError);
       }
 
       // Step 3: Generate HTML reports
-      toast.loading("Generating HTML reports...")
       const htmlResponse = await fetch('/api/clo-report-generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -133,10 +119,9 @@ export default function AssessmentCard({ href, course, standalone }: {
         throw new Error('Failed to generate HTML reports');
       }
 
-      const { cloHtml, ploHtml, plogroups } = await htmlResponse.json();
+      const { cloHtml, ploHtml } = await htmlResponse.json();
 
       // Step 4: Generate PDFs
-      toast.loading("Generating PDFs...")
       const pdfDataArray: string[] = [];
 
       // Create temporary container for CLO HTML
@@ -176,16 +161,13 @@ export default function AssessmentCard({ href, course, standalone }: {
         console.error("Error generating PLO report:", ploError);
       }
 
-      // Generate AI Analysis PDF using existing AI comments
+      // Generate AI Analysis PDF
       try {
-        if (aiComments && (aiComments.strengthPoints || aiComments.weaknessPoints || aiComments.recommendations)) {
-          // Generate comments HTML directly from AI analysis we already have
-          const { generateCommentsReportHTML } = await import('@/templates/ploGroupReport');
-          const commentsHtml = await generateCommentsReportHTML(aiComments);
-          const aiPdfData = await generateCommentsPdfFromHtml(commentsHtml, `${course?.course_code} AI Analysis Report`, false) as string;
-          if (aiPdfData) {
-            pdfDataArray.push(aiPdfData);
-          }
+        const { generateCommentsReportHTML } = await import('@/templates/ploGroupReport');
+        const commentsHtml = await generateCommentsReportHTML(aiComments);
+        const aiPdfData = await generateCommentsPdfFromHtml(commentsHtml, `${course?.course_code} AI Analysis Report`, false) as string;
+        if (aiPdfData) {
+          pdfDataArray.push(aiPdfData);
         }
       } catch (aiError) {
         console.error("Error generating AI analysis report:", aiError);
@@ -193,25 +175,18 @@ export default function AssessmentCard({ href, course, standalone }: {
 
       // Step 5: Merge PDFs
       if (pdfDataArray.length > 0) {
-        toast.loading("Merging reports...")
-        try {
-          await mergePDFs(pdfDataArray, `${course?.course_code} Combined Reports`);
-          toast.success('Combined reports generated successfully');
-        } catch (mergeError) {
-          console.error("Error merging PDFs:", mergeError);
-          toast.error('Failed to merge reports');
-        }
+        await mergePDFs(pdfDataArray, `${course?.course_code} Combined Reports`);
+        toast.success('Report generated successfully', { id: toastId });
+      } else {
+        toast.error('No reports generated', { id: toastId });
       }
-
-      toast.dismiss();
 
     } catch (error: any) {
       console.error("Error generating report:", error);
-      toast.dismiss();
       if (error?.message === "Assessment data not found") {
-        toast.error('Assessment not found');
+        toast.error('Assessment not found', { id: toastId });
       } else {
-        toast.error('Failed to generate report');
+        toast.error('Failed to generate report', { id: toastId });
       }
     }
   }
@@ -227,8 +202,9 @@ export default function AssessmentCard({ href, course, standalone }: {
       return;
     }
 
+    const toastId = toast.loading("Generating report...");
+
     try {
-      toast.loading("Generating report")
       const response = await fetch(`/api/generate-plo-report?perc=${60}&courseId=${id}&academicYear=${ace_year}&section=${section}&coordinator=${coordinator?.name}`, {
         method: 'GET',
         headers: {
@@ -241,14 +217,12 @@ export default function AssessmentCard({ href, course, standalone }: {
       }
 
       const html = await response.text();
-      toast.loading("Generating report")
       await generateLandscapePDFSinglePage(html, `${course?.course_code} PLO Report`);
-      toast.dismiss();
-      toast.success('Report generated successfully');
+      toast.success('Report generated successfully', { id: toastId });
 
     } catch (error: any) {
-      console.error("Error generating CLO report:", error);
-      toast.error(error.response?.data?.message || 'Failed to generate report');
+      console.error("Error generating PLO report:", error);
+      toast.error(error.response?.data?.message || 'Failed to generate report', { id: toastId });
     }
   }
 
@@ -261,9 +235,10 @@ export default function AssessmentCard({ href, course, standalone }: {
       return;
     }
 
+    const toastId = toast.loading("Generating report...");
+
     try {
       // Step 1: Calculate SO report data
-      toast.loading("Calculating report data...")
       const dataResponse = await fetch(`/api/so-report-data?courseId=${id}&academicYear=${ace_year}&section=${section}`, {
         method: 'GET',
         headers: {
@@ -277,15 +252,14 @@ export default function AssessmentCard({ href, course, standalone }: {
 
       const reportData = await dataResponse.json();
 
-      // Step 2: Generate AI analysis using STREAMING (bypasses 10s timeout!)
-      toast.loading("Streaming AI analysis...")
-      let aiComments;
-      
+      // Step 2: Generate AI analysis using streaming
+      let aiComments = getDefaultAIComments(reportData.performanceCurveData);
+
       try {
         // Prepare AI analysis data
         const mean = reportData.performanceAnalysis.overall.mean;
         const stdDev = reportData.performanceAnalysis.overall.stdDev;
-        
+
         // Generate normal distribution data
         const normalDistributionData = [];
         for (let x = 60; x <= 100; x++) {
@@ -294,7 +268,7 @@ export default function AssessmentCard({ href, course, standalone }: {
           const value = coefficient * Math.exp(exponent) * 97;
           normalDistributionData.push({ x, value });
         }
-        
+
         const soAnalysisData = {
           histogram: {
             scoreRanges: reportData.performanceCurveData.ranges,
@@ -313,8 +287,6 @@ export default function AssessmentCard({ href, course, standalone }: {
           }
         };
 
-        console.log('🚀 Starting streaming AI analysis...');
-        
         // Use Server-Sent Events streaming
         const response = await fetch('/api/ai-stream', {
           method: 'POST',
@@ -327,63 +299,49 @@ export default function AssessmentCard({ href, course, standalone }: {
           }),
         });
 
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
+        if (response.ok && response.body) {
+          const reader = response.body.getReader();
+          const decoder = new TextDecoder();
+          let finalResult = {};
 
-        if (!response.body) {
-          throw new Error('No response body');
-        }
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
 
-        const reader = response.body.getReader();
-        const decoder = new TextDecoder();
-        let finalResult = {};
+            const chunk = decoder.decode(value, { stream: true });
+            const lines = chunk.split('\n');
 
-        while (true) {
-          const { done, value } = await reader.read();
-          
-          if (done) break;
+            for (const line of lines) {
+              if (line.startsWith('data: ')) {
+                try {
+                  const jsonStr = line.substring(6);
+                  const parsed = JSON.parse(jsonStr);
 
-          const chunk = decoder.decode(value, { stream: true });
-          const lines = chunk.split('\n');
-
-          for (const line of lines) {
-            if (line.startsWith('data: ')) {
-              try {
-                const jsonStr = line.substring(6); // Remove 'data: '
-                const parsed = JSON.parse(jsonStr);
-                
-                if (parsed.type === 'partial' && parsed.data) {
-                  finalResult = { ...finalResult, ...parsed.data };
-                  toast.loading("AI streaming in progress...");
-                } else if (parsed.type === 'complete' && parsed.data) {
-                  finalResult = parsed.data;
-                  break;
-                } else if (parsed.type === 'error') {
-                  throw new Error(parsed.error);
+                  if (parsed.type === 'partial' && parsed.data) {
+                    finalResult = { ...finalResult, ...parsed.data };
+                  } else if (parsed.type === 'complete' && parsed.data) {
+                    finalResult = parsed.data;
+                    break;
+                  }
+                } catch (parseError) {
+                  continue;
                 }
-              } catch (parseError) {
-                // Ignore parsing errors for incomplete chunks
-                continue;
               }
             }
           }
+
+          if (finalResult && Object.keys(finalResult).length > 0) {
+            aiComments = {
+              ...finalResult,
+              normalDistributionData
+            };
+          }
         }
-
-        aiComments = {
-          ...finalResult,
-          normalDistributionData
-        };
-
-        console.log('✅ Streaming AI analysis completed successfully');
-        
       } catch (aiError) {
-        console.warn('❌ Streaming AI failed, using defaults:', aiError);
-        aiComments = getDefaultAIComments(reportData.performanceCurveData);
+        console.warn('AI analysis failed, using defaults:', aiError);
       }
 
       // Step 3: Generate HTML report
-      toast.loading("Generating HTML report...")
       const htmlResponse = await fetch('/api/so-report-generate', {
         method: 'POST',
         headers: {
@@ -403,16 +361,13 @@ export default function AssessmentCard({ href, course, standalone }: {
       const html = await htmlResponse.text();
 
       // Step 4: Generate PDF
-      toast.loading("Generating PDF...")
       await generatePDF(html, `${course?.course_code} SO Report`, 'portrait');
 
-      toast.dismiss();
-      toast.success('Report generated successfully');
+      toast.success('Report generated successfully', { id: toastId });
 
     } catch (error: any) {
       console.error("Error generating SO report:", error);
-      toast.dismiss();
-      toast.error(error.message || 'Failed to generate report');
+      toast.error(error.message || 'Failed to generate report', { id: toastId });
     }
   }
 
@@ -445,7 +400,7 @@ export default function AssessmentCard({ href, course, standalone }: {
                   <Button onClick={(e) => {
                     e.preventDefault()
                     e.stopPropagation()
-                    handleAssessmentPlan(e)
+                    handleAssessmentPlan()
                   }} variant='outline' size='sm' className='px-5 py-3 text-[11px] w-full h-fit font-bold'>
                     CLO - Report
                   </Button>
