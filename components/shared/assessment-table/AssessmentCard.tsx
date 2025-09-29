@@ -234,14 +234,11 @@ export default function AssessmentCard({ href, course, standalone }: {
 
       const reportData = await dataResponse.json();
 
-      // Step 2: Generate AI analysis (call external AI server directly)
-      toast.loading("Generating AI analysis...")
+      // Step 2: Generate AI analysis using STREAMING (bypasses 10s timeout!)
+      toast.loading("Streaming AI analysis...")
       let aiComments;
       
       try {
-        // Call external AI server directly (hosted on Render/Railway)
-        const AI_SERVER_URL = process.env.NEXT_PUBLIC_AI_SERVER_URL || 'http://localhost:3002';
-        
         // Prepare AI analysis data
         const mean = reportData.performanceAnalysis.overall.mean;
         const stdDev = reportData.performanceAnalysis.overall.stdDev;
@@ -273,16 +270,10 @@ export default function AssessmentCard({ href, course, standalone }: {
           }
         };
 
-        console.log('🤖 Calling external AI server directly...');
+        console.log('🚀 Starting streaming AI analysis...');
         
-        // First, wake up the server (for Render free tier cold starts)
-        try {
-          await fetch(`${AI_SERVER_URL}/health`, { method: 'GET' });
-        } catch (e) {
-          console.log('Waking up AI server...');
-        }
-        
-        const aiResponse = await fetch(`${AI_SERVER_URL}/analyze`, {
+        // Use Server-Sent Events streaming
+        const response = await fetch('/api/ai-stream', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -290,26 +281,61 @@ export default function AssessmentCard({ href, course, standalone }: {
           body: JSON.stringify({
             slug: 'so-report',
             data: soAnalysisData
-          })
+          }),
         });
 
-        if (aiResponse.ok) {
-          const aiResult = await aiResponse.json();
-          if (aiResult.success) {
-            aiComments = {
-              ...aiResult.result,
-              normalDistributionData
-            };
-            console.log('✅ AI analysis completed successfully');
-          } else {
-            throw new Error(aiResult.error || 'AI analysis failed');
-          }
-        } else {
-          throw new Error(`AI server error: ${aiResponse.status}`);
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
+
+        if (!response.body) {
+          throw new Error('No response body');
+        }
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let finalResult = {};
+
+        while (true) {
+          const { done, value } = await reader.read();
+          
+          if (done) break;
+
+          const chunk = decoder.decode(value, { stream: true });
+          const lines = chunk.split('\n');
+
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              try {
+                const jsonStr = line.substring(6); // Remove 'data: '
+                const parsed = JSON.parse(jsonStr);
+                
+                if (parsed.type === 'partial' && parsed.data) {
+                  finalResult = { ...finalResult, ...parsed.data };
+                  toast.loading("AI streaming in progress...");
+                } else if (parsed.type === 'complete' && parsed.data) {
+                  finalResult = parsed.data;
+                  break;
+                } else if (parsed.type === 'error') {
+                  throw new Error(parsed.error);
+                }
+              } catch (parseError) {
+                // Ignore parsing errors for incomplete chunks
+                continue;
+              }
+            }
+          }
+        }
+
+        aiComments = {
+          ...finalResult,
+          normalDistributionData
+        };
+
+        console.log('✅ Streaming AI analysis completed successfully');
         
       } catch (aiError) {
-        console.warn('❌ AI analysis failed, using defaults:', aiError);
+        console.warn('❌ Streaming AI failed, using defaults:', aiError);
         aiComments = getDefaultAIComments(reportData.performanceCurveData);
       }
 
