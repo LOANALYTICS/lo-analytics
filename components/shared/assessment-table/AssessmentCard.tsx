@@ -27,27 +27,116 @@ export default function AssessmentCard({ href, course, standalone }: {
 
   const handleAssessmentPlan = async (e: any) => {
     try {
-      toast.loading("Generating reports")
-      const response = await fetch('/api/generate-clo-report', {
+      // Step 1: Calculate CLO report data
+      toast.loading("Calculating report data...")
+      const dataResponse = await fetch('/api/clo-report-data', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           courseId: course._id,
-          academicYear: course.academic_year,
-          coordinator: coordinator?.name
+          academicYear: course.academic_year
         }),
       });
 
-      if (!response.ok) {
-        toast.warning('Something went wrong!')
-        return
-      };
+      if (!dataResponse.ok) {
+        toast.error('Failed to calculate report data');
+        return;
+      }
 
-      // Parse JSON response with HTML contents and plogroups for AI analysis
-      const data = await response.json();
-      const { cloHtml, ploHtml, plogroups } = data;
+      const reportData = await dataResponse.json();
 
-      // Array to store PDF data
+      // Step 2: Generate AI analysis using streaming
+      toast.loading("Generating AI analysis...")
+      let aiComments;
+      
+      try {
+        console.log('🚀 Starting streaming AI analysis for CLO...');
+        
+        const response = await fetch('/api/ai-stream', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            slug: 'clo-report',
+            data: { plogroups: reportData.plogroups }
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        if (!response.body) {
+          throw new Error('No response body');
+        }
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let finalResult = {};
+
+        while (true) {
+          const { done, value } = await reader.read();
+          
+          if (done) break;
+
+          const chunk = decoder.decode(value, { stream: true });
+          const lines = chunk.split('\n');
+
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              try {
+                const jsonStr = line.substring(6);
+                const parsed = JSON.parse(jsonStr);
+                
+                if (parsed.type === 'partial' && parsed.data) {
+                  finalResult = { ...finalResult, ...parsed.data };
+                  toast.loading("AI analysis streaming...");
+                } else if (parsed.type === 'complete' && parsed.data) {
+                  finalResult = parsed.data;
+                  break;
+                } else if (parsed.type === 'error') {
+                  throw new Error(parsed.error);
+                }
+              } catch (parseError) {
+                continue;
+              }
+            }
+          }
+        }
+
+        aiComments = finalResult;
+        console.log('✅ Streaming AI analysis completed for CLO');
+        
+      } catch (aiError) {
+        console.warn('❌ Streaming AI failed for CLO, using defaults:', aiError);
+        aiComments = {
+          strengthPoints: ["Assessment data shows consistent performance patterns"],
+          weaknessPoints: ["Some areas may need additional focus"],
+          recommendations: ["Continue monitoring student progress"]
+        };
+      }
+
+      // Step 3: Generate HTML reports
+      toast.loading("Generating HTML reports...")
+      const htmlResponse = await fetch('/api/clo-report-generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...reportData,
+          coordinator: coordinator?.name,
+          aiComments
+        }),
+      });
+
+      if (!htmlResponse.ok) {
+        throw new Error('Failed to generate HTML reports');
+      }
+
+      const { cloHtml, ploHtml, plogroups } = await htmlResponse.json();
+
+      // Step 4: Generate PDFs
+      toast.loading("Generating PDFs...")
       const pdfDataArray: string[] = [];
 
       // Create temporary container for CLO HTML
@@ -55,7 +144,7 @@ export default function AssessmentCard({ href, course, standalone }: {
       cloContainer.innerHTML = cloHtml;
       document.body.appendChild(cloContainer);
 
-      // Wait for Plotly chart to render in CLO report
+      // Wait for chart to render
       await new Promise((resolve) => {
         const checkChart = setInterval(() => {
           const chartDiv = cloContainer.querySelector('#achievementChart');
@@ -64,96 +153,49 @@ export default function AssessmentCard({ href, course, standalone }: {
             resolve(true);
           }
         }, 100);
-        // Timeout after 5 seconds
         setTimeout(() => {
           clearInterval(checkChart);
           resolve(false);
         }, 5000);
       });
 
-      // Generate CLO PDF and capture data instead of saving
-      console.log('Generating CLO PDF');
+      // Generate CLO PDF
       const cloPdfData = await generatePDFWithJsPDF(cloContainer.innerHTML, `${course?.course_code} CLO Report`, 'portrait', false) as string;
-      console.log('CLO PDF generated successfully');
       document.body.removeChild(cloContainer);
       if (cloPdfData) {
-        console.log('Adding CLO PDF data to array');
         pdfDataArray.push(cloPdfData);
-        console.log(`PDF data array now has ${pdfDataArray.length} items`);
-      } else {
-        console.error('CLO PDF data is null or undefined');
       }
 
-      // Generate PLO PDF and capture data instead of saving
+      // Generate PLO PDF
       try {
-        // Generate PLO PDF directly from HTML string
-        console.log('Generating PLO PDF');
         const ploPdfData = await generatePloPdfFromHtml(ploHtml, `${course?.course_code} PLO Report`, false) as string;
-        console.log('PLO PDF generated successfully');
-
         if (ploPdfData) {
-          console.log('Adding PLO PDF data to array');
           pdfDataArray.push(ploPdfData);
-          console.log(`PDF data array now has ${pdfDataArray.length} items`);
-        } else {
-          console.error('PLO PDF data is null or undefined');
         }
       } catch (ploError) {
         console.error("Error generating PLO report:", ploError);
-        toast.error('Failed to generate PLO report');
       }
 
-      // Generate AI Analysis Report (third report)
+      // Generate AI Analysis PDF using existing AI comments
       try {
-        toast.loading("Generating reports");
-
-        const aiResponse = await fetch('/api/generate-ai-analysis', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            plogroups
-          }),
-        });
-
-        if (!aiResponse.ok) {
-          console.error('analysis failed');
-          toast.error('analysis failed');
-        } else {
-          const aiData = await aiResponse.json();
-          const { commentsHtml } = aiData;
-
-          console.log('Generating AI Analysis PDF');
+        if (aiComments && (aiComments.strengthPoints || aiComments.weaknessPoints || aiComments.recommendations)) {
+          // Generate comments HTML directly from AI analysis we already have
+          const { generateCommentsReportHTML } = await import('@/templates/ploGroupReport');
+          const commentsHtml = await generateCommentsReportHTML(aiComments);
           const aiPdfData = await generateCommentsPdfFromHtml(commentsHtml, `${course?.course_code} AI Analysis Report`, false) as string;
-          console.log('AI Analysis PDF generated successfully');
-
           if (aiPdfData) {
-            console.log('Adding AI Analysis PDF data to array');
             pdfDataArray.push(aiPdfData);
-            console.log(`PDF data array now has ${pdfDataArray.length} items`);
-          } else {
-            console.error('AI Analysis PDF data is null or undefined');
           }
         }
       } catch (aiError) {
         console.error("Error generating AI analysis report:", aiError);
-        toast.error('Failed to generate AI analysis report');
       }
 
-      // Merge and save PDFs
+      // Step 5: Merge PDFs
       if (pdfDataArray.length > 0) {
-        toast.loading("Merging reports");
+        toast.loading("Merging reports...")
         try {
-          console.log(`Attempting to merge ${pdfDataArray.length} PDFs`);
-          console.log(`CLO PDF data length: ${pdfDataArray[0]?.length || 0}`);
-          if (pdfDataArray.length > 1) {
-            console.log(`PLO PDF data length: ${pdfDataArray[1]?.length || 0}`);
-          }
-          if (pdfDataArray.length > 2) {
-            console.log(`AI Analysis PDF data length: ${pdfDataArray[2]?.length || 0}`);
-          }
           await mergePDFs(pdfDataArray, `${course?.course_code} Combined Reports`);
-          toast.dismiss();
-
           toast.success('Combined reports generated successfully');
         } catch (mergeError) {
           console.error("Error merging PDFs:", mergeError);
@@ -165,10 +207,11 @@ export default function AssessmentCard({ href, course, standalone }: {
 
     } catch (error: any) {
       console.error("Error generating report:", error);
+      toast.dismiss();
       if (error?.message === "Assessment data not found") {
         toast.error('Assessment not found');
       } else {
-        toast.error('Failed to download assessment report');
+        toast.error('Failed to generate report');
       }
     }
   }
