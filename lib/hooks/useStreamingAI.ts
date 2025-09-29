@@ -1,6 +1,5 @@
 // Custom hook for streaming AI analysis
 import { useState } from 'react';
-import { streamObject } from 'ai/react';
 
 interface StreamingAIOptions {
   onComplete?: (result: any) => void;

@@ -54,12 +54,12 @@ export default function StreamingAssessmentCard({ href, course, standalone }: {
       // Step 2: Generate AI analysis using STREAMING (bypasses 10s timeout!)
       toast.loading("Streaming AI analysis...")
       let aiComments;
-      
+
       try {
         // Prepare AI analysis data
         const mean = reportData.performanceAnalysis.overall.mean;
         const stdDev = reportData.performanceAnalysis.overall.stdDev;
-        
+
         // Generate normal distribution data
         const normalDistributionData = [];
         for (let x = 60; x <= 100; x++) {
@@ -68,7 +68,7 @@ export default function StreamingAssessmentCard({ href, course, standalone }: {
           const value = coefficient * Math.exp(exponent) * 97;
           normalDistributionData.push({ x, value });
         }
-        
+
         const soAnalysisData = {
           histogram: {
             scoreRanges: reportData.performanceCurveData.ranges,
@@ -88,7 +88,7 @@ export default function StreamingAssessmentCard({ href, course, standalone }: {
         };
 
         console.log('🚀 Starting streaming AI analysis...');
-        
+
         // Use streaming AI - this bypasses Vercel's 10s timeout!
         const streamResult = await analyzeReport('so-report', soAnalysisData, {
           onProgress: (partial) => {
@@ -109,7 +109,7 @@ export default function StreamingAssessmentCard({ href, course, standalone }: {
         };
 
         console.log('✅ Streaming AI analysis completed successfully');
-        
+
       } catch (aiError) {
         console.warn('❌ Streaming AI failed, using defaults:', aiError);
         aiComments = getDefaultAIComments(reportData.performanceCurveData);
@@ -176,20 +176,20 @@ export default function StreamingAssessmentCard({ href, course, standalone }: {
                 </div>
 
                 <div className='z-50 flex flex-col gap-2 self-end bottom-3 '>
-                  <Button 
+                  <Button
                     onClick={(e) => {
                       e.preventDefault()
                       e.stopPropagation()
                       handleStreamingStudentOutcome(e, course?._id, course?.academic_year, course?.section)
-                    }} 
-                    variant='outline' 
-                    size='sm' 
+                    }}
+                    variant='outline'
+                    size='sm'
                     className='px-5 py-3 text-[11px] w-full h-fit font-bold'
                     disabled={aiLoading}
                   >
                     {aiLoading ? 'Streaming...' : 'S.O - Report (Stream)'}
                   </Button>
-                  
+
                   <Button onClick={(e) => {
                     e.preventDefault()
                     e.stopPropagation()
