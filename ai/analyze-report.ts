@@ -13,10 +13,10 @@ export async function analyzeReport(slug: string, data: any) {
     console.log('entered')
     // Get the prompt configuration for the given slug
     const config = getPromptConfig(slug);
-    
+
     // Replace the data placeholder in the prompt
     const prompt = config.prompt.replace('{{data}}', JSON.stringify(data, null, 2));
-    
+
     // Generate structured output using Gemini Flash
     const result = await generateObject({
       model: google('gemini-2.5-flash'),

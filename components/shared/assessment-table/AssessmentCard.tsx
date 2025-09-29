@@ -275,6 +275,13 @@ export default function AssessmentCard({ href, course, standalone }: {
 
         console.log('🤖 Calling external AI server directly...');
         
+        // First, wake up the server (for Render free tier cold starts)
+        try {
+          await fetch(`${AI_SERVER_URL}/health`, { method: 'GET' });
+        } catch (e) {
+          console.log('Waking up AI server...');
+        }
+        
         const aiResponse = await fetch(`${AI_SERVER_URL}/analyze`, {
           method: 'POST',
           headers: {

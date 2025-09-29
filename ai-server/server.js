@@ -17,25 +17,25 @@ app.use(express.json({ limit: '10mb' }));
 
 // Schema for CLO Report Analysis
 const cloReportSchema = z.object({
-  strengthPoints: z.array(z.string()).describe("List of strength points identified in the CLO analysis"),
-  weaknessPoints: z.array(z.string()).describe("List of weakness points identified in the CLO analysis"),
-  recommendations: z.array(z.string()).describe("List of actionable recommendations for improvement")
+    strengthPoints: z.array(z.string()).describe("List of strength points identified in the CLO analysis"),
+    weaknessPoints: z.array(z.string()).describe("List of weakness points identified in the CLO analysis"),
+    recommendations: z.array(z.string()).describe("List of actionable recommendations for improvement")
 });
 
 // Schema for SO Report Analysis
 const soReportSchema = z.object({
-  centralTendency: z.string().describe("Analysis of the central tendency of the data distribution"),
-  distributionShape: z.string().describe("Description of the distribution shape (normal, skewed, etc.)"),
-  spread: z.string().describe("Analysis of data spread and range"),
-  performanceInsight: z.string().describe("Insights about student performance patterns"),
-  performanceBenchmarking: z.string().describe("Benchmarking analysis and recommendations")
+    centralTendency: z.string().describe("Analysis of the central tendency of the data distribution"),
+    distributionShape: z.string().describe("Description of the distribution shape (normal, skewed, etc.)"),
+    spread: z.string().describe("Analysis of data spread and range"),
+    performanceInsight: z.string().describe("Insights about student performance patterns"),
+    performanceBenchmarking: z.string().describe("Benchmarking analysis and recommendations")
 });
 
 // Prompt configurations
 const promptConfigs = [
-  {
-    slug: 'clo-report',
-    prompt: `You are an educational assessment expert analyzing Course Learning Outcomes (CLOs) data following international quality assurance standards for higher education.
+    {
+        slug: 'clo-report',
+        prompt: `You are an educational assessment expert analyzing Course Learning Outcomes (CLOs) data following international quality assurance standards for higher education.
 
 Given the following CLO groups data: {{data}}
 
@@ -74,13 +74,13 @@ Recommendations:
 - Review and revise assessments to better measure soft skills outcomes.
 
 **Note:** Follow NCAAA Saudi guidelines and provide analysis as a human educational assessment expert would.`,
-    schema: cloReportSchema,
-    description: "Analyzes CLO (Course Learning Outcomes) data to identify strengths, weaknesses, and recommendations"
-  },
-  
-  {
-    slug: 'so-report',
-    prompt: `You are a statistical analysis expert examining student performance data following international quality assurance standards for higher education.
+        schema: cloReportSchema,
+        description: "Analyzes CLO (Course Learning Outcomes) data to identify strengths, weaknesses, and recommendations"
+    },
+
+    {
+        slug: 'so-report',
+        prompt: `You are a statistical analysis expert examining student performance data following international quality assurance standards for higher education.
 
 Given the following performance data: {{data}}
 
@@ -119,18 +119,18 @@ Assessment Quality:
 - Performance tiers can be used to define actionable improvement steps for assessments.
 
 **Note:** Follow NCAAA Saudi guidelines and provide analysis as a human statistical assessment expert would.`,
-    schema: soReportSchema,
-    description: "Analyzes student performance data from histograms and bell curves to provide statistical insights"
-  }
+        schema: soReportSchema,
+        description: "Analyzes student performance data from histograms and bell curves to provide statistical insights"
+    }
 ];
 
 // Helper function to get config by slug
 function getPromptConfig(slug) {
-  const config = promptConfigs.find(config => config.slug === slug);
-  if (!config) {
-    throw new Error(`No prompt configuration found for slug: ${slug}`);
-  }
-  return config;
+    const config = promptConfigs.find(config => config.slug === slug);
+    if (!config) {
+        throw new Error(`No prompt configuration found for slug: ${slug}`);
+    }
+    return config;
 }
 
 /**
@@ -140,116 +140,118 @@ function getPromptConfig(slug) {
  * @returns Structured analysis results
  */
 async function analyzeReport(slug, data) {
-  try {
-    console.log(`🤖 Starting AI analysis for ${slug}...`);
-    
-    // Get the prompt configuration for the given slug
-    const config = getPromptConfig(slug);
-    
-    // Replace the data placeholder in the prompt
-    const prompt = config.prompt.replace('{{data}}', JSON.stringify(data, null, 2));
-    
-    console.log(`📝 Prompt prepared, calling Gemini...`);
-    
-    // Generate structured output using Gemini Flash
-    const result = await generateObject({
-      model: google('gemini-2.0-flash-exp'),
-      prompt,
-      schema: config.schema,
-      temperature: 0.3, // Lower temperature for more consistent analysis
-    });
+    try {
+        console.log(`🤖 Starting AI analysis for ${slug}...`);
 
-    console.log(`✅ AI analysis completed for ${slug}`);
-    return result.object;
+        // Get the prompt configuration for the given slug
+        const config = getPromptConfig(slug);
 
-  } catch (error) {
-    console.error('❌ Error analyzing report:', error);
-    throw new Error(`Failed to analyze ${slug} report: ${error instanceof Error ? error.message : 'Unknown error'}`);
-  }
+        // Replace the data placeholder in the prompt
+        const prompt = config.prompt.replace('{{data}}', JSON.stringify(data, null, 2));
+
+        console.log(`📝 Prompt prepared, calling Gemini...`);
+
+        // Generate structured output using Gemini Flash
+        const result = await generateObject({
+            model: google('gemini-2.0-flash-exp', {
+                apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY
+            }),
+            prompt,
+            schema: config.schema,
+            temperature: 0.3, // Lower temperature for more consistent analysis
+        });
+
+        console.log(`✅ AI analysis completed for ${slug}`);
+        return result.object;
+
+    } catch (error) {
+        console.error('❌ Error analyzing report:', error);
+        throw new Error(`Failed to analyze ${slug} report: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
 }
 
 // Health check endpoint
 app.get('/health', (req, res) => {
-  res.json({ 
-    status: 'healthy', 
-    timestamp: new Date().toISOString(),
-    service: 'AI Analysis Server'
-  });
+    res.json({
+        status: 'healthy',
+        timestamp: new Date().toISOString(),
+        service: 'AI Analysis Server'
+    });
 });
 
 // Main AI analysis endpoint
 app.post('/analyze', async (req, res) => {
-  try {
-    const { slug, data } = req.body;
+    try {
+        const { slug, data } = req.body;
 
-    // Validate input
-    if (!slug || !data) {
-      return res.status(400).json({
-        error: 'Missing required fields: slug and data are required'
-      });
+        // Validate input
+        if (!slug || !data) {
+            return res.status(400).json({
+                error: 'Missing required fields: slug and data are required'
+            });
+        }
+
+        // Validate slug
+        const validSlugs = ['clo-report', 'so-report'];
+        if (!validSlugs.includes(slug)) {
+            return res.status(400).json({
+                error: `Invalid slug. Must be one of: ${validSlugs.join(', ')}`
+            });
+        }
+
+        console.log(`📊 Received analysis request for ${slug}`);
+
+        // Perform AI analysis
+        const result = await analyzeReport(slug, data);
+
+        console.log(`🎉 Analysis completed successfully for ${slug}`);
+
+        res.json({
+            success: true,
+            slug,
+            result,
+            timestamp: new Date().toISOString()
+        });
+
+    } catch (error) {
+        console.error('❌ Analysis error:', error);
+
+        res.status(500).json({
+            success: false,
+            error: error.message || 'Internal server error',
+            timestamp: new Date().toISOString()
+        });
     }
-
-    // Validate slug
-    const validSlugs = ['clo-report', 'so-report'];
-    if (!validSlugs.includes(slug)) {
-      return res.status(400).json({
-        error: `Invalid slug. Must be one of: ${validSlugs.join(', ')}`
-      });
-    }
-
-    console.log(`📊 Received analysis request for ${slug}`);
-    
-    // Perform AI analysis
-    const result = await analyzeReport(slug, data);
-    
-    console.log(`🎉 Analysis completed successfully for ${slug}`);
-    
-    res.json({
-      success: true,
-      slug,
-      result,
-      timestamp: new Date().toISOString()
-    });
-
-  } catch (error) {
-    console.error('❌ Analysis error:', error);
-    
-    res.status(500).json({
-      success: false,
-      error: error.message || 'Internal server error',
-      timestamp: new Date().toISOString()
-    });
-  }
 });
 
 // Error handling middleware
 app.use((error, req, res, next) => {
-  console.error('❌ Unhandled error:', error);
-  res.status(500).json({
-    success: false,
-    error: 'Internal server error',
-    timestamp: new Date().toISOString()
-  });
+    console.error('❌ Unhandled error:', error);
+    res.status(500).json({
+        success: false,
+        error: 'Internal server error',
+        timestamp: new Date().toISOString()
+    });
 });
 
 // 404 handler
 app.use((req, res) => {
-  res.status(404).json({
-    success: false,
-    error: 'Endpoint not found',
-    availableEndpoints: [
-      'GET /health - Health check',
-      'POST /analyze - AI analysis endpoint'
-    ]
-  });
+    res.status(404).json({
+        success: false,
+        error: 'Endpoint not found',
+        availableEndpoints: [
+            'GET /health - Health check',
+            'POST /analyze - AI analysis endpoint'
+        ]
+    });
 });
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`🚀 AI Analysis Server running on port ${PORT}`);
-  console.log(`📍 Health check: http://localhost:${PORT}/health`);
-  console.log(`🤖 Analysis endpoint: http://localhost:${PORT}/analyze`);
-  console.log(`🔑 Make sure GOOGLE_GENERATIVE_AI_API_KEY is set in environment`);
+    console.log(`🚀 AI Analysis Server running on port ${PORT}`);
+    console.log(`📍 Health check: http://localhost:${PORT}/health`);
+    console.log(`🤖 Analysis endpoint: http://localhost:${PORT}/analyze`);
+    console.log(`🔑 Make sure GOOGLE_GENERATIVE_AI_API_KEY is set in environment`);
 });
 
 export default app;
