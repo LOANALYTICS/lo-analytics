@@ -332,9 +332,15 @@ export default function AssessmentCard({ href, course, standalone }: {
 
           if (finalResult && Object.keys(finalResult).length > 0) {
             aiComments = {
+              ...aiComments,
               ...finalResult,
               normalDistributionData
-            };
+            } as any;
+          } else {
+            aiComments = {
+              ...aiComments,
+              normalDistributionData
+            } as any;
           }
         }
       } catch (aiError) {
