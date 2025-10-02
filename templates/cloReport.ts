@@ -571,13 +571,22 @@ export async function generateCloReportHTML(props: CloReportProps): Promise<stri
                     <div class="vertical-text-container">Indirect Assessment</div>
                   </td>
                   <td colspan="2" class="achievement-label">Achievement Rate</td>
-                  ${sortedClos.map(() => `<td>80.00</td>`).join('')}
+                  ${sortedClos.map(clo => {
+      // Extract CLO number from "clo1" -> "1"
+      const cloNumber = clo.replace(/^clo/i, '');
+      const assessment = indirectAssessmentData.indirectAssessments.find(
+        (a: any) => a.clo === cloNumber
+      );
+      return `<td>${assessment ? assessment.benchmark : '80.00'}</td>`;
+    }).join('')}
                 </tr>
                 <tr class="achievement-row">
                   <td colspan="2" class="achievement-label">% of students agreed that they achieved the CLO</td>
                   ${sortedClos.map(clo => {
+      // Extract CLO number from "clo1" -> "1"
+      const cloNumber = clo.replace(/^clo/i, '');
       const assessment = indirectAssessmentData.indirectAssessments.find(
-        (a: any) => a.clo.replace(/\s/g, '').toUpperCase() === clo.replace(/\s/g, '').toUpperCase()
+        (a: any) => a.clo === cloNumber
       );
       return `<td>${assessment ? assessment.achievementPercentage.toFixed(1) + '%' : '-'}</td>`;
     }).join('')}

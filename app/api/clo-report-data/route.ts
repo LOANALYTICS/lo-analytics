@@ -143,6 +143,8 @@ function buildCloDiagnostics60(processedData: unknown, assessmentData: unknown) 
   });
 
   const indirectArr = ((assessmentData as any)?.indirectAssessments as Array<{ clo: string; achievementPercentage: number }>) || [];
+console.log('indirectArr', indirectArr  )
+console.log('cloMap', cloMap  )
   const flatIndirect = indirectArr.map((ia) => {
     const key = toCloKey(ia?.clo);
     const info = key && cloMap[key] ? cloMap[key] : { description: '', mapping: [] };
@@ -154,6 +156,9 @@ function buildCloDiagnostics60(processedData: unknown, assessmentData: unknown) 
       percentageAchieving: typeof ia?.achievementPercentage === 'number' ? ia.achievementPercentage.toFixed(2) : String(ia?.achievementPercentage ?? ''),
     };
   });
+
+  console.log('flatIndirect', flatIndirect  )
+
 
   const byKey: Record<string, {
     cloNumber: string;
@@ -395,6 +400,7 @@ export async function POST(request: Request) {
       console.error('Failed to save achievement data:', error);
     }
 
+    console.log(assessmentData?.indirectAssessments,'assessmentData?.indirectAssessments')
     return NextResponse.json({
       course: {
         course_name: courseData.course_name,

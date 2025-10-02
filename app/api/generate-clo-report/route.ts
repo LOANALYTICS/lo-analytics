@@ -445,6 +445,10 @@ export async function POST(request: Request) {
 
   
 
+    const indirectData = assessmentData?.indirectAssessments ? {
+      indirectAssessments: assessmentData.indirectAssessments
+    } : undefined;
+
     // Generate HTML content using the template
     const htmlContent = await generateCloReportHTML({
       course: {
@@ -460,9 +464,7 @@ export async function POST(request: Request) {
       },
       college: courseData.collage,
       assessmentData: processedData,
-      indirectAssessmentData: assessmentData?.indirectAssessments ? {
-        indirectAssessments: assessmentData.indirectAssessments
-      } : undefined,
+      indirectAssessmentData: indirectData,
       plogroups,
       benchmark: assessmentData.benchmark || 0
     });

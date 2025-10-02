@@ -63,7 +63,7 @@ export async function updateCLOData(courseId: string, cloData: Array<{
             { course: courseId },
             { $set: { cloData: transformedCLOData } },
             { new: true, upsert: true }
-        ).lean();
+        ).select('indirectAssessments').lean();
 
         // Sync indirect assessments with updated CLO data
         if (assessment) {
