@@ -65,6 +65,50 @@ export async function updateCLOData(courseId: string, cloData: Array<{
             { new: true, upsert: true }
         ).lean();
 
+        // Sync indirect assessments with updated CLO data
+        if (assessment) {
+            const existingIndirect = (assessment as any).indirectAssessments || [];
+            const existingIndirectMap = new Map();
+            
+            // Map existing indirect assessments by CLO name
+            existingIndirect.forEach((indirect: any) => {
+                existingIndirectMap.set(indirect.clo, indirect);
+            });
+
+            // Create updated indirect assessments array
+            const updatedIndirectAssessments = transformedCLOData.map((cloItem, index) => {
+                // Try to match by CLO name first
+                let existing = existingIndirectMap.get(cloItem.clo);
+                
+                // If no match by name, try to match by position/index
+                if (!existing && existingIndirect[index]) {
+                    existing = existingIndirect[index];
+                }
+                
+                if (existing) {
+                    return {
+                        ...existing,
+                        clo: cloItem.clo // Update to new CLO name
+                    };
+                } else {
+                    // Create new empty indirect assessment
+                    return {
+                        clo: cloItem.clo,
+                        achievementRate: 0,
+                        benchmark: '80',
+                        achievementPercentage: 0
+                    };
+                }
+            });
+
+            // Update the assessment with synced indirect assessments
+            await Assessment.findOneAndUpdate(
+                { course: courseId },
+                { $set: { indirectAssessments: updatedIndirectAssessments } },
+                { new: true }
+            );
+        }
+
         if (!assessment) {
             throw new Error('Failed to update CLO data');
         }
