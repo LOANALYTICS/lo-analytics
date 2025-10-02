@@ -143,7 +143,6 @@ function generateCommentsAndSignaturePage(comments?: { strengthPoints: string[];
   return `
     <div class="comments-page">
       <div class="comments-content">
-        <h3>AI Analysis Comments</h3>
         ${strengthPointsHtml ? `
           <div class="comment-category">
             <h4>Strengths:</h4>
