@@ -13,7 +13,7 @@ const sidebarItems: SidebarItem[] = [
     name: "Learning Outcome", displayName: "Learning Outcomes", href: "/dashboard/learning-outcomes", icon: BookOpenCheck,
     others: [
       { name: "Student Details", href: "/dashboard/learning-outcomes/student-details", icon: UsersRound },
-      { name: "Clo Mappings", href: "/dashboard/learning-outcomes/clo-mapping", icon: BookDashed },
+      { name: "CLO Mappings", href: "/dashboard/learning-outcomes/clo-mapping", icon: BookDashed },
       { name: "Assessment Plan", href: "/dashboard/learning-outcomes/assessment-plan", icon: AsteriskSquare },
       { name: "Reports", href: "/dashboard/learning-outcomes/reports", icon: FileChartLine },
     ]

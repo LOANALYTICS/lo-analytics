@@ -34,6 +34,7 @@ Please analyze this data and provide a concise assessment following quality assu
 5. Ensure compliance with NCAAA Saudi quality assurance standards
 
 **Output Requirements:**
+- IMPORTANT: Do not include AI stuff or sound AI generated like, And Do not use Clo clo or lower case it , alway use CLO as uppercased, in all cases
 - Keep each point SHORT and DESCRIPTIVE (maximum 2 sentences)
 - Focus on specific, measurable observations
 - Base recommendations on actual data evidence
@@ -80,6 +81,7 @@ Please analyze this data and provide concise insights following quality assuranc
 5. Quality Benchmarking: Compare against NCAAA Saudi quality assurance standards
 
 **Output Requirements:**
+- IMPORTANT: Do not include AI stuff or sound AI generated like, And Do not use Clo clo or lower case it , alway use CLO as uppercased, in all cases
 - Keep each point SHORT and DESCRIPTIVE (maximum 2 sentences)
 - Focus on specific, measurable statistical observations
 - Base recommendations on actual data evidence
