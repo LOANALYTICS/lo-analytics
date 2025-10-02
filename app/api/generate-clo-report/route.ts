@@ -352,12 +352,24 @@ export async function POST(request: Request) {
         .reduce((sum, score) => sum + score.marksScored, 0);
     });
 
+    // Filter out CLOs that have no data (total marks = 0)
+    console.log('🔍 DEBUG - All CLOs found:', Array.from(uniqueClos));
+    console.log('🔍 DEBUG - CLO total marks:', Object.fromEntries(cloTotalMarks));
+    
+    const activeClos = Array.from(uniqueClos).filter(clo => {
+      const totalMarks = cloTotalMarks.get(clo) || 0;
+      console.log(`🔍 DEBUG - CLO ${clo}: totalMarks = ${totalMarks}, active = ${totalMarks > 0}`);
+      return totalMarks > 0;
+    });
+    
+    console.log('🔍 DEBUG - Active CLOs after filtering:', activeClos);
+
     // Prepare data for template with all calculations
     const processedData = {
       students: Array.from(studentResults.values()),
       cloScores: Object.fromEntries(cloTotalMarks),
       achievementData: {
-        60: Array.from(uniqueClos).map(clo => {
+        60: activeClos.map(clo => {
           const totalScore = cloTotalMarks.get(clo) || 0;
           const studentsAchieving = Array.from(studentResults.values()).filter(student => {
             const studentScore = student.cloScores[clo]?.marksScored || 0;
@@ -370,7 +382,7 @@ export async function POST(request: Request) {
             percentageAchieving: ((studentsAchieving.length / studentResults.size) * 100).toFixed(2)
           };
         }),
-        70: Array.from(uniqueClos).map(clo => {
+        70: activeClos.map(clo => {
           const totalScore = cloTotalMarks.get(clo) || 0;
           const studentsAchieving = Array.from(studentResults.values()).filter(student => {
             const studentScore = student.cloScores[clo]?.marksScored || 0;
@@ -383,7 +395,7 @@ export async function POST(request: Request) {
             percentageAchieving: ((studentsAchieving.length / studentResults.size) * 100).toFixed(2)
           };
         }),
-        80: Array.from(uniqueClos).map(clo => {
+        80: activeClos.map(clo => {
           const totalScore = cloTotalMarks.get(clo) || 0;
           const studentsAchieving = Array.from(studentResults.values()).filter(student => {
             const studentScore = student.cloScores[clo]?.marksScored || 0;
@@ -396,7 +408,7 @@ export async function POST(request: Request) {
             percentageAchieving: ((studentsAchieving.length / studentResults.size) * 100).toFixed(2)
           };
         }),
-        90: Array.from(uniqueClos).map(clo => {
+        90: activeClos.map(clo => {
           const totalScore = cloTotalMarks.get(clo) || 0;
           const studentsAchieving = Array.from(studentResults.values()).filter(student => {
             const studentScore = student.cloScores[clo]?.marksScored || 0;
@@ -410,7 +422,7 @@ export async function POST(request: Request) {
           };
         })
       },
-      sortedClos: Array.from(uniqueClos).sort((a, b) => {
+      sortedClos: activeClos.sort((a, b) => {
         const aNum = parseInt(a.replace(/[^\d]/g, ''));
         const bNum = parseInt(b.replace(/[^\d]/g, ''));
         return aNum - bNum;
@@ -446,7 +458,10 @@ export async function POST(request: Request) {
   
 
     const indirectData = assessmentData?.indirectAssessments ? {
-      indirectAssessments: assessmentData.indirectAssessments
+      indirectAssessments: assessmentData.indirectAssessments.filter((assessment: any) => {
+        // Only include indirect assessments for CLOs that have actual data
+        return activeClos.includes(`clo${assessment.clo}`);
+      })
     } : undefined;
 
     // Generate HTML content using the template

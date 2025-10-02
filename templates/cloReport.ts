@@ -137,7 +137,9 @@ async function generateAchievementChartHTML(achievementData: any, sortedClos: st
 
 
   const indirectChartData = indirectAssessmentData ? sortedClos.map(clo => {
-    const assessment = indirectAssessmentData.indirectAssessments.find((a: any) => a.clo.replace(/\s/g, '').toUpperCase() === clo.replace(/\s/g, '').toUpperCase());
+    // Extract CLO number from "clo1" -> "1"
+    const cloNumber = clo.replace(/^clo/i, '');
+    const assessment = indirectAssessmentData.indirectAssessments.find((a: any) => a.clo === cloNumber);
     const value = assessment ? parseFloat(assessment.achievementPercentage) : 0;
     return value;
   }) : [];
