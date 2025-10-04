@@ -4,7 +4,7 @@ export interface PloGroupItem {
   mappedPLOs: string[];
   weightage: number | null;
   direct: { achievementGrade: string; percentageAchieving: string };
-  indirect: { achievementGrade: string; percentageAchieving: string };
+  indirect: { achievementGrade: string; percentageAchieving: string; benchmark?: string };
 }
 
 export interface PloGroups {
@@ -65,8 +65,6 @@ function diffComment(actual: number | null, target: number): string {
 }
 
 function buildGroupSection(title: string, items: PloGroupItem[], directTarget: number, groupNumber: number): string {
-  const indirectTarget = 80; // Indirect targeted level is constant 80%
-
   const rows: string[] = [];
 
   items.forEach((item, index) => {
@@ -90,9 +88,9 @@ function buildGroupSection(title: string, items: PloGroupItem[], directTarget: n
       </tr>
       <tr class="clo-row clo-row-indirect row-${escapeHTML(serial)}">
         <td class="method">Indirect</td>
-        <td class="target">≥ ${indirectTarget}% of students should agree that they achieved the CLO</td>
+        <td class="target">≥ ${item?.indirect?.benchmark || '80'}% of students should agree that they achieved the CLO</td>
         <td class="actual">${fmtPct(indirectActual)} of students agreed that they achieved the CLO</td>
-        <td class="comment">${escapeHTML(diffComment(indirectActual, indirectTarget))}</td>
+        <td class="comment">${escapeHTML(diffComment(indirectActual, Number(item?.indirect?.benchmark) || 80))}</td>
       </tr>
     `);
   });

@@ -142,7 +142,7 @@ function buildCloDiagnostics60(processedData: unknown, assessmentData: unknown) 
     };
   });
 
-  const indirectArr = ((assessmentData as any)?.indirectAssessments as Array<{ clo: string; achievementPercentage: number }>) || [];
+  const indirectArr = ((assessmentData as any)?.indirectAssessments as Array<{ clo: string; achievementPercentage: number; benchmark: string }>) || [];
 console.log('indirectArr', indirectArr  )
 console.log('cloMap', cloMap  )
   const flatIndirect = indirectArr.map((ia) => {
@@ -154,6 +154,7 @@ console.log('cloMap', cloMap  )
       mappedPLOs: info.mapping,
       achievementGrade: '',
       percentageAchieving: typeof ia?.achievementPercentage === 'number' ? ia.achievementPercentage.toFixed(2) : String(ia?.achievementPercentage ?? ''),
+      benchmark: ia?.benchmark || '',
     };
   });
 
@@ -166,7 +167,7 @@ console.log('cloMap', cloMap  )
     mappedPLOs: string[];
     weightage: number | null;
     direct: { achievementGrade: string; percentageAchieving: string };
-    indirect: { achievementGrade: string; percentageAchieving: string };
+    indirect: { achievementGrade: string; percentageAchieving: string; benchmark?: string };
   }> = {};
 
   const toStr = (v: unknown) => typeof v === 'number' ? v.toFixed(2) : String(v ?? '');
@@ -183,7 +184,7 @@ console.log('cloMap', cloMap  )
         achievementGrade: toStr(d.achievementGrade),
         percentageAchieving: toStr(d.percentageAchieving),
       },
-      indirect: { achievementGrade: '', percentageAchieving: '' },
+      indirect: { achievementGrade: '', percentageAchieving: '', benchmark: '' },
     };
   }
 
@@ -197,12 +198,13 @@ console.log('cloMap', cloMap  )
         mappedPLOs: i.mappedPLOs,
         weightage: key in weightageMap ? weightageMap[key] : null,
         direct: { achievementGrade: '', percentageAchieving: '' },
-        indirect: { achievementGrade: '', percentageAchieving: '' },
+        indirect: { achievementGrade: '', percentageAchieving: '', benchmark: '' },
       };
     }
     byKey[key].indirect = {
       achievementGrade: '',
       percentageAchieving: toStr(i.percentageAchieving),
+      benchmark: (i as any).benchmark || '',
     };
     if (!byKey[key].cloText) byKey[key].cloText = i.cloText;
     if (!byKey[key].mappedPLOs?.length) byKey[key].mappedPLOs = i.mappedPLOs;

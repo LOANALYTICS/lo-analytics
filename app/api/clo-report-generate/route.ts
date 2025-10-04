@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 
 export async function POST(request: Request) {
     try {
-        const { 
+        const {
             course,
             college,
             assessmentData,
@@ -20,8 +20,8 @@ export async function POST(request: Request) {
 
         // Validate required data
         if (!course || !college || !assessmentData || !plogroups) {
-            return NextResponse.json({ 
-                message: 'Missing required data for HTML generation' 
+            return NextResponse.json({
+                message: 'Missing required data for HTML generation'
             }, { status: 400 });
         }
 
