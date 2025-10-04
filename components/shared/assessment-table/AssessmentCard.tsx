@@ -175,7 +175,7 @@ export default function AssessmentCard({ href, course, standalone }: {
 
       // Step 5: Merge PDFs
       if (pdfDataArray.length > 0) {
-        await mergePDFs(pdfDataArray, `${course?.course_code} Combined Reports`);
+        await mergePDFs(pdfDataArray, `${course?.course_code} Reports`);
         toast.success('Report generated successfully', { id: toastId });
       } else {
         toast.error('No reports generated', { id: toastId });

@@ -538,11 +538,11 @@ function generatePerformanceCurveChartHTML(performanceCurveData: {
         // Map x (score) to chart x-coordinate (55-100 range maps to chart width)
         const xPercent = (point.x - 55) / (100 - 55); // Normalize to 0-1
         const chartX = margin.left + (xPercent * chartWidth);
-        
+
         // Map y (curve value) to chart y-coordinate using same scale as bars
         const yPercent = point.value / maxCount; // Use same scale as bars, not maxCurveValue
         const chartY = height - margin.bottom - (yPercent * chartHeight);
-        
+
         return { x: chartX, y: chartY };
     });
 

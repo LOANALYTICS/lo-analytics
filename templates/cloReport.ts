@@ -540,7 +540,7 @@ export async function generateCloReportHTML(props: CloReportProps): Promise<stri
       const threshold = totalScore * 0.6;
       const studentScore = student.cloScores[clo]?.marksScored || 0;
       const isBelow = studentScore < threshold;
-      return `<td style="background-color:${isBelow ? '#e6ffe6' : 'white'} !important;">${isBelow ? `<p >${studentScore.toFixed(2)}</p>` : `<p>${studentScore.toFixed(2)}</p>`}</td>`;
+      return `<td>${isBelow ? `<p style="color: #d32f2f;">${studentScore.toFixed(2)}</p>` : `<p>${studentScore.toFixed(2)}</p>`}</td>`;
     }).join('')}
                   </tr>
                 `}).join('')}

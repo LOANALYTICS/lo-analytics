@@ -105,7 +105,7 @@ export function generatePloReportHTML(data: {
                 if (indirectAssessmentData && indirectAssessmentData.indirectAssessments) {
                     const cloNumber = cloId.replace('clo', '');
                     const indirectAssessment = indirectAssessmentData.indirectAssessments.find(
-                        assessment => assessment.clo === `CLO ${cloNumber}`
+                        assessment => assessment.clo === cloNumber || assessment.clo === `CLO ${cloNumber}`
                     );
                     if (indirectAssessment) {
                         indirectValue = `${indirectAssessment.achievementPercentage.toFixed(1)}%`;
@@ -170,7 +170,7 @@ export function generatePloReportHTML(data: {
                 if (hasMapping && indirectAssessmentData && indirectAssessmentData.indirectAssessments) {
                     const cloNumber = cloId.replace('clo', '');
                     const indirectAssessment = indirectAssessmentData.indirectAssessments.find(
-                        assessment => assessment.clo === `CLO ${cloNumber}`
+                        assessment => assessment.clo === cloNumber || assessment.clo === `CLO ${cloNumber}`
                     );
                     if (indirectAssessment) {
                         values.push(indirectAssessment.achievementPercentage);
@@ -356,9 +356,6 @@ export function generatePloReportHTML(data: {
             <img src="${college.logo}" alt="College Logo" class="logo">
             <div class="course-details">
 
-                <div class="detail-item">
-                  <span class="detail-label">Department:</span> ${course.department}
-                </div>
 
                 <div class="detail-item">
                   <span class="detail-label">Course Code:</span> ${course.course_code}
