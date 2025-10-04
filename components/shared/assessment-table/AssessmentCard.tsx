@@ -392,7 +392,7 @@ export default function AssessmentCard({ href, course, standalone }: {
                   <p>Course Code : <span className='capitalize'>{course.course_code}</span></p>
                   <p>Section : <span className='capitalize'>{course.section}</span></p>
                   <p>Type : <span className='capitalize'>{course.examType}</span></p>
-                  <p>Semester : <span className='capitalize'>{course.semister == 1 ? 'First Semester' : 'Second Semester'}</span></p>
+                  <p>Semester : <span className='capitalize'>{course.semister == 1 ? 'First Semester' : 'Second Semester'} ({course?.academic_year})</span></p>
                 </div>
 
                 <div className='z-50 flex flex-col gap-2 self-end bottom-3 '>
@@ -430,7 +430,7 @@ export default function AssessmentCard({ href, course, standalone }: {
                   <p>Course Code : <span className='capitalize'>{course.course_code}</span></p>
                   <p>Section : <span className='capitalize'>{course.section}</span></p>
                   <p>Type : <span className='capitalize'>{course.examType}</span></p>
-                  <p>Semester : <span className='capitalize'>{course.semister == 1 ? 'First Semester' : 'Second Semester'}</span></p>
+                  <p>Semester : <span className='capitalize'>{course.semister == 1 ? 'First Semester' : 'Second Semester'}({course?.academic_year})</span></p>
                 </div>
 
               </Link>
