@@ -35,7 +35,7 @@ export default function LeaningOutcomesPage() {
       try {
         const data = await getCLOData(courseId);
         const course = await getCourseById(courseId)
-        if(!course) {
+        if (!course) {
           notFound()
         }
         setCourseDetails(course)
@@ -73,7 +73,7 @@ export default function LeaningOutcomesPage() {
   return (
     <div className="space-y-2 p-2">
       <SectionHeader courseDetails={courseDetails} />
-      <MappingTable 
+      <MappingTable
         initialData={cloData}
         defaultColumnCounts={defaultColumnCounts}
         onUpdate={handleUpdate}

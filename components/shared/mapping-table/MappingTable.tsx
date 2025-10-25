@@ -5,7 +5,9 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { cn } from "@/lib/utils"
-import { Plus, Trash, X } from 'lucide-react'
+import { Plus, Trash, X, ClipboardPaste } from 'lucide-react'
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Textarea } from "@/components/ui/textarea"
 
 export type ColumnCounts = {
   k: number;
@@ -39,6 +41,8 @@ export default function MappingTable({ initialData, defaultColumnCounts, onUpdat
   const [clos, setClos] = useState<CLO[]>(initialData);
   const [selectedCLOs, setSelectedCLOs] = useState<string[]>([]);
   const [columnCounts, setColumnCounts] = useState<ColumnCounts>(defaultColumnCounts);
+  const [bulkPasteText, setBulkPasteText] = useState('');
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const togglePLO = (cloIndex: number, type: 'k' | 's' | 'v', index: number) => {
     setClos(prev => {
@@ -88,6 +92,31 @@ export default function MappingTable({ initialData, defaultColumnCounts, onUpdat
       });
       return newClos;
     });
+  };
+
+  const handleBulkPaste = () => {
+    // Split by newlines - each line from Excel is one CLO description
+    const rows = bulkPasteText.split('\n').map(row => row.trim()).filter(row => row.length > 0);
+    
+    if (rows.length === 0) return;
+
+    const newClos: CLO[] = rows.map((description, index) => ({
+      clo: Date.now().toString() + index,
+      description: description,
+      ploMapping: {
+        k: Array(columnCounts.k).fill(0).map((_, i) => ({ [`k${i + 1}`]: false })),
+        s: Array(columnCounts.s).fill(0).map((_, i) => ({ [`s${i + 1}`]: false })),
+        v: Array(columnCounts.v).fill(0).map((_, i) => ({ [`v${i + 1}`]: false }))
+      }
+    }));
+
+    setClos(prev => {
+      const currentClos = prev.filter(clo => clo.description.trim() !== '');
+      return [...currentClos, ...newClos];
+    });
+
+    setBulkPasteText('');
+    setIsDialogOpen(false);
   };
 
   return (
@@ -162,6 +191,7 @@ export default function MappingTable({ initialData, defaultColumnCounts, onUpdat
                   <Input
                     value={clo.description}
                     onChange={(e) => updateCLODescription(rowIndex, e.target.value)}
+                    onPaste={(e) => handleInputPaste(e, rowIndex)}
                     className="w-full bg-transparent border-none focus-visible:ring-0 focus-visible:ring-offset-0"
                   />
                 </TableCell>
@@ -246,6 +276,45 @@ export default function MappingTable({ initialData, defaultColumnCounts, onUpdat
         >
           Add CLO
         </Button>
+        
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogTrigger asChild>
+            <Button type='button' variant="outline" className="flex items-center gap-2">
+              <ClipboardPaste className="h-4 w-4" />
+              Bulk Paste CLOs
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[525px]">
+            <DialogHeader>
+              <DialogTitle>Bulk Paste CLO Descriptions</DialogTitle>
+              <DialogDescription>
+                Paste CLO descriptions from Excel. Each row will create a new CLO entry. Multi-line descriptions are supported.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <Textarea
+                placeholder="Paste CLO descriptions from Excel here..."
+                value={bulkPasteText}
+                onChange={(e) => setBulkPasteText(e.target.value)}
+                className="min-h-[200px]"
+              />
+              {bulkPasteText && (
+                <p className="text-sm text-muted-foreground">
+                  {bulkPasteText.split('\n').filter(row => row.trim()).length} CLO(s) will be created
+                </p>
+              )}
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button type="button" onClick={handleBulkPaste}>
+                Create CLOs
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
         <Button
           variant="default"
           className="ml-auto"
