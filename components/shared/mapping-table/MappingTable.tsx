@@ -70,7 +70,7 @@ export default function MappingTable({ initialData, defaultColumnCounts, onUpdat
   const addColumn = (type: 'k' | 's' | 'v') => {
     const newCount = columnCounts[type] + 1;
     setColumnCounts(prev => ({ ...prev, [type]: newCount }));
-    
+
     setClos(prev => {
       const newClos = structuredClone(prev);
       newClos.forEach(clo => {
@@ -82,9 +82,9 @@ export default function MappingTable({ initialData, defaultColumnCounts, onUpdat
 
   const removeColumn = (type: 'k' | 's' | 'v', index: number) => {
     if (columnCounts[type] <= 1) return;
-    
+
     setColumnCounts(prev => ({ ...prev, [type]: prev[type] - 1 }));
-    
+
     setClos(prev => {
       const newClos = structuredClone(prev);
       newClos.forEach(clo => {
@@ -97,7 +97,7 @@ export default function MappingTable({ initialData, defaultColumnCounts, onUpdat
   const handleBulkPaste = () => {
     // Split by newlines - each line from Excel is one CLO description
     const rows = bulkPasteText.split('\n').map(row => row.trim()).filter(row => row.length > 0);
-    
+
     if (rows.length === 0) return;
 
     const newClos: CLO[] = rows.map((description, index) => ({
@@ -126,7 +126,7 @@ export default function MappingTable({ initialData, defaultColumnCounts, onUpdat
           <TableHeader>
             <TableRow>
               <TableHead rowSpan={3} className="border border-black w-[50px]">
-                <Checkbox 
+                <Checkbox
                   checked={clos.length > 0 && selectedCLOs.length === clos.length}
                   onCheckedChange={(checked) => {
                     setSelectedCLOs(checked ? clos.map(clo => clo.clo) : []);
@@ -141,11 +141,11 @@ export default function MappingTable({ initialData, defaultColumnCounts, onUpdat
             </TableRow>
             <TableRow>
               {['Knowledge & Understanding', 'Skills', 'Values'].map((title, idx) => (
-                <TableHead key={title}  colSpan={columnCounts[['k', 's', 'v'][idx] as keyof ColumnCounts]} className="text-center border border-black relative group font-bold text-black">
+                <TableHead key={title} colSpan={columnCounts[['k', 's', 'v'][idx] as keyof ColumnCounts]} className="text-center border border-black relative group font-bold text-black">
                   {title}
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
+                  <Button
+                    variant="ghost"
+                    size="sm"
                     className="absolute hidden group-hover:block right-1 top-1/2 -translate-y-1/2 h-6 w-6 p-0"
                     onClick={() => addColumn(['k', 's', 'v'][idx] as 'k' | 's' | 'v')}
                   >
@@ -157,8 +157,8 @@ export default function MappingTable({ initialData, defaultColumnCounts, onUpdat
             <TableRow>
               {['k', 's', 'v'].map(type => (
                 Array(columnCounts[type as keyof ColumnCounts]).fill(0).map((_, i) => (
-                  <TableHead 
-                    key={`${type}${i + 1}`} 
+                  <TableHead
+                    key={`${type}${i + 1}`}
                     className="p-2 text-center border border-black w-12 uppercase relative font-bold text-black"
                   >
                     {type}{i + 1}
@@ -179,9 +179,9 @@ export default function MappingTable({ initialData, defaultColumnCounts, onUpdat
             {clos.map((clo, rowIndex) => (
               <TableRow key={clo.clo}>
                 <TableCell className="border border-black">
-                  <Checkbox 
+                  <Checkbox
                     checked={selectedCLOs.includes(clo.clo)}
-                    onCheckedChange={() => setSelectedCLOs(prev => 
+                    onCheckedChange={() => setSelectedCLOs(prev =>
                       prev.includes(clo.clo) ? prev.filter(id => id !== clo.clo) : [...prev, clo.clo]
                     )}
                   />
@@ -191,22 +191,21 @@ export default function MappingTable({ initialData, defaultColumnCounts, onUpdat
                   <Input
                     value={clo.description}
                     onChange={(e) => updateCLODescription(rowIndex, e.target.value)}
-                    onPaste={(e) => handleInputPaste(e, rowIndex)}
                     className="w-full bg-transparent border-none focus-visible:ring-0 focus-visible:ring-offset-0"
                   />
                 </TableCell>
                 {['k', 's', 'v'].map(type => (
                   Array(columnCounts[type as keyof ColumnCounts]).fill(0).map((_, i) => (
-                    <TableCell 
-                      key={`${type}${i}`} 
+                    <TableCell
+                      key={`${type}${i}`}
                       className="p-2 text-center border border-black cursor-pointer"
                       onClick={() => togglePLO(rowIndex, type as 'k' | 's' | 'v', i)}
                     >
-                      <div 
+                      <div
                         className={cn(
                           "w-6 h-6 rounded-full mx-auto transition-colors duration-200",
                           isPLOSelected(clo, type as 'k' | 's' | 'v', i)
-                            ? "bg-green-800" 
+                            ? "bg-green-800"
                             : "bg-gray-200"
                         )}
                       />
@@ -227,7 +226,7 @@ export default function MappingTable({ initialData, defaultColumnCounts, onUpdat
             onClick={() => {
               setClos(prev => {
                 const newClos = prev.filter(clo => !selectedCLOs.includes(clo.clo));
-                
+
                 if (newClos.length === 0) {
                   const newClo = {
                     clo: Date.now().toString(),
@@ -244,7 +243,7 @@ export default function MappingTable({ initialData, defaultColumnCounts, onUpdat
                     clo.description = clo.description.replace(/CLO \d+/, `CLO ${index + 1}`);
                   });
                 }
-                
+
                 return newClos;
               });
               setSelectedCLOs([]);
@@ -276,7 +275,7 @@ export default function MappingTable({ initialData, defaultColumnCounts, onUpdat
         >
           Add CLO
         </Button>
-        
+
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
             <Button type='button' variant="outline" className="flex items-center gap-2">
