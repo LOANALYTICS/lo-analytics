@@ -23,7 +23,7 @@ export default function StudentDetailsPage() {
     {
       page: currentPage,
       limit: 9,
-      search: searchTerm
+      search: searchTerm, isLO: true
     },
     { enabled: !!user?.id }
   );

@@ -23,7 +23,8 @@ export default function LearningOutcomesPage() {
     { 
       page: currentPage, 
       limit: 9, 
-      search: searchTerm 
+      search: searchTerm,
+       isLO: true
     },
     { enabled: !!user?.id }
   );

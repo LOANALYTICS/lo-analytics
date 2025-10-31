@@ -137,6 +137,7 @@ type PaginationParams = {
     page?: number;
     limit?: number;
     search?: string;
+    isLO?: boolean;
 }
 
 export async function getCoursesByCreator(
@@ -144,7 +145,7 @@ export async function getCoursesByCreator(
     params: PaginationParams = {}
 ): Promise<any> {
     try {
-        const { page = 1, limit = 10, search = '' } = params;
+        const { page = 1, limit = 10, search = '', isLO = false } = params;
         const skip = (page - 1) * limit;
 
         // First, get the user to check their role
@@ -171,6 +172,11 @@ export async function getCoursesByCreator(
         } else {
             // For other roles (course_coordinator, etc.), get courses created by them
             query.createdBy = new Types.ObjectId(userId);
+        }
+
+        // If isLO is true, exclude midterm exams
+        if (isLO) {
+            query.examType = 'final';
         }
 
         // Add search functionality
@@ -243,7 +249,7 @@ export async function getCoursesByUserRoleForItems(
     userId: string,
     params: PaginationParams = {}
 ): Promise<any> {
-    const { page = 1, limit = 10, search = '' } = params;
+    const { page = 1, limit = 10, search = '', isLO = false } = params;
     const skip = (page - 1) * limit;
 
     const user = await User.findById(userId).select('role collage');
@@ -273,6 +279,11 @@ export async function getCoursesByUserRoleForItems(
             data: [],
             pagination: { page, limit, total: 0, totalPages: 0, hasNext: false, hasPrev: false }
         };
+    }
+
+    // If isLO is true, exclude midterm exams
+    if (isLO) {
+        query.examType = 'final';
     }
 
     // Add search functionality

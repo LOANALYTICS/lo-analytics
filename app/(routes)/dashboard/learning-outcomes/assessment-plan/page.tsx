@@ -23,7 +23,8 @@ export default function AssessmentPlanPage() {
     {
       page: currentPage,
       limit: 9,
-      search: searchTerm
+      search: searchTerm,
+      isLO: true
     },
     { enabled: !!user?.id }
   );
@@ -55,7 +56,7 @@ export default function AssessmentPlanPage() {
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
       />
-      
+
 
       {/* Loading State */}
       {isCoursesLoading && (

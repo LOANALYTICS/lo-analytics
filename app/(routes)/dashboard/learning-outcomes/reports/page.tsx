@@ -24,7 +24,8 @@ export default function ReportsPage() {
     { 
       page: currentPage, 
       limit: 9, 
-      search: searchTerm 
+      search: searchTerm ,
+       isLO: true
     },
     { enabled: !!user?.id }
   );

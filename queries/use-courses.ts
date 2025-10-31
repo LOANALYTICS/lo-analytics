@@ -8,6 +8,7 @@ export type CourseQueryParams = {
     page?: number;
     limit?: number;
     search?: string;
+    isLO?: boolean;
 };
 
 export type Course = {
