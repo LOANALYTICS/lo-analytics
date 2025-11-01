@@ -10,6 +10,8 @@ export interface IUser extends Document {
     collage: Schema.Types.ObjectId;
     role: UserRole;
     permissions: string[];
+    resetPasswordToken?: string;
+    resetPasswordExpires?: Date;
     comparePassword(candidatePassword: string): Promise<boolean>;
 }
 
@@ -36,6 +38,8 @@ export const userSchema = new Schema<IUser>({
         required: true,
     },
     permissions: { type: [String] },
+    resetPasswordToken: { type: String },
+    resetPasswordExpires: { type: Date },
 }, { timestamps: true });
 
 // Password hashing middleware
