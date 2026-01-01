@@ -27,10 +27,12 @@ export async function getCoursesTemplates(): Promise<any[]> {
       },
       // Add coordinator serialization
       coordinator: course.coordinator
-        ? course.coordinator.map((coord: any) => ({
-          _id: coord._id.toString(),
-          name: coord.name
-        }))
+        ? course.coordinator
+            .filter((coord: any) => coord !== null) // Filter out deleted users
+            .map((coord: any) => ({
+              _id: coord._id.toString(),
+              name: coord.name
+            }))
         : [],
       createdBy: course.createdBy ? course.createdBy.toString() : undefined,
     };
@@ -82,10 +84,12 @@ export async function getCoursesTemplatesByRole(userId: string): Promise<any[]> 
       english: course.college.english
     } : undefined,
     coordinator: Array.isArray(course.coordinator)
-      ? course.coordinator.map((coord: any) => ({
-        _id: coord._id.toString(),
-        name: coord.name
-      }))
+      ? course.coordinator
+          .filter((coord: any) => coord !== null) // Filter out deleted users
+          .map((coord: any) => ({
+            _id: coord._id.toString(),
+            name: coord.name
+          }))
       : [],
     createdAt: course.createdAt,
     createdBy: course.createdBy ? course.createdBy.toString() : undefined,
